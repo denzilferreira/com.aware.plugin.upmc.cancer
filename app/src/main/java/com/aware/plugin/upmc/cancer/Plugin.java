@@ -26,15 +26,26 @@ public class Plugin extends Aware_Plugin {
     public static final String ACTION_JOIN_STUDY = "ACTION_JOIN_STUDY";
     public static final String ACTION_UPMC_SURVEY = "ACTION_UPMC_SURVEY";
 
+    private static AlarmManager alarmManager;
+    private static SharedPreferences prefs;
+    private static Intent survey, aware;
+    private static PendingIntent surveyTrigger;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
-        Intent aware = new Intent(this, Aware.class);
+        aware = new Intent(getApplicationContext(), Aware.class);
         startService(aware);
 
+        prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        survey = new Intent(this, Plugin.class);
+        survey.setAction(ACTION_UPMC_SURVEY);
+        surveyTrigger = PendingIntent.getBroadcast(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
+
         TAG = "UPMC-Cancer";
-        DEBUG = Aware.getSetting(this, Aware_Preferences.DEBUG_FLAG).equals("true");
+        DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
         DATABASE_TABLES = Provider.DATABASE_TABLES;
         TABLES_FIELDS = Provider.TABLES_FIELDS;
@@ -43,13 +54,8 @@ public class Plugin extends Aware_Plugin {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        DEBUG = Aware.getSetting(this, Aware_Preferences.DEBUG_FLAG).equals("true");
-
-        SharedPreferences prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        Intent survey = new Intent(ACTION_UPMC_SURVEY);
-        PendingIntent surveyTrigger = PendingIntent.getBroadcast(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
+        TAG = "UPMC-Cancer";
+        DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
         if( intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_JOIN_STUDY) ) {
             if( Aware.getSetting(getApplicationContext(), "study_id").length() == 0 ) {
@@ -61,9 +67,6 @@ public class Plugin extends Aware_Plugin {
         }
 
         if( prefs.contains("scheduled") && prefs.getBoolean("scheduled", false ) ) {
-
-            alarmManager.cancel(surveyTrigger); //clean-up
-
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(System.currentTimeMillis());
 
@@ -126,5 +129,8 @@ public class Plugin extends Aware_Plugin {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        alarmManager.cancel(surveyTrigger); //clean-up
+        stopService(aware);
     }
 }

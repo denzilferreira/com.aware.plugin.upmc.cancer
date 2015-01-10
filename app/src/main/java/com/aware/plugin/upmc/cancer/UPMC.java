@@ -40,7 +40,7 @@ public class UPMC extends ActionBarActivity {
 
         prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
 
-        Intent service = new Intent(this, Plugin.class);
+        Intent service = new Intent(getApplicationContext(), Plugin.class);
         startService(service);
 
         //Settings UI
@@ -408,6 +408,40 @@ public class UPMC extends ActionBarActivity {
 
         final TextView other_rating = (TextView) findViewById(R.id.other_rating);
         final TextView other_label = (TextView) findViewById(R.id.lbl_other);
+        other_label.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog other_labeler = new Dialog(UPMC.this);
+                other_labeler.setTitle("Can you be more specific, please?");
+                other_labeler.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                other_labeler.getWindow().setGravity(Gravity.TOP);
+                other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+
+                LinearLayout editor = new LinearLayout(UPMC.this);
+                editor.setOrientation(LinearLayout.VERTICAL);
+                other_labeler.setContentView(editor);
+                other_labeler.show();
+
+                final EditText label = new EditText(UPMC.this);
+                label.setText(other_label.getText());
+                editor.addView(label);
+
+                Button confirm = new Button(UPMC.this);
+                confirm.setText("OK");
+                confirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if( label.getText().length() == 0 ) label.setText("Other");
+                        other_label.setText(label.getText().toString());
+                        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputManager.hideSoftInputFromWindow(label.getWindowToken(), 0);
+                        other_labeler.dismiss();
+                    }
+                });
+
+                editor.addView(confirm);
+            }
+        });
         SeekBar other = (SeekBar) findViewById(R.id.rate_other);
         other.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -422,33 +456,36 @@ public class UPMC extends ActionBarActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                final Dialog other_labeler = new Dialog(UPMC.this);
-                other_labeler.setTitle("Can you be more specific, please?");
-                other_labeler.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-                other_labeler.getWindow().setGravity(Gravity.TOP);
-                other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                if( other_label.getText().equals("Other") ) {
+                    final Dialog other_labeler = new Dialog(UPMC.this);
+                    other_labeler.setTitle("Can you be more specific, please?");
+                    other_labeler.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                    other_labeler.getWindow().setGravity(Gravity.TOP);
+                    other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
-                LinearLayout editor = new LinearLayout(UPMC.this);
-                editor.setOrientation(LinearLayout.VERTICAL);
-                other_labeler.setContentView(editor);
-                other_labeler.show();
+                    LinearLayout editor = new LinearLayout(UPMC.this);
+                    editor.setOrientation(LinearLayout.VERTICAL);
+                    other_labeler.setContentView(editor);
+                    other_labeler.show();
 
-                final EditText label = new EditText(UPMC.this);
-                editor.addView(label);
+                    final EditText label = new EditText(UPMC.this);
+                    editor.addView(label);
 
-                Button confirm = new Button(UPMC.this);
-                confirm.setText("OK");
-                confirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        other_label.setText(label.getText().toString());
-                        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputManager.hideSoftInputFromWindow(label.getWindowToken(), 0);
-                        other_labeler.dismiss();
-                    }
-                });
+                    Button confirm = new Button(UPMC.this);
+                    confirm.setText("OK");
+                    confirm.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if( label.getText().length() == 0 ) label.setText("Other");
+                            other_label.setText(label.getText().toString());
+                            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            inputManager.hideSoftInputFromWindow(label.getWindowToken(), 0);
+                            other_labeler.dismiss();
+                        }
+                    });
 
-                editor.addView(confirm);
+                    editor.addView(confirm);
+                }
             }
         });
 
@@ -492,7 +529,7 @@ public class UPMC extends ActionBarActivity {
 
                 Log.d("UPMC", "Answers:" + answer.toString());
 
-                Toast.makeText(getApplicationContext(), "Answers saved. Thanks!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Saved successfully.", Toast.LENGTH_LONG).show();
                 finish();
             }
         });
@@ -519,5 +556,48 @@ public class UPMC extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+
+        if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("morning_hours",0) ) {
+            //lets set the calendar for the following day, repeating every day after that
+            cal.add(Calendar.DATE, 1); //set it to tomorrow
+            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
+            cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+        } else {
+            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
+            cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+        }
+
+        String feedback = "Next questions:\nMorning: " + cal.getTime().toString() + "\n";
+
+        cal.setTimeInMillis(System.currentTimeMillis());
+        if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("evening_hours",0) ) {
+            //lets set the calendar for the following day, repeating every day after that
+            cal.add(Calendar.DATE, 1); //set it to tomorrow
+            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
+            cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+        } else {
+            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
+            cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+        }
+
+        feedback += "Evening: " + cal.getTime().toString();
+
+        Toast.makeText(getApplicationContext(), feedback, Toast.LENGTH_LONG).show();
     }
 }
