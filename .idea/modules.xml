@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../aware-client/aware-core/aware-core.iml" filepath="$PROJECT_DIR$/../aware-client/aware-core/aware-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/com.aware.plugin.upmc.cancer.iml" filepath="$PROJECT_DIR$/com.aware.plugin.upmc.cancer.iml" />
       <module fileurl="file://$PROJECT_DIR$/com.aware.upmc.cancer.iml" filepath="$PROJECT_DIR$/com.aware.upmc.cancer.iml" />
     </modules>

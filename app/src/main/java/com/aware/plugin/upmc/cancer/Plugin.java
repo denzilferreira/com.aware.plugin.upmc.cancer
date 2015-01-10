@@ -48,15 +48,19 @@ public class Plugin extends Aware_Plugin {
         SharedPreferences prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+        Intent survey = new Intent(ACTION_UPMC_SURVEY);
+        PendingIntent surveyTrigger = PendingIntent.getBroadcast(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
+
         if( intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_JOIN_STUDY) ) {
             if( Aware.getSetting(getApplicationContext(), "study_id").length() == 0 ) {
                 Intent join_study = new Intent(getApplicationContext(), Aware_Preferences.StudyConfig.class);
                 join_study.putExtra("study_url", "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
                 startService(join_study);
+                return START_STICKY;
             }
+        }
 
-            Intent survey = new Intent(ACTION_UPMC_SURVEY);
-            PendingIntent surveyTrigger = PendingIntent.getBroadcast(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
+        if( prefs.contains("scheduled") && prefs.getBoolean("scheduled", false ) ) {
 
             alarmManager.cancel(surveyTrigger); //clean-up
 
@@ -68,9 +72,13 @@ public class Plugin extends Aware_Plugin {
                 cal.add(Calendar.DATE, 1); //set it to tomorrow
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
             } else {
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
             }
             alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, surveyTrigger);
             Log.d("UPMC", "Morning: " + cal.getTime().toString());
@@ -81,13 +89,18 @@ public class Plugin extends Aware_Plugin {
                 cal.add(Calendar.DATE, 1); //set it to tomorrow
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
             } else {
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
             }
             alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, surveyTrigger);
             Log.d("UPMC", "Evening: " + cal.getTime().toString());
         }
+
         return START_STICKY;
     }
 
