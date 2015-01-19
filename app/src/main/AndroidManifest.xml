@@ -9,35 +9,31 @@
     <uses-permission android:name="android.permission.READ_SMS" />
 
     <application
-        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name">
         <activity
             android:name="com.aware.plugin.upmc.cancer.UPMC"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name="com.aware.plugin.upmc.cancer.Plugin" android:exported="true">
             <intent-filter>
                 <action android:name="ACTION_JOIN_STUDY" />
             </intent-filter>
         </service>
-        <provider
-            android:authorities="${applicationId}.provider"
-            android:name="com.aware.plugin.upmc.cancer.Provider" android:exported="true" android:readPermission="com.aware.READ_CONTEXT_DATA" android:writePermission="com.aware.WRITE_CONTEXT_DATA"/>
-        <receiver android:name="com.aware.plugin.upmc.cancer.Plugin$Survey">
-            <intent-filter>
-                <action android:name="ACTION_UPMC_SURVEY" />
-            </intent-filter>
-        </receiver>
+
+        <service android:name="com.aware.plugin.upmc.cancer.Plugin$Survey" android:exported="true" />
+
+        <provider android:authorities="${applicationId}.provider" android:name="com.aware.plugin.upmc.cancer.Provider" android:exported="true" android:readPermission="com.aware.READ_CONTEXT_DATA" android:writePermission="com.aware.WRITE_CONTEXT_DATA"/>
 
         <service
             android:name="com.aware.Applications"
-            android:exported="true"
             android:enabled="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             tools:replace="android:enabled" >
@@ -46,10 +42,8 @@
             </intent-filter>
             <meta-data android:name="android.accessibilityservice" android:resource="@xml/aware_accessibility_config" />
         </service>
-        <service
-            android:name="com.aware.Applications$BackgroundService"
-            android:exported="true" >
-        </service>
+
+        <service android:name="com.aware.Applications$BackgroundService" />
 
     </application>
 

@@ -37,16 +37,7 @@ public class UPMC extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-
-        Intent service = new Intent(getApplicationContext(), Plugin.class);
-        startService(service);
-
-        //Settings UI
-        if( ! prefs.contains("scheduled") ) {
-            loadSchedule();
-        }
     }
 
     private void loadSchedule() {
@@ -54,13 +45,16 @@ public class UPMC extends ActionBarActivity {
         ImageButton saveSchedule = (ImageButton) findViewById(R.id.save_button);
 
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
+        morning_timer.setIs24HourView(true);
         if( prefs.contains("morning_hours") ) {
             morning_timer.setCurrentHour(prefs.getInt("morning_hours",0));
         }
         if( prefs.contains("morning_minutes")) {
             morning_timer.setCurrentMinute(prefs.getInt("morning_minutes",0));
         }
+        
         final TimePicker evening_timer = (TimePicker) findViewById(R.id.evening_start_time);
+        evening_timer.setIs24HourView(true);
         if( prefs.contains("evening_hours") ) {
             evening_timer.setCurrentHour(prefs.getInt("evening_hours",0));
         }
@@ -77,15 +71,17 @@ public class UPMC extends ActionBarActivity {
                 editor.putInt("evening_minutes", evening_timer.getCurrentMinute());
 
                 editor.putBoolean("scheduled", true);
-                editor.apply();
+                editor.commit();
 
-                Toast.makeText(getApplicationContext(), "Saving preferences...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Saving schedule...", Toast.LENGTH_SHORT).show();
+
+                Plugin.is_scheduled = false;
 
                 Intent plugin = new Intent(getApplicationContext(), Plugin.class);
                 plugin.setAction(Plugin.ACTION_JOIN_STUDY);
                 startService(plugin);
 
-                onResume();
+                finish();
             }
         });
     }
@@ -556,48 +552,5 @@ public class UPMC extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
-
-        if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("morning_hours",0) ) {
-            //lets set the calendar for the following day, repeating every day after that
-            cal.add(Calendar.DATE, 1); //set it to tomorrow
-            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
-            cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-        } else {
-            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
-            cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-        }
-
-        String feedback = "Next questions:\nMorning: " + cal.getTime().toString() + "\n";
-
-        cal.setTimeInMillis(System.currentTimeMillis());
-        if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("evening_hours",0) ) {
-            //lets set the calendar for the following day, repeating every day after that
-            cal.add(Calendar.DATE, 1); //set it to tomorrow
-            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
-            cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-        } else {
-            cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
-            cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-        }
-
-        feedback += "Evening: " + cal.getTime().toString();
-
-        Toast.makeText(getApplicationContext(), feedback, Toast.LENGTH_LONG).show();
     }
 }

@@ -1,6 +1,7 @@
 package com.aware.plugin.upmc.cancer;
 
 import android.app.AlarmManager;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
@@ -24,25 +26,24 @@ import java.util.Calendar;
 public class Plugin extends Aware_Plugin {
 
     public static final String ACTION_JOIN_STUDY = "ACTION_JOIN_STUDY";
-    public static final String ACTION_UPMC_SURVEY = "ACTION_UPMC_SURVEY";
 
-    private static AlarmManager alarmManager;
+    public static AlarmManager alarmManager;
     private static SharedPreferences prefs;
-    private static Intent survey, aware;
-    private static PendingIntent surveyTrigger;
+
+    public static Intent survey;
+    public static PendingIntent surveyTrigger;
+
+    public static boolean is_scheduled = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        aware = new Intent(getApplicationContext(), Aware.class);
-        startService(aware);
-
         prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        survey = new Intent(this, Plugin.class);
-        survey.setAction(ACTION_UPMC_SURVEY);
-        surveyTrigger = PendingIntent.getBroadcast(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        survey = new Intent(getApplicationContext(), Survey.class);
+        surveyTrigger = PendingIntent.getService(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
 
         TAG = "UPMC-Cancer";
         DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
@@ -58,79 +59,81 @@ public class Plugin extends Aware_Plugin {
         DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
         if( intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_JOIN_STUDY) ) {
-            if( Aware.getSetting(getApplicationContext(), "study_id").length() == 0 ) {
+            if (Aware.getSetting(getApplicationContext(), "study_id").length() == 0) {
                 Intent join_study = new Intent(getApplicationContext(), Aware_Preferences.StudyConfig.class);
                 join_study.putExtra("study_url", "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
                 startService(join_study);
-                return START_STICKY;
             }
         }
 
-        if( prefs.contains("scheduled") && prefs.getBoolean("scheduled", false ) ) {
+        if( ! is_scheduled ) {
+
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(System.currentTimeMillis());
 
-            if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("morning_hours",0) ) {
+            String feedback = "";
+
+            if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("morning_hours",0) || cal.get(Calendar.MINUTE) > prefs.getInt("morning_minutes",0) ) {
                 //lets set the calendar for the following day, repeating every day after that
-                cal.add(Calendar.DATE, 1); //set it to tomorrow
+                cal.add(Calendar.DAY_OF_YEAR, 1); //set it to tomorrow
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
                 cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
             } else {
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("morning_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("morning_minutes",0));
                 cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
             }
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, surveyTrigger);
+
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, surveyTrigger);
             Log.d("UPMC", "Morning: " + cal.getTime().toString());
+            feedback+= "Morning: " + cal.getTime().toString() + "\n";
 
             cal.setTimeInMillis(System.currentTimeMillis());
-            if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("evening_hours",0) ) {
+            if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("evening_hours",0) || cal.get(Calendar.MINUTE) > prefs.getInt("evening_minutes",0) ) {
                 //lets set the calendar for the following day, repeating every day after that
-                cal.add(Calendar.DATE, 1); //set it to tomorrow
+                cal.add(Calendar.DAY_OF_YEAR, 1); //set it to tomorrow
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
                 cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
             } else {
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
                 cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
                 cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
             }
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, surveyTrigger);
+
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, surveyTrigger);
             Log.d("UPMC", "Evening: " + cal.getTime().toString());
+            feedback+= "Evening: " + cal.getTime().toString();
+
+            is_scheduled = true;
+
+            Toast.makeText(this, "Next questions:\n" + feedback, Toast.LENGTH_LONG).show();
         }
 
         return START_STICKY;
     }
 
-    public static class Survey extends BroadcastReceiver {
+    public static class Survey extends IntentService {
+        public Survey() {
+            super("Survey service");
+        }
+
         @Override
-        public void onReceive(Context context, Intent intent) {
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+        protected void onHandleIntent(Intent intent) {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
             mBuilder.setSmallIcon(R.drawable.ic_stat_survey);
             mBuilder.setContentTitle("UPMC");
             mBuilder.setContentText("Questionnaire available. Answer?");
             mBuilder.setDefaults(Notification.DEFAULT_ALL);
             mBuilder.setAutoCancel(true);
 
-            Intent survey = new Intent(context, UPMC.class);
-            PendingIntent onclick = PendingIntent.getActivity(context, 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent survey = new Intent(this, UPMC.class);
+            PendingIntent onclick = PendingIntent.getActivity(this, 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentIntent(onclick);
 
-            NotificationManager notManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notManager.notify(42, mBuilder.build());
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        alarmManager.cancel(surveyTrigger); //clean-up
-        stopService(aware);
     }
 }
