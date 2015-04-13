@@ -90,12 +90,10 @@ public class Plugin extends Aware_Plugin {
         }
 
         if( ! is_scheduled ) {
-
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(System.currentTimeMillis());
 
             String feedback = "";
-
             if( cal.get(Calendar.HOUR_OF_DAY) > prefs.getInt("morning_hours",0) || cal.get(Calendar.MINUTE) > prefs.getInt("morning_minutes",0) ) {
                 //lets set the calendar for the following day, repeating every day after that
                 cal.add(Calendar.DAY_OF_YEAR, 1); //set it to tomorrow
@@ -121,7 +119,7 @@ public class Plugin extends Aware_Plugin {
                 cal.set(Calendar.SECOND, 0);
             } else {
                 cal.set(Calendar.HOUR_OF_DAY, prefs.getInt("evening_hours",0));
-                cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes",0));
+                cal.set(Calendar.MINUTE, prefs.getInt("evening_minutes", 0));
                 cal.set(Calendar.SECOND, 0);
             }
 
@@ -134,9 +132,20 @@ public class Plugin extends Aware_Plugin {
             Toast.makeText(this, "Next questions:\n" + feedback, Toast.LENGTH_LONG).show();
         }
 
-
-
         return START_STICKY;
+    }
+
+    /**
+     * Get a random schedule between start and end
+     * @param start
+     * @param end
+     * @param amount
+     * @return
+     */
+    private long[] getRandomTimes(int start, int end, int amount) {
+        long[] schedules = new long[amount];
+        //TODO
+        return schedules;
     }
 
     public static class Survey extends IntentService {
