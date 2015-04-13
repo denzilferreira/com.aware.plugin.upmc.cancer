@@ -58,6 +58,29 @@ public class Plugin extends Aware_Plugin {
         TAG = "UPMC-Cancer";
         DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(System.currentTimeMillis());
+        if( now.get(Calendar.HOUR_OF_DAY) == 0 || ! prefs.contains("stress_counter") ) {
+            //start daily counter
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("stress_counter", 0);
+            editor.commit();
+        }
+
+        if( ! prefs.contains(Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS) ) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
+            editor.commit();
+        }
+        if( DEBUG ) Log.d(TAG, "Max questions per day: " + prefs.getInt(Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8));
+
+        if( ! prefs.contains(Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) ) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
+            editor.commit();
+        }
+        if( DEBUG) Log.d(TAG, "Minimum interval between questions: " + prefs.getInt(Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30) + " minutes");
+
         if( intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_JOIN_STUDY) ) {
             if (Aware.getSetting(getApplicationContext(), "study_id").length() == 0) {
                 Intent join_study = new Intent(getApplicationContext(), Aware_Preferences.StudyConfig.class);
@@ -111,6 +134,8 @@ public class Plugin extends Aware_Plugin {
             Toast.makeText(this, "Next questions:\n" + feedback, Toast.LENGTH_LONG).show();
         }
 
+
+
         return START_STICKY;
     }
 
@@ -133,7 +158,7 @@ public class Plugin extends Aware_Plugin {
             mBuilder.setContentIntent(onclick);
 
             NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notManager.notify(42, mBuilder.build());
+            notManager.notify(getPackageName().hashCode(), mBuilder.build());
         }
     }
 }
