@@ -73,13 +73,11 @@ public class UPMC extends ActionBarActivity {
                 editor.putBoolean("scheduled", true);
                 editor.commit();
 
-                Toast.makeText(getApplicationContext(), "Saving schedule...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Applying new schedule...", Toast.LENGTH_SHORT).show();
 
-                Plugin.is_scheduled = false;
-
-                Intent plugin = new Intent(getApplicationContext(), Plugin.class);
-                plugin.setAction(Plugin.ACTION_JOIN_STUDY);
-                startService(plugin);
+                Intent restart = new Intent( getApplicationContext(), Plugin.class);
+                restart.setAction(Plugin.ACTION_PLUGIN_UPMC_CANCER_SCHEDULE);
+                startService(restart);
 
                 finish();
             }

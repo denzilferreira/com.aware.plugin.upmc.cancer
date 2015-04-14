@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -29,6 +30,7 @@
         </service>
 
         <service android:name="com.aware.plugin.upmc.cancer.Plugin$Survey" android:exported="true" />
+        <service android:name="com.aware.plugin.upmc.cancer.Plugin$StressEMA" android:exported="true" />
 
         <provider android:authorities="${applicationId}.provider" android:name="com.aware.plugin.upmc.cancer.Provider" android:exported="true" android:readPermission="com.aware.READ_CONTEXT_DATA" android:writePermission="com.aware.WRITE_CONTEXT_DATA"/>
 
