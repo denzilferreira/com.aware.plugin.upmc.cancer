@@ -23,7 +23,7 @@ import java.util.HashMap;
  */
 public class Provider extends ContentProvider {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static String AUTHORITY = "com.aware.plugin.upmc.cancer.provider";
 
     private static final int ANSWERS = 1;
@@ -88,7 +88,8 @@ public class Provider extends ContentProvider {
             Cancer_Data.SCORE_DIARRHEA + " text default ''," +
             Cancer_Data.SCORE_CONSTIPATION + " text default ''," +
             Cancer_Data.SCORE_OTHER + " text default ''," +
-            Cancer_Data.OTHER_LABEL + " text default ''"
+            Cancer_Data.OTHER_LABEL + " text default ''," +
+            "UNIQUE (" + Cancer_Data.TIMESTAMP + "," + Cancer_Data.DEVICE_ID + ")"
     };
 
     private static UriMatcher sUriMatcher = null;
