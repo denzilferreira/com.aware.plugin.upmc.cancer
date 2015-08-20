@@ -57,9 +57,6 @@ public class Plugin extends Aware_Plugin {
         DATABASE_TABLES = Provider.DATABASE_TABLES;
         TABLES_FIELDS = Provider.TABLES_FIELDS;
         CONTEXT_URIS = new Uri[]{ Provider.Cancer_Data.CONTENT_URI };
-
-        Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
-        Aware.setSetting(this, Aware_Preferences.STATUS_APPLICATIONS, true);
     }
 
     @Override
