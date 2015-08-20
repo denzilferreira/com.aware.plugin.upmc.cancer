@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.ESM;
@@ -58,6 +59,7 @@ public class Plugin extends Aware_Plugin {
         CONTEXT_URIS = new Uri[]{ Provider.Cancer_Data.CONTENT_URI };
 
         Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
+        Aware.setSetting(this, Aware_Preferences.STATUS_APPLICATIONS, true);
     }
 
     @Override
@@ -177,7 +179,12 @@ public class Plugin extends Aware_Plugin {
         @Override
         protected void onHandleIntent(Intent intent) {
 
-            String stress_esm = "[{'esm':{'esm_type':'"+ESM.TYPE_ESM_RADIO+"', 'esm_title':'Stress', 'esm_instructions':'Are you stressed?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threashold':0,'esm_submit':'OK','esm_trigger':'"+getPackageName()+"'}}]";
+            String stress_esm = "[" +
+                    "{'esm':{'esm_type':'"+ESM.TYPE_ESM_RADIO+"', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'"+getPackageName()+"'}}," +
+                    "{'esm':{'esm_type':'"+ESM.TYPE_ESM_RADIO+"', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'"+getPackageName()+"'}}," +
+                    "{'esm':{'esm_type':'"+ESM.TYPE_ESM_RADIO+"', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'"+getPackageName()+"'}}" +
+                    "]";
+
             Intent esm = new Intent(ESM.ACTION_AWARE_QUEUE_ESM);
             esm.putExtra(ESM.EXTRA_ESM, stress_esm);
             sendBroadcast(esm);

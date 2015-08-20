@@ -104,7 +104,9 @@ public class UPMC extends ActionBarActivity {
         final TimePicker to_bed = (TimePicker) findViewById(R.id.bed_time);
         final TimePicker from_bed = (TimePicker) findViewById(R.id.woke_time);
         final RadioGroup qos_sleep = (RadioGroup) findViewById(R.id.qos_sleep);
+
         final RadioGroup qos_stress = (RadioGroup) findViewById(R.id.quality_of_stress);
+        final EditText most_stress = (EditText) findViewById(R.id.most_stressed_moment);
 
         if( cal.get(Calendar.HOUR_OF_DAY) >= 8 && cal.get(Calendar.HOUR_OF_DAY) <= 10 ) {
             morning_questions.setVisibility(View.VISIBLE);
@@ -159,25 +161,6 @@ public class UPMC extends ActionBarActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 disconnected_rating.setText(String.valueOf(i));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        final TextView sleep_rating = (TextView) findViewById(R.id.sleep_dist_rating);
-        SeekBar sleep_dist = (SeekBar) findViewById(R.id.rate_sleep_dist);
-        sleep_dist.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                sleep_rating.setText(String.valueOf(i));
             }
 
             @Override
@@ -362,45 +345,7 @@ public class UPMC extends ActionBarActivity {
             }
         });
 
-        final TextView diarrhea_rating = (TextView) findViewById(R.id.diarrhea_rating);
-        SeekBar diarrhea = (SeekBar) findViewById(R.id.rate_diarrhea);
-        diarrhea.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                diarrhea_rating.setText(String.valueOf(i));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        final TextView constipation_rating = (TextView) findViewById(R.id.constipation_rating);
-        SeekBar constipation = (SeekBar) findViewById(R.id.rate_constipation);
-        constipation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                constipation_rating.setText(String.valueOf(i));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        final TextView other_rating = (TextView) findViewById(R.id.other_rating);
+       final TextView other_rating = (TextView) findViewById(R.id.other_rating);
         final TextView other_label = (TextView) findViewById(R.id.lbl_other);
         other_label.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -468,6 +413,7 @@ public class UPMC extends ActionBarActivity {
                     Button confirm = new Button(UPMC.this);
                     confirm.setText("OK");
                     confirm.setOnClickListener(new View.OnClickListener() {
+
                         @Override
                         public void onClick(View v) {
                             if( label.getText().length() == 0 ) label.setText("Other");
@@ -483,6 +429,8 @@ public class UPMC extends ActionBarActivity {
             }
         });
 
+
+
         final ImageButton answer_questions = (ImageButton) findViewById(R.id.answer_questionnaire);
         answer_questions.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -497,14 +445,15 @@ public class UPMC extends ActionBarActivity {
                     answer.put(Provider.Cancer_Data.FROM_BED, from_bed.getCurrentHour() + "h"+from_bed.getCurrentMinute());
                     answer.put(Provider.Cancer_Data.SCORE_SLEEP, (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText());
                 }
+
                 if( evening_questions.getVisibility() == View.VISIBLE ) {
+                    answer.put(Provider.Cancer_Data.MOST_STRESS_LABEL, most_stress.getText().toString());
                     answer.put(Provider.Cancer_Data.SCORE_STRESS, (String) ((RadioButton) findViewById(qos_stress.getCheckedRadioButtonId())).getText());
                 }
 
                 answer.put(Provider.Cancer_Data.SCORE_PAIN, pain_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_FATIGUE, fatigue_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_DISCONNECTED, disconnected_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_SLEEP_DISTURBANCE, sleep_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_CONCENTRATING, concentrating_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_SAD, sad_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_ANXIOUS, anxious_rating.getText().toString());
@@ -514,8 +463,6 @@ public class UPMC extends ActionBarActivity {
                 answer.put(Provider.Cancer_Data.SCORE_NUMBNESS, numb_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_NAUSEA, nausea_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_APPETITE, appetite_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_DIARRHEA, diarrhea_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_CONSTIPATION, constipation_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.SCORE_OTHER, other_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.OTHER_LABEL, other_label.getText().toString());
 

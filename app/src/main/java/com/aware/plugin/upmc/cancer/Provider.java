@@ -20,10 +20,11 @@ import java.util.HashMap;
 
 /**
  * Created by denzil on 25/11/14.
+ * Edited by Grace on 19/08/15
  */
 public class Provider extends ContentProvider {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static String AUTHORITY = "com.aware.plugin.upmc.cancer.provider";
 
     private static final int ANSWERS = 1;
@@ -43,10 +44,14 @@ public class Provider extends ContentProvider {
         public static final String FROM_BED = "from_bed";
         public static final String SCORE_SLEEP = "score_sleep";
         public static final String SCORE_STRESS = "score_stress";
+        public static final String SCORE_ANGRY = "score_angry";
+        public static final String SCORE_HAPPY = "score_happy";
+        public static final String SCORE_MOST_STRESS = "score_most_stress";
+        public static final String MOST_STRESS_LABEL = "most_stress_label";
+        public static final String SCORE_HOW_STRESS = "score_how_stress";
         public static final String SCORE_PAIN = "score_pain";
         public static final String SCORE_FATIGUE = "score_fatigue";
         public static final String SCORE_DISCONNECTED = "score_disconnected";
-        public static final String SCORE_SLEEP_DISTURBANCE = "score_sleep_disturbance";
         public static final String SCORE_CONCENTRATING = "score_concentrating";
         public static final String SCORE_SAD = "score_sad";
         public static final String SCORE_ANXIOUS = "score_anxious";
@@ -56,8 +61,6 @@ public class Provider extends ContentProvider {
         public static final String SCORE_NUMBNESS = "score_numbness";
         public static final String SCORE_NAUSEA = "score_nausea";
         public static final String SCORE_APPETITE = "score_appetite";
-        public static final String SCORE_DIARRHEA = "score_diarrhea";
-        public static final String SCORE_CONSTIPATION = "score_constipation";
         public static final String SCORE_OTHER = "score_other";
         public static final String OTHER_LABEL = "other_label";
     }
@@ -72,10 +75,14 @@ public class Provider extends ContentProvider {
             Cancer_Data.FROM_BED + " text default ''," +
             Cancer_Data.SCORE_SLEEP + " text default ''," +
             Cancer_Data.SCORE_STRESS + " text default ''," +
+            Cancer_Data.SCORE_ANGRY + " text default ''," +
+            Cancer_Data.SCORE_HAPPY + " text default ''," +
+            Cancer_Data.SCORE_MOST_STRESS + " text default ''," +
+            Cancer_Data.MOST_STRESS_LABEL + " text default ''," +
+            Cancer_Data.SCORE_HOW_STRESS + " text default ''," +
             Cancer_Data.SCORE_PAIN + " text default ''," +
             Cancer_Data.SCORE_FATIGUE + " text default ''," +
             Cancer_Data.SCORE_DISCONNECTED + " text default ''," +
-            Cancer_Data.SCORE_SLEEP_DISTURBANCE + " text default ''," +
             Cancer_Data.SCORE_CONCENTRATING + " text default ''," +
             Cancer_Data.SCORE_SAD + " text default ''," +
             Cancer_Data.SCORE_ANXIOUS + " text default ''," +
@@ -85,10 +92,9 @@ public class Provider extends ContentProvider {
             Cancer_Data.SCORE_NUMBNESS + " text default ''," +
             Cancer_Data.SCORE_NAUSEA + " text default ''," +
             Cancer_Data.SCORE_APPETITE + " text default ''," +
-            Cancer_Data.SCORE_DIARRHEA + " text default ''," +
-            Cancer_Data.SCORE_CONSTIPATION + " text default ''," +
             Cancer_Data.SCORE_OTHER + " text default ''," +
-            Cancer_Data.OTHER_LABEL + " text default ''"
+            Cancer_Data.OTHER_LABEL + " text default ''," +
+            "UNIQUE (" + Cancer_Data.TIMESTAMP + "," + Cancer_Data.DEVICE_ID + ")"
     };
 
     private static UriMatcher sUriMatcher = null;
@@ -120,11 +126,14 @@ public class Provider extends ContentProvider {
         questionsMap.put(Cancer_Data.TO_BED, Cancer_Data.TO_BED);
         questionsMap.put(Cancer_Data.FROM_BED, Cancer_Data.FROM_BED);
         questionsMap.put(Cancer_Data.SCORE_SLEEP, Cancer_Data.SCORE_SLEEP);
+        questionsMap.put(Cancer_Data.SCORE_MOST_STRESS, Cancer_Data.SCORE_MOST_STRESS);
+        questionsMap.put(Cancer_Data.MOST_STRESS_LABEL, Cancer_Data.MOST_STRESS_LABEL);
         questionsMap.put(Cancer_Data.SCORE_STRESS, Cancer_Data.SCORE_STRESS);
+        questionsMap.put(Cancer_Data.SCORE_ANGRY, Cancer_Data.SCORE_ANGRY);
+        questionsMap.put(Cancer_Data.SCORE_HAPPY, Cancer_Data.SCORE_HAPPY);
         questionsMap.put(Cancer_Data.SCORE_PAIN, Cancer_Data.SCORE_PAIN);
         questionsMap.put(Cancer_Data.SCORE_FATIGUE, Cancer_Data.SCORE_FATIGUE);
         questionsMap.put(Cancer_Data.SCORE_DISCONNECTED, Cancer_Data.SCORE_DISCONNECTED);
-        questionsMap.put(Cancer_Data.SCORE_SLEEP_DISTURBANCE, Cancer_Data.SCORE_SLEEP_DISTURBANCE);
         questionsMap.put(Cancer_Data.SCORE_CONCENTRATING, Cancer_Data.SCORE_CONCENTRATING);
         questionsMap.put(Cancer_Data.SCORE_SAD, Cancer_Data.SCORE_SAD);
         questionsMap.put(Cancer_Data.SCORE_ANXIOUS, Cancer_Data.SCORE_ANXIOUS);
@@ -134,8 +143,6 @@ public class Provider extends ContentProvider {
         questionsMap.put(Cancer_Data.SCORE_NUMBNESS, Cancer_Data.SCORE_NUMBNESS);
         questionsMap.put(Cancer_Data.SCORE_NAUSEA, Cancer_Data.SCORE_NAUSEA);
         questionsMap.put(Cancer_Data.SCORE_APPETITE, Cancer_Data.SCORE_APPETITE);
-        questionsMap.put(Cancer_Data.SCORE_DIARRHEA, Cancer_Data.SCORE_DIARRHEA);
-        questionsMap.put(Cancer_Data.SCORE_CONSTIPATION, Cancer_Data.SCORE_CONSTIPATION);
         questionsMap.put(Cancer_Data.SCORE_OTHER, Cancer_Data.SCORE_OTHER);
         questionsMap.put(Cancer_Data.OTHER_LABEL, Cancer_Data.OTHER_LABEL);
 

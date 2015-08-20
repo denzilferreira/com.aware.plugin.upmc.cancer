@@ -11,6 +11,7 @@ import com.aware.Aware;
 
 /**
  * Created by denzil on 13/04/15.
+ * Edited by Grace on 19/08/15
  */
 public class Settings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
