@@ -63,10 +63,10 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
         if( key.equalsIgnoreCase(STATUS_PLUGIN_UPMC_CANCER) ) {
             if( sharedPreferences.getBoolean(key, false) ) {
                 Aware.setSetting(this, key, true);
-                Aware.startPlugin(this, getPackageName());
+                Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
             } else {
                 Aware.setSetting(this, key, false);
-                Aware.stopPlugin(this, getPackageName());
+                Aware.stopPlugin(this, "com.aware.plugin.upmc.cancer");
             }
             return;
         }
@@ -77,6 +77,6 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
             Aware.setSetting(this, key, sharedPreferences.getInt(key, 30));
         }
         //start plugin again with the new settings
-        Aware.startPlugin(this, getPackageName());
+        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
 }

@@ -108,11 +108,11 @@ public class UPMC extends ActionBarActivity {
         final RadioGroup qos_stress = (RadioGroup) findViewById(R.id.quality_of_stress);
         final EditText most_stress = (EditText) findViewById(R.id.most_stressed_moment);
 
-        if( cal.get(Calendar.HOUR_OF_DAY) >= 8 && cal.get(Calendar.HOUR_OF_DAY) <= 10 ) {
+        if( cal.get(Calendar.HOUR_OF_DAY) >= 8 && cal.get(Calendar.HOUR_OF_DAY) <= 11 ) {
             morning_questions.setVisibility(View.VISIBLE);
             evening_questions.setVisibility(View.GONE);
         }
-        if( cal.get(Calendar.HOUR_OF_DAY) >= 18 && cal.get(Calendar.HOUR_OF_DAY) <= 21 ) {
+        if( cal.get(Calendar.HOUR_OF_DAY) >= 20 && cal.get(Calendar.HOUR_OF_DAY) <= 23 ) {
             morning_questions.setVisibility(View.GONE);
             evening_questions.setVisibility(View.VISIBLE);
         }

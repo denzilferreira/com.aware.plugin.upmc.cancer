@@ -94,62 +94,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/evening_questions"
-            android:orientation="vertical"
-            android:visibility="gone">
-            
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/evening_intro"
-                android:id="@+id/evening_intro"
-                android:textColor="#000"
-                />
-                
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:id="@+id/most_stressed_moment"
-                android:textColor="#000"
-                />
-
-            <RadioGroup
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/quality_of_stress"
-                >
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Not at all stressful"
-                    android:id="@+id/no_stress" />
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="A little stressful"
-                    android:id="@+id/not_much_stress" />
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Somewhat stressful"
-                    android:id="@+id/some_stress" />
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Extremely stressful"
-                    android:id="@+id/a_lot_stress" />
-            </RadioGroup>
-        </LinearLayout>
-
-        <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -777,49 +721,61 @@
             </LinearLayout>
         </LinearLayout>
         
-<!--        <LinearLayout-->
-<!--            android:layout_width="fill_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="vertical"-->
-<!--            android:id="@+id/evening_questions_stress"-->
-<!--            android:visibility="gone">-->
-<!--            -->
-<!--            <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textAppearance="?android:attr/textAppearanceMedium"-->
-<!--            android:text="What was the most stressful or negative event you experienced today?"-->
-<!--            android:id="@+id/lbl_most_stress"-->
-<!--            android:layout_marginTop="20dp"-->
-<!--            android:textColor="#000"-->
-<!--            />-->
-<!--            -->
-<!--            <RadioGroup-->
-<!--                android:layout_width="fill_parent"-->
-<!--                android:layout_height="fill_parent"-->
-<!--                android:id="@+id/qos_sleep">-->
-<!--                <RadioButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Very good"-->
-<!--                android:id="@+id/qos_very_good" />-->
-<!--                <RadioButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Fairly good"-->
-<!--                android:id="@+id/qos_fairly_good" />-->
-<!--                <RadioButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Fairly bad"-->
-<!--                android:id="@+id/qos_fairly_bad" />-->
-<!--                <RadioButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Very bad"-->
-<!--                android:id="@+id/qos_very_bad" />-->
-<!--            </RadioGroup>-->
-<!--        </LinearLayout>-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/evening_questions"
+            android:orientation="vertical"
+            android:visibility="gone">
+            
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/evening_intro"
+            android:id="@+id/evening_intro"
+            android:textColor="#000"
+            />
+            
+            <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/most_stressed_moment"
+            android:textColor="#000"
+            />
+            
+            <RadioGroup
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/quality_of_stress"
+                >
+                
+                <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Not at all stressful"
+                android:id="@+id/no_stress" />
+                
+                <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A little stressful"
+                android:id="@+id/not_much_stress" />
+                
+                <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Somewhat stressful"
+                android:id="@+id/some_stress" />
+                
+                <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Extremely stressful"
+                android:id="@+id/a_lot_stress" />
+            </RadioGroup>
+        </LinearLayout>
 
     </LinearLayout>
 
