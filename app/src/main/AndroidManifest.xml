@@ -20,21 +20,24 @@
             android:name="com.aware.plugin.upmc.cancer.UPMC"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:label="@string/app_name"
-            android:launchMode="singleInstance">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <activity android:name="com.aware.plugin.upmc.cancer.Settings" android:exported="true" android:launchMode="singleTask" />
+
         <service android:name="com.aware.plugin.upmc.cancer.Plugin" android:exported="true">
-            <intent-filter>
-                <action android:name="ACTION_JOIN_STUDY" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="ACTION_JOIN_STUDY" />-->
+            <!--</intent-filter>-->
         </service>
 
-        <service android:name="com.aware.plugin.upmc.cancer.Plugin$Survey" android:exported="true" />
-        <service android:name="com.aware.plugin.upmc.cancer.Plugin$StressEMA" android:exported="true" />
+        <service android:name="com.aware.plugin.upmc.cancer.Survey" android:exported="true" />
+
+        <!--<service android:name="com.aware.plugin.upmc.cancer.Plugin$StressEMA" android:exported="true" />-->
 
         <provider android:authorities="${applicationId}.provider" android:name="com.aware.plugin.upmc.cancer.Provider" android:exported="true" android:readPermission="com.aware.READ_CONTEXT_DATA" android:writePermission="com.aware.WRITE_CONTEXT_DATA"/>
 
