@@ -1,34 +1,18 @@
 package com.aware.plugin.upmc.cancer;
 
-import android.app.AlarmManager;
-import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
-import com.aware.Battery;
 import com.aware.ESM;
-import com.aware.providers.ESM_Provider;
 import com.aware.utils.Aware_Plugin;
 import com.aware.utils.Scheduler;
 
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Random;
 
 /**
@@ -93,12 +77,10 @@ public class Plugin extends Aware_Plugin {
 
             try {
                 Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey");
-                schedule.setContext(Battery.ACTION_AWARE_BATTERY_CHARGING)
+                schedule.addHour(morning_hour)
+                        .addHour(evening_hour)
                         .setActionType(Scheduler.ACTION_TYPE_SERVICE)
                         .setActionClass("com.aware.plugin.upmc.cancer/com.aware.plugin.upmc.cancer.Survey");
-
-//                addHour(morning_hour)
-//                        .addHour(evening_hour)
 
                 Scheduler.saveSchedule(this, schedule);
             } catch (JSONException e) {
