@@ -123,6 +123,7 @@ public class Provider extends ContentProvider {
         questionsMap = new HashMap<>();
         questionsMap.put(Cancer_Data._ID, Cancer_Data._ID);
         questionsMap.put(Cancer_Data.TIMESTAMP, Cancer_Data.TIMESTAMP);
+        questionsMap.put(Cancer_Data.DEVICE_ID, Cancer_Data.DEVICE_ID);
         questionsMap.put(Cancer_Data.TO_BED, Cancer_Data.TO_BED);
         questionsMap.put(Cancer_Data.FROM_BED, Cancer_Data.FROM_BED);
         questionsMap.put(Cancer_Data.SCORE_SLEEP, Cancer_Data.SCORE_SLEEP);

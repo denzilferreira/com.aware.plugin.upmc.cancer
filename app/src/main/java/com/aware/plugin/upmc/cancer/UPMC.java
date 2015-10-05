@@ -33,11 +33,25 @@ import java.util.Calendar;
 public class UPMC extends ActionBarActivity {
 
     private static SharedPreferences prefs;
+    private static String DEVICE_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+
+        Intent aware = new Intent(this, Aware.class);
+        startService(aware);
+
+        DEVICE_ID = Aware.getSetting(this, Aware_Preferences.DEVICE_ID);
+
+        Log.d(Plugin.TAG, "Device ID:" + DEVICE_ID);
+
+        Aware.startPlugin(this, getPackageName());
+
+        Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
+        joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
+        startService(joinStudy);
     }
 
     private void loadSchedule() {
@@ -437,7 +451,7 @@ public class UPMC extends ActionBarActivity {
             public void onClick(View v) {
 
                 ContentValues answer = new ContentValues();
-                answer.put(Provider.Cancer_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+                answer.put(Provider.Cancer_Data.DEVICE_ID, DEVICE_ID);
                 answer.put(Provider.Cancer_Data.TIMESTAMP, System.currentTimeMillis());
 
                 if( morning_questions.getVisibility() == View.VISIBLE ) {

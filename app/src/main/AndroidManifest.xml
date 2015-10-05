@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
         android:label="@string/app_name"
         tools:replace="android:icon">
 
@@ -28,16 +29,8 @@
         </activity>
 
         <activity android:name="com.aware.plugin.upmc.cancer.Settings" android:exported="true" android:launchMode="singleTask" />
-
-        <service android:name="com.aware.plugin.upmc.cancer.Plugin" android:exported="true">
-            <!--<intent-filter>-->
-                <!--<action android:name="ACTION_JOIN_STUDY" />-->
-            <!--</intent-filter>-->
-        </service>
-
+        <service android:name="com.aware.plugin.upmc.cancer.Plugin" android:exported="true" />
         <service android:name="com.aware.plugin.upmc.cancer.Survey" android:exported="true" />
-
-        <!--<service android:name="com.aware.plugin.upmc.cancer.Plugin$StressEMA" android:exported="true" />-->
 
         <provider android:authorities="${applicationId}.provider" android:name="com.aware.plugin.upmc.cancer.Provider" android:exported="true" android:readPermission="com.aware.READ_CONTEXT_DATA" android:writePermission="com.aware.WRITE_CONTEXT_DATA"/>
 
