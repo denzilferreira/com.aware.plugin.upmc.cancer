@@ -65,7 +65,7 @@ public class Provider extends ContentProvider {
         public static final String OTHER_LABEL = "other_label";
     }
 
-    public static String DATABASE_NAME = Environment.getExternalStorageDirectory() + "/AWARE/plugin_upmc_cancer.db";
+    public static String DATABASE_NAME = "plugin_upmc_cancer.db";
     public static final String[] DATABASE_TABLES = {"upmc_cancer"};
     public static final String[] TABLES_FIELDS = {
             Cancer_Data._ID + " integer primary key autoincrement," +

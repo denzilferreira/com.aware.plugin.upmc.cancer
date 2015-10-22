@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -30,7 +30,7 @@ import com.aware.Aware_Preferences;
 
 import java.util.Calendar;
 
-public class UPMC extends ActionBarActivity {
+public class UPMC extends AppCompatActivity {
 
     private static SharedPreferences prefs;
     private static String DEVICE_ID;
@@ -47,11 +47,7 @@ public class UPMC extends ActionBarActivity {
 
         Log.d(Plugin.TAG, "Device ID:" + DEVICE_ID);
 
-        Aware.startPlugin(this, getPackageName());
-
-        Intent joinStudy = new Intent(this, Aware_Preferences.StudyConfig.class);
-        joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
-        startService(joinStudy);
+        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
 
     private void loadSchedule() {
@@ -60,6 +56,7 @@ public class UPMC extends ActionBarActivity {
 
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
         morning_timer.setIs24HourView(true);
+
         if( prefs.contains("morning_hours") ) {
             morning_timer.setCurrentHour(prefs.getInt("morning_hours",0));
         }
@@ -92,6 +89,11 @@ public class UPMC extends ActionBarActivity {
                 Intent restart = new Intent( getApplicationContext(), Plugin.class);
                 restart.setAction(Plugin.ACTION_PLUGIN_UPMC_CANCER_SCHEDULE);
                 startService(restart);
+
+                //Join the study now
+                Intent joinStudy = new Intent(getApplicationContext(), Aware_Preferences.StudyConfig.class);
+                joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
+                startService(joinStudy);
 
                 finish();
             }
@@ -443,8 +445,6 @@ public class UPMC extends ActionBarActivity {
             }
         });
 
-
-
         final ImageButton answer_questions = (ImageButton) findViewById(R.id.answer_questionnaire);
         answer_questions.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -492,24 +492,17 @@ public class UPMC extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             loadSchedule();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

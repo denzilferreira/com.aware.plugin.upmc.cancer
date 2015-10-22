@@ -65,11 +65,6 @@ public class Plugin extends Aware_Plugin {
             int morning_hour = prefs.getInt("morning_hours", 0);
             int evening_hour = prefs.getInt("evening_hours", 0);
 
-            if( morning_hour == 0 && evening_hour == 0 ) {
-                Log.d(TAG,"Schedule not set yet... will try again later...");
-                return START_STICKY;
-            }
-
             try {
                 Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey");
                 schedule.addHour(morning_hour)
