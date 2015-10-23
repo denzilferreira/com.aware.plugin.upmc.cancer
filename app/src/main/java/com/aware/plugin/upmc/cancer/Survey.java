@@ -16,6 +16,8 @@ public class Survey extends IntentService {
         super("Survey service");
     }
 
+    private final int CANCER_SURVEY = 666;
+
     @Override
     protected void onHandleIntent(Intent intent) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
@@ -25,11 +27,11 @@ public class Survey extends IntentService {
         mBuilder.setDefaults(Notification.DEFAULT_ALL);
         mBuilder.setAutoCancel(true);
 
-        Intent survey = new Intent(this, UPMC.class);
-        PendingIntent onclick = PendingIntent.getActivity(this, 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent survey = new Intent(getApplicationContext(), UPMC.class);
+        PendingIntent onclick = PendingIntent.getActivity(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(onclick);
 
         NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notManager.notify(getPackageName().hashCode(), mBuilder.build());
+        notManager.notify(CANCER_SURVEY, mBuilder.build());
     }
 }

@@ -30,36 +30,54 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
      */
     public static final String PLUGIN_UPMC_CANCER_PROMPT_INTERVAL = "plugin_upmc_cancer_prompt_interval";
 
+    public static final String PLUGIN_UPMC_CANCER_MORNING_HOUR = "plugin_upmc_cancer_morning_hour";
+    public static final String PLUGIN_UPMC_CANCER_MORNING_MINUTE = "plugin_upmc_cancer_morning_minute";
+    public static final String PLUGIN_UPMC_CANCER_EVENING_HOUR = "plugin_upmc_cancer_evening_hour";
+    public static final String PLUGIN_UPMC_CANCER_EVENING_MINUTE = "plugin_upmc_cancer_evening_minute";
+
+    private CheckBoxPreference status;
+    private EditTextPreference max_prompts, min_interval_prompts;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
-        syncSettings();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        syncSettings();
-    }
-
-    private void syncSettings() {
-        CheckBoxPreference status = (CheckBoxPreference) findPreference(STATUS_PLUGIN_UPMC_CANCER);
+        status = (CheckBoxPreference) findPreference(STATUS_PLUGIN_UPMC_CANCER);
+        if( Aware.getSetting(this, STATUS_PLUGIN_UPMC_CANCER).length() == 0 ) {
+            Aware.setSetting(this, STATUS_PLUGIN_UPMC_CANCER, true);
+        }
         status.setChecked(Aware.getSetting(this, STATUS_PLUGIN_UPMC_CANCER).equals("true"));
 
-        EditTextPreference max_prompts = (EditTextPreference) findPreference(PLUGIN_UPMC_CANCER_MAX_PROMPTS);
+        max_prompts = (EditTextPreference) findPreference(PLUGIN_UPMC_CANCER_MAX_PROMPTS);
+        if( Aware.getSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0 ) {
+            Aware.setSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
+        }
         max_prompts.setText(Aware.getSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS));
         max_prompts.setSummary(Aware.getSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS) + " questions");
 
-        EditTextPreference min_interval_prompts = (EditTextPreference) findPreference(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL);
+        min_interval_prompts = (EditTextPreference) findPreference(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL);
+        if( Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0 ) {
+            Aware.setSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
+        }
         min_interval_prompts.setText(Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL));
         min_interval_prompts.setSummary(Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_MAX_PROMPTS) ) {
+            Aware.setSetting(this, key, sharedPreferences.getInt(key, 8));
+        }
+        if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) ) {
+            Aware.setSetting(this, key, sharedPreferences.getInt(key, 30));
+        }
         if( key.equalsIgnoreCase(STATUS_PLUGIN_UPMC_CANCER) ) {
             if( sharedPreferences.getBoolean(key, false) ) {
                 Aware.setSetting(this, key, true);
@@ -68,14 +86,8 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
                 Aware.setSetting(this, key, false);
                 Aware.stopPlugin(this, "com.aware.plugin.upmc.cancer");
             }
-            return;
         }
-        if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_MAX_PROMPTS) ) {
-            Aware.setSetting(this, key, sharedPreferences.getInt(key, 8));
-        }
-        if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) ) {
-            Aware.setSetting(this, key, sharedPreferences.getInt(key, 30));
-        }
+
         //start plugin again with the new settings
         Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }

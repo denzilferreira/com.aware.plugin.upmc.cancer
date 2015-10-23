@@ -1,5 +1,6 @@
 package com.aware.plugin.upmc.cancer;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -20,20 +21,29 @@ import java.util.Random;
  */
 public class Plugin extends Aware_Plugin {
 
-    private static SharedPreferences prefs;
     public static String ACTION_PLUGIN_UPMC_CANCER_SCHEDULE = "ACTION_PLUGIN_UPMC_CANCER_SCHEDULE";
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        prefs = getSharedPreferences("com.aware.plugin.upmc.cancer", MODE_PRIVATE);
-
         DATABASE_TABLES = Provider.DATABASE_TABLES;
         TABLES_FIELDS = Provider.TABLES_FIELDS;
         CONTEXT_URIS = new Uri[]{ Provider.Cancer_Data.CONTENT_URI };
 
-        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CALL_LOG);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+
+        //Join the study now
+        Intent joinStudy = new Intent(getApplicationContext(), Aware_Preferences.StudyConfig.class);
+        joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
+        startService(joinStudy);
+
+//        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
 
     @Override
@@ -44,26 +54,20 @@ public class Plugin extends Aware_Plugin {
 
         Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
 
-        if( ! prefs.contains(Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS) ) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
-            editor.commit();
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0 ) {
             Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
         }
         Log.d(TAG, "Max questions per day: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS));
 
-        if( ! prefs.contains(Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) ) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
-            editor.commit();
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0 ) {
             Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
         }
         Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
 
         if( intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ACTION_PLUGIN_UPMC_CANCER_SCHEDULE) ) {
 
-            int morning_hour = prefs.getInt("morning_hours", 0);
-            int evening_hour = prefs.getInt("evening_hours", 0);
+            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+            int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
 
             try {
                 Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey");
@@ -137,8 +141,7 @@ public class Plugin extends Aware_Plugin {
                 e.printStackTrace();
             }
         }
-
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override

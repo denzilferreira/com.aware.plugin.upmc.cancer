@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion 10
-        targetSdkVersion 22
-        versionCode 7
-        versionName "1.6"
+        targetSdkVersion 23
+        versionCode 8
+        versionName "1.7"
     }
     buildTypes {
         release {
@@ -21,11 +21,12 @@ android {
 
 repositories {
     maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.1.0'
-    compile 'com.android.support:cardview-v7:22.1.0'
-    compile 'com.awareframework:aware-core:3.6.6@aar'
+    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.android.support:cardview-v7:23.1.0'
+    compile 'com.awareframework:aware-core:+@aar'
 }

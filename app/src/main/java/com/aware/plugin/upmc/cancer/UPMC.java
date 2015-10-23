@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,22 +31,13 @@ import java.util.Calendar;
 
 public class UPMC extends AppCompatActivity {
 
-    private static SharedPreferences prefs;
-    private static String DEVICE_ID;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prefs = getSharedPreferences(getPackageName(), MODE_PRIVATE);
 
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
-
-        DEVICE_ID = Aware.getSetting(this, Aware_Preferences.DEVICE_ID);
-
-        Log.d(Plugin.TAG, "Device ID:" + DEVICE_ID);
-
-        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
+//        //Start AWARE
+//        Intent aware = new Intent(this, Aware.class);
+//        startService(aware);
     }
 
     private void loadSchedule() {
@@ -57,43 +47,37 @@ public class UPMC extends AppCompatActivity {
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
         morning_timer.setIs24HourView(true);
 
-        if( prefs.contains("morning_hours") ) {
-            morning_timer.setCurrentHour(prefs.getInt("morning_hours",0));
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0 ) {
+            morning_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
         }
-        if( prefs.contains("morning_minutes")) {
-            morning_timer.setCurrentMinute(prefs.getInt("morning_minutes",0));
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() > 0 ) {
+            morning_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)));
         }
-        
+
         final TimePicker evening_timer = (TimePicker) findViewById(R.id.evening_start_time);
         evening_timer.setIs24HourView(true);
-        if( prefs.contains("evening_hours") ) {
-            evening_timer.setCurrentHour(prefs.getInt("evening_hours",0));
+
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() > 0 ) {
+            evening_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)));
         }
-        if( prefs.contains("evening_minutes")) {
-            evening_timer.setCurrentMinute(prefs.getInt("evening_minutes",0));
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE).length() > 0 ) {
+            evening_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE)));
         }
+
         saveSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("morning_hours", morning_timer.getCurrentHour());
-                editor.putInt("morning_minutes", morning_timer.getCurrentMinute());
-                editor.putInt("evening_hours", evening_timer.getCurrentHour());
-                editor.putInt("evening_minutes", evening_timer.getCurrentMinute());
+                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
+                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
+                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR, evening_timer.getCurrentHour().intValue());
+                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE, evening_timer.getCurrentMinute().intValue());
 
-                editor.putBoolean("scheduled", true);
-                editor.commit();
+                String schedule = String.format("Morning: %sh%s\nEvening: %sh%s", Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE));
+                Toast.makeText(getApplicationContext(), schedule, Toast.LENGTH_LONG).show();
 
-                Toast.makeText(getApplicationContext(), "Applying new schedule...", Toast.LENGTH_SHORT).show();
-
-                Intent restart = new Intent( getApplicationContext(), Plugin.class);
-                restart.setAction(Plugin.ACTION_PLUGIN_UPMC_CANCER_SCHEDULE);
-                startService(restart);
-
-                //Join the study now
-                Intent joinStudy = new Intent(getApplicationContext(), Aware_Preferences.StudyConfig.class);
-                joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
-                startService(joinStudy);
+                Intent start_probe = new Intent( getApplicationContext(), Plugin.class);
+                start_probe.setAction(Plugin.ACTION_PLUGIN_UPMC_CANCER_SCHEDULE);
+                startService(start_probe);
 
                 finish();
             }
@@ -104,7 +88,7 @@ public class UPMC extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if( ! prefs.contains("scheduled") ) {
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0 || Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() == 0 ) {
             loadSchedule();
             return;
         }
@@ -451,7 +435,7 @@ public class UPMC extends AppCompatActivity {
             public void onClick(View v) {
 
                 ContentValues answer = new ContentValues();
-                answer.put(Provider.Cancer_Data.DEVICE_ID, DEVICE_ID);
+                answer.put(Provider.Cancer_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
                 answer.put(Provider.Cancer_Data.TIMESTAMP, System.currentTimeMillis());
 
                 if( morning_questions.getVisibility() == View.VISIBLE ) {
