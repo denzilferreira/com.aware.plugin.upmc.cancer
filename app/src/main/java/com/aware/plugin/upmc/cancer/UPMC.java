@@ -5,7 +5,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -29,19 +31,19 @@ import com.aware.Aware_Preferences;
 
 import java.util.Calendar;
 
-public class UPMC extends AppCompatActivity {
+public class UPMC extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        //Start AWARE
-//        Intent aware = new Intent(this, Aware.class);
-//        startService(aware);
     }
 
     private void loadSchedule() {
         setContentView(R.layout.settings_upmc_cancer);
+
+        Toolbar aware_toolbar = (Toolbar) findViewById(R.id.aware_toolbar);
+        setSupportActionBar(aware_toolbar);
+
         ImageButton saveSchedule = (ImageButton) findViewById(R.id.save_button);
 
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
@@ -72,12 +74,12 @@ public class UPMC extends AppCompatActivity {
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR, evening_timer.getCurrentHour().intValue());
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE, evening_timer.getCurrentMinute().intValue());
 
-                String schedule = String.format("Morning: %sh%s\nEvening: %sh%s", Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE));
+                String schedule = String.format("Schedule is set to every \nmorning: %sh%s\nevening: %sh%s", Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE));
                 Toast.makeText(getApplicationContext(), schedule, Toast.LENGTH_LONG).show();
 
-                Intent start_probe = new Intent( getApplicationContext(), Plugin.class);
-                start_probe.setAction(Plugin.ACTION_PLUGIN_UPMC_CANCER_SCHEDULE);
-                startService(start_probe);
+                Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
+                applySchedule.putExtra("schedule", true);
+                startService(applySchedule);
 
                 finish();
             }
@@ -98,6 +100,9 @@ public class UPMC extends AppCompatActivity {
 
         setContentView(R.layout.activity_upmc_cancer);
 
+        Toolbar aware_toolbar = (Toolbar) findViewById(R.id.aware_toolbar);
+        setSupportActionBar(aware_toolbar);
+
         final LinearLayout morning_questions = (LinearLayout) findViewById(R.id.morning_questions);
         final LinearLayout evening_questions = (LinearLayout) findViewById(R.id.evening_questions);
 
@@ -112,7 +117,7 @@ public class UPMC extends AppCompatActivity {
             morning_questions.setVisibility(View.VISIBLE);
             evening_questions.setVisibility(View.GONE);
         }
-        if( cal.get(Calendar.HOUR_OF_DAY) >= 20 && cal.get(Calendar.HOUR_OF_DAY) <= 23 ) {
+        if( cal.get(Calendar.HOUR_OF_DAY) >= 19 && cal.get(Calendar.HOUR_OF_DAY) <= 23 ) {
             morning_questions.setVisibility(View.GONE);
             evening_questions.setVisibility(View.VISIBLE);
         }
@@ -485,6 +490,10 @@ public class UPMC extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             loadSchedule();
+            return true;
+        }
+        if( id == R.id.action_debug) {
+            sendBroadcast(new Intent(Plugin.ACTION_CANCER_SURVEY));
             return true;
         }
         return super.onOptionsItemSelected(item);

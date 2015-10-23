@@ -1,14 +1,20 @@
 package com.aware.plugin.upmc.cancer;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.util.Log;
 
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.ESM;
+import com.aware.providers.Scheduler_Provider;
 import com.aware.utils.Aware_Plugin;
 import com.aware.utils.Scheduler;
 
@@ -21,7 +27,7 @@ import java.util.Random;
  */
 public class Plugin extends Aware_Plugin {
 
-    public static String ACTION_PLUGIN_UPMC_CANCER_SCHEDULE = "ACTION_PLUGIN_UPMC_CANCER_SCHEDULE";
+    public static String ACTION_CANCER_SURVEY = "ACTION_CANCER_SURVEY";
 
     @Override
     public void onCreate() {
@@ -38,17 +44,23 @@ public class Plugin extends Aware_Plugin {
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_COARSE_LOCATION);
         REQUIRED_PERMISSIONS.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
 
-        //Join the study now
-        Intent joinStudy = new Intent(getApplicationContext(), Aware_Preferences.StudyConfig.class);
-        joinStudy.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
-        startService(joinStudy);
+        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
 
-//        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
+        IntentFilter filter = new IntentFilter(ACTION_CANCER_SURVEY);
+        registerReceiver(surveyListener, filter);
     }
+
+    public static class SurveyListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent surveyService = new Intent(context, Survey.class);
+            context.startService(surveyService);
+        }
+    }
+    private static SurveyListener surveyListener = new SurveyListener();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         TAG = "UPMC-Cancer";
         DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
@@ -64,89 +76,82 @@ public class Plugin extends Aware_Plugin {
         }
         Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
 
-        if( intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ACTION_PLUGIN_UPMC_CANCER_SCHEDULE) ) {
+        if( intent.getExtras() != null && intent.getBooleanExtra("schedule", false) ) {
+            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0 && Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() > 0) {
+                final int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+                final int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
 
-            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-            int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
-
-            try {
-                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey");
-                schedule.addHour(morning_hour)
-                        .addHour(evening_hour)
-                        .setActionType(Scheduler.ACTION_TYPE_SERVICE)
-                        .setActionClass("com.aware.plugin.upmc.cancer/com.aware.plugin.upmc.cancer.Survey");
-
-                Scheduler.saveSchedule(this, schedule);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            //Create a random schedule for Angry
-            try {
-
-                String angry_esm = "[{'esm':{'esm_type':'"+ESM.TYPE_ESM_RADIO+"', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'"+getPackageName()+"'}}]";
-
-                Scheduler.Schedule schedule = new Scheduler.Schedule("angry");
-                for(int i=morning_hour;i<evening_hour;i++) {
-                    schedule.addHour(i);
+                try {
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey");
+                    schedule.addHour(morning_hour)
+                            .addHour(evening_hour)
+                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                            .setActionClass(Plugin.ACTION_CANCER_SURVEY);
+                    Scheduler.saveSchedule(this, schedule);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                schedule.randomize(Scheduler.RANDOM_TYPE_HOUR)
-                        .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                        .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
-                        .addActionExtra(ESM.EXTRA_ESM, angry_esm);
 
-                Scheduler.saveSchedule(this, schedule);
+                //Create a random schedule for Angry
+                try {
+                    String angry_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'" + getPackageName() + "'}}]";
 
-            } catch (JSONException e ) {
-                e.printStackTrace();
-            }
-
-            //Create a random schedule for Happy
-            try {
-
-                String happy_esm = "[{'esm':{'esm_type':'"+ESM.TYPE_ESM_RADIO+"', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'"+getPackageName()+"'}}]";
-
-                Scheduler.Schedule schedule = new Scheduler.Schedule("happy");
-                for(int i=morning_hour;i<evening_hour;i++) {
-                    schedule.addHour(i);
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("angry");
+                    for (int i = morning_hour; i < evening_hour; i++) {
+                        schedule.addHour(i);
+                    }
+                    schedule.randomize(Scheduler.RANDOM_TYPE_HOUR)
+                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                            .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
+                            .addActionExtra(ESM.EXTRA_ESM, angry_esm);
+                    Scheduler.saveSchedule(this, schedule);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                schedule.randomize(Scheduler.RANDOM_TYPE_HOUR)
-                        .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                        .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
-                        .addActionExtra(ESM.EXTRA_ESM, happy_esm);
 
-                Scheduler.saveSchedule(this, schedule);
+                //Create a random schedule for Happy
+                try {
+                    String happy_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'" + getPackageName() + "'}}]";
 
-            } catch (JSONException e ) {
-                e.printStackTrace();
-            }
-
-            //Create a random schedule for Stressed
-            try {
-
-                String stressed_esm = "[{'esm':{'esm_type':'"+ESM.TYPE_ESM_RADIO+"', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'"+getPackageName()+"'}}]";
-
-                Scheduler.Schedule schedule = new Scheduler.Schedule("stressed");
-                for(int i=morning_hour;i<evening_hour;i++) {
-                    schedule.addHour(i);
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("happy");
+                    for (int i = morning_hour; i < evening_hour; i++) {
+                        schedule.addHour(i);
+                    }
+                    schedule.randomize(Scheduler.RANDOM_TYPE_HOUR)
+                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                            .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
+                            .addActionExtra(ESM.EXTRA_ESM, happy_esm);
+                    Scheduler.saveSchedule(this, schedule);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                schedule.randomize(Scheduler.RANDOM_TYPE_HOUR)
-                        .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                        .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
-                        .addActionExtra(ESM.EXTRA_ESM, stressed_esm);
 
-                Scheduler.saveSchedule(this, schedule);
+                //Create a random schedule for Stressed
+                try {
+                    String stressed_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'OK','esm_trigger':'" + getPackageName() + "'}}]";
 
-            } catch (JSONException e ) {
-                e.printStackTrace();
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("stressed");
+                    for (int i = morning_hour; i < evening_hour; i++) {
+                        schedule.addHour(i);
+                    }
+                    schedule.randomize(Scheduler.RANDOM_TYPE_HOUR)
+                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                            .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
+                            .addActionExtra(ESM.EXTRA_ESM, stressed_esm);
+                    Scheduler.saveSchedule(this, schedule);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        unregisterReceiver(surveyListener);
         Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, false);
         Aware.stopPlugin(this, "com.aware.plugin.upmc.cancer");
     }

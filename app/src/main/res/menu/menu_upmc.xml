@@ -3,4 +3,5 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".UPMC">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="always" android:icon="@drawable/ic_action_schedule" />
+    <item android:id="@+id/action_debug" android:title="Debug" android:orderInCategory="200" app:showAsAction="never" />
 </menu>

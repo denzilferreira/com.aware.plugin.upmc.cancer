@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     android:layout_height="match_parent" android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical">
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <include android:id="@+id/aware_toolbar" layout="@layout/aware_toolbar"/>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp"
         android:id="@+id/scroller">
 
         <LinearLayout
