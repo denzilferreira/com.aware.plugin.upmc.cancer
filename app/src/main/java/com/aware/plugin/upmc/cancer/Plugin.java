@@ -33,6 +33,9 @@ public class Plugin extends Aware_Plugin {
     public void onCreate() {
         super.onCreate();
 
+        Intent aware = new Intent(this, Aware.class);
+        startService(aware);
+
         DATABASE_TABLES = Provider.DATABASE_TABLES;
         TABLES_FIELDS = Provider.TABLES_FIELDS;
         CONTEXT_URIS = new Uri[]{ Provider.Cancer_Data.CONTENT_URI };
@@ -82,9 +85,18 @@ public class Plugin extends Aware_Plugin {
                 final int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
 
                 try {
-                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey");
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
                     schedule.addHour(morning_hour)
-                            .addHour(evening_hour)
+                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                            .setActionClass(Plugin.ACTION_CANCER_SURVEY);
+                    Scheduler.saveSchedule(this, schedule);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_evening");
+                    schedule.addHour(evening_hour)
                             .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
                             .setActionClass(Plugin.ACTION_CANCER_SURVEY);
                     Scheduler.saveSchedule(this, schedule);
@@ -144,6 +156,12 @@ public class Plugin extends Aware_Plugin {
                 }
             }
         }
+
+        Cursor scheduled_tasks = getContentResolver().query( Scheduler_Provider.Scheduler_Data.CONTENT_URI, null, null, null, null );
+        if( scheduled_tasks != null && scheduled_tasks.getCount() > 0 ) {
+            Log.d(TAG, DatabaseUtils.dumpCursorToString(scheduled_tasks));
+        }
+        if( scheduled_tasks != null && ! scheduled_tasks.isClosed() ) scheduled_tasks.close();
         return START_STICKY;
     }
 

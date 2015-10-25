@@ -8,8 +8,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 10
-        versionName "1.9"
+        versionCode 11
+        versionName "2.0"
     }
     buildTypes {
         release {
@@ -28,5 +28,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:cardview-v7:23.1.0'
-    compile 'com.awareframework:aware-core:+@aar'
+    compile 'com.awareframework:aware-core:3.7.2@aar'
 }
