@@ -33,9 +33,6 @@ public class Plugin extends Aware_Plugin {
     public void onCreate() {
         super.onCreate();
 
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
-
         DATABASE_TABLES = Provider.DATABASE_TABLES;
         TABLES_FIELDS = Provider.TABLES_FIELDS;
         CONTEXT_URIS = new Uri[]{ Provider.Cancer_Data.CONTENT_URI };
@@ -79,7 +76,7 @@ public class Plugin extends Aware_Plugin {
         }
         Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
 
-        if( intent.getExtras() != null && intent.getBooleanExtra("schedule", false) ) {
+        if( intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false) ) {
             if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0 && Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() > 0) {
                 final int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
                 final int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
@@ -155,14 +152,15 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
             }
+
+            Cursor scheduled_tasks = getContentResolver().query( Scheduler_Provider.Scheduler_Data.CONTENT_URI, null, null, null, null );
+            if( scheduled_tasks != null && scheduled_tasks.getCount() > 0 ) {
+                Log.d(TAG, DatabaseUtils.dumpCursorToString(scheduled_tasks));
+            }
+            if( scheduled_tasks != null && ! scheduled_tasks.isClosed() ) scheduled_tasks.close();
         }
 
-        Cursor scheduled_tasks = getContentResolver().query( Scheduler_Provider.Scheduler_Data.CONTENT_URI, null, null, null, null );
-        if( scheduled_tasks != null && scheduled_tasks.getCount() > 0 ) {
-            Log.d(TAG, DatabaseUtils.dumpCursorToString(scheduled_tasks));
-        }
-        if( scheduled_tasks != null && ! scheduled_tasks.isClosed() ) scheduled_tasks.close();
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override

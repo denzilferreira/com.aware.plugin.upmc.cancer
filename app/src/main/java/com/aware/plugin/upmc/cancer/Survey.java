@@ -16,8 +16,6 @@ public class Survey extends IntentService {
         super("Survey service");
     }
 
-    private final int CANCER_SURVEY = 666;
-
     @Override
     protected void onHandleIntent(Intent intent) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
@@ -32,6 +30,6 @@ public class Survey extends IntentService {
         mBuilder.setContentIntent(onclick);
 
         NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notManager.notify(CANCER_SURVEY, mBuilder.build());
+        notManager.notify(666, mBuilder.build());
     }
 }

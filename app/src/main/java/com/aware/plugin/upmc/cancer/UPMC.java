@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -36,9 +37,6 @@ public class UPMC extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
     }
 
     private void loadSchedule() {
@@ -405,10 +403,8 @@ public class UPMC extends ActionBarActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if( other_label.getText().equals("Other") ) {
                     final Dialog other_labeler = new Dialog(UPMC.this);
-                    other_labeler.setTitle("Can you be more specific, please?");
-                    other_labeler.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
                     other_labeler.getWindow().setGravity(Gravity.TOP);
-                    other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                    other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
 
                     LinearLayout editor = new LinearLayout(UPMC.this);
                     editor.setOrientation(LinearLayout.VERTICAL);
@@ -416,6 +412,7 @@ public class UPMC extends ActionBarActivity {
                     other_labeler.show();
 
                     final EditText label = new EditText(UPMC.this);
+                    label.setHint("Can you be more specific, please?");
                     editor.addView(label);
 
                     Button confirm = new Button(UPMC.this);
