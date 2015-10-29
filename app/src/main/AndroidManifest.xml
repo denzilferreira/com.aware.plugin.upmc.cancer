@@ -2,11 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.aware.plugin.upmc.cancer" xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <uses-permission android:name="android.permission.READ_SMS" />
+    <!--<uses-permission android:name="android.permission.WAKE_LOCK" />-->
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+    <!--<uses-permission android:name="android.permission.READ_CALL_LOG" />-->
+    <!--<uses-permission android:name="android.permission.READ_SMS" />-->
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -31,7 +30,7 @@
 
         <activity android:name="com.aware.plugin.upmc.cancer.Settings" android:exported="true" android:launchMode="singleTop" android:theme="@style/Theme.Aware" />
         <service android:name="com.aware.plugin.upmc.cancer.Plugin" android:exported="true" />
-        <service android:name="com.aware.plugin.upmc.cancer.Survey" android:exported="true" />
+        <service android:name="com.aware.plugin.upmc.cancer.Survey" />
 
         <provider
             android:authorities="${applicationId}.provider"
