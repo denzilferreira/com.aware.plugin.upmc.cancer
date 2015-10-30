@@ -25,6 +25,7 @@ import java.util.Random;
 public class Plugin extends Aware_Plugin {
 
     public static String ACTION_CANCER_SURVEY = "ACTION_CANCER_SURVEY";
+    public static String ACTION_CANCER_EMOTION = "ACTION_CANCER_EMOTION";
 
     @Override
     public void onCreate() {
@@ -36,6 +37,7 @@ public class Plugin extends Aware_Plugin {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_CANCER_SURVEY);
+        filter.addAction(ACTION_CANCER_EMOTION);
         filter.addAction(ESM.ACTION_AWARE_ESM_QUEUE_COMPLETE);
         registerReceiver(surveyListener, filter);
 
@@ -50,18 +52,24 @@ public class Plugin extends Aware_Plugin {
                 context.startService(surveyService);
             }
 
+            if( intent.getAction().equals(ACTION_CANCER_EMOTION) ) {
+                String emotion_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
+                emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
+                emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + context.getPackageName() + "'}}]";
+
+                Intent esm = new Intent(ESM.ACTION_AWARE_QUEUE_ESM);
+                esm.putExtra(ESM.EXTRA_ESM, emotion_esm);
+                context.sendBroadcast(esm);
+            }
+
             if( intent.getAction().equals(ESM.ACTION_AWARE_ESM_QUEUE_COMPLETE) ) {
 
                 Calendar now = Calendar.getInstance();
                 now.setTimeInMillis(System.currentTimeMillis());
 
-                String emotion_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
-                emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
-                emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + context.getPackageName() + "'}}]";
-
                 Calendar today = Calendar.getInstance();
                 today.setTimeInMillis(System.currentTimeMillis());
-                today.set(Calendar.HOUR_OF_DAY, 1);
+                today.set(Calendar.HOUR_OF_DAY, 0);
                 today.set(Calendar.MINUTE, 0);
                 today.set(Calendar.SECOND, 0);
 
@@ -94,9 +102,11 @@ public class Plugin extends Aware_Plugin {
                         Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                         schedule.addHour(random_hour);
                         schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                                .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
-                                .addActionExtra(ESM.EXTRA_ESM, emotion_esm);
+                                .setActionClass(ACTION_CANCER_EMOTION);
                         Scheduler.saveSchedule(context, schedule);
+
+                        if( DEBUG ) Log.d(TAG, "Scheduled random to: " + random_hour);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -104,12 +114,15 @@ public class Plugin extends Aware_Plugin {
                     try {
                         //Done for today, schedule more for tomorrow again
                         int random_hour = getRandomNumberRangeInclusive(8, 11);
+
                         Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                         schedule.addHour(random_hour);
                         schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                                .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
-                                .addActionExtra(ESM.EXTRA_ESM, emotion_esm);
+                                .setActionClass(ACTION_CANCER_EMOTION);
                         Scheduler.saveSchedule(context, schedule);
+
+                        if( DEBUG ) Log.d(TAG, "Scheduled random to: " + random_hour);
+
                     }catch ( JSONException e ) {
                         e.printStackTrace();
                     }
@@ -190,8 +203,7 @@ public class Plugin extends Aware_Plugin {
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                     schedule.addHour(random_hour);
                     schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                            .setActionClass(ESM.ACTION_AWARE_QUEUE_ESM)
-                            .addActionExtra(ESM.EXTRA_ESM, emotion_esm);
+                            .setActionClass(ACTION_CANCER_EMOTION);
                     Scheduler.saveSchedule(this, schedule);
                 } catch (JSONException e) {
                     e.printStackTrace();

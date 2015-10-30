@@ -493,7 +493,7 @@ public class UPMC extends ActionBarActivity {
             return true;
         }
         if( id == R.id.action_debug) {
-            sendBroadcast(new Intent(Plugin.ACTION_CANCER_SURVEY));
+            sendBroadcast(new Intent(Plugin.ACTION_CANCER_EMOTION));
             return true;
         }
         return super.onOptionsItemSelected(item);
