@@ -1,11 +1,9 @@
 package com.aware.plugin.upmc.cancer;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
@@ -24,9 +22,6 @@ import org.json.JSONException;
 import java.util.Calendar;
 import java.util.Random;
 
-/**
- * Created by denzil on 25/11/14.
- */
 public class Plugin extends Aware_Plugin {
 
     public static String ACTION_CANCER_SURVEY = "ACTION_CANCER_SURVEY";
@@ -39,13 +34,9 @@ public class Plugin extends Aware_Plugin {
         TABLES_FIELDS = Provider.TABLES_FIELDS;
         CONTEXT_URIS = new Uri[]{ Provider.Cancer_Data.CONTENT_URI };
 
-//        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
-//        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CALL_LOG);
-//        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_FINE_LOCATION);
-//        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-//        REQUIRED_PERMISSIONS.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
-
-        IntentFilter filter = new IntentFilter(ACTION_CANCER_SURVEY);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_CANCER_SURVEY);
+        filter.addAction(ESM.ACTION_AWARE_ESM_QUEUE_COMPLETE);
         registerReceiver(surveyListener, filter);
 
         Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
@@ -58,11 +49,15 @@ public class Plugin extends Aware_Plugin {
                 Intent surveyService = new Intent(context, Survey.class);
                 context.startService(surveyService);
             }
+
             if( intent.getAction().equals(ESM.ACTION_AWARE_ESM_QUEUE_COMPLETE) ) {
+
+                Calendar now = Calendar.getInstance();
+                now.setTimeInMillis(System.currentTimeMillis());
 
                 String emotion_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
                 emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
-                emotion_esm += "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + context.getPackageName() + "'}}]";
+                emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + context.getPackageName() + "'}}]";
 
                 Calendar today = Calendar.getInstance();
                 today.setTimeInMillis(System.currentTimeMillis());
@@ -78,13 +73,24 @@ public class Plugin extends Aware_Plugin {
                 if( esms_count != null && ! esms_count.isClosed() ) esms_count.close();
 
                 if( total < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS)) ) {
+
+                    int start;
+                    int end;
+
+                    if( now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+3 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
+                        //too late, start and end are tomorrow
+                        start = 8;
+                        end = 11;
+                    } else {
+                        //still time today
+                        start = now.get(Calendar.HOUR_OF_DAY)+1;
+                        end = now.get(Calendar.HOUR_OF_DAY)+3;
+                    }
+
+                    int random_hour = getRandomNumberRangeInclusive(start, end);
+
                     //Schedule for sometime in the next 3 hours
                     try {
-                        Calendar now = Calendar.getInstance();
-                        now.setTimeInMillis(System.currentTimeMillis());
-
-                        int random_hour = getRandomNumberRangeInclusive(now.get(Calendar.HOUR_OF_DAY)+1, now.get(Calendar.HOUR_OF_DAY)+3);
-
                         Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                         schedule.addHour(random_hour);
                         schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
@@ -96,8 +102,8 @@ public class Plugin extends Aware_Plugin {
                     }
                 } else {
                     try {
-                        //Schedule for tomorrow again
-                        int random_hour = getRandomNumberRangeInclusive(8, 10);
+                        //Done for today, schedule more for tomorrow again
+                        int random_hour = getRandomNumberRangeInclusive(8, 11);
                         Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                         schedule.addHour(random_hour);
                         schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
@@ -115,7 +121,6 @@ public class Plugin extends Aware_Plugin {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        super.onStartCommand(intent, flags, startId);
 
         TAG = "UPMC-Cancer";
         DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
@@ -157,21 +162,30 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
 
-                Scheduler.removeSchedule(this, "angry");
-                Scheduler.removeSchedule(this, "happy");
-                Scheduler.removeSchedule(this, "stressed");
-
                 //Create a starting schedule for emotion ESM
                 try {
                     String emotion_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + getPackageName() + "'}},";
                     emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + getPackageName() + "'}},";
-                    emotion_esm += "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + getPackageName() + "'}}]";
+                    emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + getPackageName() + "'}}]";
 
                     //Schedule for sometime in the next 3 hours
                     Calendar now = Calendar.getInstance();
                     now.setTimeInMillis(System.currentTimeMillis());
 
-                    int random_hour = getRandomNumberRangeInclusive(now.get(Calendar.HOUR_OF_DAY)+1, now.get(Calendar.HOUR_OF_DAY)+3);
+                    int start;
+                    int end;
+
+                    if( now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+3 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
+                        //too late, start and end are tomorrow
+                        start = 8;
+                        end = 11;
+                    } else {
+                        //still time today
+                        start = now.get(Calendar.HOUR_OF_DAY)+1;
+                        end = now.get(Calendar.HOUR_OF_DAY)+3;
+                    }
+
+                    int random_hour = getRandomNumberRangeInclusive(start, end);
 
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                     schedule.addHour(random_hour);
@@ -191,7 +205,7 @@ public class Plugin extends Aware_Plugin {
             if( scheduled_tasks != null && ! scheduled_tasks.isClosed() ) scheduled_tasks.close();
         }
 
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     public static int getRandomNumberRangeInclusive(int min, int max) {
