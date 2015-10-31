@@ -177,10 +177,6 @@ public class Plugin extends Aware_Plugin {
 
                 //Create a starting schedule for emotion ESM
                 try {
-                    String emotion_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + getPackageName() + "'}},";
-                    emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + getPackageName() + "'}},";
-                    emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + getPackageName() + "'}}]";
-
                     //Schedule for sometime in the next 3 hours
                     Calendar now = Calendar.getInstance();
                     now.setTimeInMillis(System.currentTimeMillis());
@@ -222,8 +218,7 @@ public class Plugin extends Aware_Plugin {
 
     public static int getRandomNumberRangeInclusive(int min, int max) {
         Random foo = new Random();
-        int randomNumber = foo.nextInt((max + 1) - min) + min;
-        return randomNumber;
+        return foo.nextInt((max + 1) - min) + min;
     }
 
     @Override
