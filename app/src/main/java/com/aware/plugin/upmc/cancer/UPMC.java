@@ -351,7 +351,7 @@ public class UPMC extends ActionBarActivity {
             }
         });
 
-       final TextView other_rating = (TextView) findViewById(R.id.other_rating);
+        final TextView other_rating = (TextView) findViewById(R.id.other_rating);
         final TextView other_label = (TextView) findViewById(R.id.lbl_other);
         other_label.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -387,6 +387,7 @@ public class UPMC extends ActionBarActivity {
                 editor.addView(confirm);
             }
         });
+
         SeekBar other = (SeekBar) findViewById(R.id.rate_other);
         other.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -443,30 +444,30 @@ public class UPMC extends ActionBarActivity {
                 answer.put(Provider.Cancer_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
                 answer.put(Provider.Cancer_Data.TIMESTAMP, System.currentTimeMillis());
 
-                if( morning_questions.getVisibility() == View.VISIBLE ) {
-                    answer.put(Provider.Cancer_Data.TO_BED, to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute());
-                    answer.put(Provider.Cancer_Data.FROM_BED, from_bed.getCurrentHour() + "h"+from_bed.getCurrentMinute());
-                    answer.put(Provider.Cancer_Data.SCORE_SLEEP, (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText());
+                if( morning_questions != null && morning_questions.getVisibility() == View.VISIBLE ) {
+                    answer.put(Provider.Cancer_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
+                    answer.put(Provider.Cancer_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h"+from_bed.getCurrentMinute() : "");
+                    answer.put(Provider.Cancer_Data.SCORE_SLEEP, (qos_sleep != null) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
                 }
 
-                if( evening_questions.getVisibility() == View.VISIBLE ) {
-                    answer.put(Provider.Cancer_Data.MOST_STRESS_LABEL, most_stress.getText().toString());
-                    answer.put(Provider.Cancer_Data.SCORE_STRESS, (String) ((RadioButton) findViewById(qos_stress.getCheckedRadioButtonId())).getText());
+                if( evening_questions != null && evening_questions.getVisibility() == View.VISIBLE ) {
+                    answer.put(Provider.Cancer_Data.MOST_STRESS_LABEL, (most_stress != null ) ? most_stress.getText().toString() : "");
+                    answer.put(Provider.Cancer_Data.SCORE_STRESS, (qos_stress != null) ? (String) ((RadioButton) findViewById(qos_stress.getCheckedRadioButtonId())).getText() : "");
                 }
 
-                answer.put(Provider.Cancer_Data.SCORE_PAIN, pain_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_FATIGUE, fatigue_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_DISCONNECTED, disconnected_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_CONCENTRATING, concentrating_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_SAD, sad_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_ANXIOUS, anxious_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_ENJOY, not_enjoying_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_IRRITABLE, irritable_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_SHORT_BREATH, breath_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_NUMBNESS, numb_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_NAUSEA, nausea_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_APPETITE, appetite_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_OTHER, other_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_PAIN, (pain_rating != null) ? pain_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_FATIGUE, (fatigue_rating != null) ? fatigue_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_DISCONNECTED, (disconnected_rating != null) ? disconnected_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_CONCENTRATING, (concentrating_rating != null) ? concentrating_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_SAD, (sad_rating != null) ? sad_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_ANXIOUS, (anxious_rating != null ) ? anxious_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_ENJOY, (not_enjoying_rating != null) ? not_enjoying_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_IRRITABLE, (irritable_rating != null) ? irritable_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_SHORT_BREATH, (breath_rating != null) ? breath_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_NUMBNESS, (numb_rating != null) ? numb_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_NAUSEA, (nausea_rating != null) ? nausea_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_APPETITE, (appetite_rating != null) ? appetite_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_OTHER, (other_rating != null) ? other_rating.getText().toString() : "");
                 answer.put(Provider.Cancer_Data.OTHER_LABEL, other_label.getText().toString());
 
                 getContentResolver().insert(Provider.Cancer_Data.CONTENT_URI, answer);

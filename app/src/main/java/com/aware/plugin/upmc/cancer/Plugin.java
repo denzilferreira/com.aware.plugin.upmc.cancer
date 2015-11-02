@@ -81,12 +81,11 @@ public class Plugin extends Aware_Plugin {
                 if( esms_count != null && ! esms_count.isClosed() ) esms_count.close();
 
                 if( total < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS)) ) {
-
                     int start;
                     int end;
 
-                    if( now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+3 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
-                        //too late, start and end are tomorrow
+                    if ( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 3 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR))) {
+                        //too late in the evening or too early in the morning to schedule ESM, set to beginning of the day
                         start = 8;
                         end = 11;
                     } else {
@@ -184,8 +183,8 @@ public class Plugin extends Aware_Plugin {
                     int start;
                     int end;
 
-                    if( now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+3 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
-                        //too late, start and end are tomorrow
+                    if( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+3 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
+                        //too late or too early, start and end are in the beginning of the day
                         start = 8;
                         end = 11;
                     } else {
