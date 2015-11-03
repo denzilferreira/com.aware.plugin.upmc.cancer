@@ -174,6 +174,7 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
 
+
                 //Create a starting schedule for emotion ESM
                 try {
                     //Schedule for sometime in the next 3 hours
