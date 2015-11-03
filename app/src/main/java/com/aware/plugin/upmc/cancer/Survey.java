@@ -19,17 +19,18 @@ public class Survey extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.ic_stat_survey);
-        mBuilder.setContentTitle("UPMC");
-        mBuilder.setContentText("Questionnaire available. Answer?");
-        mBuilder.setDefaults(Notification.DEFAULT_ALL);
+        mBuilder.setSmallIcon( R.drawable.ic_stat_survey );
+        mBuilder.setContentTitle( "UPMC Questionnaire" );
+        mBuilder.setContentText( "Tap to answer at your convenience." );
+        mBuilder.setDefaults( Notification.DEFAULT_ALL );
         mBuilder.setAutoCancel(true);
 
         Intent survey = new Intent(getApplicationContext(), UPMC.class);
+        survey.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
         PendingIntent onclick = PendingIntent.getActivity(getApplicationContext(), 0, survey, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(onclick);
 
         NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notManager.notify(666, mBuilder.build());
+        notManager.notify(42, mBuilder.build());
     }
 }

@@ -24,7 +24,7 @@ import java.util.HashMap;
  */
 public class Provider extends ContentProvider {
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static String AUTHORITY = "com.aware.plugin.upmc.cancer.provider";
 
     private static final int ANSWERS = 1;
@@ -48,7 +48,6 @@ public class Provider extends ContentProvider {
         public static final String SCORE_HAPPY = "score_happy";
         public static final String SCORE_MOST_STRESS = "score_most_stress";
         public static final String MOST_STRESS_LABEL = "most_stress_label";
-        public static final String SCORE_HOW_STRESS = "score_how_stress";
         public static final String SCORE_PAIN = "score_pain";
         public static final String SCORE_FATIGUE = "score_fatigue";
         public static final String SCORE_DISCONNECTED = "score_disconnected";
@@ -79,7 +78,6 @@ public class Provider extends ContentProvider {
             Cancer_Data.SCORE_HAPPY + " text default ''," +
             Cancer_Data.SCORE_MOST_STRESS + " text default ''," +
             Cancer_Data.MOST_STRESS_LABEL + " text default ''," +
-            Cancer_Data.SCORE_HOW_STRESS + " text default ''," +
             Cancer_Data.SCORE_PAIN + " text default ''," +
             Cancer_Data.SCORE_FATIGUE + " text default ''," +
             Cancer_Data.SCORE_DISCONNECTED + " text default ''," +

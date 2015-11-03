@@ -32,7 +32,7 @@ import com.aware.Aware_Preferences;
 
 import java.util.Calendar;
 
-public class UPMC extends ActionBarActivity {
+public class UPMC extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public class UPMC extends ActionBarActivity {
     }
 
     private void loadSchedule() {
+
         setContentView(R.layout.settings_upmc_cancer);
 
         Toolbar aware_toolbar = (Toolbar) findViewById(R.id.aware_toolbar);
@@ -97,9 +98,9 @@ public class UPMC extends ActionBarActivity {
         }
 
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.setTimeInMillis( System.currentTimeMillis() );
 
-        setContentView(R.layout.activity_upmc_cancer);
+        setContentView( R.layout.activity_upmc_cancer );
 
         Toolbar aware_toolbar = (Toolbar) findViewById(R.id.aware_toolbar);
         setSupportActionBar(aware_toolbar);
@@ -109,21 +110,25 @@ public class UPMC extends ActionBarActivity {
 
         final TimePicker to_bed = (TimePicker) findViewById(R.id.bed_time);
         final TimePicker from_bed = (TimePicker) findViewById(R.id.woke_time);
+
         final RadioGroup qos_sleep = (RadioGroup) findViewById(R.id.qos_sleep);
-
         final RadioGroup qos_stress = (RadioGroup) findViewById(R.id.quality_of_stress);
-        final EditText most_stress = (EditText) findViewById(R.id.most_stressed_moment);
 
-        if( cal.get(Calendar.HOUR_OF_DAY) >= 8 && cal.get(Calendar.HOUR_OF_DAY) <= 11 ) {
+        final EditText most_stress = (EditText) findViewById(R.id.most_stressed_moment);
+        most_stress.setText("");
+
+        if( cal.get(Calendar.HOUR_OF_DAY) == Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) ) {
             morning_questions.setVisibility(View.VISIBLE);
             evening_questions.setVisibility(View.GONE);
         }
-        if( cal.get(Calendar.HOUR_OF_DAY) >= 19 && cal.get(Calendar.HOUR_OF_DAY) <= 23 ) {
+
+        if( cal.get(Calendar.HOUR_OF_DAY) == Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
             morning_questions.setVisibility(View.GONE);
             evening_questions.setVisibility(View.VISIBLE);
         }
 
         final TextView pain_rating = (TextView) findViewById(R.id.pain_rating);
+        pain_rating.setText("0");
         SeekBar pain = (SeekBar) findViewById(R.id.rate_pain);
         pain.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -133,16 +138,15 @@ public class UPMC extends ActionBarActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
 
         final TextView fatigue_rating = (TextView) findViewById(R.id.fatigue_rating);
+        fatigue_rating.setText("0");
         SeekBar fatigue = (SeekBar) findViewById(R.id.rate_fatigue);
         fatigue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -162,6 +166,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView disconnected_rating = (TextView) findViewById(R.id.disconnected_rating);
+        disconnected_rating.setText("0");
         SeekBar disconnected = (SeekBar) findViewById(R.id.rate_disconnected);
         disconnected.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -181,6 +186,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView concentrating_rating = (TextView) findViewById(R.id.concentrating_rating);
+        concentrating_rating.setText("0");
         SeekBar concentrating = (SeekBar) findViewById(R.id.rate_concentrating);
         concentrating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -200,6 +206,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView sad_rating = (TextView) findViewById(R.id.sad_rating);
+        sad_rating.setText("0");
         SeekBar sad = (SeekBar) findViewById(R.id.rate_sad);
         sad.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -219,6 +226,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView anxious_rating = (TextView) findViewById(R.id.anxious_rating);
+        anxious_rating.setText("0");
         SeekBar anxious = (SeekBar) findViewById(R.id.rate_anxious);
         anxious.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -238,6 +246,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView not_enjoying_rating = (TextView) findViewById(R.id.not_enjoying_rating);
+        not_enjoying_rating.setText("0");
         SeekBar not_enjoying = (SeekBar) findViewById(R.id.rate_not_enjoying);
         not_enjoying.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -257,6 +266,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView irritable_rating = (TextView) findViewById(R.id.irritable_rating);
+        irritable_rating.setText("0");
         SeekBar irritable = (SeekBar) findViewById(R.id.rate_irritable);
         irritable.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -276,6 +286,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView breath_rating = (TextView) findViewById(R.id.breath_rating);
+        breath_rating.setText("0");
         SeekBar breath = (SeekBar) findViewById(R.id.rate_breath);
         breath.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -295,6 +306,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView numb_rating = (TextView) findViewById(R.id.numb_rating);
+        numb_rating.setText("0");
         SeekBar numb = (SeekBar) findViewById(R.id.rate_numb);
         numb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -314,6 +326,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView nausea_rating = (TextView) findViewById(R.id.nausea_rating);
+        nausea_rating.setText("0");
         SeekBar nausea = (SeekBar) findViewById(R.id.rate_nausea);
         nausea.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -333,6 +346,7 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView appetite_rating = (TextView) findViewById(R.id.appetite_rating);
+        appetite_rating.setText("0");
         SeekBar appetite = (SeekBar) findViewById(R.id.rate_appetite);
         appetite.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -352,13 +366,13 @@ public class UPMC extends ActionBarActivity {
         });
 
         final TextView other_rating = (TextView) findViewById(R.id.other_rating);
+        other_rating.setText("0");
         final TextView other_label = (TextView) findViewById(R.id.lbl_other);
         other_label.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Dialog other_labeler = new Dialog(UPMC.this);
                 other_labeler.setTitle("Can you be more specific, please?");
-                other_labeler.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
                 other_labeler.getWindow().setGravity(Gravity.TOP);
                 other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
@@ -368,18 +382,18 @@ public class UPMC extends ActionBarActivity {
                 other_labeler.show();
 
                 final EditText label = new EditText(UPMC.this);
-                label.setText(other_label.getText());
+                label.setHint("Can you be more specific, please?");
                 editor.addView(label);
+                label.requestFocus();
+                other_labeler.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
                 Button confirm = new Button(UPMC.this);
                 confirm.setText("OK");
                 confirm.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if( label.getText().length() == 0 ) label.setText("Other");
+                        if (label.getText().length() == 0 ) label.setText("Other");
                         other_label.setText(label.getText().toString());
-                        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputManager.hideSoftInputFromWindow(label.getWindowToken(), 0);
                         other_labeler.dismiss();
                     }
                 });
@@ -415,6 +429,8 @@ public class UPMC extends ActionBarActivity {
                     final EditText label = new EditText(UPMC.this);
                     label.setHint("Can you be more specific, please?");
                     editor.addView(label);
+                    label.requestFocus();
+                    other_labeler.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
                     Button confirm = new Button(UPMC.this);
                     confirm.setText("OK");
@@ -424,8 +440,6 @@ public class UPMC extends ActionBarActivity {
                         public void onClick(View v) {
                             if( label.getText().length() == 0 ) label.setText("Other");
                             other_label.setText(label.getText().toString());
-                            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            inputManager.hideSoftInputFromWindow(label.getWindowToken(), 0);
                             other_labeler.dismiss();
                         }
                     });
@@ -447,27 +461,27 @@ public class UPMC extends ActionBarActivity {
                 if( morning_questions != null && morning_questions.getVisibility() == View.VISIBLE ) {
                     answer.put(Provider.Cancer_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
                     answer.put(Provider.Cancer_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h"+from_bed.getCurrentMinute() : "");
-                    answer.put(Provider.Cancer_Data.SCORE_SLEEP, (qos_sleep != null) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
+                    answer.put(Provider.Cancer_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1 ) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
                 }
 
                 if( evening_questions != null && evening_questions.getVisibility() == View.VISIBLE ) {
-                    answer.put(Provider.Cancer_Data.MOST_STRESS_LABEL, (most_stress != null ) ? most_stress.getText().toString() : "");
-                    answer.put(Provider.Cancer_Data.SCORE_STRESS, (qos_stress != null) ? (String) ((RadioButton) findViewById(qos_stress.getCheckedRadioButtonId())).getText() : "");
+                    answer.put(Provider.Cancer_Data.MOST_STRESS_LABEL, most_stress.getText().toString());
+                    answer.put(Provider.Cancer_Data.SCORE_STRESS, (qos_stress != null && qos_stress.getCheckedRadioButtonId() != -1 ) ? (String) ((RadioButton) findViewById(qos_stress.getCheckedRadioButtonId())).getText() : "");
                 }
 
-                answer.put(Provider.Cancer_Data.SCORE_PAIN, (pain_rating != null) ? pain_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_FATIGUE, (fatigue_rating != null) ? fatigue_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_DISCONNECTED, (disconnected_rating != null) ? disconnected_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_CONCENTRATING, (concentrating_rating != null) ? concentrating_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_SAD, (sad_rating != null) ? sad_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_ANXIOUS, (anxious_rating != null ) ? anxious_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_ENJOY, (not_enjoying_rating != null) ? not_enjoying_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_IRRITABLE, (irritable_rating != null) ? irritable_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_SHORT_BREATH, (breath_rating != null) ? breath_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_NUMBNESS, (numb_rating != null) ? numb_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_NAUSEA, (nausea_rating != null) ? nausea_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_APPETITE, (appetite_rating != null) ? appetite_rating.getText().toString() : "");
-                answer.put(Provider.Cancer_Data.SCORE_OTHER, (other_rating != null) ? other_rating.getText().toString() : "");
+                answer.put(Provider.Cancer_Data.SCORE_PAIN, pain_rating.getText().toString() );
+                answer.put(Provider.Cancer_Data.SCORE_FATIGUE, fatigue_rating.getText().toString() );
+                answer.put(Provider.Cancer_Data.SCORE_DISCONNECTED, disconnected_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_CONCENTRATING, concentrating_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_SAD, sad_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_ANXIOUS, anxious_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_ENJOY, not_enjoying_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_IRRITABLE, irritable_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_SHORT_BREATH, breath_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_NUMBNESS, numb_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_NAUSEA, nausea_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_APPETITE, appetite_rating.getText().toString());
+                answer.put(Provider.Cancer_Data.SCORE_OTHER, other_rating.getText().toString());
                 answer.put(Provider.Cancer_Data.OTHER_LABEL, other_label.getText().toString());
 
                 getContentResolver().insert(Provider.Cancer_Data.CONTENT_URI, answer);

@@ -41,6 +41,23 @@ public class Plugin extends Aware_Plugin {
         filter.addAction(ESM.ACTION_AWARE_ESM_QUEUE_COMPLETE);
         registerReceiver(surveyListener, filter);
 
+        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0 ) {
+            Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
+        }
+        Log.d(TAG, "Max questions per day: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS));
+
+        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0 ) {
+            Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
+        }
+        Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
+
+        //Activate the ESM on the client if not active for some reason...
+        if( Aware.getSetting(this, Aware_Preferences.STATUS_ESM, "com.aware").equals("false") ) {
+            Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true, "com.aware");
+        }
+
         Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
 
@@ -63,7 +80,6 @@ public class Plugin extends Aware_Plugin {
             }
 
             if( intent.getAction().equals(ESM.ACTION_AWARE_ESM_QUEUE_COMPLETE) ) {
-
                 Calendar now = Calendar.getInstance();
                 now.setTimeInMillis(System.currentTimeMillis());
 
@@ -84,14 +100,14 @@ public class Plugin extends Aware_Plugin {
                     int start;
                     int end;
 
-                    if ( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 3 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR))) {
+                    if ( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 2 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR))) {
                         //too late in the evening or too early in the morning to schedule ESM, set to beginning of the day
                         start = 8;
-                        end = 11;
+                        end = start + 2;
                     } else {
                         //still time today
-                        start = now.get(Calendar.HOUR_OF_DAY)+1;
-                        end = now.get(Calendar.HOUR_OF_DAY)+3;
+                        start = now.get(Calendar.HOUR_OF_DAY) + 1;
+                        end = start + 2;
                     }
 
                     int random_hour = getRandomNumberRangeInclusive(start, end);
@@ -112,7 +128,7 @@ public class Plugin extends Aware_Plugin {
                 } else {
                     try {
                         //Done for today, schedule more for tomorrow again
-                        int random_hour = getRandomNumberRangeInclusive(8, 11);
+                        int random_hour = getRandomNumberRangeInclusive(8, 10);
 
                         Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                         schedule.addHour(random_hour);
@@ -137,46 +153,38 @@ public class Plugin extends Aware_Plugin {
         TAG = "UPMC-Cancer";
         DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
-        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
-
-        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0 ) {
-            Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
-        }
-        Log.d(TAG, "Max questions per day: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS));
-
-        if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0 ) {
-            Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
-        }
-        Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
-
         if( intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false) ) {
             if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0 && Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() > 0) {
                 final int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
                 final int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
 
                 try {
+
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
                     schedule.addHour(morning_hour)
                             .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
                             .setActionClass(Plugin.ACTION_CANCER_SURVEY);
                     Scheduler.saveSchedule(this, schedule);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
                 try {
+
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_evening");
                     schedule.addHour(evening_hour)
                             .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
                             .setActionClass(Plugin.ACTION_CANCER_SURVEY);
                     Scheduler.saveSchedule(this, schedule);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
 
-                //Create a starting schedule for emotion ESM
                 try {
+
                     //Schedule for sometime in the next 3 hours
                     Calendar now = Calendar.getInstance();
                     now.setTimeInMillis(System.currentTimeMillis());
@@ -184,14 +192,14 @@ public class Plugin extends Aware_Plugin {
                     int start;
                     int end;
 
-                    if( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+3 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
+                    if( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+2 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
                         //too late or too early, start and end are in the beginning of the day
                         start = 8;
-                        end = 11;
+                        end = start + 2;
                     } else {
                         //still time today
-                        start = now.get(Calendar.HOUR_OF_DAY)+1;
-                        end = now.get(Calendar.HOUR_OF_DAY)+3;
+                        start = now.get(Calendar.HOUR_OF_DAY) + 1;
+                        end = start + 2;
                     }
 
                     int random_hour = getRandomNumberRangeInclusive(start, end);
@@ -201,6 +209,7 @@ public class Plugin extends Aware_Plugin {
                     schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
                             .setActionClass(ACTION_CANCER_EMOTION);
                     Scheduler.saveSchedule(this, schedule);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -224,7 +233,6 @@ public class Plugin extends Aware_Plugin {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         unregisterReceiver(surveyListener);
         Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, false);
         Aware.stopPlugin(this, "com.aware.plugin.upmc.cancer");

@@ -78,9 +78,11 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_MAX_PROMPTS) ) {
             Aware.setSetting(this, key, sharedPreferences.getInt(key, 8));
+            Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
         }
         if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) ) {
             Aware.setSetting(this, key, sharedPreferences.getInt(key, 30));
+            Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
         }
         if( key.equalsIgnoreCase(STATUS_PLUGIN_UPMC_CANCER) ) {
             if( sharedPreferences.getBoolean(key, false) ) {
@@ -91,8 +93,5 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
                 Aware.stopPlugin(this, "com.aware.plugin.upmc.cancer");
             }
         }
-
-        //start plugin again with the new settings
-        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
 }
