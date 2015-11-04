@@ -21,7 +21,7 @@ public class Survey extends IntentService {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setSmallIcon( R.drawable.ic_stat_survey );
         mBuilder.setContentTitle( "UPMC Questionnaire" );
-        mBuilder.setContentText( "Tap to answer at your convenience." );
+        mBuilder.setContentText( "Tap to answer." );
         mBuilder.setDefaults( Notification.DEFAULT_ALL );
         mBuilder.setAutoCancel(true);
 
