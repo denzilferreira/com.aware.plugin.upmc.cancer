@@ -53,11 +53,6 @@ public class Plugin extends Aware_Plugin {
         }
         Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
 
-        //Activate the ESM on the client if not active for some reason...
-        if( Aware.getSetting(this, Aware_Preferences.STATUS_ESM, "com.aware").equals("false") ) {
-            Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true, "com.aware");
-        }
-
         Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
 
@@ -100,14 +95,14 @@ public class Plugin extends Aware_Plugin {
                     int start;
                     int end;
 
-                    if ( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 2 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR))) {
+                    if ( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 3 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR))) {
                         //too late in the evening or too early in the morning to schedule ESM, set to beginning of the day
                         start = 8;
-                        end = start + 2;
+                        end = 10;
                     } else {
                         //still time today
                         start = now.get(Calendar.HOUR_OF_DAY) + 1;
-                        end = start + 2;
+                        end = now.get(Calendar.HOUR_OF_DAY) + 3;
                     }
 
                     int random_hour = getRandomNumberRangeInclusive(start, end);
@@ -192,14 +187,14 @@ public class Plugin extends Aware_Plugin {
                     int start;
                     int end;
 
-                    if( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY)+2 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
+                    if( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 3 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
                         //too late or too early, start and end are in the beginning of the day
                         start = 8;
-                        end = start + 2;
+                        end = 11;
                     } else {
                         //still time today
                         start = now.get(Calendar.HOUR_OF_DAY) + 1;
-                        end = start + 2;
+                        end = now.get(Calendar.HOUR_OF_DAY) + 3;
                     }
 
                     int random_hour = getRandomNumberRangeInclusive(start, end);

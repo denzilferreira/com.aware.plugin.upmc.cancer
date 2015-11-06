@@ -117,12 +117,12 @@ public class UPMC extends AppCompatActivity {
         final EditText most_stress = (EditText) findViewById(R.id.most_stressed_moment);
         most_stress.setText("");
 
-        if( cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
+        if( cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12 ) {
             morning_questions.setVisibility(View.VISIBLE);
             evening_questions.setVisibility(View.GONE);
         }
 
-        if( cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 23) {
+        if( cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 23 ) {
             morning_questions.setVisibility(View.GONE);
             evening_questions.setVisibility(View.VISIBLE);
         }
