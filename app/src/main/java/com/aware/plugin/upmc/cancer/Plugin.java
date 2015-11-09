@@ -75,12 +75,13 @@ public class Plugin extends Aware_Plugin {
             }
 
             if( intent.getAction().equals(ESM.ACTION_AWARE_ESM_QUEUE_COMPLETE) ) {
+
                 Calendar now = Calendar.getInstance();
                 now.setTimeInMillis(System.currentTimeMillis());
 
                 Calendar today = Calendar.getInstance();
                 today.setTimeInMillis(System.currentTimeMillis());
-                today.set(Calendar.HOUR_OF_DAY, 0);
+                today.set(Calendar.HOUR_OF_DAY, 1);
                 today.set(Calendar.MINUTE, 0);
                 today.set(Calendar.SECOND, 0);
 
@@ -95,19 +96,19 @@ public class Plugin extends Aware_Plugin {
                     int start;
                     int end;
 
-                    if ( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 3 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR))) {
-                        //too late in the evening or too early in the morning to schedule ESM, set to beginning of the day
+                    if ( now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 2 >= Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR))) {
+                        //too late in the evening, set to beginning of the day
                         start = 8;
                         end = 10;
                     } else {
                         //still time today
                         start = now.get(Calendar.HOUR_OF_DAY) + 1;
-                        end = now.get(Calendar.HOUR_OF_DAY) + 3;
+                        end = now.get(Calendar.HOUR_OF_DAY) + 2;
                     }
 
                     int random_hour = getRandomNumberRangeInclusive(start, end);
 
-                    //Schedule for sometime in the next 3 hours
+                    //Schedule for sometime in the next 2 hours
                     try {
                         Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
                         schedule.addHour(random_hour);
@@ -177,24 +178,23 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
 
-
                 try {
 
-                    //Schedule for sometime in the next 3 hours
+                    //Schedule for sometime in the next 2 hours
                     Calendar now = Calendar.getInstance();
                     now.setTimeInMillis(System.currentTimeMillis());
 
                     int start;
                     int end;
 
-                    if( now.get(Calendar.HOUR_OF_DAY) < Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 3 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
-                        //too late or too early, start and end are in the beginning of the day
+                    if( now.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) || now.get(Calendar.HOUR_OF_DAY) + 2 >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) ) {
+                        //too late today, set to the beginning of the day
                         start = 8;
-                        end = 11;
+                        end = 10;
                     } else {
                         //still time today
                         start = now.get(Calendar.HOUR_OF_DAY) + 1;
-                        end = now.get(Calendar.HOUR_OF_DAY) + 3;
+                        end = now.get(Calendar.HOUR_OF_DAY) + 2;
                     }
 
                     int random_hour = getRandomNumberRangeInclusive(start, end);
