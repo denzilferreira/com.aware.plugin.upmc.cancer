@@ -3,7 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com.aware.plugin.google.activity_recognition/com.aware.plugin.google.activity_recognition.iml" filepath="$PROJECT_DIR$/com.aware.plugin.google.activity_recognition/com.aware.plugin.google.activity_recognition.iml" />
       <module fileurl="file://$PROJECT_DIR$/com.aware.plugin.upmc.cancer.iml" filepath="$PROJECT_DIR$/com.aware.plugin.upmc.cancer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/device_usage/device_usage.iml" filepath="$PROJECT_DIR$/device_usage/device_usage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/google_FusedLocation/google_FusedLocation.iml" filepath="$PROJECT_DIR$/google_FusedLocation/google_FusedLocation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/openWeather/openWeather.iml" filepath="$PROJECT_DIR$/openWeather/openWeather.iml" />
     </modules>
   </component>
 </project>

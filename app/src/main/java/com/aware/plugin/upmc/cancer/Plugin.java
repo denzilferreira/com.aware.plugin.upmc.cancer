@@ -1,5 +1,6 @@
 package com.aware.plugin.upmc.cancer;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -52,6 +53,9 @@ public class Plugin extends Aware_Plugin {
             Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
         }
         Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
+
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_FINE_LOCATION);
 
         Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
