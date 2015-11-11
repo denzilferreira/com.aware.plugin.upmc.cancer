@@ -2,12 +2,16 @@ package com.aware.plugin.upmc.cancer;
 
 import android.app.Dialog;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -607,7 +611,18 @@ public class UPMC extends AppCompatActivity {
             return true;
         }
         if( id == R.id.action_debug) {
-            sendBroadcast(new Intent(Plugin.ACTION_CANCER_EMOTION));
+
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext());
+            mBuilder.setSmallIcon( R.drawable.ic_stat_survey );
+            mBuilder.setContentTitle( "UPMC Participant ID" );
+            mBuilder.setContentText( Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID) );
+            mBuilder.setDefaults( Notification.DEFAULT_ALL );
+            mBuilder.setOnlyAlertOnce( true );
+            mBuilder.setAutoCancel( true );
+
+            NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notManager.notify(404, mBuilder.build());
+
             return true;
         }
         return super.onOptionsItemSelected(item);
