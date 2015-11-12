@@ -8,8 +8,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 23
-        versionName "3.2"
+        versionCode 24
+        versionName "3.3"
     }
     buildTypes {
         release {
@@ -28,7 +28,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:cardview-v7:23.1.0'
-    compile 'com.awareframework:aware-core:3.8.5@aar'
+    compile 'com.awareframework:aware-core:3.8.6@aar'
+    compile 'com.google.android.gms:play-services:8.3.0'
     compile project(':com.aware.plugin.google.activity_recognition')
     compile project(':device_usage')
     compile project(':google_FusedLocation')

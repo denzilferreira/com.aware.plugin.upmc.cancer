@@ -34,8 +34,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
+import com.aware.providers.Aware_Provider;
 import com.aware.utils.Https;
 
 import org.json.JSONArray;
@@ -52,87 +54,10 @@ public class UPMC extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent aware = new Intent(getApplicationContext(), Aware.class);
+        Intent aware = new Intent(this, Aware.class);
         startService(aware);
 
-        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
-    }
-
-    public static class JoinStudy extends Aware_Preferences.StudyConfig {
-        @Override
-        protected void onHandleIntent(Intent intent) {
-            String study_url = intent.getStringExtra(EXTRA_JOIN_STUDY);
-
-            if( Aware.DEBUG ) Log.d(Aware.TAG, "Joining: " + study_url);
-
-            if( study_url.startsWith("https://api.awareframework.com/") ) {
-                //Request study settings
-                Hashtable<String, String> data = new Hashtable<>();
-                data.put(Aware_Preferences.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-                String answer = new Https(getApplicationContext()).dataPOST(study_url, data, true);
-                try {
-                    JSONArray configs = new JSONArray(answer);
-                    if (configs.getJSONObject(0).has("message")) {
-                        Toast.makeText(getApplicationContext(), "This study is no longer available.", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-
-                    //Apply study settings
-                    JSONArray plugins = new JSONArray();
-                    JSONArray sensors = new JSONArray();
-
-                    for( int i = 0; i<configs.length(); i++ ) {
-                        try {
-                            JSONObject element = configs.getJSONObject(i);
-                            if( element.has("plugins") ) {
-                                plugins = element.getJSONArray("plugins");
-                            }
-                            if( element.has("sensors")) {
-                                sensors = element.getJSONArray("sensors");
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    //Set the sensors' settings first
-                    for( int i=0; i < sensors.length(); i++ ) {
-                        try {
-                            JSONObject sensor_config = sensors.getJSONObject(i);
-                            Aware.setSetting( getApplicationContext(), sensor_config.getString("setting"), sensor_config.get("value") );
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    //Set the plugins' settings now
-                    ArrayList<String> active_plugins = new ArrayList<>();
-                    for( int i=0; i < plugins.length(); i++ ) {
-                        try{
-                            JSONObject plugin_config = plugins.getJSONObject(i);
-
-                            String package_name = plugin_config.getString("plugin");
-                            active_plugins.add(package_name);
-
-                            JSONArray plugin_settings = plugin_config.getJSONArray("settings");
-                            for(int j=0; j<plugin_settings.length(); j++) {
-                                JSONObject plugin_setting = plugin_settings.getJSONObject(j);
-                                Aware.setSetting(getApplicationContext(), plugin_setting.getString("setting"), plugin_setting.get("value"), package_name);
-                            }
-                        }catch( JSONException e ) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    //Start bundled plugins
-                    for( String p : active_plugins ) {
-                        Aware.startPlugin(getApplicationContext(), p);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, true);
     }
 
     private void loadSchedule() {
@@ -179,11 +104,13 @@ public class UPMC extends AppCompatActivity {
                 applySchedule.putExtra("schedule", true);
                 startService(applySchedule);
 
-                if( Aware.getSetting(getApplicationContext(), "study_id").length() == 0 ) {
-                    Intent join = new Intent(getApplicationContext(), JoinStudy.class);
-                    join.putExtra(Aware_Preferences.StudyConfig.EXTRA_JOIN_STUDY, "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
-                    startService(join);
+                if (Aware.getSetting(getApplicationContext(), Aware.STUDY_ID).length() == 0) {
+                    Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
+                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/505/iL6ebTHUNGky");
+//                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
                 }
+
+                Applications.isAccessibilityServiceActive(getApplicationContext());
 
                 finish();
             }

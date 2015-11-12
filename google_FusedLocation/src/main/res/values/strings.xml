@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Google Fused Location</string>
+    <string-array name="accuracies">
+        <item >High accuracy (GPS + network + WiFi)</item>
+        <item >Medium accuracy (network + WiFi)</item>
+        <item >Low accuracy (network only)</item>
+        <item >Opportunistic (reused location)</item>
+    </string-array>
+</resources>

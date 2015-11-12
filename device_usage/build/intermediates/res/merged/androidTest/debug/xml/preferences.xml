@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <com.aware.ui.Aware_Toolbar android:title="@string/app_name" />
+    <CheckBoxPreference android:summary="Logs device usage and non-usage." android:title="Active" android:key="status_plugin_device_usage" android:persistent="true" android:defaultValue="false"/>
+</PreferenceScreen>
+<!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/src/main/res/xml/preferences.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/bundles/debug/res/xml/preferences.xml -->

@@ -1,0 +1,7 @@
+<resources>
+
+    <string name="app_name">OpenWeather</string>
+    <string name="label_maximum">max:</string>
+    <string name="label_minimum">min:</string>
+
+</resources>
