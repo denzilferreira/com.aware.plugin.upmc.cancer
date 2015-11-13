@@ -106,8 +106,8 @@ public class UPMC extends AppCompatActivity {
 
                 if (Aware.getSetting(getApplicationContext(), Aware.STUDY_ID).length() == 0) {
                     Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
-                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/505/iL6ebTHUNGky");
-//                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
+//                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/505/iL6ebTHUNGky");
+                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
                 }
 
                 Applications.isAccessibilityServiceActive(getApplicationContext());

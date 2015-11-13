@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.0/res/values-uk/values-uk.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-uk/values-uk.xml -->
     <eat-comment/>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"Перейти на головний"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s, %2$s"</string>
@@ -57,7 +57,7 @@
     <eat-comment/>
     <string msgid="3156914698180786012" name="common_signin_button_text">"Увійти"</string>
     <string msgid="1483290677806110088" name="common_signin_button_text_long">"Увійти в облік. запис Google"</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.0/res/values-uk/values-uk.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-uk/values-uk.xml -->
     <eat-comment/>
     <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

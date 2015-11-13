@@ -61,7 +61,6 @@ public class Plugin extends Aware_Plugin {
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CONTACTS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.INTERNET);
 
         Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }

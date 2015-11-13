@@ -5,17 +5,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="com.aware.READ_CONTEXT_DATA" />
-    <uses-permission android:name="com.aware.WRITE_CONTEXT_DATA" />
 
     <permission
         android:name="com.aware.READ_CONTEXT_DATA"
@@ -75,25 +66,25 @@
         <provider
             android:authorities="${applicationId}.provider"
             android:name="com.aware.plugin.upmc.cancer.Provider"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
         <provider
             android:name="com.aware.plugin.google.activity_recognition.Google_AR_Provider"
             android:authorities="${applicationId}.provider.gar"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
         <provider android:name="com.aware.plugin.device_usage.Provider"
             android:authorities="${applicationId}.provider.device_usage"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
         <provider
-
+            android:exported="true"
             android:name="com.aware.plugin.openweather.Provider"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
@@ -102,7 +93,7 @@
         <provider
             android:name="com.aware.providers.Scheduler_Provider"
             android:authorities="${applicationId}.provider.scheduler"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -111,7 +102,7 @@
         <provider
             android:name="com.aware.providers.Bluetooth_Provider"
             android:authorities="${applicationId}.provider.bluetooth"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -127,7 +118,7 @@
         <provider
             android:name="com.aware.providers.Locations_Provider"
             android:authorities="${applicationId}.provider.locations"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -135,7 +126,7 @@
         <provider
             android:name="com.aware.providers.Installations_Provider"
             android:authorities="${applicationId}.provider.installations"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -143,7 +134,7 @@
         <provider
             android:name="com.aware.providers.ESM_Provider"
             android:authorities="${applicationId}.provider.esm"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -151,7 +142,7 @@
         <provider
             android:name="com.aware.providers.Temperature_Provider"
             android:authorities="${applicationId}.provider.temperature"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -159,7 +150,7 @@
         <provider
             android:name="com.aware.providers.Linear_Accelerometer_Provider"
             android:authorities="${applicationId}.provider.accelerometer.linear"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -167,7 +158,7 @@
         <provider
             android:name="com.aware.providers.Gravity_Provider"
             android:authorities="${applicationId}.provider.gravity"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -183,7 +174,7 @@
         <provider
             android:name="com.aware.providers.Magnetometer_Provider"
             android:authorities="${applicationId}.provider.magnetometer"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -199,7 +190,7 @@
         <provider
             android:name="com.aware.providers.Light_Provider"
             android:authorities="${applicationId}.provider.light"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -223,7 +214,7 @@
         <provider
             android:name="com.aware.providers.Rotation_Provider"
             android:authorities="${applicationId}.provider.rotation"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -231,7 +222,7 @@
         <provider
             android:name="com.aware.providers.WiFi_Provider"
             android:authorities="${applicationId}.provider.wifi"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -239,7 +230,7 @@
         <provider
             android:name="com.aware.providers.Accelerometer_Provider"
             android:authorities="${applicationId}.provider.accelerometer"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -255,7 +246,7 @@
         <provider
             android:name="com.aware.providers.Traffic_Provider"
             android:authorities="${applicationId}.provider.traffic"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -271,7 +262,7 @@
         <provider
             android:name="com.aware.providers.Processor_Provider"
             android:authorities="${applicationId}.provider.processor"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -287,7 +278,7 @@
         <provider
             android:name="com.aware.providers.Battery_Provider"
             android:authorities="${applicationId}.provider.battery"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -295,7 +286,7 @@
         <provider
             android:name="com.aware.providers.Screen_Provider"
             android:authorities="${applicationId}.provider.screen"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -303,7 +294,7 @@
         <provider
             android:name="com.aware.providers.Network_Provider"
             android:authorities="${applicationId}.provider.network"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >
@@ -319,7 +310,7 @@
         <provider
             android:name="com.aware.providers.Keyboard_Provider"
             android:authorities="${applicationId}.provider.keyboard"
-
+            android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA"
             >

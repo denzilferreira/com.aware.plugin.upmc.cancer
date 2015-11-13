@@ -7,12 +7,7 @@
         android:theme="@style/Theme.Aware"
          >
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
         <service android:name="com.aware.plugin.device_usage.Plugin" android:exported="true" android:label="Phone Usage"/>
-
         <activity android:name="com.aware.plugin.device_usage.Settings" android:exported="true" android:theme="@style/Theme.Aware"/>
 
     </application>
