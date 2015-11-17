@@ -2,4 +2,4 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <solid android:color="#33B5E5"/>
-</shape><!-- From: file:/Users/denzil/Android/aware-client/aware-core/src/main/res/drawable/circle.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.8.7/res/drawable/circle.xml -->
+</shape><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/aware-core/src/main/res/drawable/circle.xml --><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9/phoneRelease/res/drawable/circle.xml -->

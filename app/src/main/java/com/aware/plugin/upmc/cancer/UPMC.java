@@ -57,7 +57,7 @@ public class UPMC extends AppCompatActivity {
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
 
-        Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, true);
+        Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, false);
     }
 
     private void loadSchedule() {
@@ -108,10 +108,9 @@ public class UPMC extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
 //                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/505/iL6ebTHUNGky");
                     Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
+
+                    Applications.isAccessibilityServiceActive(getApplicationContext());
                 }
-
-                Applications.isAccessibilityServiceActive(getApplicationContext());
-
                 finish();
             }
         });
