@@ -8,8 +8,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 25
-        versionName "3.4"
+        versionCode 27
+        versionName "3.6"
     }
     buildTypes {
         release {
