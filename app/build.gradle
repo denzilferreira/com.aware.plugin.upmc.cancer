@@ -35,5 +35,6 @@ dependencies {
     compile project(':device_usage')
     compile project(':google_FusedLocation')
     compile project(':openWeather')
+//    compile 'com.awareframework:aware-core:3.9.2@aar'
     compile project(':aware-core')
 }

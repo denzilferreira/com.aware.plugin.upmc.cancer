@@ -8,7 +8,7 @@
         <item>Low accuracy (network only)</item>
         <item>Opportunistic (reused location)</item>
     </string-array>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <string-array name="clean_old_data_readable">
         <item>Never</item>
@@ -46,7 +46,7 @@
     <bool name="abc_config_allowActionMenuItemTextWithIcon">false</bool>
     <bool name="abc_config_closeDialogWhenTouchOutside">true</bool>
     <bool name="abc_config_showMenuShortcutsWhenKeyboardPresent">false</bool>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <item format="boolean" name="display_aware" type="bool">false</item>
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
@@ -56,7 +56,7 @@
     <color name="abc_search_url_text_pressed">@android:color/black</color>
     <color name="abc_search_url_text_selected">@android:color/black</color>
     <color name="accent_material_dark">@color/material_deep_teal_200</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <color name="accent_material_light">#33b5e5</color>
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
@@ -73,7 +73,7 @@
     <color name="bright_foreground_material_light">@android:color/black</color>
     <color name="button_material_dark">#ff5a595b</color>
     <color name="button_material_light">#ffd6d7d7</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <color name="card_shadow">#AFAFAF</color>
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.1.1/res/values/values.xml -->
@@ -120,7 +120,7 @@
     <color name="dim_foreground_material_light">#ff323232</color>
     <color name="foreground_material_dark">@android:color/white</color>
     <color name="foreground_material_light">@android:color/black</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <color name="grey_background">#E5E5E5</color>
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
@@ -141,7 +141,7 @@
     <color name="material_grey_800">#ff424242</color>
     <color name="material_grey_850">#ff303030</color>
     <color name="material_grey_900">#ff212121</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <color name="navBarColor">#33b5e5</color>
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
@@ -390,7 +390,7 @@
     <eat-comment/>
     <string name="auth_google_play_services_client_facebook_display_name">Facebook</string>
     <string name="auth_google_play_services_client_google_display_name">Google</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <string name="aware_activate_accessibility">Activate AWARE in Accessibility Services.</string>
     <string name="aware_auto_update">Check for updates</string>
@@ -452,7 +452,7 @@
     <eat-comment/>
     <string name="common_signin_button_text">Sign in</string>
     <string name="common_signin_button_text_long">Sign in with Google</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <string name="drawer_close">Closed</string>
     <string name="drawer_open">Opened</string>
@@ -460,7 +460,7 @@
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <string name="write_permission">Allow read and write access to the Context Providers data.</string>
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
@@ -481,7 +481,7 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <style name="Aware_Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
         <!-- Used to for the title of the Toolbar -->
@@ -1721,7 +1721,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.1/phoneRelease/res/values/values.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
     <eat-comment/>
     <style name="Theme.AppCompat.Translucent">
         <item name="android:windowContentOverlay">@null</item>

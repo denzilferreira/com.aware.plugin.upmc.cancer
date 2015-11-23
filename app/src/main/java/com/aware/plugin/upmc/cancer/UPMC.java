@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.database.Cursor;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -39,6 +40,8 @@ import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.providers.Aware_Provider;
 import com.aware.utils.Https;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +52,8 @@ import java.util.Calendar;
 import java.util.Hashtable;
 
 public class UPMC extends AppCompatActivity {
+
+    private boolean debug = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +75,6 @@ public class UPMC extends AppCompatActivity {
         ImageButton saveSchedule = (ImageButton) findViewById(R.id.save_button);
 
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
-        morning_timer.setIs24HourView(true);
-
         if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0 ) {
             morning_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
         }
@@ -80,8 +83,6 @@ public class UPMC extends AppCompatActivity {
         }
 
         final TimePicker evening_timer = (TimePicker) findViewById(R.id.evening_start_time);
-        evening_timer.setIs24HourView(true);
-
         if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() > 0 ) {
             evening_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)));
         }
@@ -114,6 +115,10 @@ public class UPMC extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private boolean is_google_services_available() {
+        return (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext()));
     }
 
     @Override
@@ -149,11 +154,35 @@ public class UPMC extends AppCompatActivity {
         if( cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12 ) {
             morning_questions.setVisibility(View.VISIBLE);
             evening_questions.setVisibility(View.GONE);
+
+            Calendar today = Calendar.getInstance();
+            today.setTimeInMillis(System.currentTimeMillis());
+            today.set(Calendar.HOUR_OF_DAY, 1);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+
+            Cursor already_answered = getContentResolver().query( Provider.Cancer_Data.CONTENT_URI, null, Provider.Cancer_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Cancer_Data.TO_BED + " != '' OR " + Provider.Cancer_Data.FROM_BED + " !='')", null, null );
+            if( already_answered != null && already_answered.getCount() > 0 ){
+                morning_questions.setVisibility(View.GONE);
+            }
+            if( already_answered != null && ! already_answered.isClosed() ) already_answered.close();
         }
 
         if( cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 23 ) {
             morning_questions.setVisibility(View.GONE);
             evening_questions.setVisibility(View.VISIBLE);
+
+            Calendar today = Calendar.getInstance();
+            today.setTimeInMillis(System.currentTimeMillis());
+            today.set(Calendar.HOUR_OF_DAY, 1);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+
+            Cursor already_answered = getContentResolver().query( Provider.Cancer_Data.CONTENT_URI, null, Provider.Cancer_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Cancer_Data.MOST_STRESS_LABEL + " != '' OR " + Provider.Cancer_Data.SCORE_MOST_STRESS + " !='')", null, null );
+            if( already_answered != null && already_answered.getCount() > 0 ){
+                evening_questions.setVisibility(View.GONE);
+            }
+            if( already_answered != null && ! already_answered.isClosed() ) already_answered.close();
         }
 
         final TextView pain_rating = (TextView) findViewById(R.id.pain_rating);
@@ -526,6 +555,9 @@ public class UPMC extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
+        if( ! debug ) {
+            menu.getItem(2).setVisible(false);
+        }
         return true;
     }
 
@@ -537,7 +569,6 @@ public class UPMC extends AppCompatActivity {
             return true;
         }
         if( id == R.id.action_debug) {
-
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext());
             mBuilder.setSmallIcon( R.drawable.ic_stat_survey );
             mBuilder.setContentTitle( "UPMC Participant ID" );
@@ -549,6 +580,10 @@ public class UPMC extends AppCompatActivity {
             NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notManager.notify(404, mBuilder.build());
 
+            return true;
+        }
+        if( id == R.id.action_test) {
+            sendBroadcast(new Intent(Plugin.ACTION_CANCER_EMOTION));
             return true;
         }
         return super.onOptionsItemSelected(item);

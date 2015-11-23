@@ -2,6 +2,7 @@ package com.aware.plugin.upmc.cancer;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,6 +21,7 @@ import com.aware.utils.Scheduler;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
@@ -74,6 +76,21 @@ public class Plugin extends Aware_Plugin {
             }
 
             if( intent.getAction().equals(ACTION_CANCER_EMOTION) ) {
+                //Check if we already had something waiting but the participant has not answered
+                //If we do, set the old as expired
+                Cursor pending_esms = context.getContentResolver().query(ESM_Provider.ESM_Data.CONTENT_URI, null, ESM_Provider.ESM_Data.STATUS +"="+ ESM.STATUS_NEW, null, null );
+                boolean pending = false;
+                if( pending_esms != null && pending_esms.getCount() > 0 ) {
+                    pending = true;
+                }
+                if( pending_esms != null && ! pending_esms.isClosed() ) pending_esms.close();
+
+                if( pending ) {
+                    ContentValues newStatus = new ContentValues();
+                    newStatus.put(ESM_Provider.ESM_Data.STATUS, ESM.STATUS_EXPIRED);
+                    context.getContentResolver().update(ESM_Provider.ESM_Data.CONTENT_URI, newStatus, ESM_Provider.ESM_Data.STATUS + "=" + ESM.STATUS_NEW, null);
+                }
+
                 String emotion_esm = "[{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Angry/frustrated', 'esm_instructions':'Are you angry/frustrated?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
                 emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Happy', 'esm_instructions':'Are you happy?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Next','esm_trigger':'" + context.getPackageName() + "'}},";
                 emotion_esm += "{'esm':{'esm_type':'" + ESM.TYPE_ESM_RADIO + "', 'esm_title':'Stressed/nervous', 'esm_instructions':'Are you stressed/nervous?','esm_radios':['NO','No','Yes','YES'],'esm_expiration_threshold':0,'esm_submit':'Thanks!','esm_trigger':'" + context.getPackageName() + "'}}]";

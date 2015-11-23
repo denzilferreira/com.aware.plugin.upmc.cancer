@@ -403,7 +403,7 @@ public class ESM extends Aware_Sensor {
                         notifyESM(getApplicationContext());
                     } else {
                         Intent intent_ESM = new Intent( getApplicationContext(), ESM_Queue.class );
-                        intent_ESM.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent_ESM.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
                         startActivity(intent_ESM);
                     }
                 } catch (JSONException e) {

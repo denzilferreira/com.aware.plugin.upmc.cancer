@@ -1,5 +1,6 @@
 package com.aware.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -49,8 +50,9 @@ public class ESM_UI extends DialogFragment {
 
 	private static ESMExpireMonitor expire_monitor = null;
 	private static Dialog current_dialog = null;
-	private static Context sContext = null;
+//	private static Context sContext = null;
 
+	private Activity parent;
 	private static int esm_id = 0;
 	private static int esm_type = 0;
 	private static int expires_seconds = 0;
@@ -59,6 +61,10 @@ public class ESM_UI extends DialogFragment {
 
 	//Checkbox ESM UI to store selected items
 	private static ArrayList<String> selected_options = new ArrayList<String>();
+
+	public ESM_UI(Activity parent) {
+		this.parent = parent;
+	}
 
     @NonNull
     @Override
@@ -113,7 +119,6 @@ public class ESM_UI extends DialogFragment {
         	final View layout = ui;
             builder.setView(layout);
         	current_dialog = builder.create();
-        	sContext = current_dialog.getContext();
 
         	TextView esm_instructions = (TextView) layout.findViewById(R.id.esm_instructions);
             if( esm_instructions != null ) {
@@ -152,7 +157,7 @@ public class ESM_UI extends DialogFragment {
 							rowData.put(ESM_Data.ANSWER, feedback.getText().toString());
 							rowData.put(ESM_Data.STATUS, ESM.STATUS_ANSWERED);
 
-		                    sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+		                    parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
 		                    Intent answer = new Intent(ESM.ACTION_AWARE_ESM_ANSWERED);
 		                    getActivity().sendBroadcast(answer);
@@ -240,7 +245,7 @@ public class ESM_UI extends DialogFragment {
 	                    		}
 	                    	    rowData.put(ESM_Data.STATUS, ESM.STATUS_ANSWERED);
 
-			                    sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+			                    parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
 			                    Intent answer = new Intent(ESM.ACTION_AWARE_ESM_ANSWERED);
 			                    getActivity().sendBroadcast(answer);
@@ -342,7 +347,7 @@ public class ESM_UI extends DialogFragment {
 
 			                    rowData.put(ESM_Data.STATUS, ESM.STATUS_ANSWERED);
 
-			                    sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+			                    parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 			                    selected_options.clear();
 
 			                    Intent answer = new Intent(ESM.ACTION_AWARE_ESM_ANSWERED);
@@ -395,7 +400,7 @@ public class ESM_UI extends DialogFragment {
 		                    rowData.put(ESM_Data.ANSWER, ratingBar.getRating());
                 	        rowData.put(ESM_Data.STATUS, ESM.STATUS_ANSWERED);
 
-		                    sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+		                    parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
 		                    Intent answer = new Intent(ESM.ACTION_AWARE_ESM_ANSWERED);
 		                    getActivity().sendBroadcast(answer);
@@ -497,7 +502,7 @@ public class ESM_UI extends DialogFragment {
 							rowData.put(ESM_Data.ANSWER, selected_scale_progress );
 							rowData.put(ESM_Data.STATUS, ESM.STATUS_ANSWERED);
 
-							sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+							parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
 							Intent answer = new Intent(ESM.ACTION_AWARE_ESM_ANSWERED);
 							getActivity().sendBroadcast(answer);
@@ -536,7 +541,7 @@ public class ESM_UI extends DialogFragment {
 									rowData.put(ESM_Data.STATUS, ESM.STATUS_ANSWERED);
 									rowData.put(ESM_Data.ANSWER, (String) answer.getText());
 
-									sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+									parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
 									Intent answer = new Intent(ESM.ACTION_AWARE_ESM_ANSWERED);
 									getActivity().sendBroadcast(answer);
@@ -591,7 +596,7 @@ public class ESM_UI extends DialogFragment {
             ContentValues rowData = new ContentValues();
             rowData.put(ESM_Data.ANSWER_TIMESTAMP, System.currentTimeMillis());
             rowData.put(ESM_Data.STATUS, ESM.STATUS_NEW);
-            sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+            parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
             //Update notification
             ESM.notifyESM(getActivity().getApplicationContext());
@@ -608,21 +613,21 @@ public class ESM_UI extends DialogFragment {
         ContentValues rowData = new ContentValues();
         rowData.put(ESM_Data.ANSWER_TIMESTAMP, System.currentTimeMillis());
         rowData.put(ESM_Data.STATUS, ESM.STATUS_DISMISSED);
-        sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+        parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
-        Cursor esm = sContext.getContentResolver().query(ESM_Data.CONTENT_URI, null, ESM_Data.STATUS + " IN (" + ESM.STATUS_NEW + "," + ESM.STATUS_VISIBLE + ")", null, null);
+        Cursor esm = parent.getContentResolver().query(ESM_Data.CONTENT_URI, null, ESM_Data.STATUS + " IN (" + ESM.STATUS_NEW + "," + ESM.STATUS_VISIBLE + ")", null, null);
         if( esm != null && esm.moveToFirst() ) {
             do {
                 rowData = new ContentValues();
                 rowData.put(ESM_Data.ANSWER_TIMESTAMP, System.currentTimeMillis());
                 rowData.put(ESM_Data.STATUS, ESM.STATUS_DISMISSED);
-                sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, null, null);
+                parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, null, null);
             } while(esm.moveToNext());
         }
         if( esm != null && ! esm.isClosed()) esm.close();
 
         Intent answer = new Intent(ESM.ACTION_AWARE_ESM_DISMISSED);
-        sContext.sendBroadcast(answer);
+        parent.sendBroadcast(answer);
 
 		if( current_dialog != null ) current_dialog.dismiss();
     }
@@ -647,7 +652,7 @@ public class ESM_UI extends DialogFragment {
 		protected Void doInBackground(Void... params) {
 			while( (System.currentTimeMillis()-display_timestamp) / 1000 <= expires_in_seconds ) {
 				if( isCancelled() ) {
-					Cursor esm = sContext.getContentResolver().query(ESM_Data.CONTENT_URI, null, ESM_Data._ID + "=" + esm_id, null, null );
+					Cursor esm = parent.getContentResolver().query(ESM_Data.CONTENT_URI, null, ESM_Data._ID + "=" + esm_id, null, null );
 					if( esm != null && esm.moveToFirst() ) {
 						int status = esm.getInt(esm.getColumnIndex(ESM_Data.STATUS));
 						switch(status) {
@@ -669,10 +674,10 @@ public class ESM_UI extends DialogFragment {
 			ContentValues rowData = new ContentValues();
 			rowData.put(ESM_Data.ANSWER_TIMESTAMP, System.currentTimeMillis());
 			rowData.put(ESM_Data.STATUS, ESM.STATUS_EXPIRED);
-			sContext.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
+			parent.getContentResolver().update(ESM_Data.CONTENT_URI, rowData, ESM_Data._ID + "=" + esm_id, null);
 
 			Intent expired = new Intent(ESM.ACTION_AWARE_ESM_EXPIRED);
-			sContext.sendBroadcast(expired);
+			parent.sendBroadcast(expired);
 
 			if( current_dialog != null ) current_dialog.dismiss();
 

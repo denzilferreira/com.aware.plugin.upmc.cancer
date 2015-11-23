@@ -22,6 +22,7 @@ import com.aware.ui.PermissionsHandler;
 import com.aware.utils.Aware_Plugin;
 import com.aware.utils.Http;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -107,23 +108,30 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-        if( ! mGoogleApiClient.isConnecting() && ! mGoogleApiClient.isConnected() ) {
-            mGoogleApiClient.connect();
-        }
+        if( ! is_google_services_available() ) {
+            Log.e(TAG,"Google Services fused location is not available on this device.");
+            stopSelf();
+        } else {
+            if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.connect();
+            }
+            TAG = "AWARE::OpenWeather";
+            DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
-        TAG = "AWARE::OpenWeather";
-        DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
-
-        if(mGoogleApiClient.isConnected()) {
-            if( ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
-                Intent openWeatherIntent = new Intent(getApplicationContext(), OpenWeather_Service.class);
-                PendingIntent openWeatherFetcher = PendingIntent.getService(getApplicationContext(), 0, openWeatherIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, openWeatherFetcher );
+            if (mGoogleApiClient.isConnected()) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    Intent openWeatherIntent = new Intent(getApplicationContext(), OpenWeather_Service.class);
+                    PendingIntent openWeatherFetcher = PendingIntent.getService(getApplicationContext(), 0, openWeatherIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, openWeatherFetcher);
+                }
             }
         }
-
 		return super.onStartCommand(intent, flags, startId);
 	}
+
+    private boolean is_google_services_available() {
+        return (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext()));
+    }
 
 	@Override
 	public void onDestroy() {

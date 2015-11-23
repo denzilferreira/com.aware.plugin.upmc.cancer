@@ -55,10 +55,11 @@ public class ESM_Queue extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        DialogFragment esmDialog = new ESM_UI();
-        esmDialog.show(fragmentManager, TAG);
+        if( ! isFinishing() ) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            DialogFragment esmDialog = new ESM_UI(ESM_Queue.this);
+            esmDialog.show(fragmentManager, TAG);
+        }
     }
 
     public class ESM_State extends BroadcastReceiver {
