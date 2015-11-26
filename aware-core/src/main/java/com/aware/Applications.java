@@ -295,8 +295,8 @@ public class Applications extends AccessibilityService {
         }
 
         //Boot-up AWARE framework
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
+//        Intent aware = new Intent(getApplicationContext(), Aware.class);
+//        startService(aware);
     }
     
     @Override
@@ -316,29 +316,22 @@ public class Applications extends AccessibilityService {
     public void onCreate() {
         super.onCreate();
 
-        if( ! isAccessibilityEnabled(getApplicationContext()) ) {
-            //Retro-compatibility with some devices that don't support XML defined Accessibility Services
-            AccessibilityServiceInfo info = new AccessibilityServiceInfo();
-            info.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
-            info.feedbackType = AccessibilityServiceInfoCompat.FEEDBACK_ALL_MASK;
-            info.notificationTimeout = 50;
-            info.packageNames = null;
-            setServiceInfo(info);
-            onServiceConnected();
-        }
+//        if( ! isAccessibilityEnabled(getApplicationContext()) ) {
+//            //Retro-compatibility with some devices that don't support XML defined Accessibility Services
+//            AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+//            info.eventTypes = AccessibilityEventCompat.TYPES_ALL_MASK;
+//            info.feedbackType = AccessibilityServiceInfoCompat.FEEDBACK_ALL_MASK;
+//            info.notificationTimeout = 50;
+//            info.packageNames = null;
+//            setServiceInfo(info);
+//            onServiceConnected();
+//        }
     }
 
     private static boolean isAccessibilityEnabled(Context c) {
         boolean enabled = false;
 
         AccessibilityManager accessibilityManager = (AccessibilityManager) c.getSystemService(ACCESSIBILITY_SERVICE);
-
-        //Support for 2.3.x series
-//        List<String> running_services = new ArrayList<>();
-//        ActivityManager activityManager = (ActivityManager) c.getSystemService(ACTIVITY_SERVICE);
-//        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)){
-//            running_services.add(service.service.getPackageName());
-//        }
 
         //Try to fetch active accessibility services directly from Android OS database instead of broken API...
         TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(':');
@@ -401,7 +394,7 @@ public class Applications extends AccessibilityService {
 
         isAccessibilityServiceActive(getApplicationContext());
     	
-    	return START_STICKY;
+    	return super.onStartCommand(intent, flags, startId);
     }
     
     @Override

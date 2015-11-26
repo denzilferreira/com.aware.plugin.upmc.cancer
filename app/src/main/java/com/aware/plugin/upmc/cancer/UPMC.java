@@ -59,8 +59,8 @@ public class UPMC extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
+//        Intent aware = new Intent(getApplicationContext(), Aware.class);
+//        startService(aware);
 
         Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, true);
     }
@@ -105,7 +105,7 @@ public class UPMC extends AppCompatActivity {
                 applySchedule.putExtra("schedule", true);
                 startService(applySchedule);
 
-                if (Aware.getSetting(getApplicationContext(), Aware.STUDY_ID).length() == 0) {
+                if ( Aware.getSetting(getApplicationContext(), Aware.STUDY_ID).length() == 0 ) {
                     Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
 //                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/505/iL6ebTHUNGky");
                     Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
@@ -115,10 +115,6 @@ public class UPMC extends AppCompatActivity {
                 finish();
             }
         });
-    }
-
-    private boolean is_google_services_available() {
-        return (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext()));
     }
 
     @Override

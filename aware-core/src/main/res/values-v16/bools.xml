@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- False for AWARE plugins/applications -->
-    <item name="display_aware" type="bool" format="boolean">false</item>
-    <item name="is_jelly_bean" type="bool" format="boolean">true</item>
+    <item name="is_not_retro" type="bool" format="boolean">false</item>
 </resources>

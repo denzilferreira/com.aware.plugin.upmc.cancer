@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-my-rMM/values-my-rMM.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-my-rMM/values-my-rMM.xml -->
     <eat-comment/>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"မူလနေရာကို သွားရန်"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s၊ %2$s"</string>
@@ -21,7 +21,7 @@
     <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"မျှဝေဖို့ ရွေးပါ"</string>
     <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"%s ကို မျှဝေပါရန်"</string>
     <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"ခေါက်ရန်"</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.3.0/res/values-my-rMM/common_strings.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.3.0/res/values-my-rMM/common_strings.xml -->
     <eat-comment/>
     <string msgid="6428604800157361567" name="common_android_wear_notification_needs_update_text">"Android Wear app အတွက် <ns1:g id="APP_NAME">%1$s</ns1:g> သည် အဆင့်မြှင့်မွမ်းမံမှုတစ်ခု လိုအပ်၏။"</string>
     <string msgid="2453027084525739603" name="common_android_wear_update_text">"Android Wear app  အား အဆင့်မြှင့်မွမ်းမံထားခြင်းမရှိပါက <ns1:g id="APP_NAME">%1$s</ns1:g> သည် အလုပ်လုပ်မည် မဟုတ်ပါ။"</string>
@@ -53,11 +53,11 @@
     <string msgid="2201289642219771610" name="common_google_play_services_updating_text">"လက်ရှိ အဆင့်မြှင့်မွမ်းမံနေသော၊ Google Play ဝန်ဆောင်မှုများ မရှိပါက <ns1:g id="APP_NAME">%1$s</ns1:g> အလုပ်လုပ်မည် မဟုတ်ပါ။"</string>
     <string msgid="815008177440683245" name="common_google_play_services_updating_title">"Google Play ဝန်ဆောင်မှုများ မွမ်းမံနေစဉ်"</string>
     <string msgid="411506735369601515" name="common_open_on_phone">"ဖုန်းထဲ ဖွင့်ရန်"</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.3.0/res/values-my-rMM/base_strings.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.3.0/res/values-my-rMM/base_strings.xml -->
     <eat-comment/>
     <string msgid="3156914698180786012" name="common_signin_button_text">"လက်မှတ်ထိုး ဝင်ရန်"</string>
     <string msgid="1483290677806110088" name="common_signin_button_text_long">"Google ဖြင့် လက်မှတ်ထိုးဝင်ရေ"</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-my-rMM/values-my-rMM.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-my-rMM/values-my-rMM.xml -->
     <eat-comment/>
     <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"၉၉၉+"</string>
 </resources>

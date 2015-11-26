@@ -190,15 +190,13 @@
             android:name="com.aware.utils.Scheduler"
             android:exported="true" />
         <service
+            android:name="com.aware.Aware"
+            android:exported="true" />
+        <service
             android:name="com.aware.Aware$JoinStudy"
             android:exported="true" />
         <service
-            android:name="com.aware.Aware"
-            android:exported="true" >
-        </service>
-        <service
             android:name="com.aware.Applications"
-            android:enabled="@bool/display_aware"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
             <intent-filter>
