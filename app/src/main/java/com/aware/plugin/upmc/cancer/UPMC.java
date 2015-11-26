@@ -53,7 +53,7 @@ import java.util.Hashtable;
 
 public class UPMC extends AppCompatActivity {
 
-    private boolean debug = false;
+    private boolean debug = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,7 @@ public class UPMC extends AppCompatActivity {
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
 
-        Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, false);
+        Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, true);
     }
 
     private void loadSchedule() {
@@ -570,12 +570,17 @@ public class UPMC extends AppCompatActivity {
         }
         if( id == R.id.action_debug) {
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext());
-            mBuilder.setSmallIcon( R.drawable.ic_stat_survey );
-            mBuilder.setContentTitle( "UPMC Participant ID" );
-            mBuilder.setContentText( Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID) );
-            mBuilder.setDefaults( Notification.DEFAULT_ALL );
-            mBuilder.setOnlyAlertOnce( true );
-            mBuilder.setAutoCancel( true );
+            mBuilder.setSmallIcon(R.drawable.ic_stat_survey);
+            mBuilder.setContentTitle("UPMC Participant ID");
+            mBuilder.setContentText(Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+            mBuilder.setDefaults(Notification.DEFAULT_ALL);
+            mBuilder.setOnlyAlertOnce(true);
+            mBuilder.setAutoCancel(true);
+
+            Intent self = new Intent(this, UPMC.class);
+            self.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, self, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(pendingIntent);
 
             NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notManager.notify(404, mBuilder.build());

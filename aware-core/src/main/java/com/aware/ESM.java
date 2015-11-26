@@ -244,7 +244,7 @@ public class ESM extends Aware_Sensor {
         mBuilder.setDefaults( NotificationCompat.DEFAULT_ALL );
 
         Intent intent_ESM = new Intent( c, ESM_Queue.class );
-        intent_ESM.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent_ESM.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pending_ESM = PendingIntent.getActivity( c, 0, intent_ESM, PendingIntent.FLAG_UPDATE_CURRENT );
         mBuilder.setContentIntent(pending_ESM);

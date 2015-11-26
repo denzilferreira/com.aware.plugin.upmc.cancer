@@ -8,8 +8,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 27
-        versionName "3.6"
+        versionCode 28
+        versionName "3.7"
     }
     buildTypes {
         release {
@@ -35,6 +35,5 @@ dependencies {
     compile project(':device_usage')
     compile project(':google_FusedLocation')
     compile project(':openWeather')
-//    compile 'com.awareframework:aware-core:3.9.2@aar'
     compile project(':aware-core')
 }

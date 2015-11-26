@@ -41,6 +41,9 @@
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/src/main/res/values/bools.xml -->
     <eat-comment/>
     <item format="boolean" name="display_aware" type="bool">false</item>
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/values/values.xml -->
+    <eat-comment/>
+    <item format="boolean" name="is_jelly_bean" type="bool">false</item>
     <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <color name="abc_input_method_navigation_guard">@android:color/black</color>

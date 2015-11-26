@@ -1873,8 +1873,15 @@ public class Aware extends Service {
      */
     protected static void startApplications(Context context) {
         awareContext = context;
-        if( applicationsSrv == null) applicationsSrv = new Intent(awareContext, Applications.class);
-        awareContext.startService(applicationsSrv);
+        if( applicationsSrv == null) {
+            applicationsSrv = new Intent(awareContext, Applications.class);
+        }
+        ComponentName service = awareContext.startService(applicationsSrv);
+        //we reach here with 2.3.x-4.0.x
+        if( service == null ) {
+            applicationsSrv = new Intent(awareContext, ApplicationsRetro.class);
+            awareContext.startService(applicationsSrv);
+        }
     }
     
     /**

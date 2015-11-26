@@ -44,7 +44,9 @@ import com.aware.providers.Keyboard_Provider;
 import com.aware.utils.Encrypter;
 import com.aware.utils.WebserviceHelper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Service that logs application usage on the device. 
@@ -314,47 +316,7 @@ public class Applications extends AccessibilityService {
     public void onCreate() {
         super.onCreate();
 
-        boolean enabled = false;
-        //Fix bug where some devices report the accessibility service as inactive, even though it is!
-        TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(':');
-        String settingValue = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        if( settingValue != null ) {
-            splitter.setString(settingValue);
-            while (splitter.hasNext()) {
-                if (splitter.next().matches(getPackageName())){
-                    enabled = true;
-                    break;
-                }
-            }
-        }
-
-        AccessibilityManager accessibilityManager = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-        if( ! enabled ) {
-            List<AccessibilityServiceInfo> enabledServices = AccessibilityManagerCompat.getEnabledAccessibilityServiceList(accessibilityManager, AccessibilityEventCompat.TYPES_ALL_MASK);
-            if( ! enabledServices.isEmpty() ) {
-                for( AccessibilityServiceInfo service : enabledServices ) {
-                    Log.d(Aware.TAG, service.toString());
-                    if( service.getId().contains(getPackageName()) ) {
-                        enabled = true;
-                        break;
-                    }
-                }
-            }
-        }
-        if( ! enabled ) {
-            List<AccessibilityServiceInfo> enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
-            if ( ! enabledServices.isEmpty()) {
-                for (AccessibilityServiceInfo service : enabledServices) {
-                    Log.d(Aware.TAG, service.toString());
-                    if (service.getId().contains(getPackageName())) {
-                        enabled = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if( ! enabled ) {
+        if( ! isAccessibilityEnabled(getApplicationContext()) ) {
             //Retro-compatibility with some devices that don't support XML defined Accessibility Services
             AccessibilityServiceInfo info = new AccessibilityServiceInfo();
             info.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
@@ -364,6 +326,61 @@ public class Applications extends AccessibilityService {
             setServiceInfo(info);
             onServiceConnected();
         }
+    }
+
+    private static boolean isAccessibilityEnabled(Context c) {
+        boolean enabled = false;
+
+        AccessibilityManager accessibilityManager = (AccessibilityManager) c.getSystemService(ACCESSIBILITY_SERVICE);
+
+        //Support for 2.3.x series
+//        List<String> running_services = new ArrayList<>();
+//        ActivityManager activityManager = (ActivityManager) c.getSystemService(ACTIVITY_SERVICE);
+//        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)){
+//            running_services.add(service.service.getPackageName());
+//        }
+
+        //Try to fetch active accessibility services directly from Android OS database instead of broken API...
+        TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(':');
+        String settingValue = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if( settingValue != null ) {
+            splitter.setString(settingValue);
+            while (splitter.hasNext()) {
+                if (splitter.next().matches(c.getPackageName())){
+                    enabled = true;
+                    break;
+                }
+            }
+        }
+        if( ! enabled ) {
+            try {
+                List<AccessibilityServiceInfo> enabledServices = AccessibilityManagerCompat.getEnabledAccessibilityServiceList(accessibilityManager, AccessibilityEventCompat.TYPES_ALL_MASK);
+                if( ! enabledServices.isEmpty() ) {
+                    for( AccessibilityServiceInfo service : enabledServices ) {
+                        Log.d(Aware.TAG, service.toString());
+                        if( service.getId().contains(c.getPackageName()) ) {
+                            enabled = true;
+                            break;
+                        }
+                    }
+                }
+            } catch ( NoSuchMethodError e ) {}
+        }
+        if( ! enabled ) {
+            try{
+                List<AccessibilityServiceInfo> enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
+                if ( ! enabledServices.isEmpty()) {
+                    for (AccessibilityServiceInfo service : enabledServices) {
+                        Log.d(Aware.TAG, service.toString());
+                        if (service.getId().contains(c.getPackageName())) {
+                            enabled = true;
+                            break;
+                        }
+                    }
+                }
+            }catch (NoSuchMethodError e) {}
+        }
+        return enabled;
     }
     
     @Override
@@ -390,7 +407,6 @@ public class Applications extends AccessibilityService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        
         Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, false);
         alarmManager.cancel(repeatingIntent);
         unregisterReceiver(awareMonitor);
@@ -402,50 +418,7 @@ public class Applications extends AccessibilityService {
      */
     public static boolean isAccessibilityServiceActive(Context c) {
         if( Aware.getSetting(c, Applications.STATUS_AWARE_ACCESSIBILITY).equals("true") ) return true;
-
-        boolean enabled = false;
-        //Fix bug where some devices report the accessibility service as inactive, even though it is!
-        TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(':');
-        String settingValue = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        if( settingValue != null ) {
-            splitter.setString(settingValue);
-            while (splitter.hasNext()) {
-                if (splitter.next().matches(c.getPackageName())){
-                    enabled = true;
-                    break;
-                }
-            }
-        }
-
-        AccessibilityManager accessibilityManager = (AccessibilityManager) c.getSystemService(ACCESSIBILITY_SERVICE);
-
-        if( ! enabled ) {
-            List<AccessibilityServiceInfo> enabledServices = AccessibilityManagerCompat.getEnabledAccessibilityServiceList(accessibilityManager, AccessibilityEventCompat.TYPES_ALL_MASK);
-            if( ! enabledServices.isEmpty() ) {
-                for( AccessibilityServiceInfo service : enabledServices ) {
-                    Log.d(Aware.TAG, service.toString());
-                    if( service.getId().contains(c.getPackageName()) ) {
-                        enabled = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if( ! enabled ) {
-            List<AccessibilityServiceInfo> enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
-            if ( ! enabledServices.isEmpty()) {
-                for (AccessibilityServiceInfo service : enabledServices) {
-                    Log.d(Aware.TAG, service.toString());
-                    if (service.getId().contains(c.getPackageName())) {
-                        enabled = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if( ! enabled ) {
+        if( ! isAccessibilityEnabled(c) ) {
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(c);
             mBuilder.setSmallIcon(R.drawable.ic_stat_aware_accessibility);
             mBuilder.setContentTitle("AWARE configuration");
@@ -462,8 +435,7 @@ public class Applications extends AccessibilityService {
             NotificationManager notManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
             notManager.notify(Applications.ACCESSIBILITY_NOTIFICATION_ID, mBuilder.build());
         }
-
-        return enabled;
+        return isAccessibilityEnabled(c);
     }
 
     /**

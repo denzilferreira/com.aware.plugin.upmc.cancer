@@ -50,7 +50,6 @@ public class ESM_UI extends DialogFragment {
 
 	private static ESMExpireMonitor expire_monitor = null;
 	private static Dialog current_dialog = null;
-//	private static Context sContext = null;
 
 	private Activity parent;
 	private static int esm_id = 0;
@@ -602,7 +601,9 @@ public class ESM_UI extends DialogFragment {
             ESM.notifyESM(getActivity().getApplicationContext());
 
             current_dialog.dismiss();
-            getActivity().finish();
+			if( ! getActivity().isFinishing() ) {
+				getActivity().finish();
+			}
         }
 	}
 

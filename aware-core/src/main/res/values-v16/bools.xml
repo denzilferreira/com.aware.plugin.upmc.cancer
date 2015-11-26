@@ -2,5 +2,5 @@
 <resources>
     <!-- False for AWARE plugins/applications -->
     <item name="display_aware" type="bool" format="boolean">false</item>
-    <item name="is_jelly_bean" type="bool" format="boolean">false</item>
+    <item name="is_jelly_bean" type="bool" format="boolean">true</item>
 </resources>

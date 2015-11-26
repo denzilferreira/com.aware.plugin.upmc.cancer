@@ -42,7 +42,6 @@ public class Https {
 	private static final String TAG = "AWARE::HTTPS";
 
     private static SSLContext sslContext;
-//    private static HostnameVerifier sslHostVerifier;
     private static Context sContext;
 
 	public Https(Context c) {
@@ -145,6 +144,8 @@ public class Https {
             path_connection.setReadTimeout(10000);
 			path_connection.setConnectTimeout(10000);
 			path_connection.setRequestMethod("POST");
+            path_connection.setDoOutput(true);
+            path_connection.setDoInput(true);
 			if( is_gzipped ) path_connection.setRequestProperty("accept-encoding","gzip");
 
 			Uri.Builder builder = new Uri.Builder();
@@ -249,6 +250,8 @@ public class Https {
             path_connection.setReadTimeout(10000);
             path_connection.setConnectTimeout(10000);
             path_connection.setRequestMethod("GET");
+            path_connection.setDoInput(true);
+            path_connection.setDoOutput(true);
             if( is_gzipped ) path_connection.setRequestProperty("accept-encoding","gzip");
 
             if(Aware.DEBUG) {

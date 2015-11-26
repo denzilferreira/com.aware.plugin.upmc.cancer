@@ -2239,13 +2239,14 @@ containing a value of this type.
     public static final class bool {
         public static int abc_action_bar_embed_tabs=0x7f080003;
         public static int abc_action_bar_embed_tabs_pre_jb=0x7f080001;
-        public static int abc_action_bar_expanded_action_views_exclusive=0x7f080004;
+        public static int abc_action_bar_expanded_action_views_exclusive=0x7f080006;
         public static int abc_allow_stacked_button_bar=0x7f080000;
-        public static int abc_config_actionMenuItemAllCaps=0x7f080005;
+        public static int abc_config_actionMenuItemAllCaps=0x7f080007;
         public static int abc_config_allowActionMenuItemTextWithIcon=0x7f080002;
-        public static int abc_config_closeDialogWhenTouchOutside=0x7f080006;
-        public static int abc_config_showMenuShortcutsWhenKeyboardPresent=0x7f080007;
-        public static int display_aware=0x7f080008;
+        public static int abc_config_closeDialogWhenTouchOutside=0x7f080008;
+        public static int abc_config_showMenuShortcutsWhenKeyboardPresent=0x7f080009;
+        public static int display_aware=0x7f080004;
+        public static int is_jelly_bean=0x7f080005;
     }
     public static final class color {
         public static int abc_background_cache_hint_selector_material_dark=0x7f0d005b;

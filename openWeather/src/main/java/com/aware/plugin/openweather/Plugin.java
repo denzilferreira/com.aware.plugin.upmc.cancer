@@ -52,7 +52,6 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
 	private static JSONObject sOpenWeather;
 
     private static GoogleApiClient mGoogleApiClient;
-
     private static LocationRequest locationRequest;
 
 	@Override
@@ -100,9 +99,6 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
         locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
 
-        Intent openWeatherIntent = new Intent(getApplicationContext(), OpenWeather_Service.class);
-        PendingIntent openWeatherFetcher = PendingIntent.getService(getApplicationContext(), 0, openWeatherIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         Aware.startPlugin(this, "com.aware.plugin.openweather");
 	}
 
@@ -118,7 +114,7 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
             TAG = "AWARE::OpenWeather";
             DEBUG = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG).equals("true");
 
-            if (mGoogleApiClient.isConnected()) {
+            if ( mGoogleApiClient.isConnected() ) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Intent openWeatherIntent = new Intent(getApplicationContext(), OpenWeather_Service.class);
                     PendingIntent openWeatherFetcher = PendingIntent.getService(getApplicationContext(), 0, openWeatherIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -136,14 +132,11 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
-        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LOCATION_NETWORK, false);
-        if( mGoogleApiClient != null ) {
+        if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ) {
             Intent openWeatherIntent = new Intent(this, OpenWeather_Service.class);
             PendingIntent openWeatherFetcher = PendingIntent.getService(this, 0, openWeatherIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, openWeatherFetcher);
         }
-
         Aware.stopPlugin(this, "com.aware.plugin.openweather");
 	}
 

@@ -125,7 +125,7 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
     public void onDestroy() {
         super.onDestroy();
         Aware.setSetting(this, Settings.STATUS_GOOGLE_FUSED_LOCATION, false);
-        if( mLocationClient != null ) {
+        if( mLocationClient != null && mLocationClient.isConnected() ) {
             Intent locationIntent = new Intent(this, com.aware.plugin.google.fused_location.Algorithm.class);
             PendingIntent pIntent = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient, pIntent);
