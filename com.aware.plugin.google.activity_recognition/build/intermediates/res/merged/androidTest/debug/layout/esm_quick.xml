@@ -20,4 +20,4 @@
         android:paddingBottom="10dp"
         android:baselineAligned="false" />
 
-</LinearLayout><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/aware-core/src/main/res/layout/esm_quick.xml --><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/layout/esm_quick.xml -->
+</LinearLayout><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/aware-core/src/main/res/layout/esm_quick.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/layout/esm_quick.xml -->

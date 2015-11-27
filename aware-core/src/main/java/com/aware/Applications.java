@@ -25,6 +25,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.accessibilityservice.AccessibilityServiceInfoCompat;
 import android.support.v4.app.NotificationCompat;
@@ -264,7 +265,7 @@ public class Applications extends AccessibilityService {
             sendBroadcast(keyboard_data);
         }
     }
-    
+
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
@@ -291,12 +292,22 @@ public class Applications extends AccessibilityService {
             updateApps = new Intent(getApplicationContext(), BackgroundService.class);
             updateApps.setAction(ACTION_AWARE_APPLICATIONS_HISTORY);
             repeatingIntent = PendingIntent.getService(getApplicationContext(), 0, updateApps, 0);
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000, Integer.parseInt(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_APPLICATIONS)) * 1000, repeatingIntent);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, Integer.parseInt(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_APPLICATIONS)) * 1000, repeatingIntent);
         }
 
-        //Boot-up AWARE framework
-//        Intent aware = new Intent(getApplicationContext(), Aware.class);
-//        startService(aware);
+        //Retro-compatibility with Gingerbread
+        if( Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN ) {
+            AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+            info.eventTypes = AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED;
+            info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+            info.notificationTimeout = 50;
+            info.packageNames = null;
+            this.setServiceInfo(info);
+        }
+
+        //Boot AWARE
+        Intent aware = new Intent(getApplicationContext(), Aware.class);
+        startService(aware);
     }
     
     @Override
@@ -308,24 +319,8 @@ public class Applications extends AccessibilityService {
     @Override
     public boolean onUnbind(Intent intent) {
         Aware.setSetting(this, Applications.STATUS_AWARE_ACCESSIBILITY, false, "com.aware");
-        Log.e(TAG,"Accessibility Service has been interrupted...");
+        Log.e(TAG, "Accessibility Service has been interrupted...");
         return super.onUnbind(intent);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-//        if( ! isAccessibilityEnabled(getApplicationContext()) ) {
-//            //Retro-compatibility with some devices that don't support XML defined Accessibility Services
-//            AccessibilityServiceInfo info = new AccessibilityServiceInfo();
-//            info.eventTypes = AccessibilityEventCompat.TYPES_ALL_MASK;
-//            info.feedbackType = AccessibilityServiceInfoCompat.FEEDBACK_ALL_MASK;
-//            info.notificationTimeout = 50;
-//            info.packageNames = null;
-//            setServiceInfo(info);
-//            onServiceConnected();
-//        }
     }
 
     private static boolean isAccessibilityEnabled(Context c) {
@@ -389,11 +384,9 @@ public class Applications extends AccessibilityService {
             updateApps = new Intent(getApplicationContext(), BackgroundService.class);
             updateApps.setAction(ACTION_AWARE_APPLICATIONS_HISTORY);
             repeatingIntent = PendingIntent.getService(getApplicationContext(), 0, updateApps, 0);
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000, Integer.parseInt(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_APPLICATIONS)) * 1000, repeatingIntent);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, Integer.parseInt(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_APPLICATIONS)) * 1000, repeatingIntent);
         }
 
-        isAccessibilityServiceActive(getApplicationContext());
-    	
     	return super.onStartCommand(intent, flags, startId);
     }
     

@@ -50,29 +50,6 @@
         <service android:name="com.aware.plugin.upmc.cancer.Plugin" android:exported="true" android:label="UPMC Cancer" />
         <service android:name="com.aware.plugin.upmc.cancer.Survey" android:label="Cancer Survey"/>
 
-        <service
-            android:name="com.aware.Applications"
-            android:enabled="@bool/is_not_retro"
-            android:exported="true"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-                <category android:name="android.accessibilityservice.category.FEEDBACK_MASK_ALL"/>
-            </intent-filter>
-            <meta-data android:name="android.accessibilityservice" android:resource="@xml/aware_accessibility_config" />
-        </service>
-
-        <service
-            android:name="com.aware.ApplicationsRetro"
-            android:enabled="@bool/is_retro"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-                <category android:name="android.accessibilityservice.category.FEEDBACK_MASK_ALL"/>
-            </intent-filter>
-            <meta-data android:name="android.accessibilityservice" android:resource="@xml/aware_accessibility_config" />
-        </service>
-
         <provider
             android:authorities="${applicationId}.provider"
             android:name="com.aware.plugin.upmc.cancer.Provider"

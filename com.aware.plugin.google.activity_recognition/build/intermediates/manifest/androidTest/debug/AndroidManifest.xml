@@ -194,19 +194,24 @@
             android:exported="true" />
         <service
             android:name="com.aware.Aware$JoinStudy"
-            android:exported="true" />
-        <service
-            android:name="com.aware.Applications"
-            android:exported="true"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/aware_accessibility_config" />
-        </service>
+            android:exported="true" /> <!-- <service -->
+        <!-- android:name="com.aware.Applications" -->
+        <!-- android:enabled="@bool/display_aware" -->
+        <!-- android:exported="true" -->
+        <!-- android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.accessibilityservice.AccessibilityService" /> -->
+        <!-- </intent-filter> -->
+        <!-- <meta-data android:name="android.accessibilityservice" android:resource="@xml/aware_accessibility_config" /> -->
+        <!-- </service> -->
+        <!-- <service -->
+        <!-- android:name="com.aware.ApplicationsRetro" -->
+        <!-- android:enabled="@bool/display_aware" -->
+        <!-- android:exported="true"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.accessibilityservice.AccessibilityService" /> -->
+        <!-- </intent-filter> -->
+        <!-- </service> -->
         <service
             android:name="com.aware.Applications$BackgroundService"
             android:exported="true" >

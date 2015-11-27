@@ -1876,11 +1876,10 @@ public class Aware extends Service {
         if( applicationsSrv == null) {
             applicationsSrv = new Intent(awareContext, Applications.class);
         }
-        ComponentName service = awareContext.startService(applicationsSrv);
-        //we reach here with 2.3.x-4.0.x
-        if( service == null ) {
-            applicationsSrv = new Intent(awareContext, ApplicationsRetro.class);
-            awareContext.startService(applicationsSrv);
+        try{
+            ComponentName service = awareContext.startService(applicationsSrv);
+        } catch (RuntimeException e ) {
+            //Gingerbread and Jelly Bean complain when we start the service explicitly. In these, it is handled by the OS
         }
     }
     
@@ -1889,7 +1888,14 @@ public class Aware extends Service {
      */
     protected static void stopApplications(Context context) {
         awareContext = context;
-        if( applicationsSrv != null) awareContext.stopService(applicationsSrv);
+        if( applicationsSrv != null) {
+            try {
+                awareContext.stopService(applicationsSrv);
+            } catch (RuntimeException e ) {
+                //Gingerbread and Jelly Bean complain when we stop the serive explicitly. In these, it is handled by the OS
+            }
+
+        }
     }
     
     /**

@@ -8,4 +8,4 @@
     android:accessibilityFlags="flagDefault"
     android:notificationTimeout="50"
     android:canRetrieveWindowContent="true"
-/><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/aware-core/src/main/res/xml/aware_accessibility_config.xml --><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/xml/aware_accessibility_config.xml -->
+/><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/aware-core/src/main/res/xml/aware_accessibility_config.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/xml/aware_accessibility_config.xml -->

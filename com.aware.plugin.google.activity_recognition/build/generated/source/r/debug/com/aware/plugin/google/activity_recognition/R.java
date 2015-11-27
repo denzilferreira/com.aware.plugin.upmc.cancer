@@ -2244,8 +2244,9 @@ containing a value of this type.
         public static int abc_config_allowActionMenuItemTextWithIcon=0x7f080002;
         public static int abc_config_closeDialogWhenTouchOutside=0x7f080008;
         public static int abc_config_showMenuShortcutsWhenKeyboardPresent=0x7f080009;
-        public static int display_aware=0x7f080004;
-        public static int is_jelly_bean=0x7f080005;
+        public static int display_aware=0x7f08000a;
+        public static int is_not_retro=0x7f080004;
+        public static int is_retro=0x7f080005;
     }
     public static final class color {
         public static int abc_background_cache_hint_selector_material_dark=0x7f0d005b;

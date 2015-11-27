@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-te-rIN/values-te-rIN.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-te-rIN/values-te-rIN.xml -->
     <eat-comment/>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"హోమ్‌కు నావిగేట్ చేయండి"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s, %2$s"</string>
@@ -21,7 +21,7 @@
     <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"వీరితో భాగస్వామ్యం చేయి"</string>
     <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"%sతో భాగస్వామ్యం చేయి"</string>
     <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"కుదించండి"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.3.0/res/values-te-rIN/common_strings.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.3.0/res/values-te-rIN/common_strings.xml -->
     <eat-comment/>
     <string msgid="6428604800157361567" name="common_android_wear_notification_needs_update_text">"<ns1:g id="APP_NAME">%1$s</ns1:g>కి Android వేర్ అనువర్తనాన్ని నవీకరించడం అవసరం."</string>
     <string msgid="2453027084525739603" name="common_android_wear_update_text">"మీరు Android వేర్ అనువర్తనాన్ని నవీకరిస్తే మినహా <ns1:g id="APP_NAME">%1$s</ns1:g> అమలు కాదు."</string>
@@ -53,11 +53,11 @@
     <string msgid="2201289642219771610" name="common_google_play_services_updating_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> Google Play సేవలు లేకుండా అమలు కాదు, ఆ సేవలు ప్రస్తుతం నవీకరించబడుతున్నాయి."</string>
     <string msgid="815008177440683245" name="common_google_play_services_updating_title">"Google Play సేవలు నవీకరించబడుతున్నాయి"</string>
     <string msgid="411506735369601515" name="common_open_on_phone">"ఫోన్‌లో తెరవండి"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.3.0/res/values-te-rIN/base_strings.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.3.0/res/values-te-rIN/base_strings.xml -->
     <eat-comment/>
     <string msgid="3156914698180786012" name="common_signin_button_text">"సైన్ ఇన్ చేయి"</string>
     <string msgid="1483290677806110088" name="common_signin_button_text_long">"Googleతో సైన్ ఇన్ చేయి"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-te-rIN/values-te-rIN.xml -->
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-te-rIN/values-te-rIN.xml -->
     <eat-comment/>
     <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

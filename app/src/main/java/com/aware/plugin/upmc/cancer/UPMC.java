@@ -59,8 +59,8 @@ public class UPMC extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        Intent aware = new Intent(getApplicationContext(), Aware.class);
-//        startService(aware);
+        Intent aware = new Intent(this, Aware.class);
+        startService(aware);
 
         Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, true);
     }
