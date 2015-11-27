@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/src/main/res/values/arrays.xml -->
+    <eat-comment/>
+    <string-array name="units_labels">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
+    <string-array name="units_values">
+        <item>metric</item>
+        <item>imperial</item>
+    </string-array>
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/src/main/res/values/bools.xml -->
+    <eat-comment/>
+    <item format="boolean" name="display_aware" type="bool">false</item>
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="app_name">OpenWeather</string>
+    <string name="label_maximum">max:</string>
+    <string name="label_minimum">min:</string>
+    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/src/main/res/values/styles.xml -->
+    <eat-comment/>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+</resources>
