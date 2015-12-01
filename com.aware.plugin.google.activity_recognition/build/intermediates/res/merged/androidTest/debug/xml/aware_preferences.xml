@@ -9,7 +9,6 @@
             android:persistent="true"
             android:summary="@string/aware_debug_summary"
             android:title="@string/aware_debug_title" />
-
         <EditTextPreference
             android:defaultValue="AWARE"
             android:dependency="debug_flag"
@@ -17,7 +16,6 @@
             android:persistent="true"
             android:summary="@string/aware_debug_tag_summary"
             android:title="@string/aware_debug_tag" />
-
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="aware_auto_update"
@@ -40,6 +38,13 @@
             android:selectable="false"
             android:summary="UUID:"
             android:title="@string/aware_device_id" />
+        <EditTextPreference
+            android:key="group_id"
+            android:persistent="true"
+            android:selectable="false"
+            android:summary="Group: AWARE"
+            android:defaultValue="AWARE"
+            android:title="@string/aware_research_group" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="sensors"
@@ -688,7 +693,8 @@
                 android:key="webservice_server"
                 android:persistent="true"
                 android:summary="URL"
-                android:title="Study URL" />
+                android:title="Study URL"
+                android:defaultValue="https://api.awareframework.com/index.php"/>
 
             <CheckBoxPreference
                 android:defaultValue="false"
@@ -716,4 +722,4 @@
         </PreferenceScreen>
     </PreferenceCategory>
 
-</PreferenceScreen><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/aware-core/src/main/res/xml/aware_preferences.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.2/phoneRelease/res/xml/aware_preferences.xml -->
+</PreferenceScreen><!-- From: file:/Users/denzil/Android/aware-client/aware-core/src/main/res/xml/aware_preferences.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.3/res/xml/aware_preferences.xml -->

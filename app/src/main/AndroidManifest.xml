@@ -9,20 +9,20 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <permission
-        android:name="com.aware.READ_CONTEXT_DATA"
-        android:description="@string/read_permission"
-        android:icon="@drawable/ic_launcher_settings"
-        android:label="Read AWARE&apos;s Context data"
-        android:protectionLevel="normal" >
-    </permission>
-    <permission
-        android:name="com.aware.WRITE_CONTEXT_DATA"
-        android:description="@string/write_permission"
-        android:icon="@drawable/ic_launcher_settings"
-        android:label="Write to AWARE&apos;s Context data"
-        android:protectionLevel="normal" >
-    </permission>
+    <!--<permission-->
+        <!--android:name="com.aware.READ_CONTEXT_DATA"-->
+        <!--android:description="@string/read_permission"-->
+        <!--android:icon="@drawable/ic_launcher_settings"-->
+        <!--android:label="Read AWARE&apos;s Context data"-->
+        <!--android:protectionLevel="normal" >-->
+    <!--</permission>-->
+    <!--<permission-->
+        <!--android:name="com.aware.WRITE_CONTEXT_DATA"-->
+        <!--android:description="@string/write_permission"-->
+        <!--android:icon="@drawable/ic_launcher_settings"-->
+        <!--android:label="Write to AWARE&apos;s Context data"-->
+        <!--android:protectionLevel="normal" >-->
+    <!--</permission>-->
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -49,6 +49,19 @@
         <activity android:name="com.aware.plugin.upmc.cancer.Settings" android:exported="true" android:theme="@style/Theme.Aware" />
         <service android:name="com.aware.plugin.upmc.cancer.Plugin" android:exported="true" android:label="UPMC Cancer" />
         <service android:name="com.aware.plugin.upmc.cancer.Survey" android:label="Cancer Survey"/>
+
+        <service
+            android:name="com.aware.Applications"
+            android:exported="true"
+            android:enabled="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            tools:replace="android:enabled">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+                <category android:name="android.accessibilityservice.category.FEEDBACK_GENERIC" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/aware_accessibility_config" />
+        </service>
 
         <provider
             android:authorities="${applicationId}.provider"
