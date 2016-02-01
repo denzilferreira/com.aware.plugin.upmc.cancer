@@ -196,6 +196,9 @@
             android:name="com.aware.Aware$JoinStudy"
             android:exported="true" />
         <service
+            android:name="com.aware.utils.SSLManager"
+            android:exported="true" />
+        <service
             android:name="com.aware.Applications"
             android:enabled="@bool/display_aware"
             android:exported="true"

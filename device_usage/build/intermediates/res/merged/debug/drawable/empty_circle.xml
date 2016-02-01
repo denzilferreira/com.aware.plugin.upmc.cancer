@@ -4,4 +4,4 @@
     <stroke android:color="#33B5E5" android:width="2dp" />
     <solid android:color="#80FFFFFF" />
     <size android:width="50dp" android:height="50dp" />
-</shape><!-- From: file:/Users/denzil/Android/aware-client/aware-core/src/main/res/drawable/empty_circle.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.3/res/drawable/empty_circle.xml -->
+</shape><!-- From: file:/Users/denzil/AndroidStudio/aware-client/aware-core/src/main/res/drawable/empty_circle.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/drawable/empty_circle.xml -->

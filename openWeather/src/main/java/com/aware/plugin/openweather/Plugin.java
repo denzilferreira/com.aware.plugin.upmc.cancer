@@ -96,7 +96,7 @@ public class Plugin extends Aware_Plugin implements GoogleApiClient.ConnectionCa
                 .build();
 
         locationRequest = new LocationRequest();
-        locationRequest.setFastestInterval(1000);
+        locationRequest.setFastestInterval(Integer.valueOf(Aware.getSetting(this, Settings.PLUGIN_OPENWEATHER_FREQUENCY)) * 60 * 1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
 
         Aware.startPlugin(this, "com.aware.plugin.openweather");
