@@ -235,12 +235,6 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
             }
-
-//            Cursor scheduled_tasks = getContentResolver().query( Scheduler_Provider.Scheduler_Data.CONTENT_URI, null, null, null, null );
-//            if( scheduled_tasks != null && scheduled_tasks.getCount() > 0 ) {
-//                Log.d(TAG, DatabaseUtils.dumpCursorToString(scheduled_tasks));
-//            }
-//            if( scheduled_tasks != null && ! scheduled_tasks.isClosed() ) scheduled_tasks.close();
         }
 
         return super.onStartCommand(intent, flags, startId);

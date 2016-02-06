@@ -15,6 +15,7 @@
         <service android:exported="true" android:name="com.aware.plugin.google.fused_location.Plugin" android:label="@string/app_name"/>
         <service android:name="com.aware.plugin.google.fused_location.Algorithm" android:exported="true" android:label="@string/app_name"/>
         <activity android:label="@string/app_name" android:name="com.aware.plugin.google.fused_location.Settings" android:exported="true" android:theme="@style/Theme.Aware" />
+        <activity android:name=".DialogLocation" android:exported="true" />
 
     </application>
 

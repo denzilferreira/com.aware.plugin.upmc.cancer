@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <string-array name="clean_old_data_readable">
         <item>Never</item>
@@ -24,7 +24,7 @@
         <item>20000</item>
         <item>0</item>
     </string-array>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <attr format="reference" name="drawerArrowStyle"/>
     <attr format="dimension" name="height"/>
@@ -38,10 +38,10 @@
     <bool name="abc_config_allowActionMenuItemTextWithIcon">false</bool>
     <bool name="abc_config_closeDialogWhenTouchOutside">true</bool>
     <bool name="abc_config_showMenuShortcutsWhenKeyboardPresent">false</bool>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/src/main/res/values/bools.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/src/main/res/values/bools.xml -->
     <eat-comment/>
     <item format="boolean" name="display_aware" type="bool">false</item>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <color name="abc_input_method_navigation_guard">@android:color/black</color>
     <color name="abc_search_url_text_normal">#7fa87f</color>
@@ -61,16 +61,16 @@
     <color name="bright_foreground_material_light">@android:color/black</color>
     <color name="button_material_dark">#ff5a595b</color>
     <color name="button_material_light">#ffd6d7d7</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <color name="card_shadow">#AFAFAF</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <color name="cardview_dark_background">#FF202020</color>
     <color name="cardview_light_background">#FFFAFAFA</color>
     <color name="cardview_shadow_end_color">#03000000</color>
     <color name="cardview_shadow_start_color">#37000000</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values/base_colors.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values/base_colors.xml -->
     <eat-comment/>
     <color name="common_action_bar_splitter">#d2d2d2</color>
     <color name="common_google_signin_btn_text_dark_default">@android:color/white</color>
@@ -89,7 +89,7 @@
     <color name="common_plus_signin_btn_text_light_disabled">#FFAAAAAA</color>
     <color name="common_plus_signin_btn_text_light_focused">#FF737373</color>
     <color name="common_plus_signin_btn_text_light_pressed">#DE000000</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <color name="dim_foreground_disabled_material_dark">#80bebebe</color>
     <color name="dim_foreground_disabled_material_light">#80323232</color>
@@ -97,10 +97,10 @@
     <color name="dim_foreground_material_light">#ff323232</color>
     <color name="foreground_material_dark">@android:color/white</color>
     <color name="foreground_material_light">@android:color/black</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <color name="grey_background">#E5E5E5</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <color name="highlighted_text_material_dark">#6680cbc4</color>
     <color name="highlighted_text_material_light">#66009688</color>
@@ -118,10 +118,10 @@
     <color name="material_grey_800">#ff424242</color>
     <color name="material_grey_850">#ff303030</color>
     <color name="material_grey_900">#ff212121</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <color name="navBarColor">#33b5e5</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values/location_colors.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values/location_colors.xml -->
     <eat-comment/>
     <color name="place_autocomplete_prediction_primary_text">#212121</color>
     <color name="place_autocomplete_prediction_primary_text_highlight">#757575</color>
@@ -129,7 +129,7 @@
     <color name="place_autocomplete_search_hint">#42000000</color>
     <color name="place_autocomplete_search_text">#DE000000</color>
     <color name="place_autocomplete_separator">#1F000000</color>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <color name="primary_dark_material_dark">@android:color/black</color>
     <color name="primary_dark_material_light">@color/material_grey_600</color>
@@ -248,12 +248,12 @@
     <dimen name="abc_text_size_subtitle_material_toolbar">16dp</dimen>
     <dimen name="abc_text_size_title_material">20sp</dimen>
     <dimen name="abc_text_size_title_material_toolbar">20dp</dimen>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <dimen name="cardview_compat_inset_shadow">1dp</dimen>
     <dimen name="cardview_default_elevation">2dp</dimen>
     <dimen name="cardview_default_radius">2dp</dimen>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <item format="float" name="disabled_alpha_material_dark" type="dimen">0.30</item>
     <item format="float" name="disabled_alpha_material_light" type="dimen">0.26</item>
@@ -263,7 +263,7 @@
     <dimen name="notification_large_icon_height">64dp</dimen>
     <dimen name="notification_large_icon_width">64dp</dimen>
     <dimen name="notification_subtext_size">12dp</dimen>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values/location_dimens.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values/location_dimens.xml -->
     <eat-comment/>
     <dimen name="place_autocomplete_button_padding">16dp</dimen>
     <dimen name="place_autocomplete_powered_by_google_height">40dp</dimen>
@@ -275,7 +275,7 @@
     <dimen name="place_autocomplete_progress_horizontal_margin">16dp</dimen>
     <dimen name="place_autocomplete_progress_size">24dp</dimen>
     <dimen name="place_autocomplete_separator_start">72dp</dimen>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <drawable name="notification_template_icon_bg">#3333B5E5</drawable>
     <item name="action_bar_activity_content" type="id"/>
@@ -291,10 +291,10 @@
     <integer name="abc_config_activityShortDur">150</integer>
     <integer name="abc_max_action_buttons">2</integer>
     <integer name="cancel_button_image_alpha">127</integer>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values/version.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values/version.xml -->
     <eat-comment/>
     <integer name="google_play_services_version">8487000</integer>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="abc_action_bar_home_description">Navigate home</string>
@@ -316,14 +316,14 @@
     <string name="abc_shareactionprovider_share_with">Share with</string>
     <string name="abc_shareactionprovider_share_with_application">Share with %s</string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/src/main/res/values/strings.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="app_name">Google Activity Recognition</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values/auth_strings.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values/auth_strings.xml -->
     <eat-comment/>
     <string name="auth_google_play_services_client_facebook_display_name">Facebook</string>
     <string name="auth_google_play_services_client_google_display_name">Google</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <string name="aware_activate_accessibility">Activate AWARE in Accessibility Services.</string>
     <string name="aware_auto_update">Check for updates</string>
@@ -347,7 +347,7 @@
     <string name="aware_stream">AWARE Stream</string>
     <string name="aware_studies">AWARE Studies</string>
     <string name="aware_team">Team</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values/base_strings.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values/base_strings.xml -->
     <eat-comment/>
     <string name="common_google_play_services_api_unavailable_text"><ns1:g id="app_name">%1$s</ns1:g> requires one or more Google Play services that are not currently available. Please contact the developer for assistance.</string>
     <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Enable Google Play services</string>
@@ -366,10 +366,10 @@
     <string name="common_google_play_services_restricted_profile_title">Restricted Profile</string>
     <string name="common_google_play_services_sign_in_failed_text">Error signing in the specified account. Please choose a different account.</string>
     <string name="common_google_play_services_sign_in_failed_title">Sign in failed</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values/common_strings.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values/common_strings.xml -->
     <eat-comment/>
     <string name="common_google_play_services_unknown_issue"><ns1:g id="app_name">%1$s</ns1:g> is having trouble with Google Play services. If the problem persists, please contact the developer for assistance.</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values/base_strings.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values/base_strings.xml -->
     <eat-comment/>
     <string name="common_google_play_services_unsupported_text"><ns1:g id="app_name">%1$s</ns1:g> relies on Google Play services, which is not supported by your device. Contact the manufacturer for assistance.</string>
     <string name="common_google_play_services_unsupported_title">Google Play services</string>
@@ -382,30 +382,30 @@
     <string name="common_open_on_phone">Open on phone</string>
     <string name="common_signin_button_text">Sign in</string>
     <string name="common_signin_button_text_long">Sign in with Google</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <string name="drawer_close">Closed</string>
     <string name="drawer_open">Opened</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values/location_strings.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values/location_strings.xml -->
     <eat-comment/>
     <string name="place_autocomplete_clear_button">Clear search</string>
     <string name="place_autocomplete_search_hint">Search</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <string name="read_permission">Allow read-only access to the Context Providers data.</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <string name="write_permission">Allow read and write access to the Context Providers data.</string>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <style name="AlertDialog.AppCompat" parent="Base.AlertDialog.AppCompat"/>
     <style name="AlertDialog.AppCompat.Light" parent="Base.AlertDialog.AppCompat.Light"/>
     <style name="Animation.AppCompat.Dialog" parent="Base.Animation.AppCompat.Dialog"/>
     <style name="Animation.AppCompat.DropDownUp" parent="Base.Animation.AppCompat.DropDownUp"/>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <style name="Aware_Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
         <!-- Used to for the title of the Toolbar -->
@@ -420,7 +420,7 @@
         <item name="android:background">#33B5E5</item>
         <item name="android:displayOptions">showHome|homeAsUp|showTitle</item>
     </style>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <style name="Base.AlertDialog.AppCompat" parent="android:Widget">
         <item name="android:layout">@layout/abc_alert_dialog_material</item>
@@ -1357,7 +1357,7 @@
         <item name="android:minWidth">56dp</item>
         <item name="android:scaleType">center</item>
     </style>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <style name="CardView">
         <item name="cardBackgroundColor">@color/cardview_light_background</item>
@@ -1373,7 +1373,7 @@
     <style name="CardView.Light">
         <item name="cardBackgroundColor">@color/cardview_light_background</item>
     </style>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <style name="Platform.AppCompat" parent="android:Theme">
         <item name="android:windowNoTitle">true</item>
@@ -1608,7 +1608,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/values/values.xml -->
     <eat-comment/>
     <style name="Theme.AppCompat.Translucent">
         <item name="android:windowContentOverlay">@null</item>
@@ -1628,7 +1628,7 @@
         <item name="colorPrimaryDark">#33B5E5</item>
         <item name="android:textColor">#000000</item>
     </style>
-    <!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <style name="ThemeOverlay.AppCompat" parent="Base.ThemeOverlay.AppCompat"/>
     <style name="ThemeOverlay.AppCompat.ActionBar" parent="Base.ThemeOverlay.AppCompat.ActionBar"/>

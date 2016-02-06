@@ -18,4 +18,4 @@
     <alpha android:fromAlpha="1.0" android:toAlpha="0.0"
            android:interpolator="@android:anim/decelerate_interpolator"
            android:duration="@integer/abc_config_activityShortDur" />
-</set><!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/v7/appcompat/res/anim/abc_popup_exit.xml --><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/anim/abc_popup_exit.xml -->
+</set><!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/v7/appcompat/res/anim/abc_popup_exit.xml --><!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/anim/abc_popup_exit.xml -->

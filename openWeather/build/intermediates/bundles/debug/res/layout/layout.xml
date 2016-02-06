@@ -359,4 +359,4 @@
         android:layout_below="@+id/snow_wrapper"
         android:layout_centerHorizontal="true" />
 
-</RelativeLayout><!-- From: file:/Users/denzil/Android/com.aware.plugin.upmc.cancer/openWeather/src/main/res/layout/layout.xml -->
+</RelativeLayout><!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/src/main/res/layout/layout.xml -->

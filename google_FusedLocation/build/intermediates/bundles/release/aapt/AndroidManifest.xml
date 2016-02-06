@@ -32,6 +32,9 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Aware" />
+        <activity
+            android:name="com.aware.plugin.google.fused_location.DialogLocation"
+            android:exported="true" />
     </application>
 
 </manifest>

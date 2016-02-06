@@ -68,12 +68,12 @@
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <provider
-            android:exported="true"
-            android:name="com.aware.plugin.openweather.Provider"
-            android:readPermission="com.aware.READ_CONTEXT_DATA"
-            android:writePermission="com.aware.WRITE_CONTEXT_DATA"
-            android:authorities="${applicationId}.provider.openweather" />
+        <!--<provider-->
+            <!--android:exported="true"-->
+            <!--android:name="com.aware.plugin.openweather.Provider"-->
+            <!--android:readPermission="com.aware.READ_CONTEXT_DATA"-->
+            <!--android:writePermission="com.aware.WRITE_CONTEXT_DATA"-->
+            <!--android:authorities="${applicationId}.provider.openweather" />-->
 
         <provider
             android:name="com.aware.providers.Scheduler_Provider"
