@@ -2,4 +2,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/aware_qrcode" android:icon="@drawable/ic_action_qrcode" android:title="@string/aware_qrcode" app:showAsAction="always" />
     <item android:id="@+id/aware_about" android:icon="@drawable/ic_launcher_aware" android:title="@string/aware_team" app:showAsAction="never" />
-</menu><!-- From: file:/Users/denzil/AndroidStudio/aware-client/aware-core/src/main/res/menu/aware_menu.xml --><!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.8/res/menu/aware_menu.xml -->
+</menu><!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/aware-core/src/main/res/menu/aware_menu.xml --><!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.9/res/menu/aware_menu.xml -->
