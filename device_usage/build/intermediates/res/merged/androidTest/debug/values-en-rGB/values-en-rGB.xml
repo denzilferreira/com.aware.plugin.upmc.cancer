@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-en-rGB/values-en-rGB.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-en-rGB/values-en-rGB.xml -->
     <eat-comment/>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"Navigate home"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s, %2$s"</string>
@@ -21,7 +21,7 @@
     <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"Share with"</string>
     <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"Share with %s"</string>
     <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"Collapse"</string>
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-en-rGB/base_strings.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-en-rGB/base_strings.xml -->
     <eat-comment/>
     <string msgid="2785372108150982144" name="common_google_play_services_api_unavailable_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> requires one or more Google Play services that are not currently available. Please contact the developer for assistance."</string>
     <string msgid="7334167077229901382" name="common_google_play_services_enable_button">"Enable Google Play services"</string>
@@ -40,10 +40,10 @@
     <string msgid="4958149393843193760" name="common_google_play_services_restricted_profile_title">"Restricted Profile"</string>
     <string msgid="59739986196915578" name="common_google_play_services_sign_in_failed_text">"Error signing in to the specified account. Please choose a different account."</string>
     <string msgid="8431204498860131150" name="common_google_play_services_sign_in_failed_title">"Sign in failed"</string>
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values-en-rGB/common_strings.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values-en-rGB/common_strings.xml -->
     <eat-comment/>
     <string msgid="7170719956698345984" name="common_google_play_services_unknown_issue">"<ns1:g id="APP_NAME">%1$s</ns1:g> is having trouble with Google Play services. If the problem persists, please contact the developer for assistance."</string>
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-en-rGB/base_strings.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-en-rGB/base_strings.xml -->
     <eat-comment/>
     <string msgid="4291190028362992831" name="common_google_play_services_unsupported_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> relies on Google Play services, which is not supported by your device. Contact the manufacturer for assistance."</string>
     <string msgid="909734065366822541" name="common_google_play_services_unsupported_title">"Google Play services"</string>
@@ -56,11 +56,11 @@
     <string msgid="311697239335516384" name="common_open_on_phone">"Open on phone"</string>
     <string msgid="3156914698180786012" name="common_signin_button_text">"Sign In"</string>
     <string msgid="1483290677806110088" name="common_signin_button_text_long">"Sign in with Google"</string>
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values-en-rGB/location_strings.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values-en-rGB/location_strings.xml -->
     <eat-comment/>
     <string msgid="2132213647576279742" name="place_autocomplete_clear_button">"Clear search"</string>
     <string msgid="4600782048316473865" name="place_autocomplete_search_hint">"Search"</string>
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-en-rGB/values-en-rGB.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-en-rGB/values-en-rGB.xml -->
     <eat-comment/>
     <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

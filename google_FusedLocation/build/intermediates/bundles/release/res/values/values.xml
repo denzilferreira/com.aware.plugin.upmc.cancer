@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/google_FusedLocation/src/main/res/values/strings.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/google_FusedLocation/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string-array name="accuracies">
         <item>High accuracy (GPS + network + WiFi)</item>
@@ -9,7 +9,7 @@
         <item>Opportunistic (reused location)</item>
     </string-array>
     <string name="app_name">Google Fused Location</string>
-    <!-- From: file:/Users/denzilferreira/AndroidStudio/com.aware.plugin.upmc.cancer/google_FusedLocation/src/main/res/values/styles.xml -->
+    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/google_FusedLocation/src/main/res/values/styles.xml -->
     <eat-comment/>
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--

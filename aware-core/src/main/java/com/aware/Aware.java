@@ -240,7 +240,7 @@ public class Aware extends Service {
         filter.addAction(Aware.ACTION_AWARE_REFRESH);
         filter.addAction(Aware.ACTION_AWARE_SYNC_DATA);
         filter.addAction(Aware.ACTION_QUIT_STUDY);
-        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+//        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         filter.addAction(Aware.ACTION_AWARE_CHECK_UPDATE);
         awareContext.registerReceiver(aware_BR, filter);
 
@@ -434,9 +434,8 @@ public class Aware extends Service {
 
                     //Fixed: set alarm only once if not set yet.
                     if( aware_preferences.getLong(PREF_LAST_SYNC, 0) == 0 || (aware_preferences.getLong(PREF_LAST_SYNC, 0) > 0 && System.currentTimeMillis() - aware_preferences.getLong(PREF_LAST_SYNC, 0) > frequency_webservice * 60 * 1000 ) ) {
-                    	if( DEBUG ) {
-                            Log.d(TAG,"Data sync every " + frequency_webservice + " minute(s)");
-                        }
+                    	Log.d(TAG,"Data sync every " + frequency_webservice + " minute(s)");
+
                     	SharedPreferences.Editor editor = aware_preferences.edit();
                     	editor.putLong(PREF_LAST_SYNC, System.currentTimeMillis());
                     	editor.commit();
@@ -1688,19 +1687,19 @@ public class Aware extends Service {
             }
 
             //Monitor if the user just connected to Wi-Fi and the client is supposed to sync the data to a study when he does
-            if( intent.getAction().equals(WifiManager.WIFI_STATE_CHANGED_ACTION) ) {
-                int wifi_state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
-                if( wifi_state == WifiManager.WIFI_STATE_ENABLED ) {
-                    if( Aware.getSetting(context, Aware_Preferences.WEBSERVICE_WIFI_ONLY).equals("true") && Aware.getSetting(context, Aware_Preferences.STATUS_WEBSERVICE).equals("true") ) {
-                        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
-                        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                        if( activeNetwork != null && activeNetwork.isConnectedOrConnecting() && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI ) {
-                            if(Aware.DEBUG) Log.d(Aware.TAG, "Internet is available, let's sync!");
-                            context.sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
-                        }
-                    }
-                }
-            }
+//            if( intent.getAction().equals(WifiManager.WIFI_STATE_CHANGED_ACTION) ) {
+//                int wifi_state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
+//                if( wifi_state == WifiManager.WIFI_STATE_ENABLED ) {
+//                    if( Aware.getSetting(context, Aware_Preferences.WEBSERVICE_WIFI_ONLY).equals("true") && Aware.getSetting(context, Aware_Preferences.STATUS_WEBSERVICE).equals("true") ) {
+//                        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+//                        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+//                        if( activeNetwork != null && activeNetwork.isConnectedOrConnecting() && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI ) {
+//                            if(Aware.DEBUG) Log.d(Aware.TAG, "Internet is available, let's sync!");
+//                            context.sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
+//                        }
+//                    }
+//                }
+//            }
         	
             if( intent.getAction().equals(Aware.ACTION_AWARE_CLEAR_DATA) ) {
                 context.getContentResolver().delete(Aware_Provider.Aware_Device.CONTENT_URI, null, null);
