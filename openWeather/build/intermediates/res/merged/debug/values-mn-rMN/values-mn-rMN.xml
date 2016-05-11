@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-mn-rMN/values-mn-rMN.xml -->
-    <eat-comment/>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"Нүүр хуудас руу шилжих"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s, %2$s"</string>
     <string msgid="6623331958280229229" name="abc_action_bar_home_subtitle_description_format">"%1$s, %2$s, %3$s"</string>
@@ -21,8 +19,6 @@
     <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"Хуваалцах"</string>
     <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"%s-тай хуваалцах"</string>
     <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"Хумих"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-mn-rMN/base_strings.xml -->
-    <eat-comment/>
     <string msgid="2785372108150982144" name="common_google_play_services_api_unavailable_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> нь одоогоор ажиллах боломжгүй нэг болон түүнээс дээш Google Play үйлчилгээг шаардаж байна. Тусламж хэрэгтэй бол хөгжүүлэгчтэй холбоо барина уу."</string>
     <string msgid="7334167077229901382" name="common_google_play_services_enable_button">"Google Play үйлчилгээг идэвхжүүлэх"</string>
     <string msgid="2016066508617425489" name="common_google_play_services_enable_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> нь Google Play үйлчилгээг идэвхжүүлэх хүртэл ажиллахгүй."</string>
@@ -40,11 +36,7 @@
     <string msgid="4958149393843193760" name="common_google_play_services_restricted_profile_title">"Хязгаарлагдсан профайл"</string>
     <string msgid="59739986196915578" name="common_google_play_services_sign_in_failed_text">"Тогтоосон бүртгэлд нэвтрэхэд алдаа гарлаа. Өөр бүртгэл сонгоно уу."</string>
     <string msgid="8431204498860131150" name="common_google_play_services_sign_in_failed_title">"Нэвтрэлт амжилтгүй"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values-mn-rMN/common_strings.xml -->
-    <eat-comment/>
     <string msgid="7170719956698345984" name="common_google_play_services_unknown_issue">"<ns1:g id="APP_NAME">%1$s</ns1:g> нь Google Play-н үйлчилгээг ашиглахад алдаа гарлаа. Хэрэв алдаа гарсаар байвал хөгжүүлэгчтэй холбогдож, зөвлөгөө аваарай."</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-mn-rMN/base_strings.xml -->
-    <eat-comment/>
     <string msgid="4291190028362992831" name="common_google_play_services_unsupported_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> нь Google Play үйлчилгээний тусламжтай ажилладаг боловч таны төхөөрөмж үүнийг дэмждэггүй. Тусламж авахын тулд үйлдвэрлэгчтэй холбоо барина уу."</string>
     <string msgid="909734065366822541" name="common_google_play_services_unsupported_title">"Google Play үйлчилгээ"</string>
     <string msgid="2221302284291941971" name="common_google_play_services_update_button">"Шинэчлэх"</string>
@@ -56,11 +48,7 @@
     <string msgid="311697239335516384" name="common_open_on_phone">"Утсаар нээх"</string>
     <string msgid="3156914698180786012" name="common_signin_button_text">"Нэвтрэх"</string>
     <string msgid="1483290677806110088" name="common_signin_button_text_long">"Google-р нэвтрэх:"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values-mn-rMN/location_strings.xml -->
-    <eat-comment/>
     <string msgid="2132213647576279742" name="place_autocomplete_clear_button">"Хайлтыг цэвэрлэх"</string>
     <string msgid="4600782048316473865" name="place_autocomplete_search_hint">"Хайх"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-mn-rMN/values-mn-rMN.xml -->
-    <eat-comment/>
     <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

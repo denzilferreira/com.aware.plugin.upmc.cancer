@@ -56,4 +56,4 @@
         android:layout_gravity="center_horizontal"
         android:text="Apply settings" />
 
-</LinearLayout><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/google_FusedLocation/src/main/res/layout/settings.xml -->
+</LinearLayout>

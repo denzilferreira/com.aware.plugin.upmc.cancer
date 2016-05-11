@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-am/values-am.xml -->
-    <eat-comment/>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"ወደ መነሻ ይዳስሱ"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s፣ %2$s"</string>
     <string msgid="6623331958280229229" name="abc_action_bar_home_subtitle_description_format">"%1$s፣ %2$s፣ %3$s"</string>
@@ -21,8 +19,6 @@
     <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"ከሚከተለው ጋር ያጋሩ"</string>
     <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"ከ%s ጋር ያጋሩ"</string>
     <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"ሰብስብ"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-am/base_strings.xml -->
-    <eat-comment/>
     <string msgid="2785372108150982144" name="common_google_play_services_api_unavailable_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> በአሁኑ ጊዜ የማይገኝ አንድ ወይም ከዚያ በላይ የGoogle Play አገልግሎቶችን ያስፈልገዋል። እገዛ ለማግኘት እባክዎ ገንቢውን ያነጋግሩ።"</string>
     <string msgid="7334167077229901382" name="common_google_play_services_enable_button">"Google Play አገልግሎቶችን ያንቁ"</string>
     <string msgid="2016066508617425489" name="common_google_play_services_enable_text">"Google Play አገልግሎቶችን ካላነቁ በስተቀር <ns1:g id="APP_NAME">%1$s</ns1:g> አይሰራም።"</string>
@@ -40,11 +36,7 @@
     <string msgid="4958149393843193760" name="common_google_play_services_restricted_profile_title">"የተገደበ መገለጫ"</string>
     <string msgid="59739986196915578" name="common_google_play_services_sign_in_failed_text">"ወደተገለጸው መለያ መግባት ላይ ስህተት። እባክዎ የተለየ መለያ ይምረጡ።"</string>
     <string msgid="8431204498860131150" name="common_google_play_services_sign_in_failed_title">"ወደ መለያ መግባት አልተሳካም"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values-am/common_strings.xml -->
-    <eat-comment/>
     <string msgid="7170719956698345984" name="common_google_play_services_unknown_issue">"<ns1:g id="APP_NAME">%1$s</ns1:g> በGoogle Play አገልግሎቶች ላይ እየተቸገረ ነው። ችግሩ ከቀጠለ እባክዎ እርዳታ ለማግኘት ገንቢውን ያነጋግሩ።"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-am/base_strings.xml -->
-    <eat-comment/>
     <string msgid="4291190028362992831" name="common_google_play_services_unsupported_text">"<ns1:g id="APP_NAME">%1$s</ns1:g> በመሣሪያዎ በማይደገፉ Google Play አገልግሎቶች ላይ የተወሰነ ነው። እርዳታ ለማግኘት አምራቹን ያነጋግሩ።"</string>
     <string msgid="909734065366822541" name="common_google_play_services_unsupported_title">"የGoogle Play አገልግሎቶች"</string>
     <string msgid="2221302284291941971" name="common_google_play_services_update_button">"ያዘምኑ"</string>
@@ -56,11 +48,7 @@
     <string msgid="311697239335516384" name="common_open_on_phone">"ስልክ ላይ ክፈት"</string>
     <string msgid="3156914698180786012" name="common_signin_button_text">"ግባ"</string>
     <string msgid="1483290677806110088" name="common_signin_button_text_long">"በGoogle ይግቡ"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values-am/location_strings.xml -->
-    <eat-comment/>
     <string msgid="2132213647576279742" name="place_autocomplete_clear_button">"ፍለጋን አጽዳ"</string>
     <string msgid="4600782048316473865" name="place_autocomplete_search_hint">"ይፈልጉ"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-am/values-am.xml -->
-    <eat-comment/>
     <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

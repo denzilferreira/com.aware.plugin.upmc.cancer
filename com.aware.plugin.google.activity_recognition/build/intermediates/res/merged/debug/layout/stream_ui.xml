@@ -63,4 +63,4 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" android:id="@android:id/list"
         />
-</LinearLayout><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/aware-core/src/main/res/layout/stream_ui.xml --><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.9/res/layout/stream_ui.xml -->
+</LinearLayout>

@@ -552,9 +552,6 @@ public class UPMC extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
-        if( ! debug ) {
-            menu.getItem(2).setVisible(false);
-        }
         return true;
     }
 

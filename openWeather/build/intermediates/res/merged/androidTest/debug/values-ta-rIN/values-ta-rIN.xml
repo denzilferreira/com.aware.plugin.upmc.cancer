@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-ta-rIN/values-ta-rIN.xml -->
-    <eat-comment/>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"முகப்பிற்கு வழிசெலுத்து"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s, %2$s"</string>
     <string msgid="6623331958280229229" name="abc_action_bar_home_subtitle_description_format">"%1$s, %2$s, %3$s"</string>
@@ -21,8 +19,6 @@
     <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"இதனுடன் பகிர்"</string>
     <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"%s உடன் பகிர்"</string>
     <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"சுருக்கு"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-ta-rIN/base_strings.xml -->
-    <eat-comment/>
     <string msgid="2785372108150982144" name="common_google_play_services_api_unavailable_text">"தற்போது கிடைக்காத, ஒன்று அல்லது அதற்கு மேற்பட்ட Google Play சேவைகள் <ns1:g id="APP_NAME">%1$s</ns1:g>க்குத் தேவை. உதவிக்கு, டெவெலப்பரைத் தொடர்புகொள்ளவும்."</string>
     <string msgid="7334167077229901382" name="common_google_play_services_enable_button">"Google Play சேவைகளை இயக்கு"</string>
     <string msgid="2016066508617425489" name="common_google_play_services_enable_text">"Google Play சேவைகளை இயக்கினால் மட்டுமே, <ns1:g id="APP_NAME">%1$s</ns1:g> செயல்படும்."</string>
@@ -40,11 +36,7 @@
     <string msgid="4958149393843193760" name="common_google_play_services_restricted_profile_title">"வரையறுக்கப்பட்ட சுயவிவரம்"</string>
     <string msgid="59739986196915578" name="common_google_play_services_sign_in_failed_text">"குறிப்பிடப்பட்ட கணக்கில் உள்நுழைவதில் பிழை. வேறு கணக்கைத் தேர்வுசெய்யவும்."</string>
     <string msgid="8431204498860131150" name="common_google_play_services_sign_in_failed_title">"உள்நுழைவதில் தோல்வி"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values-ta-rIN/common_strings.xml -->
-    <eat-comment/>
     <string msgid="7170719956698345984" name="common_google_play_services_unknown_issue">"<ns1:g id="APP_NAME">%1$s</ns1:g>க்கு Google Play சேவைகளுடன் சிக்கல் உள்ளது. சிக்கல் தொடர்ந்தால், உதவிக்கு டெவெலப்பரைத் தொடர்புகொள்ளவும்."</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/values-ta-rIN/base_strings.xml -->
-    <eat-comment/>
     <string msgid="4291190028362992831" name="common_google_play_services_unsupported_text">"சாதனம் ஆதரிக்காத Google Play சேவைகளை <ns1:g id="APP_NAME">%1$s</ns1:g> சார்ந்துள்ளது. உதவிக்கு, தயாரிப்பாளரைத் தொடர்புகொள்ளவும்."</string>
     <string msgid="909734065366822541" name="common_google_play_services_unsupported_title">"Google Play சேவைகள்"</string>
     <string msgid="2221302284291941971" name="common_google_play_services_update_button">"புதுப்பி"</string>
@@ -56,11 +48,7 @@
     <string msgid="311697239335516384" name="common_open_on_phone">"மொபைலில் திற"</string>
     <string msgid="3156914698180786012" name="common_signin_button_text">"உள்நுழைக"</string>
     <string msgid="1483290677806110088" name="common_signin_button_text_long">"Google மூலம் உள்நுழைக"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/8.4.0/res/values-ta-rIN/location_strings.xml -->
-    <eat-comment/>
     <string msgid="2132213647576279742" name="place_autocomplete_clear_button">"தேடலை அழி"</string>
     <string msgid="4600782048316473865" name="place_autocomplete_search_hint">"தேடுக"</string>
-    <!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/openWeather/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-ta-rIN/values-ta-rIN.xml -->
-    <eat-comment/>
     <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

@@ -12,4 +12,3 @@
     <item
         android:drawable="@drawable/common_plus_signin_btn_text_light_normal" />
 </selector>
-<!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.4.0/res/drawable/common_plus_signin_btn_text_light.xml -->

@@ -85,4 +85,4 @@
         android:text="0"
         android:layout_below="@+id/esm_instructions" />
 
-</RelativeLayout><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/aware-core/src/main/res/layout/esm_scale.xml --><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/exploded-aar/com.awareframework/aware-core/3.9.9/res/layout/esm_scale.xml -->
+</RelativeLayout>

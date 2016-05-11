@@ -20,4 +20,4 @@
         android:title="Activity recognition interval (in seconds)"
         android:inputType="numberDecimal" />
 
-</PreferenceScreen><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/src/main/res/xml/preferences.xml --><!-- From: file:/Users/denzil/AndroidStudio/com.aware.plugin.upmc.cancer/com.aware.plugin.google.activity_recognition/build/intermediates/bundles/debug/res/xml/preferences.xml -->
+</PreferenceScreen>
