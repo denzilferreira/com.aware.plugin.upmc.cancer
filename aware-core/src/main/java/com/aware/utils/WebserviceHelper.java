@@ -246,6 +246,25 @@ public class WebserviceHelper extends IntentService {
                     e.printStackTrace();
                 }
             }
+
+            /**
+             * Remove old data to free space on the phone
+             */
+            if (DATABASE_TABLE.equalsIgnoreCase("accelerometer")) {
+                Hashtable<String, String> request = new Hashtable<>();
+                request.put(Aware_Preferences.DEVICE_ID, DEVICE_ID);
+
+                //check the latest entry in remote database
+                String latest = getLatest(protocol, WEBSERVER, DATABASE_TABLE, request);
+
+                try {
+                    JSONArray remoteData = new JSONArray(latest);
+                    long last = remoteData.getJSONObject(0).getLong("timestamp");
+                    getContentResolver().delete(CONTENT_URI, "timestamp < " + last, null);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         //Clear database table remotely
