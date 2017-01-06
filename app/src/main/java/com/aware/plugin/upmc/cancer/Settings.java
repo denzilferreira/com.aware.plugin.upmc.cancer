@@ -54,20 +54,20 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
     protected void onResume() {
         super.onResume();
         status = (CheckBoxPreference) findPreference(STATUS_PLUGIN_UPMC_CANCER);
-        if( Aware.getSetting(this, STATUS_PLUGIN_UPMC_CANCER).length() == 0 ) {
+        if (Aware.getSetting(this, STATUS_PLUGIN_UPMC_CANCER).length() == 0) {
             Aware.setSetting(this, STATUS_PLUGIN_UPMC_CANCER, true);
         }
         status.setChecked(Aware.getSetting(this, STATUS_PLUGIN_UPMC_CANCER).equals("true"));
 
         max_prompts = (EditTextPreference) findPreference(PLUGIN_UPMC_CANCER_MAX_PROMPTS);
-        if( Aware.getSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0 ) {
+        if (Aware.getSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0) {
             Aware.setSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
         }
         max_prompts.setText(Aware.getSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS));
         max_prompts.setSummary(Aware.getSetting(this, PLUGIN_UPMC_CANCER_MAX_PROMPTS) + " questions");
 
         min_interval_prompts = (EditTextPreference) findPreference(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL);
-        if( Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0 ) {
+        if (Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0) {
             Aware.setSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
         }
         min_interval_prompts.setText(Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL));
@@ -76,16 +76,16 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_MAX_PROMPTS) ) {
+        if (key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_MAX_PROMPTS)) {
             Aware.setSetting(this, key, sharedPreferences.getInt(key, 8));
             Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
         }
-        if( key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) ) {
+        if (key.equalsIgnoreCase(PLUGIN_UPMC_CANCER_PROMPT_INTERVAL)) {
             Aware.setSetting(this, key, sharedPreferences.getInt(key, 30));
             Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
         }
-        if( key.equalsIgnoreCase(STATUS_PLUGIN_UPMC_CANCER) ) {
-            if( sharedPreferences.getBoolean(key, false) ) {
+        if (key.equalsIgnoreCase(STATUS_PLUGIN_UPMC_CANCER)) {
+            if (sharedPreferences.getBoolean(key, false)) {
                 Aware.setSetting(this, key, true);
                 Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
             } else {

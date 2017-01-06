@@ -6,16 +6,16 @@
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_schedule"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Settings"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_debug"
+        android:id="@+id/action_study"
         android:orderInCategory="200"
-        android:title="Participant ID"
+        android:title="Participant"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_test"
+        android:id="@+id/action_esm_example"
         android:orderInCategory="300"
-        android:title="Emotions"
+        android:title="Demo"
         app:showAsAction="never" />
 </menu>
