@@ -55,9 +55,9 @@ public class Plugin extends Aware_Plugin {
                     angry.addRadio("No");
                     angry.addRadio("Yes");
                     angry.addRadio("YES");
-                    angry.setReplaceQueue(true);
+                    angry.setReplaceQueue(true); //replace the old queue if we get a new queue
                     angry.setNotificationRetry(3);
-                    angry.setNotificationTimeout(10*60); //10 minutes
+                    angry.setNotificationTimeout(10*60); //repeat every 10 minutes, up to 3 times
                     angry.setSubmitButton("Next");
 
                     ESM_Radio happy = new ESM_Radio();
