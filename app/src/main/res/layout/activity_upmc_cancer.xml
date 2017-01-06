@@ -1,801 +1,793 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".UPMC"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-<include android:id="@+id/aware_toolbar" layout="@layout/aware_toolbar"/>
-
-<ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="60dp">
-
-    <LinearLayout
-        android:orientation="vertical"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/aware_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin">
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp">
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:id="@+id/morning_questions"
-            android:visibility="gone">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="I went to bed last night at:"
-                android:id="@+id/lbl_bed_time"
-                android:paddingBottom="10dp"
-                android:textColor="#000"/>
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
 
-            <TimePicker
+            <LinearLayout
+                android:id="@+id/morning_questions"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/bed_time"
-                android:timePickerMode="spinner"
-                android:layout_gravity="center_horizontal" />
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="I got out of bed this morning at:"
-                android:id="@+id/lbl_woke_up"
-                android:layout_marginTop="20dp"
-                android:paddingBottom="10dp"
-                android:textColor="#000" />
+                <TextView
+                    android:id="@+id/lbl_bed_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:text="I went to bed last night at:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
 
-            <TimePicker
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/woke_time"
-                android:timePickerMode="spinner"
-                android:layout_gravity="center_horizontal" />
+                <TimePicker
+                    android:id="@+id/bed_time"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:timePickerMode="spinner" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Last night my sleep was:"
-                android:id="@+id/lbl_quality_sleep"
-                android:layout_marginTop="20dp"
-                android:textColor="#000"
-                />
+                <TextView
+                    android:id="@+id/lbl_woke_up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:paddingBottom="10dp"
+                    android:text="I got out of bed this morning at:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
 
-            <RadioGroup
+                <TimePicker
+                    android:id="@+id/woke_time"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    android:id="@+id/lbl_quality_sleep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Last night my sleep was:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <RadioGroup
+                    android:id="@+id/qos_sleep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <RadioButton
+                        android:id="@+id/qos_very_good"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Very good" />
+
+                    <RadioButton
+                        android:id="@+id/qos_fairly_good"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fairly good" />
+
+                    <RadioButton
+                        android:id="@+id/qos_fairly_bad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fairly bad" />
+
+                    <RadioButton
+                        android:id="@+id/qos_very_bad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Very bad" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/pain"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:id="@+id/qos_sleep">
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Very good"
-                    android:id="@+id/qos_very_good" />
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Fairly good"
-                    android:id="@+id/qos_fairly_good" />
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Fairly bad"
-                    android:id="@+id/qos_fairly_bad" />
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Very bad"
-                    android:id="@+id/qos_very_bad" />
-            </RadioGroup>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:id="@+id/pain"
-            android:background="@color/background_material_light"
-            android:padding="5dp"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Please rate how severe the following symptoms are right now from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be)."
-                android:id="@+id/lbl_rating_intro"
-                android:textColor="#000"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Pain"
-                android:id="@+id/lbl_pain"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_pain"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_rating_intro"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/pain_rating"
-                    android:textColor="#000"
-                    android:layout_gravity="center_vertical" />
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/pain"
-            android:id="@+id/fatigue"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Fatigue / tiredness"
-                android:id="@+id/lbl_fatigue"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <SeekBar
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/rate_fatigue"
-                android:layout_weight="1"
-                android:max="10"
-                android:progress="0"
-                android:splitTrack="true"
-                android:layout_gravity="center_vertical" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="0"
-                android:id="@+id/fatigue_rating"
-                android:textColor="#000"
-                android:layout_gravity="center_vertical" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/fatigue"
-            android:id="@+id/disconnected"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Feeling disconnected from others"
-                android:id="@+id/lbl_disconnected"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <SeekBar
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/rate_disconnected"
-                android:layout_weight="1"
-                android:max="10"
-                android:progress="0"
-                android:splitTrack="true"
-                android:layout_gravity="center_vertical" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="0"
-                android:id="@+id/disconnected_rating"
-                android:textColor="#000"
-                android:layout_gravity="center_vertical" />
-            </LinearLayout>
-        </LinearLayout>
-
-
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/disconnected"
-            android:id="@+id/concentrating"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Trouble concentrating / remembering things"
-                android:id="@+id/lbl_concentrating"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_concentrating"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                    android:text="Please rate how severe the following symptoms are right now from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be)."
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
 
                 <TextView
+                    android:id="@+id/lbl_pain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/concentrating_rating"
-                    android:textColor="#000"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Pain"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_pain"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/pain_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/concentrating"
-            android:id="@+id/sad"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Feeling sad or down"
-                android:id="@+id/lbl_sad"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_sad"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/fatigue"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/pain"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_fatigue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/sad_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Fatigue / tiredness"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_fatigue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/fatigue_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
+
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/sad"
-            android:id="@+id/anxious"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Feeling anxious or worried"
-                android:id="@+id/lbl_anxious"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_anxious"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/disconnected"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/fatigue"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_disconnected"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/anxious_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Feeling disconnected from others"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_disconnected"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/disconnected_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/anxious"
-            android:id="@+id/not_enjoying"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Not enjoying things"
-                android:id="@+id/lbl_not_enjoying"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_not_enjoying"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/concentrating"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/disconnected"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_concentrating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/not_enjoying_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Trouble concentrating / remembering things"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_concentrating"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/concentrating_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/not_enjoying"
-            android:id="@+id/irritable"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Feeling irritable"
-                android:id="@+id/lbl_irritable"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_irritable"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/sad"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/concentrating"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_sad"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/irritable_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Feeling sad or down"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_sad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/sad_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/irritable"
-            android:id="@+id/breath"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Shortness of breath"
-                android:id="@+id/lbl_breath"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_breath"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/anxious"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/sad"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_anxious"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/breath_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Feeling anxious or worried"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_anxious"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/anxious_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/breath"
-            android:id="@+id/numb"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Numbness or tingling"
-                android:id="@+id/lbl_numb"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_numb"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/not_enjoying"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/anxious"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_not_enjoying"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/numb_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Not enjoying things"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_not_enjoying"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/not_enjoying_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/numb"
-            android:id="@+id/nausea"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Nausea"
-                android:id="@+id/lbl_nausea"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_nausea"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/irritable"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/not_enjoying"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_irritable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/nausea_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Feeling irritable"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_irritable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/irritable_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/nausea"
-            android:id="@+id/appetite"
-            android:background="@color/background_material_light"
-            android:padding="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Poor appetite"
-                android:id="@+id/lbl_appetite"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_appetite"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/breath"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/irritable"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_breath"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/appetite_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Shortness of breath"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_breath"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/breath_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/appetite"
-            android:id="@+id/other"
-            android:background="@color/background_material_light"
-            android:padding="5dp"
-            android:layout_marginBottom="40dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Other"
-                android:id="@+id/lbl_other"
-                android:textColor="#33B5E5"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:layout_gravity="center_vertical" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/rate_other"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0"
-                    android:splitTrack="true"
-                    android:layout_gravity="center_vertical" />
+                android:id="@+id/numb"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/breath"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/lbl_numb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="0"
-                    android:id="@+id/other_rating"
-                    android:textColor="#000"
-                    android:textAlignment="viewEnd"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:text="Numbness or tingling"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_numb"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/numb_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-        
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/evening_questions"
-            android:orientation="vertical"
-            android:visibility="gone">
-            
-            <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/evening_intro"
-            android:id="@+id/evening_intro"
-            android:textColor="#000"
-            />
-            
-            <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/most_stressed_moment"
-            android:textColor="#000"
-            />
-            
-            <RadioGroup
+
+            <LinearLayout
+                android:id="@+id/nausea"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/numb"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <TextView
+                    android:id="@+id/lbl_nausea"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Nausea"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_nausea"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/nausea_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/appetite"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/nausea"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <TextView
+                    android:id="@+id/lbl_appetite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Poor appetite"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_appetite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/appetite_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/other"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/appetite"
+                android:layout_marginBottom="40dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/background_material_light"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <TextView
+                    android:id="@+id/lbl_other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Other"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#33B5E5"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/rate_other"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="-1"
+                        android:splitTrack="true" />
+
+                    <TextView
+                        android:id="@+id/other_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="-1"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/evening_questions"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/quality_of_stress"
-                >
-                
-                <RadioButton
-                android:layout_width="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/evening_intro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/evening_intro"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <EditText
+                    android:id="@+id/most_stressed_moment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#000" />
+
+                <RadioGroup
+                    android:id="@+id/quality_of_stress"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/no_stress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Not at all stressful" />
+
+                    <RadioButton
+                        android:id="@+id/not_much_stress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A little stressful" />
+
+                    <RadioButton
+                        android:id="@+id/some_stress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Somewhat stressful" />
+
+                    <RadioButton
+                        android:id="@+id/a_lot_stress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Extremely stressful" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/answer_questionnaire"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Not at all stressful"
-                android:id="@+id/no_stress" />
-                
-                <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="A little stressful"
-                android:id="@+id/not_much_stress" />
-                
-                <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Somewhat stressful"
-                android:id="@+id/some_stress" />
-                
-                <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Extremely stressful"
-                android:id="@+id/a_lot_stress" />
-            </RadioGroup>
+                android:text="Save answers"
+                android:background="@color/colorPrimary" />
+
         </LinearLayout>
-
-    </LinearLayout>
-
-</ScrollView>
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/answer_questionnaire"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@drawable/circle"
-        android:src="@drawable/ic_action_save"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:padding="12dp"
-        android:elevation="2dp" />
-
+    </ScrollView>
 </RelativeLayout>

@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:layout_height="match_parent" android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
 
-    <include android:id="@+id/aware_toolbar" layout="@layout/aware_toolbar"/>
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/aware_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <ScrollView
+        android:id="@+id/scroller"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
-        android:id="@+id/scroller">
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <TextView
+                android:id="@+id/lbl_morning"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Morning schedule"
-                android:id="@+id/lbl_morning"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="30sp" />
 
             <TimePicker
+                android:id="@+id/morning_start_time"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/morning_start_time"
-                android:timePickerMode="spinner"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal"
+                android:timePickerMode="spinner" />
 
             <TextView
+                android:id="@+id/lbl_evening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="20dp"
                 android:text="Evening schedule"
-                android:id="@+id/lbl_evening"
-                android:textSize="30sp"
-                android:layout_marginTop="20dp"/>
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="30sp" />
 
             <TimePicker
+                android:id="@+id/evening_start_time"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/evening_start_time"
                 android:timePickerMode="spinner" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save schedule"
+                android:background="@color/colorPrimary" />
 
         </LinearLayout>
     </ScrollView>
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/save_button"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/circle"
-        android:padding="16dp"
-        android:src="@drawable/ic_action_save" />
 </RelativeLayout>

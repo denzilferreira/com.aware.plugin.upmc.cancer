@@ -1,8 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".UPMC">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="always" android:icon="@drawable/ic_action_schedule" />
-    <item android:id="@+id/action_debug" android:title="Participant ID" android:orderInCategory="200" app:showAsAction="never" />
-    <item android:id="@+id/action_test" android:title="Emotions" android:orderInCategory="300" app:showAsAction="never" />
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".UPMC">
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_action_schedule"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_debug"
+        android:orderInCategory="200"
+        android:title="Participant ID"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_test"
+        android:orderInCategory="300"
+        android:title="Emotions"
+        app:showAsAction="never" />
 </menu>

@@ -1,20 +1,15 @@
 package com.aware.plugin.upmc.cancer;
 
 import android.app.Dialog;
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.database.Cursor;
-import android.graphics.Paint;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,12 +17,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -39,18 +31,8 @@ import android.widget.Toast;
 import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
-import com.aware.providers.Aware_Provider;
-import com.aware.utils.Https;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Hashtable;
 
 public class UPMC extends AppCompatActivity {
 
@@ -63,17 +45,14 @@ public class UPMC extends AppCompatActivity {
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
 
-        Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, false);
+        Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
     }
 
     private void loadSchedule() {
 
         setContentView(R.layout.settings_upmc_cancer);
 
-        Toolbar aware_toolbar = (Toolbar) findViewById(R.id.aware_toolbar);
-        setSupportActionBar(aware_toolbar);
-
-        ImageButton saveSchedule = (ImageButton) findViewById(R.id.save_button);
+        Button saveSchedule = (Button) findViewById(R.id.save_button);
 
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
         if( Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0 ) {
@@ -106,7 +85,7 @@ public class UPMC extends AppCompatActivity {
                 applySchedule.putExtra("schedule", true);
                 startService(applySchedule);
 
-                if ( Aware.getSetting(getApplicationContext(), Aware.STUDY_ID).length() == 0 ) {
+                if ( ! Aware.isStudy(getApplicationContext()) ) {
                     Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
                     Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
 
@@ -133,9 +112,6 @@ public class UPMC extends AppCompatActivity {
 
         setContentView( R.layout.activity_upmc_cancer );
 
-        Toolbar aware_toolbar = (Toolbar) findViewById(R.id.aware_toolbar);
-        setSupportActionBar(aware_toolbar);
-
         final LinearLayout morning_questions = (LinearLayout) findViewById(R.id.morning_questions);
         final LinearLayout evening_questions = (LinearLayout) findViewById(R.id.evening_questions);
 
@@ -158,7 +134,7 @@ public class UPMC extends AppCompatActivity {
             today.set(Calendar.MINUTE, 0);
             today.set(Calendar.SECOND, 0);
 
-            Cursor already_answered = getContentResolver().query( Provider.Cancer_Data.CONTENT_URI, null, Provider.Cancer_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Cancer_Data.TO_BED + " != '' OR " + Provider.Cancer_Data.FROM_BED + " !='')", null, null );
+            Cursor already_answered = getContentResolver().query( Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.TO_BED + " != '' OR " + Provider.Symptom_Data.FROM_BED + " !='')", null, null );
             if( already_answered != null && already_answered.getCount() > 0 ){
                 morning_questions.setVisibility(View.GONE);
             }
@@ -175,7 +151,7 @@ public class UPMC extends AppCompatActivity {
             today.set(Calendar.MINUTE, 0);
             today.set(Calendar.SECOND, 0);
 
-            Cursor already_answered = getContentResolver().query( Provider.Cancer_Data.CONTENT_URI, null, Provider.Cancer_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Cancer_Data.MOST_STRESS_LABEL + " != '' OR " + Provider.Cancer_Data.SCORE_MOST_STRESS + " !='')", null, null );
+            Cursor already_answered = getContentResolver().query( Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.MOST_STRESS_LABEL + " != '' OR " + Provider.Symptom_Data.SCORE_MOST_STRESS + " !='')", null, null );
             if( already_answered != null && already_answered.getCount() > 0 ){
                 evening_questions.setVisibility(View.GONE);
             }
@@ -504,42 +480,42 @@ public class UPMC extends AppCompatActivity {
             }
         });
 
-        final ImageButton answer_questions = (ImageButton) findViewById(R.id.answer_questionnaire);
+        final Button answer_questions = (Button) findViewById(R.id.answer_questionnaire);
         answer_questions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 ContentValues answer = new ContentValues();
-                answer.put(Provider.Cancer_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-                answer.put(Provider.Cancer_Data.TIMESTAMP, System.currentTimeMillis());
+                answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+                answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
 
                 if( morning_questions != null && morning_questions.getVisibility() == View.VISIBLE ) {
-                    answer.put(Provider.Cancer_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
-                    answer.put(Provider.Cancer_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h"+from_bed.getCurrentMinute() : "");
-                    answer.put(Provider.Cancer_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1 ) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
+                    answer.put(Provider.Symptom_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
+                    answer.put(Provider.Symptom_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h"+from_bed.getCurrentMinute() : "");
+                    answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1 ) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
                 }
 
                 if( evening_questions != null && evening_questions.getVisibility() == View.VISIBLE ) {
-                    answer.put(Provider.Cancer_Data.MOST_STRESS_LABEL, most_stress.getText().toString());
-                    answer.put(Provider.Cancer_Data.SCORE_STRESS, (qos_stress != null && qos_stress.getCheckedRadioButtonId() != -1 ) ? (String) ((RadioButton) findViewById(qos_stress.getCheckedRadioButtonId())).getText() : "");
+                    answer.put(Provider.Symptom_Data.MOST_STRESS_LABEL, most_stress.getText().toString());
+                    answer.put(Provider.Symptom_Data.SCORE_STRESS, (qos_stress != null && qos_stress.getCheckedRadioButtonId() != -1 ) ? (String) ((RadioButton) findViewById(qos_stress.getCheckedRadioButtonId())).getText() : "");
                 }
 
-                answer.put(Provider.Cancer_Data.SCORE_PAIN, pain_rating.getText().toString() );
-                answer.put(Provider.Cancer_Data.SCORE_FATIGUE, fatigue_rating.getText().toString() );
-                answer.put(Provider.Cancer_Data.SCORE_DISCONNECTED, disconnected_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_CONCENTRATING, concentrating_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_SAD, sad_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_ANXIOUS, anxious_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_ENJOY, not_enjoying_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_IRRITABLE, irritable_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_SHORT_BREATH, breath_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_NUMBNESS, numb_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_NAUSEA, nausea_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_APPETITE, appetite_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.SCORE_OTHER, other_rating.getText().toString());
-                answer.put(Provider.Cancer_Data.OTHER_LABEL, other_label.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_PAIN, pain_rating.getText().toString() );
+                answer.put(Provider.Symptom_Data.SCORE_FATIGUE, fatigue_rating.getText().toString() );
+                answer.put(Provider.Symptom_Data.SCORE_DISCONNECTED, disconnected_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_CONCENTRATING, concentrating_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_SAD, sad_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_ANXIOUS, anxious_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_ENJOY, not_enjoying_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_IRRITABLE, irritable_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_SHORT_BREATH, breath_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_NUMBNESS, numb_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_NAUSEA, nausea_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_APPETITE, appetite_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.SCORE_OTHER, other_rating.getText().toString());
+                answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
 
-                getContentResolver().insert(Provider.Cancer_Data.CONTENT_URI, answer);
+                getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
 
                 Log.d("UPMC", "Answers:" + answer.toString());
 
