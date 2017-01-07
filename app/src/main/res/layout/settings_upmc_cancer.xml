@@ -29,14 +29,15 @@
                 android:layout_height="wrap_content"
                 android:text="Morning schedule"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="30sp" />
+                android:textSize="30sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="normal|bold" />
 
             <TimePicker
                 android:id="@+id/morning_start_time"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:timePickerMode="spinner" />
+                android:layout_gravity="center_horizontal" />
 
             <TextView
                 android:id="@+id/lbl_evening"
@@ -45,20 +46,23 @@
                 android:layout_marginTop="20dp"
                 android:text="Evening schedule"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="30sp" />
+                android:textSize="30sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="normal|bold" />
 
             <TimePicker
                 android:id="@+id/evening_start_time"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:timePickerMode="spinner" />
+                android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/save_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
                 android:text="Save schedule"
-                android:background="@color/colorPrimary" />
+                android:textStyle="normal|bold"
+                android:textColor="@android:color/white" />
 
         </LinearLayout>
     </ScrollView>

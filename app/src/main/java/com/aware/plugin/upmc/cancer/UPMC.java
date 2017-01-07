@@ -2,19 +2,15 @@ package com.aware.plugin.upmc.cancer;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ContentValues;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -582,21 +578,28 @@ public class UPMC extends AppCompatActivity {
             return true;
         }
         if (title.equalsIgnoreCase("Participant")) {
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext());
-            mBuilder.setSmallIcon(R.drawable.ic_stat_survey);
-            mBuilder.setContentTitle("UPMC Participant ID");
-            mBuilder.setContentText(Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-            mBuilder.setDefaults(Notification.DEFAULT_ALL);
-            mBuilder.setOnlyAlertOnce(true);
-            mBuilder.setAutoCancel(true);
 
-            Intent self = new Intent(this, UPMC.class);
-            self.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, self, PendingIntent.FLAG_UPDATE_CURRENT);
-            mBuilder.setContentIntent(pendingIntent);
+            View participantInfo = getLayoutInflater().inflate(R.layout.participant_info, null);
 
-            NotificationManager notManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notManager.notify(404, mBuilder.build());
+            TextView uuid = (TextView) participantInfo.findViewById(R.id.device_id);
+            uuid.setText("UUID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+
+            final EditText device_label = (EditText) participantInfo.findViewById(R.id.device_label);
+            device_label.setText(Aware.getSetting(this, Aware_Preferences.DEVICE_LABEL));
+
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+            mBuilder.setTitle("UPMC Participant");
+            mBuilder.setView(participantInfo);
+            mBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (device_label.getText().length() > 0 && !device_label.getText().toString().equals(Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL))) {
+                        Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, device_label.getText().toString());
+                    }
+                    dialog.dismiss();
+                }
+            });
+            mBuilder.create().show();
 
             return true;
         }
@@ -604,6 +607,10 @@ public class UPMC extends AppCompatActivity {
             Intent demo_esms = new Intent(Plugin.ACTION_CANCER_EMOTION);
             demo_esms.putExtra("demo", true);
             sendBroadcast(demo_esms);
+            return true;
+        }
+        if (title.equalsIgnoreCase("Sync")) {
+            sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
             return true;
         }
         return super.onOptionsItemSelected(item);
