@@ -4,21 +4,29 @@
     tools:context=".UPMC">
     <item
         android:id="@+id/action_settings"
-        android:icon="@drawable/ic_action_schedule"
+        android:icon="@drawable/ic_action_timer"
         android:orderInCategory="100"
         android:title="Settings"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_study"
+        android:icon="@drawable/ic_action_participant"
         android:orderInCategory="200"
         android:title="Participant"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/action_esm_example"
         android:orderInCategory="300"
-        android:title="Demo"
+        android:title="Demo ESM"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_motivation_example"
+        android:title="Demo Fitbit"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/study_sync"
         android:icon="@drawable/ic_stat_aware_sync"

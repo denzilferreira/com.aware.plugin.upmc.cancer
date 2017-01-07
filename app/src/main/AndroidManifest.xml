@@ -33,6 +33,13 @@
             android:exported="true"
             android:label="UPMC Settings" />
 
+        <activity
+            android:name=".UPMC_Motivation"
+            android:exported="true"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.AppCompat.Dialog" />
+
         <service
             android:name=".Plugin"
             android:exported="true"

@@ -23,7 +23,7 @@ import java.util.HashMap;
  */
 public class Provider extends ContentProvider {
 
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
     public static String AUTHORITY = "com.aware.plugin.upmc.cancer.provider.survey";
 
     private static final int ANSWERS = 1;
@@ -35,35 +35,35 @@ public class Provider extends ContentProvider {
         private Symptom_Data() {
         }
 
-        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer");
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.cancer";
-        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.cancer";
+        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer");
+        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.cancer";
+        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.cancer";
 
-        public static final String _ID = "_id";
-        public static final String TIMESTAMP = "timestamp";
-        public static final String DEVICE_ID = "device_id";
-        public static final String TO_BED = "to_bed";
-        public static final String FROM_BED = "from_bed";
-        public static final String SCORE_SLEEP = "score_sleep";
-        public static final String SCORE_STRESS = "score_stress";
-        public static final String SCORE_ANGRY = "score_angry";
-        public static final String SCORE_HAPPY = "score_happy";
-        public static final String SCORE_MOST_STRESS = "score_most_stress";
-        public static final String MOST_STRESS_LABEL = "most_stress_label";
-        public static final String SCORE_PAIN = "score_pain";
-        public static final String SCORE_FATIGUE = "score_fatigue";
-        public static final String SCORE_DISCONNECTED = "score_disconnected";
-        public static final String SCORE_CONCENTRATING = "score_concentrating";
-        public static final String SCORE_SAD = "score_sad";
-        public static final String SCORE_ANXIOUS = "score_anxious";
-        public static final String SCORE_ENJOY = "score_enjoy";
-        public static final String SCORE_IRRITABLE = "score_irritable";
-        public static final String SCORE_SHORT_BREATH = "score_short_breath";
-        public static final String SCORE_NUMBNESS = "score_numbness";
-        public static final String SCORE_NAUSEA = "score_nausea";
-        public static final String SCORE_APPETITE = "score_appetite";
-        public static final String SCORE_OTHER = "score_other";
-        public static final String OTHER_LABEL = "other_label";
+        static final String _ID = "_id";
+        static final String TIMESTAMP = "timestamp";
+        static final String DEVICE_ID = "device_id";
+        static final String TO_BED = "to_bed";
+        static final String FROM_BED = "from_bed";
+        static final String SCORE_SLEEP = "score_sleep";
+        static final String SCORE_STRESS = "score_stress";
+        static final String SCORE_ANGRY = "score_angry";
+        static final String SCORE_HAPPY = "score_happy";
+        static final String SCORE_MOST_STRESS = "score_most_stress";
+        static final String MOST_STRESS_LABEL = "most_stress_label";
+        static final String SCORE_PAIN = "score_pain";
+        static final String SCORE_FATIGUE = "score_fatigue";
+        static final String SCORE_DISCONNECTED = "score_disconnected";
+        static final String SCORE_CONCENTRATING = "score_concentrating";
+        static final String SCORE_SAD = "score_sad";
+        static final String SCORE_ANXIOUS = "score_anxious";
+        static final String SCORE_ENJOY = "score_enjoy";
+        static final String SCORE_IRRITABLE = "score_irritable";
+        static final String SCORE_SHORT_BREATH = "score_short_breath";
+        static final String SCORE_NUMBNESS = "score_numbness";
+        static final String SCORE_NAUSEA = "score_nausea";
+        static final String SCORE_APPETITE = "score_appetite";
+        static final String SCORE_OTHER = "score_other";
+        static final String OTHER_LABEL = "other_label";
     }
 
     public static final class Motivational_Data implements BaseColumns {
@@ -76,9 +76,7 @@ public class Provider extends ContentProvider {
         static final String _ID = "_id";
         static final String TIMESTAMP = "timestamp";
         static final String DEVICE_ID = "device_id";
-        static final String ACTION = "motivation_action"; //triggered 0, answered = 1, snoozed = 2
         static final String RATIONALE = "motivation_rationale";
-        static final String ANSWER_TIME = "answer_timestamp";
     }
 
     public static String DATABASE_NAME = "plugin_upmc_cancer.db";
@@ -118,9 +116,7 @@ public class Provider extends ContentProvider {
             Motivational_Data._ID + " integer primary key autoincrement," +
             Motivational_Data.TIMESTAMP + " real default 0,"+
             Motivational_Data.DEVICE_ID + " text default '',"+
-            Motivational_Data.ACTION + " integer default 0,"+
-            Motivational_Data.RATIONALE + " text default '',"+
-            Motivational_Data.ANSWER_TIME + " real default 0"
+            Motivational_Data.RATIONALE + " text default ''"
     };
 
     private static UriMatcher sUriMatcher = null;
@@ -180,9 +176,7 @@ public class Provider extends ContentProvider {
         motivationMap.put(Motivational_Data._ID, Motivational_Data._ID);
         motivationMap.put(Motivational_Data.TIMESTAMP, Motivational_Data.TIMESTAMP);
         motivationMap.put(Motivational_Data.DEVICE_ID, Motivational_Data.DEVICE_ID);
-        motivationMap.put(Motivational_Data.ACTION, Motivational_Data.ACTION);
         motivationMap.put(Motivational_Data.RATIONALE, Motivational_Data.RATIONALE);
-        motivationMap.put(Motivational_Data.ANSWER_TIME, Motivational_Data.ANSWER_TIME);
 
         return true;
     }

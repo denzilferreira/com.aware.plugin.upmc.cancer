@@ -51,22 +51,33 @@ public class UPMC extends AppCompatActivity {
 
         setContentView(R.layout.settings_upmc_cancer);
 
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Button saveSchedule = (Button) findViewById(R.id.save_button);
 
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
         if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0) {
             morning_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
+        } else {
+            morning_timer.setCurrentHour(9);
         }
         if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() > 0) {
             morning_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)));
+        } else {
+            morning_timer.setCurrentMinute(0);
         }
 
         final TimePicker evening_timer = (TimePicker) findViewById(R.id.evening_start_time);
         if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() > 0) {
             evening_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)));
+        } else {
+            evening_timer.setCurrentHour(21);
         }
         if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE).length() > 0) {
             evening_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE)));
+        } else {
+            evening_timer.setCurrentMinute(0);
         }
 
         saveSchedule.setOnClickListener(new View.OnClickListener() {
@@ -138,6 +149,9 @@ public class UPMC extends AppCompatActivity {
             cal.setTimeInMillis(System.currentTimeMillis());
 
             setContentView(R.layout.activity_upmc_cancer);
+            if (getSupportActionBar() != null)
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
 
             final LinearLayout morning_questions = (LinearLayout) findViewById(R.id.morning_questions);
             final LinearLayout evening_questions = (LinearLayout) findViewById(R.id.evening_questions);
@@ -566,13 +580,25 @@ public class UPMC extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
+
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.getTitle().toString().equalsIgnoreCase("Sync") && ! Aware.isStudy(getApplicationContext())) {
+                item.setVisible(false);
+            }
+        }
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String title = item.getTitle().toString();
+        if (item.getItemId() == android.R.id.home) {
+            onResume();
+            return true;
+        }
 
+        String title = item.getTitle().toString();
         if (title.equalsIgnoreCase("Settings")) {
             loadSchedule();
             return true;
@@ -603,12 +629,23 @@ public class UPMC extends AppCompatActivity {
 
             return true;
         }
-        if (title.equalsIgnoreCase("Demo")) {
+        if (title.equalsIgnoreCase("Demo ESM")) {
             Intent demo_esms = new Intent(Plugin.ACTION_CANCER_EMOTION);
             demo_esms.putExtra("demo", true);
             sendBroadcast(demo_esms);
             return true;
         }
+
+        if (title.equalsIgnoreCase("Demo Fitbit")) {
+            Intent walking = new Intent(this, UPMC_Motivation.class);
+            walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
+//            walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
+            walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(walking);
+
+            return true;
+        }
+
         if (title.equalsIgnoreCase("Sync")) {
             sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
             return true;
