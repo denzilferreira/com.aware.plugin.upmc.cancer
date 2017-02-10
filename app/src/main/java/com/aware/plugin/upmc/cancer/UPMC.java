@@ -97,7 +97,6 @@ public class UPMC extends AppCompatActivity {
 
                 if (!Aware.isStudy(getApplicationContext())) {
                     Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
-//                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
 
                     //UPMC sQOL
                     Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/80/7UHUVQVyXQ8x");
