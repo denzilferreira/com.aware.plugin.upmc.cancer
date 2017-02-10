@@ -97,10 +97,52 @@ public class UPMC extends AppCompatActivity {
 
                 if (!Aware.isStudy(getApplicationContext())) {
                     Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
-                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
+//                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/205/tgj4NVrQK5Wl");
 
-                    //only if we have significant motion we record.
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_ACCELEROMETER, 0.05);
+                    //UPMC sQOL
+                    Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/80/7UHUVQVyXQ8x");
+
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
+                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
+
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
+
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NOTIFICATIONS, true);
+
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
+                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.device_usage.Settings.STATUS_PLUGIN_DEVICE_USAGE, true);
+                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.device_usage");
+
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.STATUS_GOOGLE_FUSED_LOCATION, true);
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.MAX_FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.ACCURACY_GOOGLE_FUSED_LOCATION, 102);
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FALLBACK_LOCATION_TIMEOUT, 20);
+                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.LOCATION_SENSITIVITY, 5);
+                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.fused_location");
+
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 10);
+
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_CALLS, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_MESSAGES, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
+
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+
+                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
+                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
 
                     //Ask accessibility to be activated
                     Applications.isAccessibilityServiceActive(getApplicationContext());
@@ -122,6 +164,7 @@ public class UPMC extends AppCompatActivity {
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CONTACTS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
 
         boolean permissions_ok = true;
         for (String p : REQUIRED_PERMISSIONS) {

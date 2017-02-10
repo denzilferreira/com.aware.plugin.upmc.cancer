@@ -11,6 +11,15 @@ android {
         versionCode 36
         versionName "4.5"
     }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -29,9 +38,12 @@ configurations.all {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.1.1'
+
     compile 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
     compile 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
     compile 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
     compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
 }
