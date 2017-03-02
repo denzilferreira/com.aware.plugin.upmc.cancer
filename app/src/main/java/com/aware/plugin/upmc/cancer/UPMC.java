@@ -109,6 +109,7 @@ public class UPMC extends AppCompatActivity {
 
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NOTIFICATIONS, true);
 
@@ -128,7 +129,7 @@ public class UPMC extends AppCompatActivity {
                     Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.fused_location");
 
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 10);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
 
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_CALLS, true);
@@ -615,7 +616,6 @@ public class UPMC extends AppCompatActivity {
             permissions.putExtra(PermissionsHandler.EXTRA_REDIRECT_ACTIVITY, getPackageName() + "/" + getClass().getName());
             permissions.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(permissions);
-            finish();
         }
     }
 

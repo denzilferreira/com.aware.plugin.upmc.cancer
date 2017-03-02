@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.aware.Aware;
@@ -30,8 +29,6 @@ public class Plugin extends Aware_Plugin {
         DATABASE_TABLES = Provider.DATABASE_TABLES;
         TABLES_FIELDS = Provider.TABLES_FIELDS;
         CONTEXT_URIS = new Uri[]{Provider.Symptom_Data.CONTENT_URI, Provider.Motivational_Data.CONTENT_URI};
-
-        Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
     }
 
     public static class SurveyListener extends BroadcastReceiver {
@@ -58,7 +55,7 @@ public class Plugin extends Aware_Plugin {
                     angry.addRadio("YES");
                     angry.setReplaceQueue(true); //replace the old queue if we get a new queue
                     angry.setNotificationRetry(3);
-                    angry.setNotificationTimeout(10*60); //repeat every 10 minutes, up to 3 times
+                    angry.setNotificationTimeout(10 * 60); //repeat every 10 minutes, up to 3 times
                     angry.setSubmitButton("Next");
 
                     ESM_Radio happy = new ESM_Radio();
@@ -101,64 +98,69 @@ public class Plugin extends Aware_Plugin {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
 
-        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+        if (PERMISSIONS_OK) {
+            Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
 
-        if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0) {
-            Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
-        }
-        if (DEBUG)
-            Log.d(TAG, "Max questions per day: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS));
-
-        if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0) {
-            Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
-        }
-        if (DEBUG)
-            Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
-
-        if (intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false)) {
-            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-            int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-            int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
-            int evening_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE));
-            int max_prompts = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS));
-            int min_interval = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL));
-
-            try {
-                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
-                schedule.addHour(morning_hour)
-                        .addMinute(morning_minute)
-                        .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
-                        .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
-                Scheduler.saveSchedule(this, schedule);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0) {
+                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
             }
+            if (DEBUG)
+                Log.d(TAG, "Max questions per day: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS));
 
-            try {
-
-                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_evening");
-                schedule.addHour(evening_hour)
-                        .addMinute(evening_minute)
-                        .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                        .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY);
-                Scheduler.saveSchedule(this, schedule);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL).length() == 0) {
+                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
             }
+            if (DEBUG)
+                Log.d(TAG, "Minimum interval between questions: " + Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
 
-            try {
-                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
-                schedule.random(max_prompts, min_interval);
-                schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                        .setActionIntentAction(Plugin.ACTION_CANCER_EMOTION);
+            if (intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false)) {
+                int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+                int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+                int evening_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR));
+                int evening_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_MINUTE));
+                int max_prompts = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS));
+                int min_interval = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL));
 
-                Scheduler.saveSchedule(this, schedule);
+                try {
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
+                    schedule.addHour(morning_hour)
+                            .addMinute(morning_minute)
+                            .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
+                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
+                    Scheduler.saveSchedule(this, schedule);
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_evening");
+                    schedule.addHour(evening_hour)
+                            .addMinute(evening_minute)
+                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                            .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY);
+                    Scheduler.saveSchedule(this, schedule);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
+                    schedule.addHour(morning_hour);
+                    schedule.addHour(evening_hour);
+                    schedule.random(max_prompts, min_interval); //randoms between morning and evening hours
+                    schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                            .setActionIntentAction(Plugin.ACTION_CANCER_EMOTION);
+
+                    Scheduler.saveSchedule(this, schedule);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -174,13 +176,13 @@ public class Plugin extends Aware_Plugin {
 //            startActivity(walking);
 //        }
 
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, false);
-        Aware.stopAWARE();
+        Aware.stopAWARE(this);
     }
 }
