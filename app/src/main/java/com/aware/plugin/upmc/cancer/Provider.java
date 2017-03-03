@@ -19,7 +19,6 @@ import java.util.HashMap;
 
 /**
  * Created by denzil on 25/11/14.
- * Edited by Grace on 19/08/15
  */
 public class Provider extends ContentProvider {
 
@@ -35,9 +34,9 @@ public class Provider extends ContentProvider {
         private Symptom_Data() {
         }
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer");
-        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.cancer";
-        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.cancer";
+        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash");
+        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash";
+        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash";
 
         static final String _ID = "_id";
         static final String TIMESTAMP = "timestamp";
@@ -52,26 +51,29 @@ public class Provider extends ContentProvider {
         static final String MOST_STRESS_LABEL = "most_stress_label";
         static final String SCORE_PAIN = "score_pain";
         static final String SCORE_FATIGUE = "score_fatigue";
-        static final String SCORE_DISCONNECTED = "score_disconnected";
+        //        static final String SCORE_DISCONNECTED = "score_disconnected";
+        static final String SCORE_SLEEP_DISTURBANCE = "score_sleep_dist";
         static final String SCORE_CONCENTRATING = "score_concentrating";
         static final String SCORE_SAD = "score_sad";
         static final String SCORE_ANXIOUS = "score_anxious";
-        static final String SCORE_ENJOY = "score_enjoy";
-        static final String SCORE_IRRITABLE = "score_irritable";
+        //        static final String SCORE_ENJOY = "score_enjoy";
+//        static final String SCORE_IRRITABLE = "score_irritable";
         static final String SCORE_SHORT_BREATH = "score_short_breath";
         static final String SCORE_NUMBNESS = "score_numbness";
         static final String SCORE_NAUSEA = "score_nausea";
-        static final String SCORE_APPETITE = "score_appetite";
+        //        static final String SCORE_APPETITE = "score_appetite";
+        static final String SCORE_DIARRHEA = "score_diarrhea";
         static final String SCORE_OTHER = "score_other";
         static final String OTHER_LABEL = "other_label";
     }
 
     public static final class Motivational_Data implements BaseColumns {
-        private Motivational_Data(){}
+        private Motivational_Data() {
+        }
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer_motivation");
-        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.cancer.motivation";
-        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.cancer.motivation";
+        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash_motivation");
+        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.motivation";
+        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.motivation";
 
         static final String _ID = "_id";
         static final String TIMESTAMP = "timestamp";
@@ -79,44 +81,46 @@ public class Provider extends ContentProvider {
         static final String RATIONALE = "motivation_rationale";
     }
 
-    public static String DATABASE_NAME = "plugin_upmc_cancer.db";
+    public static String DATABASE_NAME = "plugin_upmc_dash.db";
 
     public static final String[] DATABASE_TABLES = {
-            "upmc_cancer",
-            "upmc_cancer_motivation"
+            "upmc_dash",
+            "upmc_dash_motivation"
     };
 
     public static final String[] TABLES_FIELDS = {
             Symptom_Data._ID + " integer primary key autoincrement," +
-            Symptom_Data.TIMESTAMP + " real default 0," +
-            Symptom_Data.DEVICE_ID + " text default ''," +
-            Symptom_Data.TO_BED + " text default ''," +
-            Symptom_Data.FROM_BED + " text default ''," +
-            Symptom_Data.SCORE_SLEEP + " text default ''," +
-            Symptom_Data.SCORE_STRESS + " text default ''," +
-            Symptom_Data.SCORE_ANGRY + " text default ''," +
-            Symptom_Data.SCORE_HAPPY + " text default ''," +
-            Symptom_Data.SCORE_MOST_STRESS + " text default ''," +
-            Symptom_Data.MOST_STRESS_LABEL + " text default ''," +
-            Symptom_Data.SCORE_PAIN + " text default ''," +
-            Symptom_Data.SCORE_FATIGUE + " text default ''," +
-            Symptom_Data.SCORE_DISCONNECTED + " text default ''," +
-            Symptom_Data.SCORE_CONCENTRATING + " text default ''," +
-            Symptom_Data.SCORE_SAD + " text default ''," +
-            Symptom_Data.SCORE_ANXIOUS + " text default ''," +
-            Symptom_Data.SCORE_ENJOY + " text default ''," +
-            Symptom_Data.SCORE_IRRITABLE + " text default ''," +
-            Symptom_Data.SCORE_SHORT_BREATH + " text default ''," +
-            Symptom_Data.SCORE_NUMBNESS + " text default ''," +
-            Symptom_Data.SCORE_NAUSEA + " text default ''," +
-            Symptom_Data.SCORE_APPETITE + " text default ''," +
-            Symptom_Data.SCORE_OTHER + " text default ''," +
-            Symptom_Data.OTHER_LABEL + " text default ''",
+                    Symptom_Data.TIMESTAMP + " real default 0," +
+                    Symptom_Data.DEVICE_ID + " text default ''," +
+                    Symptom_Data.TO_BED + " text default ''," +
+                    Symptom_Data.FROM_BED + " text default ''," +
+                    Symptom_Data.SCORE_SLEEP + " text default ''," +
+                    Symptom_Data.SCORE_STRESS + " text default ''," +
+                    Symptom_Data.SCORE_ANGRY + " text default ''," +
+                    Symptom_Data.SCORE_HAPPY + " text default ''," +
+                    Symptom_Data.SCORE_MOST_STRESS + " text default ''," +
+                    Symptom_Data.MOST_STRESS_LABEL + " text default ''," +
+                    Symptom_Data.SCORE_PAIN + " text default ''," +
+                    Symptom_Data.SCORE_FATIGUE + " text default ''," +
+//                    Symptom_Data.SCORE_DISCONNECTED + " text default ''," +
+                    Symptom_Data.SCORE_SLEEP_DISTURBANCE + " text default ''," +
+                    Symptom_Data.SCORE_CONCENTRATING + " text default ''," +
+                    Symptom_Data.SCORE_SAD + " text default ''," +
+                    Symptom_Data.SCORE_ANXIOUS + " text default ''," +
+//                    Symptom_Data.SCORE_ENJOY + " text default ''," +
+//                    Symptom_Data.SCORE_IRRITABLE + " text default ''," +
+                    Symptom_Data.SCORE_SHORT_BREATH + " text default ''," +
+                    Symptom_Data.SCORE_NUMBNESS + " text default ''," +
+                    Symptom_Data.SCORE_NAUSEA + " text default ''," +
+//                    Symptom_Data.SCORE_APPETITE + " text default ''," +
+                    Symptom_Data.SCORE_DIARRHEA + " text default ''," +
+                    Symptom_Data.SCORE_OTHER + " text default ''," +
+                    Symptom_Data.OTHER_LABEL + " text default ''",
 
             Motivational_Data._ID + " integer primary key autoincrement," +
-            Motivational_Data.TIMESTAMP + " real default 0,"+
-            Motivational_Data.DEVICE_ID + " text default '',"+
-            Motivational_Data.RATIONALE + " text default ''"
+                    Motivational_Data.TIMESTAMP + " real default 0," +
+                    Motivational_Data.DEVICE_ID + " text default ''," +
+                    Motivational_Data.RATIONALE + " text default ''"
     };
 
     private static UriMatcher sUriMatcher = null;
@@ -156,16 +160,18 @@ public class Provider extends ContentProvider {
         surveyMap.put(Symptom_Data.SCORE_HAPPY, Symptom_Data.SCORE_HAPPY);
         surveyMap.put(Symptom_Data.SCORE_PAIN, Symptom_Data.SCORE_PAIN);
         surveyMap.put(Symptom_Data.SCORE_FATIGUE, Symptom_Data.SCORE_FATIGUE);
-        surveyMap.put(Symptom_Data.SCORE_DISCONNECTED, Symptom_Data.SCORE_DISCONNECTED);
+//        surveyMap.put(Symptom_Data.SCORE_DISCONNECTED, Symptom_Data.SCORE_DISCONNECTED);
+        surveyMap.put(Symptom_Data.SCORE_SLEEP_DISTURBANCE, Symptom_Data.SCORE_SLEEP_DISTURBANCE);
         surveyMap.put(Symptom_Data.SCORE_CONCENTRATING, Symptom_Data.SCORE_CONCENTRATING);
         surveyMap.put(Symptom_Data.SCORE_SAD, Symptom_Data.SCORE_SAD);
         surveyMap.put(Symptom_Data.SCORE_ANXIOUS, Symptom_Data.SCORE_ANXIOUS);
-        surveyMap.put(Symptom_Data.SCORE_ENJOY, Symptom_Data.SCORE_ENJOY);
-        surveyMap.put(Symptom_Data.SCORE_IRRITABLE, Symptom_Data.SCORE_IRRITABLE);
+//        surveyMap.put(Symptom_Data.SCORE_ENJOY, Symptom_Data.SCORE_ENJOY);
+//        surveyMap.put(Symptom_Data.SCORE_IRRITABLE, Symptom_Data.SCORE_IRRITABLE);
         surveyMap.put(Symptom_Data.SCORE_SHORT_BREATH, Symptom_Data.SCORE_SHORT_BREATH);
         surveyMap.put(Symptom_Data.SCORE_NUMBNESS, Symptom_Data.SCORE_NUMBNESS);
         surveyMap.put(Symptom_Data.SCORE_NAUSEA, Symptom_Data.SCORE_NAUSEA);
-        surveyMap.put(Symptom_Data.SCORE_APPETITE, Symptom_Data.SCORE_APPETITE);
+//        surveyMap.put(Symptom_Data.SCORE_APPETITE, Symptom_Data.SCORE_APPETITE);
+        surveyMap.put(Symptom_Data.SCORE_DIARRHEA, Symptom_Data.SCORE_DIARRHEA);
         surveyMap.put(Symptom_Data.SCORE_OTHER, Symptom_Data.SCORE_OTHER);
         surveyMap.put(Symptom_Data.OTHER_LABEL, Symptom_Data.OTHER_LABEL);
 

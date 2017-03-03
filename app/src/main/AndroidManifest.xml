@@ -36,8 +36,8 @@
 
         <activity
             android:name=".UPMC_Motivation"
-            android:exported="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
@@ -73,10 +73,15 @@
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name=".Plugin$SurveyListener">
+        <receiver android:name="com.aware.plugin.upmc.cancer.Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.aware.plugin.upmc.cancer.Plugin$FitbitAnalyser">
+            <intent-filter>
+                <action android:name="ACTION_AWARE_PLUGIN_FITBIT" />
             </intent-filter>
         </receiver>
 

@@ -31,7 +31,7 @@ public class UPMC_Motivation extends AppCompatActivity {
 
     JSONObject user_answers = new JSONObject();
     EditText other_reason, other_symptom;
-    int question_type;
+    int question_type = 0;
 
     @Override
     protected void onResume() {
@@ -39,7 +39,9 @@ public class UPMC_Motivation extends AppCompatActivity {
         setContentView(R.layout.mobility_trigger);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        question_type = getIntent().getExtras().getInt("question_type");
+        if (getIntent().getExtras() != null) {
+            question_type = getIntent().getExtras().getInt("question_type");
+        }
 
         TextView header = (TextView) findViewById(R.id.mobility_question);
         switch (question_type) {
@@ -55,6 +57,14 @@ public class UPMC_Motivation extends AppCompatActivity {
                 header.setText("Ready for a quick walk?");
                 try {
                     user_answers.put("trigger", "< 50 in past 5h, any symptoms >= 7");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 0:
+                header.setText("Walking prompt demo");
+                try {
+                    user_answers.put("trigger", "demo");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
