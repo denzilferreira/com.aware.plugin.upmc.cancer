@@ -44,7 +44,7 @@
         <service
             android:name=".Plugin"
             android:exported="true"
-            android:label="AWARE: UPMC Cancer" />
+            android:label="AWARE: UPMC Rhythms" />
 
         <service
             android:name=".Survey"
@@ -79,12 +79,6 @@
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.aware.plugin.upmc.cancer.Plugin$FitbitAnalyser">
-            <intent-filter>
-                <action android:name="ACTION_AWARE_PLUGIN_FITBIT" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>

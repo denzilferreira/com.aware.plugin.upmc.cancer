@@ -55,14 +55,31 @@ public class Plugin extends Aware_Plugin {
 
             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NOTIFICATIONS, true);
+
             Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
             Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+
+            Aware.setSetting(getApplicationContext(), com.aware.plugin.device_usage.Settings.STATUS_PLUGIN_DEVICE_USAGE, true);
+            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.device_usage");
+
+            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.STATUS_GOOGLE_FUSED_LOCATION, true);
+            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.MAX_FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.ACCURACY_GOOGLE_FUSED_LOCATION, 102);
+            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FALLBACK_LOCATION_TIMEOUT, 20);
+            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.LOCATION_SENSITIVITY, 5);
+            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.fused_location");
 
             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
             Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
 
             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_CALLS, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_MESSAGES, true);
             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
 
             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
@@ -70,6 +87,7 @@ public class Plugin extends Aware_Plugin {
             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
 
+            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
 
             if (intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false)) {
@@ -91,85 +109,6 @@ public class Plugin extends Aware_Plugin {
         }
 
         return START_STICKY;
-    }
-
-    public static Float symptomAvg(Context c) {
-
-        Float todays_symptoms;
-
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        Cursor symptoms = c.getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, new String[]{
-                "AVG(" +
-                        Provider.Symptom_Data.SCORE_PAIN + "+" +
-                        Provider.Symptom_Data.SCORE_FATIGUE + "+" +
-                        Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE + "+" +
-                        Provider.Symptom_Data.SCORE_CONCENTRATING + "+" +
-                        Provider.Symptom_Data.SCORE_SAD + "+" +
-                        Provider.Symptom_Data.SCORE_ANXIOUS + "+" +
-                        Provider.Symptom_Data.SCORE_SHORT_BREATH + "+" +
-                        Provider.Symptom_Data.SCORE_NUMBNESS + "+" +
-                        Provider.Symptom_Data.SCORE_NAUSEA + "+" +
-                        Provider.Symptom_Data.SCORE_DIARRHEA + "+" +
-                        Provider.Symptom_Data.SCORE_OTHER + ") as avg_symptoms"
-        }, Provider.Symptom_Data.TIMESTAMP + " >= " + today.getTimeInMillis(), null, null);
-        if (symptoms != null && symptoms.moveToFirst()) {
-            todays_symptoms = symptoms.getFloat(0);
-        } else {
-            return null;
-        }
-        if (!symptoms.isClosed()) symptoms.close();
-
-        return todays_symptoms;
-    }
-
-    public static Integer walkingPromptsCount(Context c) {
-        Integer todays_count;
-
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        Cursor todayPrompts = c.getContentResolver().query(Provider.Motivational_Data.CONTENT_URI, new String[]{"count(*) as total_count"}, Provider.Motivational_Data.TIMESTAMP + " >= " + today.getTimeInMillis(), null, null);
-        if (todayPrompts != null && todayPrompts.moveToFirst()) {
-            todays_count = todayPrompts.getInt(0);
-        } else {
-            return null;
-        }
-        if (todayPrompts != null && !todayPrompts.isClosed()) todayPrompts.close();
-        return todays_count;
-    }
-
-    public static class FitbitAnalyser extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equalsIgnoreCase(com.aware.plugin.fitbit.Plugin.ACTION_AWARE_PLUGIN_FITBIT)) {
-                Integer walks = walkingPromptsCount(context);
-                if (walks != null && walks <= 4) {
-                    int last_3h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_3H, 1000);
-                    int last_5h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_5H, 1000);
-                    Float symptoms_today = symptomAvg(context);
-
-                    if (symptoms_today != null && last_3h < 50 && symptoms_today < 7) {
-                        Intent walking = new Intent(context, UPMC_Motivation.class);
-                        walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
-                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        context.startActivity(walking);
-                    } else if (symptoms_today != null && last_5h < 50 && symptoms_today >= 7) {
-                        Intent walking = new Intent(context, UPMC_Motivation.class);
-                        walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
-                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        context.startActivity(walking);
-                    }
-                }
-            }
-        }
     }
 
     @Override
