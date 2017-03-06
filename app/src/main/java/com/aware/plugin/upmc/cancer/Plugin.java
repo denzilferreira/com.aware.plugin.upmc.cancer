@@ -13,6 +13,7 @@ import com.aware.ESM;
 import com.aware.ui.esms.ESMFactory;
 import com.aware.ui.esms.ESM_Radio;
 import com.aware.utils.Aware_Plugin;
+import com.aware.utils.PluginsManager;
 import com.aware.utils.Scheduler;
 
 import org.json.JSONException;
@@ -49,28 +50,10 @@ public class Plugin extends Aware_Plugin {
         super.onStartCommand(intent, flags, startId);
 
         if (PERMISSIONS_OK) {
+
+            PluginsManager.enablePlugin(this, "com.aware.plugin.upmc.cancer");
+
             Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
-
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
-
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
-            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
-            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
-
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
-
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
-
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
-            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
-
-            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
 
             if (intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false)) {
                 int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
@@ -88,6 +71,8 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
             }
+
+            Aware.startAWARE(this);
         }
 
         return START_STICKY;
@@ -142,7 +127,7 @@ public class Plugin extends Aware_Plugin {
         } else {
             return null;
         }
-        if (todayPrompts != null && !todayPrompts.isClosed()) todayPrompts.close();
+        if (!todayPrompts.isClosed()) todayPrompts.close();
         return todays_count;
     }
 

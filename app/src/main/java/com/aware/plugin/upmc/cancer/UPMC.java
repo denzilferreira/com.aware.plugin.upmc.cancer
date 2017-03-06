@@ -43,9 +43,6 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
     }
 
     private void loadSchedule() {
