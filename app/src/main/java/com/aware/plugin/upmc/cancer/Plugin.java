@@ -11,6 +11,7 @@ import com.aware.ESM;
 import com.aware.ui.esms.ESMFactory;
 import com.aware.ui.esms.ESM_Radio;
 import com.aware.utils.Aware_Plugin;
+import com.aware.utils.PluginsManager;
 import com.aware.utils.Scheduler;
 
 import org.json.JSONException;
@@ -101,6 +102,9 @@ public class Plugin extends Aware_Plugin {
         super.onStartCommand(intent, flags, startId);
 
         if (PERMISSIONS_OK) {
+
+            PluginsManager.enablePlugin(this, "com.aware.plugin.upmc.cancer");
+
             Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
 
             if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0) {
@@ -162,19 +166,9 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
             }
-        }
 
-//        int fitbit_steps = 50;
-//        int all_symptoms_day = 7;
-//        int elapsed_hours = 3;
-//
-//        if (fitbit_steps <= fitbit_steps && elapsed_hours <= elapsed_hours) {
-//            Intent walking = new Intent(this, UPMC_Motivation.class);
-//            walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
-////            walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
-//            walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(walking);
-//        }
+            Aware.startAWARE(this);
+        }
 
         return START_STICKY;
     }
@@ -182,7 +176,9 @@ public class Plugin extends Aware_Plugin {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, false);
+
         Aware.stopAWARE(this);
     }
 }
