@@ -67,6 +67,8 @@ public class Plugin extends Aware_Plugin {
                             .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
                     Scheduler.saveSchedule(this, schedule);
 
+                    Aware.startScheduler(this);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
