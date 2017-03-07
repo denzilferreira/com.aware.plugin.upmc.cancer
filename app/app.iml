@@ -79,7 +79,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.denzilferreira/aware-client/development-SNAPSHOT/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.denzilferreira/com.aware.plugin.device_usage/development-SNAPSHOT/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.denzilferreira/com.aware.plugin.fitbit/development-SNAPSHOT/jars" />
