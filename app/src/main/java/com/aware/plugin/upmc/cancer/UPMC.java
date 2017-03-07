@@ -43,6 +43,9 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent aware = new Intent(this, Aware.class);
+        startService(aware);
     }
 
     private void loadSchedule() {
@@ -93,6 +96,8 @@ public class UPMC extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
                     Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
                     Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
 
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);

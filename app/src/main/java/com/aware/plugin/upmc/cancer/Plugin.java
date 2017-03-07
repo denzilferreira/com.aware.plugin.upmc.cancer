@@ -67,6 +67,9 @@ public class Plugin extends Aware_Plugin {
                             .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
                     Scheduler.saveSchedule(this, schedule);
 
+                    //Apply schedule
+                    Aware.startScheduler(this);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -101,7 +104,19 @@ public class Plugin extends Aware_Plugin {
                         Provider.Symptom_Data.SCORE_NAUSEA + "+" +
                         Provider.Symptom_Data.SCORE_DIARRHEA + "+" +
                         Provider.Symptom_Data.SCORE_OTHER + ") as avg_symptoms"
-        }, Provider.Symptom_Data.TIMESTAMP + " >= " + today.getTimeInMillis(), null, null);
+        }, Provider.Symptom_Data.TIMESTAMP + " >= " + today.getTimeInMillis() + " AND " +
+                        Provider.Symptom_Data.SCORE_PAIN + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_FATIGUE + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_CONCENTRATING + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_SAD + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_ANXIOUS + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_SHORT_BREATH + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_NUMBNESS + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_NAUSEA + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_DIARRHEA + ">=0 AND " +
+                        Provider.Symptom_Data.SCORE_OTHER + ">=0"
+                , null, null);
         if (symptoms != null && symptoms.moveToFirst()) {
             todays_symptoms = symptoms.getFloat(0);
         } else {

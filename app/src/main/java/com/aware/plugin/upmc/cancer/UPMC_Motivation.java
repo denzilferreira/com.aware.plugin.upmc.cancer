@@ -231,6 +231,9 @@ public class UPMC_Motivation extends AppCompatActivity {
                         .addActionExtra("question_type", question_type);
 
                 Scheduler.saveSchedule(getApplicationContext(), snoozed);
+
+                //Apply schedule
+                Aware.startScheduler(this);
             }
 
         } catch (JSONException e) {
