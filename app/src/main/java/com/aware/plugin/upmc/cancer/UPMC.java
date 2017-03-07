@@ -2,6 +2,7 @@ package com.aware.plugin.upmc.cancer;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,6 +40,7 @@ import java.util.Calendar;
 public class UPMC extends AppCompatActivity {
 
     private boolean debug = true;
+    private static ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,8 @@ public class UPMC extends AppCompatActivity {
     }
 
     private void loadSchedule() {
+
+        dialog = new ProgressDialog(UPMC.this);
 
         setContentView(R.layout.settings_upmc_dash);
 
@@ -72,50 +76,75 @@ public class UPMC extends AppCompatActivity {
         saveSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
-                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
 
-                String schedule = String.format("Schedule is set to every morning at: %sh%s", Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR), Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-                Toast.makeText(getApplicationContext(), schedule, Toast.LENGTH_LONG).show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
 
-                Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
-                applySchedule.putExtra("schedule", true);
-                startService(applySchedule);
+                        dialog.setIndeterminate(true);
+                        if (Aware.isStudy(getApplicationContext())) {
+                            dialog.setMessage("Please wait...");
+                        } else {
+                            dialog.setMessage("Joining study...");
+                        }
+                        dialog.setInverseBackgroundForced(true);
 
-                if (!Aware.isStudy(getApplicationContext())) {
-                    Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.show();
+                            }
+                        });
 
-                    //UPMC Dash
-                    Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
+                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
 
-                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
+                        Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
+                        applySchedule.putExtra("schedule", true);
+                        startService(applySchedule);
 
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
-                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-                    Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
-                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+                        if (!Aware.isStudy(getApplicationContext())) {
+                            Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
 
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
+                            //UPMC Dash
+                            Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
 
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
 
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
 
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
 
-                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
 
-                    //Ask accessibility to be activated
-                    Applications.isAccessibilityServiceActive(getApplicationContext());
-                }
-                finish();
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
+
+                            //Ask accessibility to be activated
+                            Applications.isAccessibilityServiceActive(getApplicationContext());
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                    }
+                }).start();
             }
         });
     }
