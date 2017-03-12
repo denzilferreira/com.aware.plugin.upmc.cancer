@@ -246,7 +246,7 @@ public class UPMC_Motivation extends AppCompatActivity {
         mobility_answer.put(Provider.Motivational_Data.RATIONALE, user_answers.toString());
         getContentResolver().insert(Provider.Motivational_Data.CONTENT_URI, mobility_answer);
 
-        if (Plugin.DEBUG)
-            Log.d(Plugin.TAG, "Motivation answer: " + mobility_answer.toString());
+        if (Aware.DEBUG)
+            Log.d(Aware.TAG, "Motivation answer: " + mobility_answer.toString());
     }
 }

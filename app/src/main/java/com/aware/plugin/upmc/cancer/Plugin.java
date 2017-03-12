@@ -75,6 +75,7 @@ public class Plugin extends Aware_Plugin {
                 }
             }
 
+            Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
             Aware.startAWARE(this);
         }
 
