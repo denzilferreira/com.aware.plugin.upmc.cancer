@@ -103,8 +103,6 @@ public class Plugin extends Aware_Plugin {
 
         if (PERMISSIONS_OK) {
 
-            PluginsManager.enablePlugin(this, "com.aware.plugin.upmc.cancer");
-
             Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
 
             if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0) {
@@ -169,6 +167,7 @@ public class Plugin extends Aware_Plugin {
                 Aware.startScheduler(this);
             }
 
+            Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
             Aware.startAWARE(this);
         }
 
