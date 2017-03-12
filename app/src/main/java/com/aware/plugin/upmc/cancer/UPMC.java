@@ -105,8 +105,6 @@ public class UPMC extends AppCompatActivity {
                         startService(applySchedule);
 
                         if (!Aware.isStudy(getApplicationContext())) {
-                            Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
-
                             //UPMC Rhythms
                             Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/82/yLxV9leTNGK3");
 
@@ -160,6 +158,7 @@ public class UPMC extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
                                 dialog.dismiss();
                                 finish();
                             }
