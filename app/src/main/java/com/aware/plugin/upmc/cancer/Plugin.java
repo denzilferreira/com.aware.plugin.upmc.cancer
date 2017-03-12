@@ -162,19 +162,10 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
             }
-        }
 
-//        int fitbit_steps = 50;
-//        int all_symptoms_day = 7;
-//        int elapsed_hours = 3;
-//
-//        if (fitbit_steps <= fitbit_steps && elapsed_hours <= elapsed_hours) {
-//            Intent walking = new Intent(this, UPMC_Motivation.class);
-//            walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
-////            walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
-//            walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(walking);
-//        }
+            Aware.startPlugin(this, "com.awre.plugin.upmc.cancer");
+            Aware.startAWARE(this);
+        }
 
         return START_STICKY;
     }
