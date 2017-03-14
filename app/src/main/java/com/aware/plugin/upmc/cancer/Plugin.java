@@ -1,10 +1,14 @@
 package com.aware.plugin.upmc.cancer;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.aware.Aware;
@@ -161,15 +165,31 @@ public class Plugin extends Aware_Plugin {
                         Intent walking = new Intent(context, UPMC_Motivation.class);
                         walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
                         walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        context.startActivity(walking);
+                        notifyUser(context, walking);
                     } else if (symptoms_today != null && last_5h < 50 && symptoms_today >= 7) {
                         Intent walking = new Intent(context, UPMC_Motivation.class);
                         walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
                         walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        context.startActivity(walking);
+                        notifyUser(context, walking);
                     }
                 }
             }
+        }
+
+        private void notifyUser(Context context, Intent walk_condition) {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+            mBuilder.setSmallIcon( R.drawable.ic_stat_fitbit );
+            mBuilder.setContentTitle( "UPMC" );
+            mBuilder.setContentText( "Tap to answer." );
+            mBuilder.setDefaults( Notification.DEFAULT_ALL );
+            mBuilder.setOnlyAlertOnce( true );
+            mBuilder.setAutoCancel( true );
+
+            PendingIntent onclick = PendingIntent.getActivity(context, 0, walk_condition, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(onclick);
+
+            NotificationManager notManager = (NotificationManager) context.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notManager.notify(677, mBuilder.build());
         }
     }
 
