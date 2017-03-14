@@ -703,6 +703,13 @@ public class UPMC extends AppCompatActivity {
 
             return true;
         }
+
+        if (title.equalsIgnoreCase("See schedule")) {
+            Intent schedules = new Intent(this, DebugSchedules.class);
+            startActivity(schedules);
+            return true;
+        }
+
         if (title.equalsIgnoreCase("Demo ESM")) {
             Intent demo_esms = new Intent(Plugin.ACTION_CANCER_EMOTION);
             demo_esms.putExtra("demo", true);
