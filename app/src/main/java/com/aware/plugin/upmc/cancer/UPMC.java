@@ -158,7 +158,6 @@ public class UPMC extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getApplicationContext(), "Thanks for joining the study!", Toast.LENGTH_LONG).show();
                                 dialog.dismiss();
                                 finish();
                             }
