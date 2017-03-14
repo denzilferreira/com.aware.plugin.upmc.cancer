@@ -41,10 +41,6 @@ public class Plugin extends Aware_Plugin {
             }
 
             if (intent.getAction().equals(ACTION_CANCER_EMOTION)) {
-
-                //Make sure ESM service is running
-                Aware.startESM(context);
-
                 try {
                     ESMFactory factory = new ESMFactory();
                     ESM_Radio angry = new ESM_Radio();

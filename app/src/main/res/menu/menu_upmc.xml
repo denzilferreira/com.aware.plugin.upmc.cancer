@@ -28,6 +28,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_debug_scheduler"
+        android:title="See schedule"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/study_sync"
         android:icon="@drawable/ic_stat_aware_sync"
         android:orderInCategory="101"
