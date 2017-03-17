@@ -43,14 +43,6 @@ public class UPMC extends AppCompatActivity {
 
     private static ProgressDialog dialog;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
-    }
-
     private void loadSchedule() {
 
         dialog = new ProgressDialog(UPMC.this);
@@ -192,11 +184,10 @@ public class UPMC extends AppCompatActivity {
 
         if (permissions_ok) {
 
-            Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
+            Intent aware = new Intent(this, Aware.class);
+            startService(aware);
 
-            //NOTE: needed for demo to participants
-            Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
-            Aware.startESM(this);
+            Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
                 loadSchedule();
@@ -612,14 +603,6 @@ public class UPMC extends AppCompatActivity {
                 }
             });
             mBuilder.create().show();
-
-            return true;
-        }
-
-        if (title.equalsIgnoreCase("Demo Fitbit")) {
-            Intent walking = new Intent(this, UPMC_Motivation.class);
-            walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(walking);
 
             return true;
         }
