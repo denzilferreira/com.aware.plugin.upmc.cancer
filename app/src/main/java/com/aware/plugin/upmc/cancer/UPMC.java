@@ -145,6 +145,9 @@ public class UPMC extends AppCompatActivity {
 
                             //Ask accessibility to be activated
                             Applications.isAccessibilityServiceActive(getApplicationContext());
+
+                            //Ask doze to be disabled
+                            Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());
                         }
 
                         runOnUiThread(new Runnable() {
