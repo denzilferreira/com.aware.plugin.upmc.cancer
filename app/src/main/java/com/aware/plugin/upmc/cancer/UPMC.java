@@ -97,6 +97,7 @@ public class UPMC extends AppCompatActivity {
                         startService(applySchedule);
 
                         if (!Aware.isStudy(getApplicationContext())) {
+
                             //UPMC Rhythms
                             Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/82/yLxV9leTNGK3");
 
@@ -139,6 +140,7 @@ public class UPMC extends AppCompatActivity {
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
 
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
+
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
 
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");

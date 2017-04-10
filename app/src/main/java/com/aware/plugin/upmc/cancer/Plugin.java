@@ -3,22 +3,13 @@ package com.aware.plugin.upmc.cancer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import com.aware.Aware;
-import com.aware.Aware_Preferences;
-import com.aware.ESM;
-import com.aware.ui.esms.ESMFactory;
-import com.aware.ui.esms.ESM_Radio;
 import com.aware.utils.Aware_Plugin;
-import com.aware.utils.PluginsManager;
 import com.aware.utils.Scheduler;
 
 import org.json.JSONException;
-
-import java.util.Calendar;
 
 public class Plugin extends Aware_Plugin {
 
@@ -72,7 +63,6 @@ public class Plugin extends Aware_Plugin {
                 }
             }
 
-            Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
             Aware.startAWARE(this);
         }
 
