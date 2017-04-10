@@ -43,15 +43,6 @@ public class UPMC extends AppCompatActivity {
     private boolean debug = true;
     private static ProgressDialog dialog;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        //initialise framework + assign UUID
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
-    }
-
     private void loadSchedule() {
 
         dialog = new ProgressDialog(UPMC.this);
@@ -124,7 +115,6 @@ public class UPMC extends AppCompatActivity {
 
                             Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);
                             Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL, 30);
-                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
 
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
 
@@ -167,8 +157,13 @@ public class UPMC extends AppCompatActivity {
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
 
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
+
                             //Ask accessibility to be activated
                             Applications.isAccessibilityServiceActive(getApplicationContext());
+
+                            //Ask to ignore Doze
+                            Aware.isBatteryOptimizationIgnored(getApplicationContext(), getApplicationContext().getPackageName());
                         }
 
                         runOnUiThread(new Runnable() {
@@ -208,11 +203,11 @@ public class UPMC extends AppCompatActivity {
 
         if (permissions_ok) {
 
-            Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
+            //initialise framework + assign UUID
+            Intent aware = new Intent(this, Aware.class);
+            startService(aware);
 
-            //NOTE: needed for demo to participants
-            Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
-            Aware.startESM(this);
+            Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0
                     || Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR).length() == 0) {
@@ -700,29 +695,6 @@ public class UPMC extends AppCompatActivity {
                 }
             });
             mBuilder.create().show();
-
-            return true;
-        }
-
-        if (title.equalsIgnoreCase("See schedule")) {
-            Intent schedules = new Intent(this, DebugSchedules.class);
-            startActivity(schedules);
-            return true;
-        }
-
-        if (title.equalsIgnoreCase("Demo ESM")) {
-            Intent demo_esms = new Intent(Plugin.ACTION_CANCER_EMOTION);
-            demo_esms.putExtra("demo", true);
-            sendBroadcast(demo_esms);
-            return true;
-        }
-
-        if (title.equalsIgnoreCase("Demo Fitbit")) {
-            Intent walking = new Intent(this, UPMC_Motivation.class);
-            walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
-//            walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
-            walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(walking);
 
             return true;
         }

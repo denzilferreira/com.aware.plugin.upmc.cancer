@@ -11,7 +11,6 @@ import com.aware.ESM;
 import com.aware.ui.esms.ESMFactory;
 import com.aware.ui.esms.ESM_Radio;
 import com.aware.utils.Aware_Plugin;
-import com.aware.utils.PluginsManager;
 import com.aware.utils.Scheduler;
 
 import org.json.JSONException;
@@ -163,7 +162,6 @@ public class Plugin extends Aware_Plugin {
                 Aware.startScheduler(this);
             }
 
-            Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
             Aware.startAWARE(this);
         }
 
@@ -173,9 +171,7 @@ public class Plugin extends Aware_Plugin {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, false);
-
         Aware.stopAWARE(this);
     }
 }

@@ -43,12 +43,12 @@
         <activity android:name=".DebugSchedules" />
 
         <service
-            android:name=".Plugin"
+            android:name="com.aware.plugin.upmc.cancer.Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Cancer" />
 
         <service
-            android:name=".Survey"
+            android:name="com.aware.plugin.upmc.cancer.Survey"
             android:exported="true"
             android:label="UPMC Survey" />
 
@@ -74,7 +74,7 @@
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name=".Plugin$SurveyListener">
+        <receiver android:name="com.aware.plugin.upmc.cancer.Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />
