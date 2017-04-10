@@ -8,8 +8,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 36
-        versionName "4.5"
+        versionCode 37
+        versionName "4.6"
     }
 
     splits {
