@@ -36,10 +36,11 @@
 
         <activity
             android:name=".UPMC_Motivation"
-            android:exported="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
+
         <activity android:name=".DebugSchedules" />
 
         <service

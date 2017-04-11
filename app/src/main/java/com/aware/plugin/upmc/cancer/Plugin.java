@@ -158,8 +158,6 @@ public class Plugin extends Aware_Plugin {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                Aware.startScheduler(this);
             }
 
             Aware.startAWARE(this);

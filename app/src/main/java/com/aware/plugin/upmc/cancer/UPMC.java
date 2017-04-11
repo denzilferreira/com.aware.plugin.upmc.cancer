@@ -34,6 +34,7 @@ import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.ui.PermissionsHandler;
+import com.aware.utils.PluginsManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,6 +43,7 @@ public class UPMC extends AppCompatActivity {
 
     private boolean debug = true;
     private static ProgressDialog dialog;
+    private static Intent aware;
 
     private void loadSchedule() {
 
@@ -150,7 +152,7 @@ public class UPMC extends AppCompatActivity {
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
 
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
 
@@ -204,8 +206,10 @@ public class UPMC extends AppCompatActivity {
         if (permissions_ok) {
 
             //initialise framework + assign UUID
-            Intent aware = new Intent(this, Aware.class);
-            startService(aware);
+            if (aware == null) {
+                aware = new Intent(this, Aware.class);
+                startService(aware);
+            }
 
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 
@@ -703,6 +707,13 @@ public class UPMC extends AppCompatActivity {
             sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
             return true;
         }
+
+        if (title.equalsIgnoreCase("Schedule")) {
+            Intent scheduleDebug = new Intent(getApplicationContext(), DebugSchedules.class);
+            startActivity(scheduleDebug);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 }
