@@ -121,6 +121,7 @@ public class Plugin extends Aware_Plugin {
                 int min_interval = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_PROMPT_INTERVAL));
 
                 try {
+                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
                     schedule.addHour(morning_hour)
                             .addMinute(morning_minute)
@@ -133,7 +134,7 @@ public class Plugin extends Aware_Plugin {
                 }
 
                 try {
-
+                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_evening");
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_evening");
                     schedule.addHour(evening_hour)
                             .addMinute(evening_minute)
@@ -146,15 +147,16 @@ public class Plugin extends Aware_Plugin {
                 }
 
                 try {
-                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_emotion");
-                    schedule.addHour(morning_hour);
-                    schedule.addHour(evening_hour);
-                    schedule.random(max_prompts, min_interval); //randoms between morning and evening hours
-                    schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                            .setActionIntentAction(Plugin.ACTION_CANCER_EMOTION);
-
-                    Scheduler.saveSchedule(this, schedule);
-
+                    Scheduler.Schedule schedule = Scheduler.getSchedule(getApplicationContext(), "cancer_emotion");
+                    if (schedule == null) {
+                        schedule = new Scheduler.Schedule("cancer_emotion");
+                        schedule.addHour(morning_hour);
+                        schedule.addHour(evening_hour);
+                        schedule.random(max_prompts, min_interval); //randoms between morning and evening hours
+                        schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                                .setActionIntentAction(Plugin.ACTION_CANCER_EMOTION);
+                        Scheduler.saveSchedule(this, schedule);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

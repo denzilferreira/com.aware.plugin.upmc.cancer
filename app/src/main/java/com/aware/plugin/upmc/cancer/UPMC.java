@@ -51,8 +51,7 @@ public class UPMC extends AppCompatActivity {
 
         setContentView(R.layout.settings_upmc_cancer);
 
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Button saveSchedule = (Button) findViewById(R.id.save_button);
 
@@ -656,7 +655,7 @@ public class UPMC extends AppCompatActivity {
 
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
-            if (item.getTitle().toString().equalsIgnoreCase("Sync") && ! Aware.isStudy(getApplicationContext())) {
+            if (item.getTitle().toString().equalsIgnoreCase("Sync") && !Aware.isStudy(getApplicationContext())) {
                 item.setVisible(false);
             }
         }
