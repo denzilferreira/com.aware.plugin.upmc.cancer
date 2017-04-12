@@ -49,14 +49,13 @@ public class Plugin extends Aware_Plugin {
                 int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
 
                 try {
+                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
                     schedule.addHour(morning_hour)
                             .addMinute(morning_minute)
                             .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
                             .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
                     Scheduler.saveSchedule(this, schedule);
-
-                    Aware.startScheduler(this);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

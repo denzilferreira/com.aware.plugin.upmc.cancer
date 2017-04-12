@@ -40,8 +40,8 @@ import java.util.Calendar;
 public class UPMC extends AppCompatActivity {
 
     private boolean debug = true;
-
     private static ProgressDialog dialog;
+    private static Intent aware;
 
     private void loadSchedule() {
 
@@ -189,8 +189,10 @@ public class UPMC extends AppCompatActivity {
 
         if (permissions_ok) {
 
-            Intent aware = new Intent(this, Aware.class);
-            startService(aware);
+            if (aware == null) {
+                aware = new Intent(this, Aware.class);
+                startService(aware);
+            }
 
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 
