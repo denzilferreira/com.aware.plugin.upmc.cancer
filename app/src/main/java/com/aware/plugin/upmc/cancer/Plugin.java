@@ -3,11 +3,13 @@ package com.aware.plugin.upmc.cancer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
 import com.aware.Aware;
 import com.aware.ESM;
+import com.aware.providers.Scheduler_Provider;
 import com.aware.ui.esms.ESMFactory;
 import com.aware.ui.esms.ESM_Radio;
 import com.aware.utils.Aware_Plugin;
@@ -147,6 +149,9 @@ public class Plugin extends Aware_Plugin {
                 }
 
                 try {
+                    //Remove old randoms
+                    getContentResolver().delete(Scheduler_Provider.Scheduler_Data.CONTENT_URI, Scheduler_Provider.Scheduler_Data.SCHEDULE_ID + " LIKE 'cancer_emotion_random_%'", null);
+
                     Scheduler.Schedule schedule = Scheduler.getSchedule(getApplicationContext(), "cancer_emotion");
                     if (schedule == null) {
                         schedule = new Scheduler.Schedule("cancer_emotion");
