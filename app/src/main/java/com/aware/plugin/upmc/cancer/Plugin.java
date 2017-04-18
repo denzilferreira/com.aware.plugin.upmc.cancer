@@ -148,22 +148,28 @@ public class Plugin extends Aware_Plugin {
                     e.printStackTrace();
                 }
 
-                try {
-                    //Remove old randoms
-                    getContentResolver().delete(Scheduler_Provider.Scheduler_Data.CONTENT_URI, Scheduler_Provider.Scheduler_Data.SCHEDULE_ID + " LIKE 'cancer_emotion_random_%'", null);
-
-                    Scheduler.Schedule schedule = Scheduler.getSchedule(getApplicationContext(), "cancer_emotion");
-                    if (schedule == null) {
-                        schedule = new Scheduler.Schedule("cancer_emotion");
-                        schedule.addHour(morning_hour);
-                        schedule.addHour(evening_hour);
-                        schedule.random(max_prompts, min_interval); //randoms between morning and evening hours
-                        schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
-                                .setActionIntentAction(Plugin.ACTION_CANCER_EMOTION);
-                        Scheduler.saveSchedule(this, schedule);
+                Cursor randoms = getContentResolver().query(Scheduler_Provider.Scheduler_Data.CONTENT_URI, null, Scheduler_Provider.Scheduler_Data.SCHEDULE_ID + " LIKE 'cancer_emotion_random_%'", null, null);
+                if (randoms != null && randoms.getCount() > 0) {
+                    //already scheduled randoms, do nothing.
+                    Log.d(TAG, "Randoms already scheduled, do nothing.");
+                    randoms.close();
+                } else {
+                    try {
+//                    //Remove old randoms
+//                    getContentResolver().delete(Scheduler_Provider.Scheduler_Data.CONTENT_URI, Scheduler_Provider.Scheduler_Data.SCHEDULE_ID + " LIKE 'cancer_emotion_random_%'", null);
+                        Scheduler.Schedule schedule = Scheduler.getSchedule(getApplicationContext(), "cancer_emotion");
+                        if (schedule == null) {
+                            schedule = new Scheduler.Schedule("cancer_emotion");
+                            schedule.addHour(morning_hour);
+                            schedule.addHour(evening_hour);
+                            schedule.random(max_prompts, min_interval); //randoms between morning and evening hours
+                            schedule.setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+                                    .setActionIntentAction(Plugin.ACTION_CANCER_EMOTION);
+                            Scheduler.saveSchedule(this, schedule);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
 
