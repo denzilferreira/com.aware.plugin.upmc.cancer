@@ -155,8 +155,6 @@ public class Plugin extends Aware_Plugin {
                     randoms.close();
                 } else {
                     try {
-//                    //Remove old randoms
-//                    getContentResolver().delete(Scheduler_Provider.Scheduler_Data.CONTENT_URI, Scheduler_Provider.Scheduler_Data.SCHEDULE_ID + " LIKE 'cancer_emotion_random_%'", null);
                         Scheduler.Schedule schedule = Scheduler.getSchedule(getApplicationContext(), "cancer_emotion");
                         if (schedule == null) {
                             schedule = new Scheduler.Schedule("cancer_emotion");

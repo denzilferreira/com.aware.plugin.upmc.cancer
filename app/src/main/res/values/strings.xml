@@ -6,5 +6,5 @@
     <string name="evening_intro">What was the most stressful or negative event you experienced today?</string>
     <string name="aware_description">This service makes sure the application is running at all times. Please activate it during the study.</string>
     <string name="aware_activate_accessibility">Activate UPMC Cancer in the accessibility services.</string>
-
+    <string name="foreground_notification_text">UPMC software is active.</string>
 </resources>

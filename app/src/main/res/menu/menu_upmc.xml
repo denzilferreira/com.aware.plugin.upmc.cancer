@@ -23,10 +23,10 @@
         android:title="Sync"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/action_debug"
-        android:icon="@drawable/ic_action_schedule"
-        android:orderInCategory="200"
-        android:title="Schedule"
-        app:showAsAction="always" />
+    <!--<item-->
+        <!--android:id="@+id/action_debug"-->
+        <!--android:icon="@drawable/ic_action_schedule"-->
+        <!--android:orderInCategory="200"-->
+        <!--android:title="Schedule"-->
+        <!--app:showAsAction="always" />-->
 </menu>
