@@ -134,15 +134,13 @@ public class UPMC extends AppCompatActivity {
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_MESSAGES, true);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
 
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, false);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
 
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
-
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
-
                             Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
 
                             //Ask accessibility to be activated

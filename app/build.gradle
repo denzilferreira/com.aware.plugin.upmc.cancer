@@ -61,10 +61,10 @@ dependencies {
     compile "com.google.android.gms:play-services-location:$google_libs"
     compile "com.android.support:appcompat-v7:$support_libs"
 
-    compile 'com.github.denzilferreira:aware-client:master-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:master-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.device_usage:master-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:master-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.fitbit:master-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:master-SNAPSHOT'
+    compile 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
 }
