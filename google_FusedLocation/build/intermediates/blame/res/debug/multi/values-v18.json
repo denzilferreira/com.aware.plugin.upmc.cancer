@@ -1,0 +1,26 @@
+[
+    {
+        "outputFile": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/google_FusedLocation/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v18/values-v18.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 48,
+                    "endOffset": 99
+                },
+                "from": {
+                    "file": "/Users/RaghuTeja/.android/build-cache/19856cc07604b39a2b35759ed6fccf6bf53dbfc2/output/res/values-v18/values-v18.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 48,
+                        "endOffset": 99
+                    }
+                }
+            }
+        ]
+    }
+]

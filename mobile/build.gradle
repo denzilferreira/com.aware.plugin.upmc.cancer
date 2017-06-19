@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        applicationId "com.aware.plugin.upmc.cancer"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 36
+        versionName "4.5"
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi'
+        }
+    }
+
+    signingConfigs {
+        release
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+if (System.getenv("storeFile") != null && System.getenv("storePassword") != null && System.getenv("keyAlias") != null && System.getenv("keyPassword") != null) {
+    android.signingConfigs.release.storeFile = file(System.getenv("storeFile"))
+    android.signingConfigs.release.storePassword = System.getenv("storePassword")
+    android.signingConfigs.release.keyAlias = System.getenv("keyAlias")
+    android.signingConfigs.release.keyPassword = System.getenv("keyPassword")
+} else {
+    println("No keystore defined. Unsigned!")
+    android.buildTypes.release.signingConfig = null
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile "com.google.android.gms:play-services-location:$google_libs"
+    compile "com.android.support:appcompat-v7:$support_libs"
+
+    compile 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
+    compile 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
+}

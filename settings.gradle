@@ -1,2 +1,2 @@
-include ':app'
+include ':mobile', ':wear'
 //, ':device_usage', ':com.aware.plugin.google.activity_recognition', ':google_FusedLocation', ':openWeather', ':aware-core'

@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    tools:context=".Settings" >
+
+    <ImageView
+        android:id="@+id/device_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_device_usage" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Unused for:  "
+        android:id="@+id/not_used"
+        android:layout_toRightOf="@+id/device_icon"
+        android:textColor="#ff000000"
+         />
+
+    <TextView
+        android:id="@+id/device_off"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/not_used"
+        android:text="0h00"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#ff000000" />
+
+    <LinearLayout
+        android:id="@+id/chart_container"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/device_icon">
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Average: 0h00"
+        android:id="@+id/average_unused"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="#000" />
+
+</RelativeLayout>

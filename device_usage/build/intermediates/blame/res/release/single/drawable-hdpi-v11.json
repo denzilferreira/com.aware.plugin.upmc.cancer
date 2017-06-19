@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/release/drawable-hdpi-v11/ic_stat_aware_plugin_dependency.png",
+        "source": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/aware-core/build/intermediates/bundles/default/res/drawable-hdpi-v11/ic_stat_aware_plugin_dependency.png"
+    },
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/release/drawable-hdpi-v11/ic_stat_aware_update.png",
+        "source": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/aware-core/build/intermediates/bundles/default/res/drawable-hdpi-v11/ic_stat_aware_update.png"
+    },
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/release/drawable-hdpi-v11/ic_stat_aware_accessibility.png",
+        "source": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/aware-core/build/intermediates/bundles/default/res/drawable-hdpi-v11/ic_stat_aware_accessibility.png"
+    },
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/release/drawable-hdpi-v11/ic_stat_aware_esm.png",
+        "source": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/aware-core/build/intermediates/bundles/default/res/drawable-hdpi-v11/ic_stat_aware_esm.png"
+    }
+]

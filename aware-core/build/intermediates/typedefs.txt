@@ -1,0 +1,2 @@
+D com/aware/ui/qrcode/CameraSource$FlashMode
+D com/aware/ui/qrcode/CameraSource$FocusMode

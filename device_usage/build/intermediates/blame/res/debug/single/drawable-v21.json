@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/debug/drawable-v21/circle.xml",
+        "source": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/aware-core/build/intermediates/bundles/default/res/drawable-v21/circle.xml"
+    },
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/debug/drawable-v21/abc_action_bar_item_background_material.xml",
+        "source": "/Users/RaghuTeja/.android/build-cache/19856cc07604b39a2b35759ed6fccf6bf53dbfc2/output/res/drawable-v21/abc_action_bar_item_background_material.xml"
+    },
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/debug/drawable-v21/abc_edit_text_material.xml",
+        "source": "/Users/RaghuTeja/.android/build-cache/19856cc07604b39a2b35759ed6fccf6bf53dbfc2/output/res/drawable-v21/abc_edit_text_material.xml"
+    },
+    {
+        "merged": "/Users/RaghuTeja/Workstation/Ubicomp Lab/Repos/aware/com.aware.plugin.upmc.cancer/device_usage/build/intermediates/res/merged/debug/drawable-v21/abc_btn_colored_material.xml",
+        "source": "/Users/RaghuTeja/.android/build-cache/19856cc07604b39a2b35759ed6fccf6bf53dbfc2/output/res/drawable-v21/abc_btn_colored_material.xml"
+    }
+]

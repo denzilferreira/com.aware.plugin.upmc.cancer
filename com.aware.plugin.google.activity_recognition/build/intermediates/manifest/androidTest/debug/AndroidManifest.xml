@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aware.plugin.google.activity_recognition.test" >
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="23" />
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:functionalTest="false"
+        android:handleProfiling="false"
+        android:label="Tests for com.aware.plugin.google.activity_recognition.test"
+        android:targetPackage="com.aware.plugin.google.activity_recognition.test" />
+
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" /> <!-- Include required permissions for Google Maps API to run. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" /> <!-- FOR PLUGINS/APPS COMMENT STARTS HERE -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
+    <!-- <uses-permission android:name="android.permission.BLUETOOTH" /> -->
+    <!-- <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> -->
+    <!-- <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> -->
+    <!-- <uses-permission android:name="android.permission.GET_TASKS" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_SMS" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_CONTACTS" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
+    <!-- <uses-permission android:name="android.permission.RESTART_PACKAGES" /> -->
+    <!-- <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" /> -->
+    <!-- <uses-permission android:name="android.permission.VIBRATE" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_CALL_LOG" /> -->
+    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+    <!-- <uses-permission android:name="android.permission.DISABLE_KEYGUARD" /> -->
+    <!-- <permission -->
+    <!-- android:name="com.aware.READ_CONTEXT_DATA" -->
+    <!-- android:description="@string/read_permission" -->
+    <!-- android:icon="@drawable/ic_launcher_settings" -->
+    <!-- android:label="Read AWARE&apos;s Context data" -->
+    <!-- android:protectionLevel="normal" > -->
+    <!-- </permission> -->
+    <!-- <permission -->
+    <!-- android:name="com.aware.WRITE_CONTEXT_DATA" -->
+    <!-- android:description="@string/write_permission" -->
+    <!-- android:icon="@drawable/ic_launcher_settings" -->
+    <!-- android:label="Write to AWARE&apos;s Context data" -->
+    <!-- android:protectionLevel="normal" > -->
+    <!-- </permission> -->
+    <!-- FOR PLUGINS/APPS COMMENT ENDS HERE, BUT CONTINUES AGAIN BELOW -->
+    <uses-permission android:name="com.aware.READ_CONTEXT_DATA" />
+    <uses-permission android:name="com.aware.WRITE_CONTEXT_DATA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+
+    <application
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher_aware"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Aware" >
+        <uses-library android:name="android.test.runner" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <service
+            android:name="com.aware.plugin.google.activity_recognition.Algorithm"
+            android:exported="true"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name="com.aware.plugin.google.activity_recognition.Settings"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Aware" />
+
+        <service
+            android:name="com.aware.plugin.google.activity_recognition.Plugin"
+            android:exported="true"
+            android:label="@string/app_name" />
+
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" /> <!-- Activities -->
+        <activity
+            android:name="com.aware.Aware_Preferences"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:enabled="@bool/display_aware"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_aware"
+            android:label="@string/aware_sensors"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Aware" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.aware.ui.Stream_UI"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:enabled="@bool/display_aware"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_aware"
+            android:label="@string/aware_stream"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:parentActivityName="com.aware.Aware_Preferences"
+            android:theme="@style/Theme.Aware" >
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="com.android.systemui.action_assist_icon"
+                android:resource="@drawable/ic_launcher_aware" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aware.Aware_Preferences" />
+        </activity>
+        <activity
+            android:name="com.aware.ui.Aware_QRCode"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:enabled="@bool/display_aware"
+            android:label="@string/aware_studies"
+            android:launchMode="singleTop"
+            android:parentActivityName="com.aware.Aware_Preferences"
+            android:theme="@style/Theme.Aware" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aware.Aware_Preferences" />
+        </activity>
+        <activity
+            android:name="com.aware.ui.Plugins_Manager"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_settings"
+            android:label="@string/aware_plugins"
+            android:launchMode="singleTop"
+            android:parentActivityName="com.aware.Aware_Preferences"
+            android:theme="@style/Theme.Aware" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aware.Aware_Preferences" />
+        </activity>
+        <activity
+            android:name="com.aware.ui.About"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:enabled="@bool/display_aware"
+            android:exported="true"
+            android:label="@string/aware_team"
+            android:launchMode="singleTop"
+            android:parentActivityName="com.aware.Aware_Preferences"
+            android:theme="@style/Theme.Aware" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aware.Aware_Preferences" />
+        </activity>
+        <activity
+            android:name="com.aware.ui.ESM_Queue"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Translucent" />
+        <activity
+            android:name="com.aware.ui.PermissionsHandler"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Translucent" /> <!-- Services -->
+        <service
+            android:name="com.aware.Keyboard"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.Scheduler"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Aware"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Aware$JoinStudy"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.SSLManager"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Applications"
+            android:enabled="@bool/display_aware"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+
+                <category android:name="android.accessibilityservice.category.FEEDBACK_GENERIC" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/aware_accessibility_config" />
+        </service>
+        <service
+            android:name="com.aware.Applications$BackgroundService"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Locations"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Bluetooth"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Screen"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Battery"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Network"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Communication"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Processor"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.TimeZone"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Mqtt"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Traffic"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Accelerometer"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Gyroscope"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Bluetooth$BackgroundService"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.WiFi"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.WiFi$BackgroundService"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Telephony"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Rotation"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Light"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Proximity"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Magnetometer"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Barometer"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Gravity"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.LinearAccelerometer"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Temperature"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.ESM"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.ESM$BackgroundService"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.Installations"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.aware.utils.WebserviceHelper"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_WEBSERVICE_SYNC_TABLE" />
+                <action android:name="ACTION_AWARE_WEBSERVICE_CLEAR_TABLE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.aware.Aware$UpdateFrameworkService"
+            android:enabled="@bool/display_aware"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Aware$UpdatePlugins"
+            android:enabled="@bool/display_aware"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.DownloadPluginService"
+            android:exported="true" />
+        <service
+            android:name="com.aware.Aware_Preferences$StudyConfig"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.Aware_TTS"
+            android:exported="true" />
+        <service
+            android:name="com.aware.utils.WearClient"
+            android:exported="true" /> <!-- Receivers -->
+        <receiver
+            android:name="com.aware.utils.WearClient$AndroidWearHTTPClient"
+            android:enabled="@bool/display_aware"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_ANDROID_WEAR_HTTP_GET" />
+                <action android:name="ACTION_AWARE_ANDROID_WEAR_HTTP_POST" />
+                <action android:name="ACTION_AWARE_ANDROID_WEAR_JOIN_STUDY" />
+                <action android:name="ACTION_AWARE_ANDROID_WEAR_QUIT_STUDY" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.utils.Aware_TTS$Aware_TTS_Receiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_TTS_SPEAK" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.Aware$Aware_Broadcaster"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ACTION_AWARE_SYNC_DATA" />
+                <action android:name="ACTION_AWARE_CLEAR_DATA" />
+                <action android:name="ACTION_AWARE_CONFIGURATION" />
+                <action android:name="ACTION_AWARE_REFRESH" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.Aware$PluginMonitor"
+            android:enabled="@bool/display_aware"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.aware.Aware$Storage_Broadcaster"
+            android:enabled="@bool/display_aware"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
+
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
