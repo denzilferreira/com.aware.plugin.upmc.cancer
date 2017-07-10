@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.aware.Aware;
+import com.aware.Aware_Preferences;
 import com.aware.ESM;
 import com.aware.providers.Scheduler_Provider;
 import com.aware.ui.esms.ESMFactory;
@@ -101,6 +102,8 @@ public class Plugin extends Aware_Plugin {
         if (PERMISSIONS_OK) {
 
             Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
 
             if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS).length() == 0) {
                 Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MAX_PROMPTS, 8);

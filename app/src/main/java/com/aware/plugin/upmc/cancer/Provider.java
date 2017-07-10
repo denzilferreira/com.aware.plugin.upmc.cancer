@@ -226,7 +226,7 @@ public class Provider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues initialValues) {
+    public synchronized Uri insert(Uri uri, ContentValues initialValues) {
         initialiseDatabase();
         if (database == null) return null;
 
@@ -268,7 +268,7 @@ public class Provider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public synchronized int delete(Uri uri, String selection, String[] selectionArgs) {
         initialiseDatabase();
         if (database == null) return 0;
 
@@ -295,7 +295,7 @@ public class Provider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public synchronized int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         initialiseDatabase();
         if (database == null) return 0;
 
