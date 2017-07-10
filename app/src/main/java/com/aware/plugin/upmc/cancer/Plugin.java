@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.aware.Aware;
+import com.aware.Aware_Preferences;
 import com.aware.utils.Aware_Plugin;
 import com.aware.utils.Scheduler;
 
@@ -43,6 +44,8 @@ public class Plugin extends Aware_Plugin {
         if (PERMISSIONS_OK) {
 
             Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
 
             if (intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false)) {
                 int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));

@@ -8,8 +8,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 38
-        versionName "4.7"
+        versionCode 39
+        versionName "4.8"
     }
 
     splits {
@@ -60,6 +60,9 @@ dependencies {
 
     compile "com.google.android.gms:play-services-location:$google_libs"
     compile "com.android.support:appcompat-v7:$support_libs"
+    compile "com.android.support:gridlayout-v7:$support_libs"
+    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_libs"
+    compile "com.koushikdutta.ion:ion:$ion_libs"
 
     compile 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
     compile 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
