@@ -42,14 +42,6 @@ public class UPMC extends AppCompatActivity {
     private boolean debug = true;
     private static ProgressDialog dialog;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
-    }
-
     private void loadSchedule() {
 
         dialog = new ProgressDialog(UPMC.this);
@@ -125,7 +117,8 @@ public class UPMC extends AppCompatActivity {
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
 
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
 
@@ -133,6 +126,9 @@ public class UPMC extends AppCompatActivity {
 
                             //Ask accessibility to be activated
                             Applications.isAccessibilityServiceActive(getApplicationContext());
+
+                            //Ask doze to be disabled
+                            Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());
                         }
                         runOnUiThread(new Runnable() {
                             @Override
@@ -164,11 +160,12 @@ public class UPMC extends AppCompatActivity {
 
         if (permissions_ok) {
 
-            Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
+            if (!Aware.isServiceRunning(this, Aware.class)) {
+                Intent aware = new Intent(this, Aware.class);
+                startService(aware);
+            }
 
-            //NOTE: needed for demo to participants
-            Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
-            Aware.startESM(this);
+            Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
                 loadSchedule();
@@ -190,7 +187,7 @@ public class UPMC extends AppCompatActivity {
 
             final RadioGroup qos_sleep = (RadioGroup) findViewById(R.id.qos_sleep);
 
-            if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
+            //if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
                 morning_questions.setVisibility(View.VISIBLE);
 
                 Calendar today = Calendar.getInstance();
@@ -205,7 +202,7 @@ public class UPMC extends AppCompatActivity {
                 }
                 if (already_answered != null && !already_answered.isClosed())
                     already_answered.close();
-            }
+            //}
 
             final TextView pain_rating = (TextView) findViewById(R.id.pain_rating);
             pain_rating.setText("-1");

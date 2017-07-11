@@ -55,15 +55,16 @@ public class Plugin extends Aware_Plugin {
 
         if (PERMISSIONS_OK) {
 
-            PluginsManager.enablePlugin(this, "com.aware.plugin.upmc.cancer");
-
             Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
 
             if (intent != null && intent.getExtras() != null && intent.getBooleanExtra("schedule", false)) {
                 int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
                 int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
 
                 try {
+                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
                     schedule.addHour(morning_hour)
                             .addMinute(morning_minute)
@@ -71,15 +72,11 @@ public class Plugin extends Aware_Plugin {
                             .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
                     Scheduler.saveSchedule(this, schedule);
 
-                    //Apply schedule
-                    Aware.startScheduler(this);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
 
-            Aware.startPlugin(this, "com.aware.plugin.upmc.cancer");
             Aware.startAWARE(this);
         }
 
