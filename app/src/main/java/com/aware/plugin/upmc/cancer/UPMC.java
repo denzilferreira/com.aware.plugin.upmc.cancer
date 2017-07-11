@@ -41,7 +41,6 @@ public class UPMC extends AppCompatActivity {
 
     private boolean debug = true;
     private static ProgressDialog dialog;
-    private static Intent aware;
 
     private void loadSchedule() {
 
@@ -188,8 +187,8 @@ public class UPMC extends AppCompatActivity {
 
         if (permissions_ok) {
 
-            if (aware == null) {
-                aware = new Intent(this, Aware.class);
+            if (!Aware.isServiceRunning(this, Aware.class)) {
+                Intent aware = new Intent(this, Aware.class);
                 startService(aware);
             }
 
@@ -215,7 +214,7 @@ public class UPMC extends AppCompatActivity {
 
             final RadioGroup qos_sleep = (RadioGroup) findViewById(R.id.qos_sleep);
 
-            if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
+            //if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
                 morning_questions.setVisibility(View.VISIBLE);
 
                 Calendar today = Calendar.getInstance();
@@ -230,7 +229,7 @@ public class UPMC extends AppCompatActivity {
                 }
                 if (already_answered != null && !already_answered.isClosed())
                     already_answered.close();
-            }
+            //}
 
             final TextView pain_rating = (TextView) findViewById(R.id.pain_rating);
             pain_rating.setText("-1");
