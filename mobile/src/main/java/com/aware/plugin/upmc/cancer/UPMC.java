@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,14 +34,24 @@ import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.ui.PermissionsHandler;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class UPMC extends AppCompatActivity {
 
-    private boolean debug = true;
+    private boolean debug = false;
     private static ProgressDialog dialog;
+    private GoogleApiClient mGoogleApiClient;
+    private static final String DASH_MESSAGE = "/dash";
+    private String NODE_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +59,69 @@ public class UPMC extends AppCompatActivity {
 
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
+        retrieveDevice();
+        sendMessageToWear("start");
+        Log.d("DASH","oncreate");
+
     }
+
+
+//    private void sendMessage(final String path, final String text) {
+//        new Thread( new Runnable() {
+//            @Override
+//            public void run() {
+//                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes( mGoogleApiClient ).await();
+//                for(Node node : nodes.getNodes()) {
+//                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
+//                            mGoogleApiClient, node.getId(), path, text.getBytes() ).await();
+//                }
+//            }
+//        }).start();
+//    }
+
+    private GoogleApiClient getGoogleApiClient(Context context) {
+        return new GoogleApiClient.Builder(context).addApi(Wearable.API).build();
+    }
+
+    private void retrieveDevice() {
+        final GoogleApiClient client = getGoogleApiClient(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                client.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                NodeApi.GetConnectedNodesResult result = Wearable.NodeApi.getConnectedNodes(client).await();
+                List<Node> nodes = result.getNodes();
+                if(nodes.size() > 0) {
+                    NODE_ID = nodes.get(0).getId();
+                }
+                client.disconnect();
+                Log.d("DASH","retrieved");
+            }
+        }).start();
+    }
+
+    private void sendMessageToWear(final String message) {
+        final GoogleApiClient client = getGoogleApiClient(this);
+        if(NODE_ID!=null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    client.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    Wearable.MessageApi.sendMessage(client, NODE_ID, message, null);
+                    Log.d("DASH","sent");
+                }
+            }).start();
+        }
+    }
+//
+//    private void initGoogleApiClient(){
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .addApi(Wearable.API)
+//                .build();
+//
+//        mGoogleApiClient.connect();
+//
+//    }
 
     private void loadSchedule() {
 

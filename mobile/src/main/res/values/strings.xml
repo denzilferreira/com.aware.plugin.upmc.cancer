@@ -7,5 +7,6 @@
     <string name="evening_intro">What was the most stressful or negative event you experienced today?</string>
     <string name="aware_description">This service makes sure the application is running at all times. Please activate it during the study.</string>
     <string name="aware_activate_accessibility">Activate UPMC DASH in the accessibility services.</string>
+    <string name="title_activity_main">MainActivity</string>
 
 </resources>
