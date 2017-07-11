@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">UPMC Cancer</string>
+    <string name="app_name">UPMC sQoL</string>
     <string name="rating_intro">Please rate how severe the following symptoms have been <b><u>in the last 12 hours</u></b> from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be).</string>
     <string name="evening_intro">What was the most stressful or negative event you experienced today?</string>
     <string name="aware_description">This service makes sure the application is running at all times. Please activate it during the study.</string>
-    <string name="aware_activate_accessibility">Activate UPMC Cancer in the accessibility services.</string>
+    <string name="aware_activate_accessibility">Activate UPMC sQoL in the accessibility services.</string>
     <string name="foreground_notification_text">UPMC software is active.</string>
 </resources>

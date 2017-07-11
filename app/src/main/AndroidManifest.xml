@@ -15,10 +15,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon, android:label">
+        tools:replace="android:icon">
 
         <activity
-            android:name=".UPMC"
+            android:name="com.aware.plugin.upmc.cancer.UPMC"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -30,12 +30,12 @@
         </activity>
 
         <activity
-            android:name=".Settings"
+            android:name="com.aware.plugin.upmc.cancer.Settings"
             android:exported="true"
             android:label="UPMC Settings" />
 
         <activity
-            android:name=".UPMC_Motivation"
+            android:name="com.aware.plugin.upmc.cancer.UPMC_Motivation"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"

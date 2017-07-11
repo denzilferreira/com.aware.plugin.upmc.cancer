@@ -43,7 +43,6 @@ public class UPMC extends AppCompatActivity {
 
     private boolean debug = true;
     private static ProgressDialog dialog;
-    private static Intent aware;
 
     private void loadSchedule() {
 
@@ -165,7 +164,7 @@ public class UPMC extends AppCompatActivity {
                             Applications.isAccessibilityServiceActive(getApplicationContext());
 
                             //Ask to ignore Doze
-                            Aware.isBatteryOptimizationIgnored(getApplicationContext(), getApplicationContext().getPackageName());
+                            Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());
                         }
 
                         runOnUiThread(new Runnable() {
@@ -206,8 +205,8 @@ public class UPMC extends AppCompatActivity {
         if (permissions_ok) {
 
             //initialise framework + assign UUID
-            if (aware == null) {
-                aware = new Intent(this, Aware.class);
+            if (!Aware.isServiceRunning(this, Aware.class)) {
+                Intent aware = new Intent(this, Aware.class);
                 startService(aware);
             }
 
@@ -239,7 +238,7 @@ public class UPMC extends AppCompatActivity {
             final EditText most_stress = (EditText) findViewById(R.id.most_stressed_moment);
             most_stress.setText("");
 
-            if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
+            //if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
                 morning_questions.setVisibility(View.VISIBLE);
                 evening_questions.setVisibility(View.GONE);
 
@@ -255,19 +254,19 @@ public class UPMC extends AppCompatActivity {
                 }
                 if (already_answered != null && !already_answered.isClosed())
                     already_answered.close();
-            }
+            //}
 
             if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_EVENING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 23) {
                 morning_questions.setVisibility(View.GONE);
                 evening_questions.setVisibility(View.VISIBLE);
 
-                Calendar today = Calendar.getInstance();
+                Calendar today_2 = Calendar.getInstance();
                 today.setTimeInMillis(System.currentTimeMillis());
                 today.set(Calendar.HOUR_OF_DAY, 1);
                 today.set(Calendar.MINUTE, 0);
                 today.set(Calendar.SECOND, 0);
 
-                Cursor already_answered = getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.MOST_STRESS_LABEL + " != '' OR " + Provider.Symptom_Data.SCORE_MOST_STRESS + " !='')", null, null);
+                Cursor already_answered_2 = getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.MOST_STRESS_LABEL + " != '' OR " + Provider.Symptom_Data.SCORE_MOST_STRESS + " !='')", null, null);
                 if (already_answered != null && already_answered.getCount() > 0) {
                     evening_questions.setVisibility(View.GONE);
                 }
