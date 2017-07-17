@@ -86,7 +86,7 @@ public class MessageService extends WearableListenerService implements
         byte[] input = messageEvent.getData();
         String message = new String(input);
         Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
-        if(message.equals("start")) {
+        if(message.equals(Constants.START_SC)) {
 
             Intent sensorService = new Intent(this, SensorService.class);
             if(!isMyServiceRunning(SensorService.class)) {
@@ -98,6 +98,9 @@ public class MessageService extends WearableListenerService implements
             }
 
 
+        }
+        else if(message.equals(Constants.STATUS_WEAR)) {
+            //do essentially nothing.
         }
 
     }

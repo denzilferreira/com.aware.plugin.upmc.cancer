@@ -1,16 +1,21 @@
 package com.aware.plugin.upmc.cancer;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -49,9 +54,23 @@ public class UPMC extends AppCompatActivity {
 
     private boolean debug = false;
     private static ProgressDialog dialog;
-    private GoogleApiClient mGoogleApiClient;
-    private static final String DASH_MESSAGE = "/dash";
-    private String NODE_ID;
+    private boolean firstRun = true;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("DASH", "UPMC:onDestroy");
+        if(isMyServiceRunning(MessageService.class)) {
+            stopService(new Intent(this, MessageService.class));
+            Log.d("DASH", "Stopped Message Service");
+        }
+        else
+            Log.d("DASH", "Message Service is not running");
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wearStatusReceiver);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,69 +78,51 @@ public class UPMC extends AppCompatActivity {
 
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
-        retrieveDevice();
-        sendMessageToWear("start");
-        Log.d("DASH","oncreate");
+        Log.d("DASH","UPMC:onCreate");
 
-    }
-
-
-//    private void sendMessage(final String path, final String text) {
-//        new Thread( new Runnable() {
-//            @Override
-//            public void run() {
-//                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes( mGoogleApiClient ).await();
-//                for(Node node : nodes.getNodes()) {
-//                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
-//                            mGoogleApiClient, node.getId(), path, text.getBytes() ).await();
-//                }
-//            }
-//        }).start();
-//    }
-
-    private GoogleApiClient getGoogleApiClient(Context context) {
-        return new GoogleApiClient.Builder(context).addApi(Wearable.API).build();
-    }
-
-    private void retrieveDevice() {
-        final GoogleApiClient client = getGoogleApiClient(this);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                client.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                NodeApi.GetConnectedNodesResult result = Wearable.NodeApi.getConnectedNodes(client).await();
-                List<Node> nodes = result.getNodes();
-                if(nodes.size() > 0) {
-                    NODE_ID = nodes.get(0).getId();
-                }
-                client.disconnect();
-                Log.d("DASH","retrieved");
-            }
-        }).start();
-    }
-
-    private void sendMessageToWear(final String message) {
-        final GoogleApiClient client = getGoogleApiClient(this);
-        if(NODE_ID!=null) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    client.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    Wearable.MessageApi.sendMessage(client, NODE_ID, message, null);
-                    Log.d("DASH","sent");
-                }
-            }).start();
+        if(!isMyServiceRunning(MessageService.class)) {
+            startService(new Intent(this, MessageService.class));
+            Log.d("DASH", "Started Message Service");
         }
+        else
+            Log.d("DASH", "Message Service already running");
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(wearStatusReceiver, new IntentFilter(Constants.WEAR_STATUS_INTENT_FILTER));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
+
     }
-//
-//    private void initGoogleApiClient(){
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .addApi(Wearable.API)
-//                .build();
-//
-//        mGoogleApiClient.connect();
-//
-//    }
+
+    private BroadcastReceiver wearStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.TAG, "UPMC:BR:wearStatusMsgReceived" + intent.getStringExtra(Constants.COMM_KEY));
+        }
+    };
+
+    private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.TAG, "UPMC:BR:wearStopMessageReceived, killing application");
+            finish();
+
+        }
+    };
+
+
+
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     private void loadSchedule() {
 
@@ -223,6 +224,23 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        final Handler handler = new Handler();
+
+        if(firstRun) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(Constants.LOCAL_MESSAGE_INTENT_FILTER);
+                    // starting step count after 2 seconds
+                    intent.putExtra(Constants.COMM_KEY, Constants.STATUS_WEAR);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    Log.d(Constants.TAG, "UPMC:onResume:Handler");
+                }
+            }, 2000);
+            firstRun = false;
+        }
+
+
 
         ArrayList<String> REQUIRED_PERMISSIONS = new ArrayList<>();
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);

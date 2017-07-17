@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(Constants.TAG, "MainActivity:onCreate");
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(Constants.TAG, "MainActivity:onResume");
         if(mSensorManager!=null) {
             if(stepCounter!=null) {
                 mSensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_FASTEST, 500);
