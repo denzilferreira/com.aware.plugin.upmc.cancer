@@ -99,6 +99,19 @@ public class MessageService extends WearableListenerService implements
                 .setContentIntent(dashPendingIntent);
         startForeground(1, messageServiceNotifBuilder.build());
 
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(Constants.LOCAL_MESSAGE_INTENT_FILTER);
+                // starting step count after 2 seconds
+                intent.putExtra(Constants.COMM_KEY, Constants.STATUS_WEAR);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                Log.d(Constants.TAG, "MessageService:onStartCommand:Handler");
+            }
+        }, 2000);
+
         return i;
     }
 
@@ -182,7 +195,7 @@ public class MessageService extends WearableListenerService implements
         return wearConnected;
     }
 
-    private void sendMessageToWear(String message) {
+    private void sendMessageToWear(final String message) {
 
         PendingResult<MessageApi.SendMessageResult> pendingResult =
                 Wearable.MessageApi.sendMessage(
@@ -195,9 +208,9 @@ public class MessageService extends WearableListenerService implements
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if(!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed");
+                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed" + message);
                 } else {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent");
+                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent" + message);
                 }
             }
         });
@@ -218,10 +231,10 @@ public class MessageService extends WearableListenerService implements
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if(!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:wearStatus:message failed");
+                    Log.d(Constants.TAG, "MessageService:wearStatus: disconnected");
                     setWearConnected(false);
                 } else {
-                    Log.d(Constants.TAG, "MessageService:wearStatus:message sent");
+                    Log.d(Constants.TAG, "MessageService:wearStatus: connected");
                     setWearConnected(true);
                 }
             }
@@ -229,6 +242,7 @@ public class MessageService extends WearableListenerService implements
 
         final Handler handler = new Handler();
         final Context mContext = this;
+        //do something here
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -241,6 +255,7 @@ public class MessageService extends WearableListenerService implements
                     messageServiceNotifBuilder.setContentText("Connected");
                     NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+                    sendMessageToWear(Constants.START_SC);
                 }
                 else {
                     Log.d(Constants.TAG, "MessageService:detectWearStatus:wear is not connected");

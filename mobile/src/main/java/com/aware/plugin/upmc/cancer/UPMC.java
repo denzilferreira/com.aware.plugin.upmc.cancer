@@ -68,8 +68,6 @@ public class UPMC extends AppCompatActivity {
             Log.d("DASH", "Message Service is not running");
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifBroadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(wearStatusReceiver);
-
     }
 
     @Override
@@ -87,17 +85,10 @@ public class UPMC extends AppCompatActivity {
         else
             Log.d("DASH", "Message Service already running");
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(wearStatusReceiver, new IntentFilter(Constants.WEAR_STATUS_INTENT_FILTER));
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
 
     }
 
-    private BroadcastReceiver wearStatusReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(Constants.TAG, "UPMC:BR:wearStatusMsgReceived" + intent.getStringExtra(Constants.COMM_KEY));
-        }
-    };
 
     private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -224,24 +215,6 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        final Handler handler = new Handler();
-
-        if(firstRun) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Intent intent = new Intent(Constants.LOCAL_MESSAGE_INTENT_FILTER);
-                    // starting step count after 2 seconds
-                    intent.putExtra(Constants.COMM_KEY, Constants.STATUS_WEAR);
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    Log.d(Constants.TAG, "UPMC:onResume:Handler");
-                }
-            }, 2000);
-            firstRun = false;
-        }
-
-
-
         ArrayList<String> REQUIRED_PERMISSIONS = new ArrayList<>();
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
