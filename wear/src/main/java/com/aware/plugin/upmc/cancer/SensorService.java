@@ -1,5 +1,6 @@
 package com.aware.plugin.upmc.cancer;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -22,6 +24,8 @@ public class SensorService extends Service implements SensorEventListener {
     public static final String PREFS_SC1_FILE = "SC_1_HRS";
     public static final String PREFS_SC2_FILE = "SC_2_HRS";
     private boolean firstUse = true;
+
+    private NotificationCompat.Builder sensorServiceNotifBuilder;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -35,6 +39,8 @@ public class SensorService extends Service implements SensorEventListener {
             sensorManager.unregisterListener(this);
         }
         Log.d(Constants.TAG, "SensorService : onDestroy");
+        stopForeground(true);
+        stopSelf();
     }
 
     @Override
@@ -44,6 +50,21 @@ public class SensorService extends Service implements SensorEventListener {
         sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
+
+        sensorServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("UPMC Dash Wear Monitor")
+                .setContentText("Logging...")
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+        //.setContentIntent(dashPendingIntent);
+
+
+
+
+
+
+        startForeground(3, sensorServiceNotifBuilder.build());
+
 
     }
 

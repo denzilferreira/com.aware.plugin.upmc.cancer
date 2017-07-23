@@ -87,7 +87,7 @@
         </service>
 
 
-        <receiver android:name=".NotifReceiver">
+        <receiver android:name=".NotifReceiver" android:exported="true" android:enabled="true">
             <intent-filter>
                 <action android:name="upmc_notification_receiver" />
             </intent-filter>
@@ -115,11 +115,6 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
     </application>
 
 </manifest>

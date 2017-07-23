@@ -28,6 +28,7 @@ public class MainActivity extends WearableActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(Constants.TAG,"MainActivty:onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
@@ -38,7 +39,8 @@ public class MainActivity extends WearableActivity{
         Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
         if(!isMyServiceRunning(MessageService.class))
             startService(msgServiceIntent);
-        Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
+       // Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
+        finish();
     }
 
 
@@ -71,15 +73,14 @@ public class MainActivity extends WearableActivity{
     @Override
     protected void onDestroy() {
         Log.d(LC_DEBUG,"MainActivity: onDestroy");
-//        sensorManager.unregisterListener(this);
-        if(isMyServiceRunning(MessageService.class)) {
-            Intent msgService = new Intent(this,MessageService.class);
-            stopService(msgService);
-        }
-        if(isMyServiceRunning(SensorService.class)) {
-            Intent snsrService = new Intent(this,SensorService.class);
-            stopService(snsrService);
-        }
+//        if(isMyServiceRunning(MessageService.class)) {
+//            Intent msgService = new Intent(this,MessageService.class);
+//            stopService(msgService);
+//        }
+//        if(isMyServiceRunning(SensorService.class)) {
+//            Intent snsrService = new Intent(this,SensorService.class);
+//            stopService(snsrService);
+//        }
         super.onDestroy();
 
 

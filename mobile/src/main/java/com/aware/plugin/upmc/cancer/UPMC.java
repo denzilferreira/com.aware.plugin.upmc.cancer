@@ -60,13 +60,6 @@ public class UPMC extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("DASH", "UPMC:onDestroy");
-        if(isMyServiceRunning(MessageService.class)) {
-            stopService(new Intent(this, MessageService.class));
-            Log.d("DASH", "Stopped Message Service");
-        }
-        else
-            Log.d("DASH", "Message Service is not running");
-
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifBroadcastReceiver);
     }
 
@@ -93,8 +86,11 @@ public class UPMC extends AppCompatActivity {
     private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(Constants.TAG, "UPMC:BR:wearStopMessageReceived, killing application");
-            finish();
+            if(intent.hasExtra(Constants.COMM_KEY_UPMC)) {
+                Log.d(Constants.TAG, "UPMC:BR:wearStopMessageReceived, killing application");
+                finish();
+            }
+
 
         }
     };

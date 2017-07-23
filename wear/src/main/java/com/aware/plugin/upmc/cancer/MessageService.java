@@ -1,15 +1,21 @@
 package com.aware.plugin.upmc.cancer;
 
 import android.app.ActivityManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
@@ -17,6 +23,7 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by RaghuTeja on 6/23/17.
@@ -27,14 +34,21 @@ public class MessageService extends WearableListenerService implements
 
     private GoogleApiClient mGoogleApiClient;
     public boolean phoneConnected;
+    private NotificationCompat.Builder messageServiceNotifBuilder;
+    private int count = 0;
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.d(Constants.TAG, "MessageService: onDestroy");
+        //Wearable.MessageApi.removeListener(mGoogleApiClient, this);
         if(mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-        super.onDestroy();
+
+
+        stopForeground(true);
+        stopSelf();
     }
 
     @Override
@@ -59,6 +73,46 @@ public class MessageService extends WearableListenerService implements
 
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+
+
+        Intent dashIntent = new Intent(this, MainActivity.class);
+        dashIntent.setAction(new Random().nextInt(50) + "_action");
+        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0,dashIntent,0);
+
+        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("UPMC Dash Wear Client")
+                .setContentText("Not synced with phone")
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                //.setContentIntent(dashPendingIntent);
+
+
+
+        Intent dashStopIntent = new Intent(Constants.NOTIFICATION_INTENT_FILTER);
+        PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(this,0,dashStopIntent,0);
+
+
+
+
+        NotificationCompat.Action action1 = new NotificationCompat.Action.Builder(R.drawable.ic_cc_clear, "Stop Client", dashStopPendingIntent).build();
+        NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(R.drawable.ic_cc_checkmark, "Sync Client", dashStopPendingIntent).build();
+
+        messageServiceNotifBuilder.addAction(action1).extend(new NotificationCompat.WearableExtender().setContentAction(0));
+        messageServiceNotifBuilder.addAction(action2).extend(new NotificationCompat.WearableExtender().setContentAction(1));
+
+
+
+
+        startForeground(1, messageServiceNotifBuilder.build());
+
+
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
         Log.d(Constants.TAG, "MessageService: onCapability");
         super.onCapabilityChanged(capabilityInfo);
@@ -77,17 +131,18 @@ public class MessageService extends WearableListenerService implements
         Wearable.CapabilityApi.addCapabilityListener(mGoogleApiClient,
                 this,
                 Constants.CAPABILITY_PHONE_APP);
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        //Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
+
         super.onMessageReceived(messageEvent);
         byte[] input = messageEvent.getData();
         String message = new String(input);
-        Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
+        Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message + " " + count);
+        count++;
         if(message.equals(Constants.START_SC)) {
-
             Intent sensorService = new Intent(this, SensorService.class);
             if(!isMyServiceRunning(SensorService.class)) {
                 startService(sensorService);
@@ -99,8 +154,27 @@ public class MessageService extends WearableListenerService implements
 
 
         }
-        else if(message.equals(Constants.STATUS_WEAR)) {
-            //do essentially nothing.
+        else if(message.equals(Constants.GET_STATUS_WEAR)) {
+            //do essentially nothing // Yes, app is running on phone.
+            sendMessageToPhone(Constants.STATUS_READY);
+            messageServiceNotifBuilder.setContentText("Connected");
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+
+        }
+        else if(message.equals(Constants.STOP_SC)) {
+            Log.d(Constants.TAG, "Stopping this shit");
+            if(isMyServiceRunning(SensorService.class)) {
+                this.stopService(new Intent(this, SensorService.class));
+            }
+            sendMessageToPhone(Constants.STATUS_READY);
+        }
+        else if(message.equals(Constants.KILL_DASH)) {
+            Log.d(Constants.TAG, "Stopping this shit");
+            if(isMyServiceRunning(SensorService.class)) {
+                this.stopService(new Intent(this, SensorService.class));
+            }
+            this.stopSelf();
         }
 
     }
@@ -127,10 +201,28 @@ public class MessageService extends WearableListenerService implements
     }
 
 
-    private void sendMessage(String message) {
+    private void sendMessageToPhone(final String message) {
 
+        PendingResult<MessageApi.SendMessageResult> pendingResult =
+                Wearable.MessageApi.sendMessage(
+                        mGoogleApiClient,
+                        Constants.NODE_ID,
+                        Constants.CONNECTION_PATH,
+                        message.getBytes());
+
+        pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+            @Override
+            public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
+                if(!sendMessageResult.getStatus().isSuccess()) {
+                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed" + message);
+                } else {
+                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent" + message);
+                }
+            }
+        });
 
     }
+
 
 
     public void setPhoneConnected(boolean phoneConnected) {

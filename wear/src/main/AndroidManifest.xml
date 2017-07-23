@@ -20,6 +20,14 @@
 
 
 
+        <receiver android:name=".NotifReceiver">
+            <intent-filter>
+                <action android:name="upmc_notification_receiver" />
+            </intent-filter>
+        </receiver>
+
+
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
