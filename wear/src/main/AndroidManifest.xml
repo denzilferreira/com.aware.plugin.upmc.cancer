@@ -6,7 +6,6 @@
     <uses-feature android:name="android.hardware.sensor.stepcounter"/>
     <uses-feature android:name="android.hardware.sensor.stepdetector"/>
     <uses-permission android:name="android.permission.BODY_SENSORS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -22,10 +21,12 @@
 
         <receiver android:name=".NotifReceiver">
             <intent-filter>
-                <action android:name="upmc_notification_receiver" />
+                <action android:name="upmc_notification_receiver" android:enabled="true" android:exported="true" />
             </intent-filter>
         </receiver>
 
+
+        <receiver android:name=".AlarmReceiver"/>
 
 
         <activity
@@ -39,15 +40,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MessageService">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" android:enabled="true" android:exported="true"/>
-                <data android:scheme="wear" android:host="*" android:pathPrefix="/upmc-dash" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
-                <data android:scheme="wear" android:host="*"/>
-            </intent-filter>
+        <service android:name=".MessageService" android:exported="false">
+            <!--<intent-filter>-->
+                <!--<action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />-->
+                <!--<data android:scheme="wear" android:host="*" android:pathPrefix="/upmc-dash" />-->
+            <!--</intent-filter>-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />-->
+                <!--<data android:scheme="wear" android:host="*"/>-->
+            <!--</intent-filter>-->
         </service>
 
         <service android:name=".SensorService" />

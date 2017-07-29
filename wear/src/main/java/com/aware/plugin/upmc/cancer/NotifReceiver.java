@@ -13,18 +13,32 @@ import android.util.Log;
 public class NotifReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(Constants.TAG, "Let's stop this shit");
-
-        if(isMyServiceRunning(MessageService.class, context)) {
-            Intent msgService = new Intent(context,MessageService.class);
-            context.stopService(msgService);
+        if(intent.hasExtra(Constants.COMM_KEY_NOTIF)) {
+            if(intent.getStringExtra(Constants.COMM_KEY_NOTIF).equals("STOP")) {
+                if(isMyServiceRunning(MessageService.class, context)) {
+                    Intent msgService = new Intent(context,MessageService.class);
+                    context.stopService(msgService);
+                }
+                if(isMyServiceRunning(SensorService.class, context)) {
+                    Intent snsrService = new Intent(context,SensorService.class);
+                    context.stopService(snsrService);
+                }
+            }
+            else if(intent.getStringExtra(Constants.COMM_KEY_NOTIF).equals("KILL_REQUEST")) {
+                Log.d(Constants.TAG, "NotifReceive: Kill Request");
+                if(isMyServiceRunning(MessageService.class, context)) {
+                    Intent msgService = new Intent(context,MessageService.class);
+                    context.stopService(msgService);
+                }
+                if(isMyServiceRunning(SensorService.class, context)) {
+                    Intent snsrService = new Intent(context,SensorService.class);
+                    context.stopService(snsrService);
+                }
+            }
         }
-        if(isMyServiceRunning(SensorService.class, context)) {
-            Intent snsrService = new Intent(context,SensorService.class);
-            context.stopService(snsrService);
-        }
 
-        Log.d(Constants.TAG, " stoped this shit");
+
+
 
     }
 

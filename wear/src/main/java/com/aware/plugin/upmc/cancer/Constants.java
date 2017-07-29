@@ -13,9 +13,9 @@ public final class Constants {
     public static final String CAPABILITY_PHONE_APP = "upmcdash_phoneapp";
     public static final String NODE_ID = "upmcdash_wearapp";
 
-
+    public static final String ALARM_COMM = "AlarmComm";
     public static final String START_SC = "start_step_count";  // START STEP COUNT COMMAND
-    public static final String COMM_KEY = "message";  // key in putExtra
+    public static final String COMM_KEY_NOTIF = "message";  // key in putExtra
 
     public static final String GET_STATUS_WEAR = "get_wear_status";
 
@@ -31,6 +31,6 @@ public final class Constants {
 
 
 
-    public static final String NOTIFICATION_INTENT_FILTER = "upmc_notification_receiver";
+    public static final String NOTIFICATION_RECEIVER_INTENT_FILTER = "upmc_notification_receiver";
 
 }

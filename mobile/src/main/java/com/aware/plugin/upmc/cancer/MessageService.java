@@ -52,6 +52,9 @@ public class MessageService extends WearableListenerService implements
         super.onDestroy();
         Log.d(Constants.TAG,"MessageService:onDestroy");
         stopForeground(true);
+        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+        Wearable.CapabilityApi.removeListener(mGoogleApiClient, this);
+        Wearable.CapabilityApi.removeCapabilityListener(mGoogleApiClient, this, null);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifBroadcastReceiver);
         stopSelf();
 

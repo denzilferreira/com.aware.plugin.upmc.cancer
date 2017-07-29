@@ -5,17 +5,21 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageApi.MessageListener;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
@@ -35,20 +39,19 @@ public class MessageService extends WearableListenerService implements
     private GoogleApiClient mGoogleApiClient;
     public boolean phoneConnected;
     private NotificationCompat.Builder messageServiceNotifBuilder;
-    private int count = 0;
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(Constants.TAG, "MessageService: onDestroy");
-        //Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+        Wearable.CapabilityApi.removeCapabilityListener(mGoogleApiClient, this, null);
+        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
         if(mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-
-
         stopForeground(true);
         stopSelf();
+
     }
 
     @Override
@@ -59,10 +62,7 @@ public class MessageService extends WearableListenerService implements
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
                 .build();
-
-        if(mGoogleApiClient!=null) {
-            mGoogleApiClient.connect();
-        }
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -74,13 +74,10 @@ public class MessageService extends WearableListenerService implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-
-
+        Log.d(Constants.TAG, "MessageService:onStartCommand");
         Intent dashIntent = new Intent(this, MainActivity.class);
         dashIntent.setAction(new Random().nextInt(50) + "_action");
         PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0,dashIntent,0);
-
         messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                 .setContentTitle("UPMC Dash Wear Client")
@@ -88,28 +85,16 @@ public class MessageService extends WearableListenerService implements
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
                 //.setContentIntent(dashPendingIntent);
 
-
-
-        Intent dashStopIntent = new Intent(Constants.NOTIFICATION_INTENT_FILTER);
-        PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(this,0,dashStopIntent,0);
-
-
-
-
+        Intent dashStopIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
+        dashStopIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP CLIENT");
+        PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(this,0,dashStopIntent,PendingIntent.FLAG_ONE_SHOT);
         NotificationCompat.Action action1 = new NotificationCompat.Action.Builder(R.drawable.ic_cc_clear, "Stop Client", dashStopPendingIntent).build();
         NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(R.drawable.ic_cc_checkmark, "Sync Client", dashStopPendingIntent).build();
-
         messageServiceNotifBuilder.addAction(action1).extend(new NotificationCompat.WearableExtender().setContentAction(0));
         messageServiceNotifBuilder.addAction(action2).extend(new NotificationCompat.WearableExtender().setContentAction(1));
-
-
-
-
         startForeground(1, messageServiceNotifBuilder.build());
-
-
-
-        return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
+        //return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -117,11 +102,9 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageService: onCapability");
         super.onCapabilityChanged(capabilityInfo);
         if(capabilityInfo.getNodes().size() > 0){
-            Log.d(Constants.TAG, "Mobile Connected");
-            setPhoneConnected(true);
+            Log.d(Constants.TAG, "MessageService: onCapability: Mobile Connected");
         }else{
-            Log.d(Constants.TAG, "No Mobile Found");
-            setPhoneConnected(false);
+            Log.d(Constants.TAG, "MessageService: onCapability: No Mobile Found");
         }
     }
 
@@ -131,7 +114,8 @@ public class MessageService extends WearableListenerService implements
         Wearable.CapabilityApi.addCapabilityListener(mGoogleApiClient,
                 this,
                 Constants.CAPABILITY_PHONE_APP);
-        //Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        Uri uri = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
+        Wearable.MessageApi.addListener(mGoogleApiClient,this, uri, MessageApi.FILTER_PREFIX);
     }
 
     @Override
@@ -140,8 +124,7 @@ public class MessageService extends WearableListenerService implements
         super.onMessageReceived(messageEvent);
         byte[] input = messageEvent.getData();
         String message = new String(input);
-        Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message + " " + count);
-        count++;
+        Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
         if(message.equals(Constants.START_SC)) {
             Intent sensorService = new Intent(this, SensorService.class);
             if(!isMyServiceRunning(SensorService.class)) {
@@ -155,7 +138,6 @@ public class MessageService extends WearableListenerService implements
 
         }
         else if(message.equals(Constants.GET_STATUS_WEAR)) {
-            //do essentially nothing // Yes, app is running on phone.
             sendMessageToPhone(Constants.STATUS_READY);
             messageServiceNotifBuilder.setContentText("Connected");
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -174,7 +156,7 @@ public class MessageService extends WearableListenerService implements
             if(isMyServiceRunning(SensorService.class)) {
                 this.stopService(new Intent(this, SensorService.class));
             }
-            this.stopSelf();
+            sendBroadcast(new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER).putExtra(Constants.COMM_KEY_NOTIF, "KILL_REQUEST"));
         }
 
     }
@@ -196,9 +178,6 @@ public class MessageService extends WearableListenerService implements
     }
 
 
-    public boolean isPhoneConnected() {
-        return phoneConnected;
-    }
 
 
     private void sendMessageToPhone(final String message) {
@@ -214,9 +193,9 @@ public class MessageService extends WearableListenerService implements
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if(!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed" + message);
+                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed: " + message);
                 } else {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent" + message);
+                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent : " + message);
                 }
             }
         });
@@ -224,8 +203,4 @@ public class MessageService extends WearableListenerService implements
     }
 
 
-
-    public void setPhoneConnected(boolean phoneConnected) {
-        this.phoneConnected = phoneConnected;
-    }
 }

@@ -87,7 +87,7 @@
         </service>
 
 
-        <receiver android:name=".NotifReceiver" android:exported="true" android:enabled="true">
+        <receiver android:name=".NotifReceiver" android:exported="false" android:enabled="true">
             <intent-filter>
                 <action android:name="upmc_notification_receiver" />
             </intent-filter>
