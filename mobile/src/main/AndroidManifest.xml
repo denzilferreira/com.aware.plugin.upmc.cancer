@@ -109,11 +109,7 @@
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".Plugin$FitbitAnalyser">
-            <intent-filter>
-                <action android:name="ACTION_AWARE_PLUGIN_FITBIT" />
-            </intent-filter>
-        </receiver>
+
 
     </application>
 

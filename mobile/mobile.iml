@@ -82,6 +82,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/builds" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/check-manifest" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes-jar" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-runtime-classes" />
@@ -108,13 +109,16 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="play-services-wearable-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="constraint-layout-solver-1.0.2" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.3" level="project" />
     <orderEntry type="library" exported="" name="com.aware.plugin.google.activity_recognition-development-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="constraint-layout-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="aware-client-development-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="play-services-location-11.0.1" level="project" />
+    <orderEntry type="library" exported="" name="androidasync-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-compat-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="ion-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.2.0" level="project" />
     <orderEntry type="library" exported="" name="gridlayout-v7-25.2.0" level="project" />

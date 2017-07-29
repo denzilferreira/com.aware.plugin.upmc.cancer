@@ -5,7 +5,6 @@ package com.aware.plugin.upmc.cancer;
  */
 
 public final class Constants {
-    public static final long CONNECTION_TIME_OUT_MS = 4000;
     public static final String CONNECTION_PATH = "/upmc-dash";
     public static final String TAG = "DASH";
     public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";

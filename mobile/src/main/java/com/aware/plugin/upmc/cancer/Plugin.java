@@ -148,47 +148,47 @@ public class Plugin extends Aware_Plugin {
         return todays_count;
     }
 
-    public static class FitbitAnalyser extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equalsIgnoreCase(com.aware.plugin.fitbit.Plugin.ACTION_AWARE_PLUGIN_FITBIT)) {
-                Integer walks = walkingPromptsCount(context);
-                if (walks != null && walks <= 4) {
-                    int last_3h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_3H, 1000);
-                    int last_5h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_5H, 1000);
-                    Float symptoms_today = symptomAvg(context);
+//    public static class FitbitAnalyser extends BroadcastReceiver {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            if (intent.getAction().equalsIgnoreCase(com.aware.plugin.fitbit.Plugin.ACTION_AWARE_PLUGIN_FITBIT)) {
+//                Integer walks = walkingPromptsCount(context);
+//                if (walks != null && walks <= 4) {
+//                    int last_3h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_3H, 1000);
+//                    int last_5h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_5H, 1000);
+//                    Float symptoms_today = symptomAvg(context);
+//
+//                    if (symptoms_today != null && last_3h < 50 && symptoms_today < 7) {
+//                        Intent walking = new Intent(context, UPMC_Motivation.class);
+//                        walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
+//                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        notifyUser(context, walking);
+//                    } else if (symptoms_today != null && last_5h < 50 && symptoms_today >= 7) {
+//                        Intent walking = new Intent(context, UPMC_Motivation.class);
+//                        walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
+//                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        notifyUser(context, walking);
+//                    }
+//                }
+//            }
+//        }
 
-                    if (symptoms_today != null && last_3h < 50 && symptoms_today < 7) {
-                        Intent walking = new Intent(context, UPMC_Motivation.class);
-                        walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
-                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        notifyUser(context, walking);
-                    } else if (symptoms_today != null && last_5h < 50 && symptoms_today >= 7) {
-                        Intent walking = new Intent(context, UPMC_Motivation.class);
-                        walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
-                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        notifyUser(context, walking);
-                    }
-                }
-            }
-        }
-
-        private void notifyUser(Context context, Intent walk_condition) {
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-            mBuilder.setSmallIcon( R.drawable.ic_stat_fitbit );
-            mBuilder.setContentTitle( "UPMC" );
-            mBuilder.setContentText( "Tap to answer." );
-            mBuilder.setDefaults( Notification.DEFAULT_ALL );
-            mBuilder.setOnlyAlertOnce( true );
-            mBuilder.setAutoCancel( true );
-
-            PendingIntent onclick = PendingIntent.getActivity(context, 0, walk_condition, PendingIntent.FLAG_UPDATE_CURRENT);
-            mBuilder.setContentIntent(onclick);
-
-            NotificationManager notManager = (NotificationManager) context.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            notManager.notify(677, mBuilder.build());
-        }
-    }
+//        private void notifyUser(Context context, Intent walk_condition) {
+//            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+//            mBuilder.setSmallIcon( R.drawable.ic_stat_fitbit );
+//            mBuilder.setContentTitle( "UPMC" );
+//            mBuilder.setContentText( "Tap to answer." );
+//            mBuilder.setDefaults( Notification.DEFAULT_ALL );
+//            mBuilder.setOnlyAlertOnce( true );
+//            mBuilder.setAutoCancel( true );
+//
+//            PendingIntent onclick = PendingIntent.getActivity(context, 0, walk_condition, PendingIntent.FLAG_UPDATE_CURRENT);
+//            mBuilder.setContentIntent(onclick);
+//
+//            NotificationManager notManager = (NotificationManager) context.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+//            notManager.notify(677, mBuilder.build());
+//        }
+//    }
 
     @Override
     public void onDestroy() {
