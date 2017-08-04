@@ -39,6 +39,17 @@ public class MessageService extends WearableListenerService implements
     private GoogleApiClient mGoogleApiClient;
     public boolean phoneConnected;
     private NotificationCompat.Builder messageServiceNotifBuilder;
+    private String NODE_ID;
+
+
+
+    public String getNODE_ID() {
+        return NODE_ID;
+    }
+
+    public void setNODE_ID(String NODE_ID) {
+        this.NODE_ID = NODE_ID;
+    }
 
     @Override
     public void onDestroy() {
@@ -120,49 +131,52 @@ public class MessageService extends WearableListenerService implements
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-
         super.onMessageReceived(messageEvent);
-        byte[] input = messageEvent.getData();
-        String message = new String(input);
-        Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
-        if(message.equals(Constants.START_SC)) {
-            Intent sensorService = new Intent(this, SensorService.class);
-            if(!isMyServiceRunning(SensorService.class)) {
-                startService(sensorService);
-                Log.d(Constants.TAG, "MessageService: Starting SensorService: ");
-            }
-            else {
-                Log.d(Constants.TAG, "MessageService: Already Running SensorService");
-            }
+        Log.d(Constants.TAG, "MessageService:onMessageReceived");
+        Uri.Builder uriBuilder = new Uri.Builder();
+        uriBuilder.scheme("wear").path("upmc-dash");
+        if(messageEvent.getPath().equals(uriBuilder.toString())) {
+            setNODE_ID(messageEvent.getSourceNodeId());
+            byte[] input = messageEvent.getData();
+            String message = new String(input);
+            Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
+            if(message.equals(Constants.START_SC)) {
+                Intent sensorService = new Intent(this, SensorService.class);
+                if(!isMyServiceRunning(SensorService.class)) {
+                    startService(sensorService);
+                    Log.d(Constants.TAG, "MessageService: Starting SensorService: ");
+                }
+                else {
+                    Log.d(Constants.TAG, "MessageService: Already Running SensorService");
+                }
 
 
-        }
-        else if(message.equals(Constants.GET_STATUS_WEAR)) {
-            sendMessageToPhone(Constants.STATUS_READY);
-            messageServiceNotifBuilder.setContentText("Connected");
-            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(1, messageServiceNotifBuilder.build());
-
-        }
-        else if(message.equals(Constants.STOP_SC)) {
-            Log.d(Constants.TAG, "Stopping this shit");
-            if(isMyServiceRunning(SensorService.class)) {
-                this.stopService(new Intent(this, SensorService.class));
             }
-            sendMessageToPhone(Constants.STATUS_READY);
-        }
-        else if(message.equals(Constants.KILL_DASH)) {
-            Log.d(Constants.TAG, "Stopping this shit");
-            if(isMyServiceRunning(SensorService.class)) {
-                this.stopService(new Intent(this, SensorService.class));
-            }
-            sendBroadcast(new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER).putExtra(Constants.COMM_KEY_NOTIF, "KILL_REQUEST"));
-        }
+            else if(message.equals(Constants.GET_STATUS_WEAR)) {
+                sendMessageToPhone(Constants.STATUS_READY);
+                messageServiceNotifBuilder.setContentText("Connected");
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(1, messageServiceNotifBuilder.build());
 
+            }
+            else if(message.equals(Constants.STOP_SC)) {
+                Log.d(Constants.TAG, "Stopping this shit");
+                if(isMyServiceRunning(SensorService.class)) {
+                    this.stopService(new Intent(this, SensorService.class));
+                }
+                sendMessageToPhone(Constants.STATUS_READY);
+            }
+            else if(message.equals(Constants.KILL_DASH)) {
+                Log.d(Constants.TAG, "Stopping this shit");
+                if(isMyServiceRunning(SensorService.class)) {
+                    this.stopService(new Intent(this, SensorService.class));
+                }
+                sendBroadcast(new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER).putExtra(Constants.COMM_KEY_NOTIF, "KILL_REQUEST"));
+            }
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
-
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
@@ -177,15 +191,12 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageService: onConnectionSuspended");
     }
 
-
-
-
     private void sendMessageToPhone(final String message) {
 
         PendingResult<MessageApi.SendMessageResult> pendingResult =
                 Wearable.MessageApi.sendMessage(
                         mGoogleApiClient,
-                        Constants.NODE_ID,
+                        getNODE_ID(),
                         Constants.CONNECTION_PATH,
                         message.getBytes());
 

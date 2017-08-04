@@ -1,16 +1,16 @@
 package com.aware.plugin.upmc.cancer;
 
+import android.net.Uri;
+
 /**
  * Created by RaghuTeja on 6/22/17.
  */
 
 public final class Constants {
+
     public static final String CONNECTION_PATH = "/upmc-dash";
     public static final String TAG = "DASH";
     public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";
-
-    public static final String NODE_ID = "upmcdash_phoneapp";
-
     //local broadcast receivers/ MessageService stuff
     // intent filters for Broadcast Receivers
     public static final String LOCAL_MESSAGE_INTENT_FILTER = "upmcdash_phone_local_message";

@@ -30,7 +30,12 @@ public final class Constants {
 
 
 
-
     public static final String NOTIFICATION_RECEIVER_INTENT_FILTER = "upmc_notification_receiver";
+
+    //local broadcast
+    public static final String ALARM_LOCAL_RECEIVER_INTENT_FILTER = "alarm_local_broadcast_receiver";
+    public static final int ALARM_TYPE_1HR = 0;
+    public static final int ALARM_TYPE_2HR = 1;
+
 
 }

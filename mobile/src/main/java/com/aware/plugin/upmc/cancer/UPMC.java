@@ -156,7 +156,6 @@ public class UPMC extends AppCompatActivity {
                                 dialog.show();
                             }
                         });
-
                         Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
                         Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
 
