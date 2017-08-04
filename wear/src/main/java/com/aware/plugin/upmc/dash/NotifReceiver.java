@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.cancer;
+package com.aware.plugin.upmc.dash;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;

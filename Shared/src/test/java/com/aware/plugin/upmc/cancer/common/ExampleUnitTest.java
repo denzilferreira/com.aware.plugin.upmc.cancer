@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.cancer.common;
+package com.aware.plugin.upmc.dash.common;
 
 import org.junit.Test;
 

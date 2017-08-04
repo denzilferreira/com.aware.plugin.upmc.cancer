@@ -1,6 +1,4 @@
-package com.aware.plugin.upmc.cancer;
-
-import android.net.Uri;
+package com.aware.plugin.upmc.dash;
 
 /**
  * Created by RaghuTeja on 6/22/17.

@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.cancer.common;
+package com.aware.plugin.upmc.dash.common;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

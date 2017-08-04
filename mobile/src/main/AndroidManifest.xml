@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.aware.plugin.upmc.cancer">
+    package="com.aware.plugin.upmc.dash">
 
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false"/>
     <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="false"/>
@@ -25,7 +25,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".UPMC"
+            android:name="com.aware.plugin.upmc.dash.UPMC"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -36,22 +36,22 @@
              </intent-filter>
         </activity>
         <activity
-            android:name=".Settings"
+            android:name="com.aware.plugin.upmc.dash.Settings"
             android:exported="true"
             android:label="UPMC Settings" />
         <activity
-            android:name=".UPMC_Motivation"
+            android:name="com.aware.plugin.upmc.dash.UPMC_Motivation"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <service
-            android:name=".Plugin"
+            android:name="com.aware.plugin.upmc.dash.Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Cancer" />
         <service
-            android:name=".Survey"
+            android:name="com.aware.plugin.upmc.dash.Survey"
             android:exported="true"
             android:label="UPMC Survey" />
         <service
@@ -73,7 +73,7 @@
 
 
         <service
-            android:name=".MessageService"  android:exported="false" >
+            android:name="com.aware.plugin.upmc.dash.MessageService"  android:exported="false" >
             <!--<intent-filter>-->
                 <!--<action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />-->
                 <!--<data android:scheme="wear" android:host="*"/>-->
@@ -85,7 +85,7 @@
         </service>
 
 
-        <receiver android:name=".NotifReceiver" android:exported="false" android:enabled="true">
+        <receiver android:name="com.aware.plugin.upmc.dash.NotifReceiver" android:exported="false" android:enabled="true">
             <intent-filter>
                 <action android:name="upmc_notification_receiver" />
             </intent-filter>
@@ -95,13 +95,13 @@
 
 
         <provider
-            android:name=".Provider"
+            android:name="com.aware.plugin.upmc.dash.Provider"
             android:authorities="${applicationId}.provider.survey"
             android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name=".Plugin$SurveyListener">
+        <receiver android:name="com.aware.plugin.upmc.dash.Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />

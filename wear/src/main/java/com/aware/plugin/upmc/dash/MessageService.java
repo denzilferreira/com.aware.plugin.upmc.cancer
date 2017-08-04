@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.cancer;
+package com.aware.plugin.upmc.dash;
 
 import android.app.ActivityManager;
 import android.app.NotificationManager;
@@ -10,22 +10,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageApi.MessageListener;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Random;
 
@@ -55,7 +51,7 @@ public class MessageService extends WearableListenerService implements
     public void onDestroy() {
         super.onDestroy();
         Log.d(Constants.TAG, "MessageService: onDestroy");
-        Wearable.CapabilityApi.removeCapabilityListener(mGoogleApiClient, this, null);
+        Wearable.CapabilityApi.removeCapabilityListener(mGoogleApiClient, this, Constants.CAPABILITY_PHONE_APP);
         Wearable.MessageApi.removeListener(mGoogleApiClient, this);
         if(mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
