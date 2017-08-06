@@ -5,11 +5,15 @@ android {
     buildToolsVersion "26.0.0"
 
     defaultConfig {
-        applicationId "com.aware.plugin.upmc.cancer"
+        applicationId "com.aware.plugin.upmc.dash"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 36
-        versionName "4.5"
+        versionCode 1
+        versionName "1.0"
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
     }
 
     splits {
@@ -63,6 +67,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-wearable:11.0.1'
     compile 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
     compile 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
+    wearApp project(':wear')
     //compile 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
     //compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
     //compile 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'

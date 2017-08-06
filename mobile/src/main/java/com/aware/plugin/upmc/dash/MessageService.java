@@ -44,6 +44,27 @@ public class MessageService extends WearableListenerService implements
     private int count = 0;
     private String NODE_ID;
 
+    public boolean isWearReady() {
+        return isWearReady;
+    }
+
+    public void setWearReady(boolean wearReady) {
+        isWearReady = wearReady;
+    }
+
+    private boolean isWearReady = false;
+
+    public boolean isWearLogging() {
+        return isWearLogging;
+    }
+
+    public void setWearLogging(boolean wearLogging) {
+        isWearLogging = wearLogging;
+    }
+
+    private boolean isWearLogging = false;
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -95,7 +116,7 @@ public class MessageService extends WearableListenerService implements
                         NODE_ID = node.getId();
                         Log.d(Constants.TAG, "MessageService:setUpNodeIdentities: " + NODE_ID);
                         setNODE_ID(NODE_ID);
-                        isWearAppRunning(getNODE_ID());
+                        isWearServiceRunning(getNODE_ID());
                     }
                 }
 
@@ -115,34 +136,11 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "START SC");
                     sendMessageToWear(Constants.START_SC);
                     ArrayList<NotificationCompat.Action> actionList = messageServiceNotifBuilder.mActions;
-                    for (int i = 0; i < actionList.size(); i++) {
-                        if (actionList.get(i).getTitle().equals("START SESSION")) {
-                            actionList.remove(i);
-                            Intent dashStopSessionIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
-                            //dashStartSessionIntent.setAction(Long.toString(System.currentTimeMillis()));
-                            dashStopSessionIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP SESSION");
-                            //dashStartSessionIntent.setAction(new Random().nextInt(50) + "_action");
-                            PendingIntent dashStopSessionPendingIntent = PendingIntent.getBroadcast(context, 0, dashStopSessionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            messageServiceNotifBuilder.addAction(R.drawable.ic_action_rotation, "STOP SESSION", dashStopSessionPendingIntent);
-                            mNotificationManager.notify(1, messageServiceNotifBuilder.build());
-                        }
-                    }
+                    notifyWearLogging();
                 } else if (intent.getStringExtra(Constants.COMM_KEY_MSGSERVICE).equals(Constants.STOP_SC)) {
                     Log.d(Constants.TAG, "STOP SC");
                     sendMessageToWear(Constants.STOP_SC);
-                    ArrayList<NotificationCompat.Action> actionList = messageServiceNotifBuilder.mActions;
-                    for (int i = 0; i < actionList.size(); i++) {
-                        if (actionList.get(i).getTitle().equals("STOP SESSION")) {
-                            actionList.remove(i);
-                            Intent dashStartSessionIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
-                            //dashStartSessionIntent.setAction(Long.toString(System.currentTimeMillis()));
-                            dashStartSessionIntent.putExtra(Constants.COMM_KEY_NOTIF, "START SESSION");
-                            //dashStartSessionIntent.setAction(new Random().nextInt(50) + "_action");
-                            PendingIntent dashStartSessionPendingIntent = PendingIntent.getBroadcast(context, 0, dashStartSessionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            messageServiceNotifBuilder.addAction(R.drawable.ic_action_rotation, "START SESSION", dashStartSessionPendingIntent);
-                            mNotificationManager.notify(1, messageServiceNotifBuilder.build());
-                        }
-                    }
+                    notifyWearReady();
                 }
                 else if(intent.getStringExtra(Constants.COMM_KEY_MSGSERVICE).equals("KILL")) {
                     killWear(context);
@@ -159,9 +157,16 @@ public class MessageService extends WearableListenerService implements
         String message = new String(input);
         Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message + " " + count);
         count ++;
-        if(message.equals(Constants.STATUS_READY)) {
+        if(message.equals(Constants.WEAR_SERICE_RUNNING)) {
             setWearConnected(true);
         }
+        else if(message.equals(Constants.STATUS_LOGGING)) {
+                notifyWearLogging();
+        }
+        else if(message.equals(Constants.STATUS_READY)) {
+                notifyWearReady();
+        }
+
     }
 
     @Override
@@ -173,8 +178,8 @@ public class MessageService extends WearableListenerService implements
         PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0,dashIntent,0);
         messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                .setContentTitle("UPMC Dash Wear Client")
-                .setContentText("Looking for Connections")
+                .setContentTitle("Dash Debug Client")
+                .setContentText("Syncing with watch..")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(dashPendingIntent);
         startForeground(1, messageServiceNotifBuilder.build());
@@ -251,6 +256,7 @@ public class MessageService extends WearableListenerService implements
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if(!sendMessageResult.getStatus().isSuccess()) {
                     Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed" + message);
+                    notifyConnectionFailed();
                 } else {
                     Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent" + message);
                 }
@@ -284,9 +290,11 @@ public class MessageService extends WearableListenerService implements
         });
     }
 
-    private void isWearAppRunning(String NODE_ID) {
+
+    private void isWearServiceRunning(String NODE_ID) {
         setWearConnected(false);
-        String message  = Constants.GET_STATUS_WEAR;
+        String message  = Constants.IS_WEAR_RUNNING;
+        String wearState = Constants.STATUS_DISCONNECTED;
         Uri.Builder uriPath = new Uri.Builder();
         uriPath.scheme("wear").path("/upmc-dash").build();
         PendingResult<MessageApi.SendMessageResult> pendingResult = Wearable.MessageApi.sendMessage(
@@ -299,11 +307,10 @@ public class MessageService extends WearableListenerService implements
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if(!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:detectWearStatus:wearStatus: disconnected");
+                    Log.d(Constants.TAG, "MessageService:detectWearStatus:wearStatus: Disconnected");
                     setWearConnected(false);
                 } else {
-                    Log.d(Constants.TAG, "MessageService:detectWearStatus:wearStatus: connected");
-
+                    Log.d(Constants.TAG, "MessageService:detectWearStatus:wearStatus: Connected");
                 }
             }
         });
@@ -314,35 +321,101 @@ public class MessageService extends WearableListenerService implements
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                Intent dashStopIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
-                dashStopIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP");
-                PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(mContext,0,dashStopIntent,PendingIntent.FLAG_ONE_SHOT);
-                messageServiceNotifBuilder.addAction(R.drawable.ic_action_rotation,"STOP CLIENT",dashStopPendingIntent);
-                mNotificationManager.notify(1, messageServiceNotifBuilder.build());
                 if(isWearConnected()) {
                     Log.d(Constants.TAG, "MessageService:detectWearStatus:wear is connected");
-                    setWearConnected(true);
-                    messageServiceNotifBuilder.setContentText("Connected");
-                    Intent dashStartSessionIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
-                    //dashStartSessionIntent.setAction(Long.toString(System.currentTimeMillis()));
-                    dashStartSessionIntent.putExtra(Constants.COMM_KEY_NOTIF, "START SESSION");
-                    //dashStartSessionIntent.setAction(new Random().nextInt(50) + "_action");
-                    PendingIntent dashStartSessionPendingIntent = PendingIntent.getBroadcast(mContext,0,dashStartSessionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-                    messageServiceNotifBuilder.addAction(R.drawable.ic_action_rotation,"START SESSION",dashStartSessionPendingIntent);
-                    mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+
                 }
                 else {
                     Log.d(Constants.TAG, "MessageService:detectWearStatus:wear is not connected");
-                    setWearConnected(false);
-                    messageServiceNotifBuilder.setContentText("Disconnected");
-                    mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+                    notifyConnectionFailed();
                 }
             }
-        }, 5000);
+        }, 3000);
     }
+
+    public void notifyUserWithText(String notifContent) {
+        messageServiceNotifBuilder.setContentText(notifContent);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+
+    }
+
+    public void notifyConnectionFailed() {
+        Intent dashIntent = new Intent(this, UPMC.class);
+        dashIntent.setAction(new Random().nextInt(50) + "_action");
+        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0,dashIntent,0);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("Dash Debug Client")
+                .setContentText("Syncing with watch..")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(dashPendingIntent);
+        messageServiceNotifBuilder.setContentText("Unable to sync with watch");
+        Intent dashStopIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
+        dashStopIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP");
+        PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(getApplicationContext(),0,dashStopIntent,PendingIntent.FLAG_ONE_SHOT);
+        messageServiceNotifBuilder.addAction(R.drawable.ic_stop_black_24dp,"STOP CLIENT",dashStopPendingIntent);
+        mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+
+    }
+
+    public void notifyWearReady() {
+        Intent dashIntent = new Intent(this, UPMC.class);
+        dashIntent.setAction(new Random().nextInt(50) + "_action");
+        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0,dashIntent,0);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("Dash Debug Client")
+                .setContentText("Syncing with watch..")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(dashPendingIntent);
+        messageServiceNotifBuilder.setContentText("Synced with watch");
+        Intent dashStopIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
+        dashStopIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP");
+        PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(getApplicationContext(),0,dashStopIntent,PendingIntent.FLAG_ONE_SHOT);
+        messageServiceNotifBuilder.addAction(R.drawable.ic_stop_black_24dp,"STOP CLIENT",dashStopPendingIntent);
+        Intent dashStartSessionIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
+        dashStartSessionIntent.putExtra(Constants.COMM_KEY_NOTIF, "START SESSION");
+        PendingIntent dashStartSessionPendingIntent = PendingIntent.getBroadcast(getApplicationContext(),0,dashStartSessionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        messageServiceNotifBuilder.addAction(R.drawable.ic_play_arrow_black_24dp,"START SESSION",dashStartSessionPendingIntent);
+        mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+
+    }
+
+
+    public void notifyWearLogging() {
+        Intent dashIntent = new Intent(this, UPMC.class);
+        dashIntent.setAction(new Random().nextInt(50) + "_action");
+        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0,dashIntent,0);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("Dash Debug Client")
+                .setContentText("Syncing with watch..")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(dashPendingIntent);
+        messageServiceNotifBuilder.setContentText("Synced with watch");
+        Intent dashStopIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
+        dashStopIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP");
+        PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(getApplicationContext(),0,dashStopIntent,PendingIntent.FLAG_ONE_SHOT);
+        messageServiceNotifBuilder.addAction(R.drawable.ic_stop_black_24dp,"STOP CLIENT",dashStopPendingIntent);
+        Intent dashStartSessionIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
+        dashStartSessionIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP SESSION");
+        PendingIntent dashStartSessionPendingIntent = PendingIntent.getBroadcast(getApplicationContext(),0,dashStartSessionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        messageServiceNotifBuilder.addAction(R.drawable.ic_stop_black_24dp,"STOP SESSION",dashStartSessionPendingIntent);
+        mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+
+    }
+
+
+
 
     public void setWearConnected(boolean wearConnected) {
         this.wearConnected = wearConnected;
     }
+
 }
+
+

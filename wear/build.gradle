@@ -6,8 +6,8 @@ android {
     buildToolsVersion "26.0.0"
 
     defaultConfig {
-        applicationId "com.aware.plugin.upmc.cancer"
-        minSdkVersion 21
+        applicationId "com.aware.plugin.upmc.dash"
+        minSdkVersion 25
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"

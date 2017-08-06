@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.aware.plugin.upmc.dash">
 
+
+    <uses-feature android:name="android.hardware.type.WATCH" />
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false"/>
     <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="false"/>
     <uses-permission android:name="android.permission.BODY_SENSORS" />
