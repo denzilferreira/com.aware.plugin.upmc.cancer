@@ -3,6 +3,7 @@ package com.aware.plugin.upmc.dash;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -76,6 +77,7 @@ public class MessageService extends WearableListenerService implements
             mGoogleApiClient.disconnect();
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
         stopSelf();
 
 
@@ -90,6 +92,7 @@ public class MessageService extends WearableListenerService implements
                 .addConnectionCallbacks(this)
                 .build();
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         mGoogleApiClient.connect();
 
     }
@@ -146,6 +149,41 @@ public class MessageService extends WearableListenerService implements
                     killWear(context);
                 }
             }
+        }
+    };
+
+    private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            if(intent.hasExtra(Constants.BLUETOOTH_COMM_KEY)) {
+
+                int state = intent.getIntExtra(Constants.BLUETOOTH_COMM_KEY, BluetoothAdapter.ERROR);
+
+                switch (state) {
+                    case BluetoothAdapter.STATE_OFF:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
+                        notifyConnectionFailed();
+                        notifyUserWithText("Sync Failed : Switch on Bluetooth");
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_OFF:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
+                        break;
+                    case BluetoothAdapter.STATE_ON:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
+                        setUpNodeIdentities();
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
+                        notifyUserWithText("Trying to re-sync with watch..");
+
+                        break;
+                }
+
+            }
+
+
         }
     };
 

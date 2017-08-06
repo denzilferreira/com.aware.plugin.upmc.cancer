@@ -121,7 +121,7 @@
     <orderEntry type="library" name="ion-2.2.1" level="project" />
     <orderEntry type="library" name="support-media-compat-25.2.0" level="project" />
     <orderEntry type="library" name="support-core-ui-25.2.0" level="project" />
-    <orderEntry type="library" name="gridlayout-v7-25.2.0" level="project" />
+    <orderEntry type="library" name="gridlayout-v7-25.1.1" level="project" />
     <orderEntry type="library" name="play-services-base-11.0.1" level="project" />
     <orderEntry type="library" name="play-services-tasks-11.0.1" level="project" />
     <orderEntry type="library" name="appcompat-v7-25.1.1" level="project" />

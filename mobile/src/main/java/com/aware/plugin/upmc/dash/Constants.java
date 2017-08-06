@@ -42,5 +42,9 @@ public final class Constants {
     public static final String STATUS_LOGGING = "logging"; // currently logging
     public static final String STATUS_DISCONNECTED = "disconnected"; // currently disconnected
 
+    //Bluetooth Communication
+    public static final String BLUETOOTH_COMM = "bluetooth_comm";
+    public static final String BLUETOOTH_COMM_KEY = "bluetooth_comm_key";
+
 
 }
