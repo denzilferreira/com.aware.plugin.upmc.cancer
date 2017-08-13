@@ -3,13 +3,17 @@ package com.aware.plugin.upmc.dash;
 import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -78,8 +82,10 @@ public class MessageService extends WearableListenerService implements
         if(mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
         stopForeground(true);
         stopSelf();
+
 
     }
 
@@ -122,6 +128,7 @@ public class MessageService extends WearableListenerService implements
         startForeground(1, messageServiceNotifBuilder.build());
         setWearStatus(Constants.STATUS_READY);
         sendStateToPhoneIfAvailable();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         return START_NOT_STICKY;
     }
 
@@ -239,6 +246,40 @@ public class MessageService extends WearableListenerService implements
         });
 
     }
+
+    private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            if(intent.hasExtra(Constants.BLUETOOTH_COMM_KEY)) {
+
+                int state = intent.getIntExtra(Constants.BLUETOOTH_COMM_KEY, BluetoothAdapter.ERROR);
+
+                switch (state) {
+                    case BluetoothAdapter.STATE_OFF:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
+                        notifyUser("Sync Failed : Switch on Bluetooth");
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_OFF:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
+                        break;
+                    case BluetoothAdapter.STATE_ON:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
+                        sendStateToPhoneIfAvailable();
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
+                        notifyUser("Trying to re-sync with phone..");
+
+                        break;
+                }
+
+            }
+
+
+        }
+    };
 
     private void sendStateToPhoneIfAvailable() {
 

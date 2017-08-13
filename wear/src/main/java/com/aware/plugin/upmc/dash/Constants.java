@@ -30,6 +30,11 @@ public final class Constants {
     public static final String WEAR_SERICE_RUNNING = "wear service is running";
 
 
+    //Bluetooth Communication
+    public static final String BLUETOOTH_COMM = "bluetooth_comm";
+    public static final String BLUETOOTH_COMM_KEY = "bluetooth_comm_key";
+
+
 
 
 

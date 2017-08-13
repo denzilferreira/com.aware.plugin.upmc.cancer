@@ -6,6 +6,7 @@
 
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false"/>
     <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="false"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -101,6 +102,16 @@
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>
             </intent-filter>
         </receiver>
+
+
+        <!--<receiver-->
+            <!--android:name="com.aware.plugin.upmc.dash.BootReceiver"-->
+            <!--android:enabled="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
+                <!--<action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
 
 
