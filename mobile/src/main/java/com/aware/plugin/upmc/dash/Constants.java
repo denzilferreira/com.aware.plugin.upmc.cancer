@@ -21,6 +21,7 @@ public final class Constants {
     public static final String START_SC = "start_step_count";  // START STEP COUNT COMMAND
     public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
     public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
+    public static final String MORNING_TIME = "morningtimestamp"; // Morning timestamp plus
 
     //replies from wear
 
@@ -38,6 +39,7 @@ public final class Constants {
 
 
     // states
+    public static final String STATUS_INIT = "init"; // need to be time initiated
     public static final String STATUS_READY = "ready"; // ready to start logging
     public static final String STATUS_LOGGING = "logging"; // currently logging
     public static final String STATUS_DISCONNECTED = "disconnected"; // currently disconnected

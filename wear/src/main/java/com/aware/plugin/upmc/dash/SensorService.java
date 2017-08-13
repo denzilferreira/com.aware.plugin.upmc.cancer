@@ -15,6 +15,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -161,10 +163,14 @@ public class SensorService extends Service implements SensorEventListener {
                     .setContentTitle("UPMC Dash Wear Monitor")
                     .setContentText("You have been inactive! " + sc_count)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setDefaults(Notification.DEFAULT_ALL)
-                    .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000, 1000});
+                    .setDefaults(Notification.DEFAULT_ALL);
             mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
-
+            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            long[] vibrationPattern = {0, 500, 50, 300};
+            //-1 - don't repeat
+            final int indexInPatternToRepeat = 2;
+            vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_COMM).putExtra(Constants.SENSOR_INTENT_COMM, Constants.NOTIFY_INACTIVITY));
         }
     }
 

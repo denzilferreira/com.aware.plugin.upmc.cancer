@@ -8,8 +8,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -42,6 +44,8 @@ public class MessageService extends WearableListenerService implements
     public boolean phoneConnected;
     private NotificationCompat.Builder messageServiceNotifBuilder;
     private String NODE_ID;
+    private boolean timeInvalid = false;
+    int[] morningTime = {-1,-1};
 
     public boolean isSyncedWithPhone() {
         return isSyncedWithPhone;
@@ -126,11 +130,65 @@ public class MessageService extends WearableListenerService implements
         messageServiceNotifBuilder.addAction(action1).extend(new NotificationCompat.WearableExtender().setContentAction(0));
         messageServiceNotifBuilder.addAction(action2).extend(new NotificationCompat.WearableExtender().setContentAction(1));
         startForeground(1, messageServiceNotifBuilder.build());
-        setWearStatus(Constants.STATUS_READY);
+        if(isTimeInitialized()) {
+            setWearStatus(Constants.STATUS_LOGGING);
+            if(!isMyServiceRunning(SensorService.class)) {
+                startService(new Intent(this, SensorService.class));
+                Log.d(Constants.TAG, "MessageService: Starting SensorService: ");
+                setWearStatus(Constants.STATUS_LOGGING);
+            }
+        }
+        else {
+            setWearStatus(Constants.STATUS_INIT);
+        }
         sendStateToPhoneIfAvailable();
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         return START_NOT_STICKY;
     }
+
+
+    public void writeTimePref(int hour, int minute)
+    {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(Constants.MORNING_HOUR, hour);
+        editor.putInt(Constants.MORNING_MINUTE, minute);
+        editor.apply();
+    }
+
+    public void readTimePref() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
+        Log.d(Constants.TAG, "READ SOME PREFS " + minute);
+        int hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
+        setMorningTime(hour, minute);
+    }
+
+    public void setMorningTime(int hour, int minute) {
+        this.morningTime[0] = hour;
+        this.morningTime[1] = minute;
+    }
+
+    public int[] getMorningTime() {
+        readTimePref();
+        if(this.morningTime[0]==-1) {
+            setTimeInitilaized(false);
+        }
+        else {
+            setTimeInitilaized(true);
+        }
+        return this.morningTime;
+    }
+
+    public boolean isTimeInitialized() {
+        getMorningTime();
+        return this.timeInvalid;
+    }
+
+    public void setTimeInitilaized(boolean isinit) {
+        this.timeInvalid = isinit;
+    }
+
 
     @Override
     public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
@@ -207,6 +265,24 @@ public class MessageService extends WearableListenerService implements
                 }
                 sendBroadcast(new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER).putExtra(Constants.COMM_KEY_NOTIF, "KILL_REQUEST"));
             }
+            else if(message.contains(Constants.MORNING_TIME)) {
+                String[] arr = message.split("\\s+");
+                int hour = Integer.parseInt(arr[1]);
+                int minute = Integer.parseInt(arr[2]);
+                writeTimePref(hour,minute);
+                Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
+                setWearStatus(Constants.STATUS_READY);
+                sendStateToPhone();
+            }
+            else if(message.contains(Constants.MORNING_TIME_RESET)) {
+                String[] arr = message.split("\\s+");
+                int hour = Integer.parseInt(arr[1]);
+                int minute = Integer.parseInt(arr[2]);
+                setMorningTime(hour,minute);
+                Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
+                setWearStatus(Constants.STATUS_READY);
+                sendStateToPhone();
+            }
         }
     }
 
@@ -238,9 +314,9 @@ public class MessageService extends WearableListenerService implements
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if(!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed: " + message);
+                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message failed: " + message);
                 } else {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent : " + message);
+                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message sent : " + message);
                 }
             }
         });
@@ -318,9 +394,9 @@ public class MessageService extends WearableListenerService implements
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if(!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed: " + message);
+                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message failed: " + message);
                 } else {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent : " + message);
+                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message sent : " + message);
                 }
             }
         });

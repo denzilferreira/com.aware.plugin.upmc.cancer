@@ -17,6 +17,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.aware.Aware;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -204,7 +206,15 @@ public class MessageService extends WearableListenerService implements
         else if(message.equals(Constants.STATUS_READY)) {
                 notifyWearReady();
         }
+        else if(message.equals(Constants.STATUS_INIT)) {
+                timeInitializeWear();
+        }
 
+    }
+
+    public void timeInitializeWear() {
+        sendMessageToWear(Constants.MORNING_TIME + " " + Aware.getSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)
+                + " " + Aware.getSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
     }
 
     @Override
@@ -354,7 +364,6 @@ public class MessageService extends WearableListenerService implements
         });
 
         final Handler handler = new Handler();
-        final Context mContext = this;
         //do something here
         handler.postDelayed(new Runnable() {
             @Override

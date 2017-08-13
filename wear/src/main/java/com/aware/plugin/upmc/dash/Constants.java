@@ -25,6 +25,8 @@ public final class Constants {
     public static final String IS_WEAR_RUNNING = "is wear running";
     public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
     public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
+    public static final String MORNING_TIME = "morningtimestamp"; // Morning timestamp plus
+    public static final String MORNING_TIME_RESET = "resetmorningtimestamp"; // Morning timestamp plus
 
     // replies to phone
     public static final String WEAR_SERICE_RUNNING = "wear service is running";
@@ -35,11 +37,14 @@ public final class Constants {
     public static final String BLUETOOTH_COMM_KEY = "bluetooth_comm_key";
 
 
+    //Shared PRefs
+    public static final String MORNING_HOUR = "morning hour key";
+    public static final String MORNING_MINUTE = "morning minute key";
 
 
 
     //states
-
+    public static final String STATUS_INIT = "init";
     public static final String STATUS_READY = "ready"; // ready to start logging
     public static final String STATUS_LOGGING = "logging"; // currently logging
 
@@ -51,6 +56,9 @@ public final class Constants {
     public static final String ALARM_LOCAL_RECEIVER_INTENT_FILTER = "alarm_local_broadcast_receiver";
     public static final int ALARM_TYPE_1HR = 0;
     public static final int ALARM_TYPE_2HR = 1;
+    public static final String SENSOR_COMM = "sensor comm key";
+    public static final String NOTIFY_INACTIVITY = "user is inactive";
+    public static final String SENSOR_INTENT_COMM = "sensor intent comm";
 
 
 }

@@ -60,14 +60,6 @@ public class UPMC extends AppCompatActivity {
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
         Log.d("DASH","UPMC:onCreate");
-
-        if(!isMyServiceRunning(MessageService.class)) {
-            startService(new Intent(this, MessageService.class));
-            Log.d("DASH", "Started Message Service");
-        }
-        else
-            Log.d("DASH", "Message Service already running");
-
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
 
     }
@@ -127,6 +119,7 @@ public class UPMC extends AppCompatActivity {
         saveSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(Constants.TAG, "trig");
 
                 new Thread(new Runnable() {
                     @Override
@@ -148,6 +141,17 @@ public class UPMC extends AppCompatActivity {
                         });
                         Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
                         Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
+
+                        // start MessageService
+                        //Log.d(Constants.TAG, "trig::"  + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+                        if(!isMyServiceRunning(MessageService.class)) {
+
+                            startService(new Intent(getApplicationContext(), MessageService.class));
+                            Log.d("DASH", "Started Message Service");
+                        }
+                        else
+                            Log.d("DASH", "Message Service already running");
+
 
                         Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
                         applySchedule.putExtra("schedule", true);
