@@ -21,14 +21,6 @@
             android:required="false" />
 
 
-
-        <receiver android:name="com.aware.plugin.upmc.dash.NotifReceiver">
-            <intent-filter>
-                <action android:name="upmc_notification_receiver" android:enabled="true" android:exported="true" />
-            </intent-filter>
-        </receiver>
-
-
         <receiver android:name="com.aware.plugin.upmc.dash.AlarmReceiver"/>
 
 

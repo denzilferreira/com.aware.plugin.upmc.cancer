@@ -88,11 +88,6 @@
         </service>
 
 
-        <receiver android:name="com.aware.plugin.upmc.dash.NotifReceiver" android:exported="false" android:enabled="true">
-            <intent-filter>
-                <action android:name="upmc_notification_receiver" />
-            </intent-filter>
-        </receiver>
 
 
         <receiver

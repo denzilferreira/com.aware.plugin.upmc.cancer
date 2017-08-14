@@ -162,7 +162,7 @@ public class SensorService extends Service implements SensorEventListener {
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Wear Monitor")
                     .setContentText("You have been inactive! " + sc_count)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setDefaults(Notification.DEFAULT_ALL);
             mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -192,8 +192,8 @@ public class SensorService extends Service implements SensorEventListener {
                     initializeStepCount(count);
                     setALARM_1HR_FLAG(false);
                     Log.d(Constants.TAG, "Steps(taken): " + getStepCount());
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_COMM).putExtra(Constants.SENSOR_INTENT_COMM, Constants.SENSOR_ALARM));
                     notifyUser(getStepCount());
-
                 }
 //                else if(ALARM_2HR_FLAG) {
 //                    Log.d(Constants.TAG, "Step(2hr):  " + count);

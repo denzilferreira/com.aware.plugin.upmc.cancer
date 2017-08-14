@@ -20,16 +20,15 @@ public final class Constants {
 
 
     // Messages from phone
-
     public static final String GET_STATUS_WEAR = "get_wear_status";
     public static final String IS_WEAR_RUNNING = "is wear running";
     public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
     public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
     public static final String MORNING_TIME = "morningtimestamp"; // Morning timestamp plus
     public static final String MORNING_TIME_RESET = "resetmorningtimestamp"; // Morning timestamp plus
+    public static final String ACK = "device acknowledges";
 
-    // replies to phone
-    public static final String WEAR_SERICE_RUNNING = "wear service is running";
+
 
 
     //Bluetooth Communication
@@ -59,6 +58,15 @@ public final class Constants {
     public static final String SENSOR_COMM = "sensor comm key";
     public static final String NOTIFY_INACTIVITY = "user is inactive";
     public static final String SENSOR_INTENT_COMM = "sensor intent comm";
+    public static final String SENSOR_ALARM = "1hr/2hr sensor alarm";
+
+
+    // notification messages
+    public static final String NOTIFTEXT_SYNC_FAILED = "Sync Failed: Cannot display alerts on phone";
+    public static final String NOTIFTEXT_SYNC_SUCCESS = "Synced: Phone will display alerts";
+    public static final String NOTIFTEXT_SYNC_FAILED_BLUETOOTH = "Sync Failed : Switch on Bluetooth";
+    public static final String NOTIFTEXT_SENDING_MESSAGE = "Sending message...";
+    public static final String NOTIFTEXT_TRY_CONNECT = "Syncing with phone...";
 
 
 }

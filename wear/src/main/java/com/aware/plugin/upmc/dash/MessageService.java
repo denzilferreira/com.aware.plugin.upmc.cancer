@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,14 +39,66 @@ import java.util.Set;
  */
 
 public class MessageService extends WearableListenerService implements
-        GoogleApiClient.ConnectionCallbacks{
+        GoogleApiClient.ConnectionCallbacks {
 
+    int[] morningTime = {-1, -1};
+    boolean isSyncedWithPhone;
     private GoogleApiClient mGoogleApiClient;
-    public boolean phoneConnected;
     private NotificationCompat.Builder messageServiceNotifBuilder;
     private String NODE_ID;
     private boolean timeInvalid = false;
-    int[] morningTime = {-1,-1};
+    private String STATUS_WEAR;
+    boolean isNodeSaved = false;
+
+    public boolean isNodeSaved() {
+        return isNodeSaved;
+    }
+
+    public void setNodeSaved(boolean nodeSaved) {
+        isNodeSaved = nodeSaved;
+    }
+    private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra(Constants.BLUETOOTH_COMM_KEY)) {
+                int state = intent.getIntExtra(Constants.BLUETOOTH_COMM_KEY, BluetoothAdapter.ERROR);
+                switch (state) {
+                    case BluetoothAdapter.STATE_OFF:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
+                        setSyncedWithPhone(false);
+                        notifyUser(Constants.NOTIFTEXT_SYNC_FAILED_BLUETOOTH);
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_OFF:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
+                        setSyncedWithPhone(false);
+                        notifyUser(Constants.NOTIFTEXT_SYNC_FAILED_BLUETOOTH);
+                        break;
+                    case BluetoothAdapter.STATE_ON:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
+                        //setUpNodeIdentities();
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
+                        break;
+                }
+            }
+        }
+    };
+
+    private BroadcastReceiver mSensorLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.hasExtra(Constants.SENSOR_INTENT_COMM)) {
+                String message = intent.getStringExtra(Constants.SENSOR_INTENT_COMM);
+                if(message.equals(Constants.SENSOR_ALARM)) {
+                    notifyUser(Constants.NOTIFTEXT_SENDING_MESSAGE);
+                }
+                else if(message.equals(Constants.NOTIFY_INACTIVITY)) {
+                    sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
+                }
+            }
+        }
+    };
 
     public boolean isSyncedWithPhone() {
         return isSyncedWithPhone;
@@ -55,8 +108,6 @@ public class MessageService extends WearableListenerService implements
         isSyncedWithPhone = syncedWithPhone;
     }
 
-    boolean isSyncedWithPhone;
-
     public String getWearStatus() {
         return STATUS_WEAR;
     }
@@ -64,10 +115,6 @@ public class MessageService extends WearableListenerService implements
     public void setWearStatus(String STATUS_WEAR) {
         this.STATUS_WEAR = STATUS_WEAR;
     }
-
-    private String STATUS_WEAR;
-
-
 
     public String getNODE_ID() {
         return NODE_ID;
@@ -83,14 +130,13 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageService: onDestroy");
         Wearable.CapabilityApi.removeCapabilityListener(mGoogleApiClient, this, Constants.CAPABILITY_PHONE_APP);
         Wearable.MessageApi.removeListener(mGoogleApiClient, this);
-        if(mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSensorLocalReceiver);
         stopForeground(true);
         stopSelf();
-
-
     }
 
     @Override
@@ -110,45 +156,71 @@ public class MessageService extends WearableListenerService implements
         super.onConnectedNodes(list);
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Constants.TAG, "MessageService:onStartCommand");
-        Intent dashIntent = new Intent(this, MainActivity.class);
-        dashIntent.setAction(new Random().nextInt(50) + "_action");
-        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0,dashIntent,0);
-        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                .setContentTitle("UPMC Dash Wear Client")
-                .setContentText("Not synced with phone")
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
-        Intent dashStopIntent = new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER);
-        dashStopIntent.putExtra(Constants.COMM_KEY_NOTIF, "STOP CLIENT");
-        PendingIntent dashStopPendingIntent = PendingIntent.getBroadcast(this,0,dashStopIntent,PendingIntent.FLAG_ONE_SHOT);
-        NotificationCompat.Action action1 = new NotificationCompat.Action.Builder(R.drawable.ic_cc_clear, "Stop Client", dashStopPendingIntent).build();
-        NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(R.drawable.ic_cc_checkmark, "Sync Client", dashStopPendingIntent).build();
-        messageServiceNotifBuilder.addAction(action1).extend(new NotificationCompat.WearableExtender().setContentAction(0));
-        messageServiceNotifBuilder.addAction(action2).extend(new NotificationCompat.WearableExtender().setContentAction(1));
-        startForeground(1, messageServiceNotifBuilder.build());
-        if(isTimeInitialized()) {
-            setWearStatus(Constants.STATUS_LOGGING);
-            if(!isMyServiceRunning(SensorService.class)) {
+        startClientNotif();
+        if (isTimeInitialized()) {
+            if (!isMyServiceRunning(SensorService.class)) {
                 startService(new Intent(this, SensorService.class));
-                Log.d(Constants.TAG, "MessageService: Starting SensorService: ");
+                Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
                 setWearStatus(Constants.STATUS_LOGGING);
             }
-        }
-        else {
+        } else {
+            Log.d(Constants.TAG, "onStartCommand:Need TimeInitialization , Requesting Phone:");
             setWearStatus(Constants.STATUS_INIT);
         }
-        sendStateToPhoneIfAvailable();
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_ALARM));
         return START_NOT_STICKY;
     }
 
+    private void setUpNodeIdentities() {
+        notifyUser(Constants.NOTIFTEXT_TRY_CONNECT);
+        Wearable.CapabilityApi.getCapability(mGoogleApiClient, Constants.CAPABILITY_PHONE_APP, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
+            @Override
+            public void onResult(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
+                CapabilityInfo info = getCapabilityResult.getCapability();
+                Set<Node> nodes = info.getNodes();
+                String NODE_ID;
+                if (nodes.size() == 1) {
+                    for (Node node : nodes) {
+                        NODE_ID = node.getId();
+                        Log.d(Constants.TAG, "MessageService:setUpNodeIdentities: " + NODE_ID);
+                        setNODE_ID(NODE_ID);
+                        sendStateToPhone();
+                    }
+                }
+            }
+        });
 
-    public void writeTimePref(int hour, int minute)
-    {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(!isSyncedWithPhone()) {
+                    notifyUser(Constants.NOTIFTEXT_SYNC_FAILED);
+                }
+                else {
+                    notifyUser(Constants.NOTIFTEXT_SYNC_SUCCESS);
+                }
+            }
+        }, 3000);
+    }
+
+    private void startClientNotif() {
+
+        Intent dashIntent = new Intent(this, MainActivity.class);
+        dashIntent.setAction(new Random().nextInt(50) + "_action");
+        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("UPMC Dash")
+                .setContentText(Constants.NOTIFTEXT_SYNC_FAILED)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+        startForeground(1, messageServiceNotifBuilder.build());
+    }
+
+    public void writeTimePref(int hour, int minute) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(Constants.MORNING_HOUR, hour);
@@ -171,10 +243,9 @@ public class MessageService extends WearableListenerService implements
 
     public int[] getMorningTime() {
         readTimePref();
-        if(this.morningTime[0]==-1) {
+        if (this.morningTime[0] == -1) {
             setTimeInitilaized(false);
-        }
-        else {
+        } else {
             setTimeInitilaized(true);
         }
         return this.morningTime;
@@ -189,14 +260,13 @@ public class MessageService extends WearableListenerService implements
         this.timeInvalid = isinit;
     }
 
-
     @Override
     public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
         Log.d(Constants.TAG, "MessageService: onCapability");
         super.onCapabilityChanged(capabilityInfo);
-        if(capabilityInfo.getNodes().size() > 0){
+        if (capabilityInfo.getNodes().size() > 0) {
             Log.d(Constants.TAG, "MessageService: onCapability: Mobile Connected");
-        }else{
+        } else {
             Log.d(Constants.TAG, "MessageService: onCapability: No Mobile Found");
         }
     }
@@ -208,7 +278,8 @@ public class MessageService extends WearableListenerService implements
                 this,
                 Constants.CAPABILITY_PHONE_APP);
         Uri uri = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
-        Wearable.MessageApi.addListener(mGoogleApiClient,this, uri, MessageApi.FILTER_PREFIX);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this, uri, MessageApi.FILTER_PREFIX);
+        setUpNodeIdentities();
     }
 
     @Override
@@ -217,71 +288,44 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageService:onMessageReceived");
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("wear").path("upmc-dash");
-        if(messageEvent.getPath().equals(uriBuilder.toString())) {
-            setNODE_ID(messageEvent.getSourceNodeId());
+        if (messageEvent.getPath().equals(uriBuilder.toString())) {
             byte[] input = messageEvent.getData();
             String message = new String(input);
             Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
-            if(message.equals(Constants.START_SC)) {
-                //START STEP COUNT LOGGING
-                Intent sensorService = new Intent(this, SensorService.class);
-                if(!isMyServiceRunning(SensorService.class)) {
-                    startService(sensorService);
-                    Log.d(Constants.TAG, "MessageService: Starting SensorService: ");
-                    setWearStatus(Constants.STATUS_LOGGING);
-                }
-                else {
-                    Log.d(Constants.TAG, "MessageService: Already Running SensorService");
-                }
-                sendStateToPhone();
+            if(!isNodeSaved()) {
+                setNODE_ID(messageEvent.getSourceNodeId());
+                setNodeSaved(true);
             }
-            else if(message.equals(Constants.IS_WEAR_RUNNING)) {
-                // SEND IF YOU ARE RUNNING
+            if (message.equals(Constants.ACK)) {
                 if(!isSyncedWithPhone()) {
-                    notifyUser("Synced");
-
+                    notifyUser(Constants.NOTIFTEXT_SYNC_SUCCESS);
+                    setSyncedWithPhone(true);
                 }
-                else {
-                    Log.d(Constants.TAG, "Already logged with phone!");
-                }
-                sendMessageToPhone(Constants.WEAR_SERICE_RUNNING);
-                sendStateToPhone();
             }
-            else if(message.equals(Constants.STOP_SC)) {
-                Log.d(Constants.TAG, "Stopping this shit");
-                if(isMyServiceRunning(SensorService.class)) {
-                    this.stopService(new Intent(this, SensorService.class));
+            else {
+                sendMessageToPhone(Constants.ACK);
+                if (message.contains(Constants.MORNING_TIME)) {
+                    String[] arr = message.split("\\s+");
+                    int hour = Integer.parseInt(arr[1]);
+                    int minute = Integer.parseInt(arr[2]);
+                    writeTimePref(hour, minute);
+                    Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
                     setWearStatus(Constants.STATUS_READY);
+                    sendStateToPhone();
+                } else if(message.contains(Constants.MORNING_TIME_RESET)) {
+                    String[] arr = message.split("\\s+");
+                    int hour = Integer.parseInt(arr[1]);
+                    int minute = Integer.parseInt(arr[2]);
+                    setMorningTime(hour, minute);
+                    Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
                 }
-                else {
-
+                else if(message.contains(Constants.IS_WEAR_RUNNING)) {
+                    if(!isSyncedWithPhone()) {
+                        setSyncedWithPhone(true);
+                        notifyUser(Constants.NOTIFTEXT_SYNC_SUCCESS);
+                    }
+                    sendStateToPhone();
                 }
-                sendStateToPhone();
-            }
-            else if(message.equals(Constants.KILL_DASH)) {
-                Log.d(Constants.TAG, "Stopping this shit");
-                if(isMyServiceRunning(SensorService.class)) {
-                    this.stopService(new Intent(this, SensorService.class));
-                }
-                sendBroadcast(new Intent(Constants.NOTIFICATION_RECEIVER_INTENT_FILTER).putExtra(Constants.COMM_KEY_NOTIF, "KILL_REQUEST"));
-            }
-            else if(message.contains(Constants.MORNING_TIME)) {
-                String[] arr = message.split("\\s+");
-                int hour = Integer.parseInt(arr[1]);
-                int minute = Integer.parseInt(arr[2]);
-                writeTimePref(hour,minute);
-                Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
-                setWearStatus(Constants.STATUS_READY);
-                sendStateToPhone();
-            }
-            else if(message.contains(Constants.MORNING_TIME_RESET)) {
-                String[] arr = message.split("\\s+");
-                int hour = Integer.parseInt(arr[1]);
-                int minute = Integer.parseInt(arr[2]);
-                setMorningTime(hour,minute);
-                Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
-                setWearStatus(Constants.STATUS_READY);
-                sendStateToPhone();
             }
         }
     }
@@ -313,68 +357,11 @@ public class MessageService extends WearableListenerService implements
         pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                if(!sendMessageResult.getStatus().isSuccess()) {
+                if (!sendMessageResult.getStatus().isSuccess()) {
                     Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message failed: " + message);
                 } else {
                     Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message sent : " + message);
                 }
-            }
-        });
-
-    }
-
-    private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-
-            if(intent.hasExtra(Constants.BLUETOOTH_COMM_KEY)) {
-
-                int state = intent.getIntExtra(Constants.BLUETOOTH_COMM_KEY, BluetoothAdapter.ERROR);
-
-                switch (state) {
-                    case BluetoothAdapter.STATE_OFF:
-                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
-                        notifyUser("Sync Failed : Switch on Bluetooth");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_OFF:
-                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
-                        sendStateToPhoneIfAvailable();
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
-                        notifyUser("Trying to re-sync with phone..");
-
-                        break;
-                }
-
-            }
-
-
-        }
-    };
-
-    private void sendStateToPhoneIfAvailable() {
-
-        Wearable.CapabilityApi.getCapability(mGoogleApiClient,Constants.CAPABILITY_PHONE_APP, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
-            @Override
-            public void onResult(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
-                CapabilityInfo info = getCapabilityResult.getCapability();
-                Set<Node> nodes = info.getNodes();
-                String NODE_ID ;
-                if(nodes.size()==1) {
-                    notifyUser("Synced with phone");
-                    for(Node node : nodes) {
-                        NODE_ID = node.getId();
-                        Log.d(Constants.TAG, "MessageService:setUpNodeIdentities: " + NODE_ID);
-                        setNODE_ID(NODE_ID);
-                        sendStateToPhone();
-                    }
-                }
-
             }
         });
 
@@ -393,7 +380,7 @@ public class MessageService extends WearableListenerService implements
         pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
             @Override
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                if(!sendMessageResult.getStatus().isSuccess()) {
+                if (!sendMessageResult.getStatus().isSuccess()) {
                     Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message failed: " + message);
                 } else {
                     Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message sent : " + message);
@@ -409,9 +396,5 @@ public class MessageService extends WearableListenerService implements
         mNotificationManager.notify(1, messageServiceNotifBuilder.build());
 
     }
-
-
-
-
 
 }
