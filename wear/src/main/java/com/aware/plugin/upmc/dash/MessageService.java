@@ -233,26 +233,27 @@ public class MessageService extends WearableListenerService implements
         int minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
         Log.d(Constants.TAG, "READ SOME PREFS " + minute);
         int hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
-        setMorningTime(hour, minute);
+        storeMorningTime(hour, minute);
     }
 
-    public void setMorningTime(int hour, int minute) {
+    private void storeMorningTime(int hour, int minute) {
         this.morningTime[0] = hour;
         this.morningTime[1] = minute;
+
     }
 
     public int[] getMorningTime() {
         readTimePref();
-        if (this.morningTime[0] == -1) {
-            setTimeInitilaized(false);
-        } else {
-            setTimeInitilaized(true);
-        }
         return this.morningTime;
     }
 
     public boolean isTimeInitialized() {
         getMorningTime();
+        if (this.morningTime[0] == -1) {
+            setTimeInitilaized(false);
+        } else {
+            setTimeInitilaized(true);
+        }
         return this.timeInvalid;
     }
 
@@ -286,8 +287,9 @@ public class MessageService extends WearableListenerService implements
     public void onMessageReceived(MessageEvent messageEvent) {
         super.onMessageReceived(messageEvent);
         Log.d(Constants.TAG, "MessageService:onMessageReceived");
+        Log.d(Constants.TAG, "MessageService: onMessageReceived: buildPath" + messageEvent.getPath());
         Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("wear").path("upmc-dash");
+        uriBuilder.scheme("wear").path("/upmc-dash").build();
         if (messageEvent.getPath().equals(uriBuilder.toString())) {
             byte[] input = messageEvent.getData();
             String message = new String(input);
@@ -310,13 +312,16 @@ public class MessageService extends WearableListenerService implements
                     int minute = Integer.parseInt(arr[2]);
                     writeTimePref(hour, minute);
                     Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
-                    setWearStatus(Constants.STATUS_READY);
+                    setWearStatus(Constants.STATUS_LOGGING);
+                    if(!isMyServiceRunning(SensorService.class)) {
+                        startService(new Intent(this, SensorService.class));
+                    }
                     sendStateToPhone();
                 } else if(message.contains(Constants.MORNING_TIME_RESET)) {
                     String[] arr = message.split("\\s+");
                     int hour = Integer.parseInt(arr[1]);
                     int minute = Integer.parseInt(arr[2]);
-                    setMorningTime(hour, minute);
+                    writeTimePref(hour, minute);
                     Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
                 }
                 else if(message.contains(Constants.IS_WEAR_RUNNING)) {
@@ -347,11 +352,13 @@ public class MessageService extends WearableListenerService implements
 
     private void sendMessageToPhone(final String message) {
 
+        Uri.Builder uriBuilder = new Uri.Builder();
+        uriBuilder.scheme("wear").path("/upmc-dash").build();
         PendingResult<MessageApi.SendMessageResult> pendingResult =
                 Wearable.MessageApi.sendMessage(
                         mGoogleApiClient,
                         getNODE_ID(),
-                        Constants.CONNECTION_PATH,
+                        uriBuilder.toString(),
                         message.getBytes());
 
         pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
@@ -369,12 +376,13 @@ public class MessageService extends WearableListenerService implements
 
     private void sendStateToPhone() {
         final String message = getWearStatus();
-
+        Uri.Builder uriBuilder = new Uri.Builder();
+        uriBuilder.scheme("wear").path("/upmc-dash").build();
         PendingResult<MessageApi.SendMessageResult> pendingResult =
                 Wearable.MessageApi.sendMessage(
                         mGoogleApiClient,
                         getNODE_ID(),
-                        Constants.CONNECTION_PATH,
+                        uriBuilder.toString(),
                         message.getBytes());
 
         pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {

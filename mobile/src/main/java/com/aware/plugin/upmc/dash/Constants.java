@@ -38,7 +38,6 @@ public final class Constants {
 
     // states
     public static final String STATUS_INIT = "init"; // need to be time initiated
-    public static final String STATUS_READY = "ready"; // ready to start logging
     public static final String STATUS_LOGGING = "logging"; // currently logging
     public static final String STATUS_DISCONNECTED = "disconnected"; // currently disconnected
 
@@ -52,8 +51,18 @@ public final class Constants {
     public static final String NOTIFTEXT_SYNC_SUCCESS = "Synced with watch";
     public static final String NOTIFTEXT_SYNC_FAILED_BLUETOOTH = "Sync Failed : Switch on Bluetooth";
     public static final String NOTIFTEXT_SENDING_MESSAGE = "Sending message...";
-    public static final String NOTIFTEXT_IN_PROGRESS = "loggingandstuff";
+    public static final String NOTIFTEXT_IN_PROGRESS = "Watch is logging your activity..";
     public static final String NOTIFTEXT_TRY_CONNECT = "Syncing with watch...";
 
+
+    //Broadcasts from UPMC Settings Panel
+    public static final String SETTINGS_COMM = "settings comm";
+    public static final String SETTING_INTENT_FILTER = "settings intent filter";
+    public static final String SETTINGS_CHANGED = "settings panel changed";
+
+
+
+    public static final String MORNING_HOUR = "morning hour key";
+    public static final String MORNING_MINUTE = "morning minute key";
 
 }

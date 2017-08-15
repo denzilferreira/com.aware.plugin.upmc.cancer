@@ -10,8 +10,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
@@ -42,9 +44,22 @@ import java.util.Calendar;
 
 public class UPMC extends AppCompatActivity {
 
-    private boolean debug = false;
     private static ProgressDialog dialog;
+    int[] morningTime = {-1, -1};
+    private boolean debug = false;
     private boolean firstRun = true;
+    private boolean timeInvalid = false;
+    private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra(Constants.COMM_KEY_UPMC)) {
+                Log.d(Constants.TAG, "UPMC:BR:wearStopMessageReceived, killing application");
+                finish();
+            }
+
+
+        }
+    };
 
     @Override
     protected void onDestroy() {
@@ -59,26 +74,10 @@ public class UPMC extends AppCompatActivity {
 
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
-        Log.d("DASH","UPMC:onCreate");
+        Log.d("DASH", "UPMC:onCreate");
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
 
     }
-
-
-    private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra(Constants.COMM_KEY_UPMC)) {
-                Log.d(Constants.TAG, "UPMC:BR:wearStopMessageReceived, killing application");
-                finish();
-            }
-
-
-        }
-    };
-
-
-
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
 
@@ -91,6 +90,47 @@ public class UPMC extends AppCompatActivity {
         return false;
     }
 
+
+    public void writeTimePref(int hour, int minute) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(Constants.MORNING_HOUR, hour);
+        editor.putInt(Constants.MORNING_MINUTE, minute);
+        editor.apply();
+    }
+
+    public void readTimePref() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
+        Log.d(Constants.TAG, "READ SOME PREFS " + minute);
+        int hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
+        setMorningTime(hour, minute);
+    }
+
+    public void setMorningTime(int hour, int minute) {
+        this.morningTime[0] = hour;
+        this.morningTime[1] = minute;
+    }
+
+    public int[] getMorningTime() {
+        readTimePref();
+        if (this.morningTime[0] == -1) {
+            setTimeInitilaized(false);
+        } else {
+            setTimeInitilaized(true);
+        }
+        return this.morningTime;
+    }
+
+
+    public boolean isTimeInitialized() {
+        getMorningTime();
+        return this.timeInvalid;
+    }
+
+    public void setTimeInitilaized(boolean isinit) {
+        this.timeInvalid = isinit;
+    }
 
 
     private void loadSchedule() {
@@ -119,12 +159,9 @@ public class UPMC extends AppCompatActivity {
         saveSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(Constants.TAG, "trig");
-
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
                         dialog.setIndeterminate(true);
                         if (Aware.isStudy(getApplicationContext())) {
                             dialog.setMessage("Please wait...");
@@ -132,6 +169,13 @@ public class UPMC extends AppCompatActivity {
                             dialog.setMessage("Joining study...");
                         }
                         dialog.setInverseBackgroundForced(true);
+
+
+//                        if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) != null) {
+//                            Log.d(Constants.TAG, "Stuff: " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+//                            isFirstTime = false;
+//                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_COMM, Constants.SETTINGS_CHANGED));
+//                        }
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -143,15 +187,24 @@ public class UPMC extends AppCompatActivity {
                         Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
 
                         // start MessageService
-                        //Log.d(Constants.TAG, "trig::"  + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-                        if(!isMyServiceRunning(MessageService.class)) {
 
-                            startService(new Intent(getApplicationContext(), MessageService.class));
-                            Log.d("DASH", "Started Message Service");
+                        if(!isTimeInitialized()) {
+                            Log.d(Constants.TAG, "trig::" + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue());
+                            if (!isMyServiceRunning(MessageService.class)) {
+
+                                startService(new Intent(getApplicationContext(), MessageService.class));
+                                Log.d("DASH", "Started Message Service");
+                            } else
+                                Log.d("DASH", "Message Service already running");
+                            setTimeInitilaized(true);
+
                         }
-                        else
-                            Log.d("DASH", "Message Service already running");
-
+                        else {
+                            Log.d(Constants.TAG, "Sending Settings Changed Broadcast");
+                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_COMM, Constants.SETTINGS_CHANGED));
+                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue());
+                        }
 
                         Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
                         applySchedule.putExtra("schedule", true);
@@ -594,7 +647,7 @@ public class UPMC extends AppCompatActivity {
 
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
-            if (item.getTitle().toString().equalsIgnoreCase("Sync") && ! Aware.isStudy(getApplicationContext())) {
+            if (item.getTitle().toString().equalsIgnoreCase("Sync") && !Aware.isStudy(getApplicationContext())) {
                 item.setVisible(false);
             }
         }

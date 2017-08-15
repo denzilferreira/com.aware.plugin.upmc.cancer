@@ -46,8 +46,7 @@ public class MessageService extends WearableListenerService implements
     private NotificationCompat.Builder messageServiceNotifBuilder;
     private int count = 0;
     private String NODE_ID;
-
-
+    private boolean isNodeSaved = false;
     private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -73,6 +72,32 @@ public class MessageService extends WearableListenerService implements
             }
         }
     };
+    private BroadcastReceiver mSettingsLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.hasExtra(Constants.SETTINGS_COMM)) {
+                if (intent.getStringExtra(Constants.SETTINGS_COMM).equals(Constants.SETTINGS_CHANGED)) {
+                    Log.d(Constants.TAG, "MessageService: mSettingsLocalReceiver");
+                    timeResetWear();
+
+                }
+            }
+        }
+    };
+
+    public boolean isNodeSaved() {
+        return isNodeSaved;
+    }
+
+    public void setNodeSaved(boolean nodeSaved) {
+        isNodeSaved = nodeSaved;
+    }
+
+    private void timeResetWear() {
+        sendMessageToWear(Constants.MORNING_TIME_RESET + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)
+                + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+    }
 
 
     @Override
@@ -85,8 +110,8 @@ public class MessageService extends WearableListenerService implements
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSettingsLocalReceiver);
         stopSelf();
     }
 
@@ -107,6 +132,7 @@ public class MessageService extends WearableListenerService implements
 
     public void setNODE_ID(String NODE_ID) {
         this.NODE_ID = NODE_ID;
+        setNodeSaved(true);
     }
 
     private void setUpNodeIdentities() {
@@ -136,22 +162,30 @@ public class MessageService extends WearableListenerService implements
         byte[] input = messageEvent.getData();
         String message = new String(input);
         Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message + " " + count);
+        Log.d(Constants.TAG, "MessageService: onMessageReceived: buildPath" + messageEvent.getPath());
         count++;
-        if (message.equals(Constants.ACK)) {
-            if (!isWearConnected()) {
-                setWearConnected(true);
-                notifyUser(Constants.NOTIFTEXT_SYNC_SUCCESS);
+        Uri.Builder uriBuilder = new Uri.Builder();
+        uriBuilder.scheme("wear").path("/upmc-dash").build();
+        if (messageEvent.getPath().equals(uriBuilder.toString())) {
+            if (!isNodeSaved()) {
+                setNODE_ID(messageEvent.getSourceNodeId());
             }
-        } else {
-            sendMessageToWear(Constants.ACK);
-            if(message.equals(Constants.STATUS_LOGGING)) {
-                notifyUser(Constants.NOTIFTEXT_IN_PROGRESS);
-            } else if (message.equals(Constants.STATUS_READY)) {
-                // do something with symptoms here
-            } else if (message.equals(Constants.STATUS_INIT)) {
-                timeInitializeWear();
+            if (message.equals(Constants.ACK)) {
+                if (!isWearConnected()) {
+                    setWearConnected(true);
+                    notifyUser(Constants.NOTIFTEXT_SYNC_SUCCESS);
+                }
+            } else {
+                sendMessageToWear(Constants.ACK);
+                if (message.equals(Constants.STATUS_LOGGING)) {
+                    notifyUser(Constants.NOTIFTEXT_IN_PROGRESS);
+                } else if (message.equals(Constants.STATUS_INIT)) {
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:TimeInit");
+                    timeInitializeWear();
+                }
             }
         }
+
     }
 
     public void timeInitializeWear() {
@@ -165,6 +199,7 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageService: onStartCommand");
         startClientNotif();
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
         return i;
     }
 
@@ -326,7 +361,7 @@ public class MessageService extends WearableListenerService implements
                     notifyUser(Constants.NOTIFTEXT_SYNC_FAILED);
                 }
             }
-        }, 3000);
+        }, 5000);
     }
 
     public void notifyUser(String notifContent) {

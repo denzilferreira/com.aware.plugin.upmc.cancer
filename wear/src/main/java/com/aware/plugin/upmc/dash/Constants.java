@@ -7,7 +7,6 @@ package com.aware.plugin.upmc.dash;
 
 public final class Constants {
     public static final long CONNECTION_TIME_OUT_MS = 4000;
-    public static final String CONNECTION_PATH = "/upmc-dash";
     public static final String TAG = "CANCER";
     public static final int UPMC_DASH_PHONE_DISCONNECTED = 1;
     public static final String CAPABILITY_PHONE_APP = "upmcdash_phoneapp";
@@ -44,7 +43,6 @@ public final class Constants {
 
     //states
     public static final String STATUS_INIT = "init";
-    public static final String STATUS_READY = "ready"; // ready to start logging
     public static final String STATUS_LOGGING = "logging"; // currently logging
 
 
@@ -68,5 +66,9 @@ public final class Constants {
     public static final String NOTIFTEXT_SENDING_MESSAGE = "Sending message...";
     public static final String NOTIFTEXT_TRY_CONNECT = "Syncing with phone...";
 
+
+    //sensors
+    public static final int SENSOR_INTERVAL_1HR = 60 * 1000;
+    public static final int SENSOR_INTERVAL_2HR = 120 * 1000;
 
 }
