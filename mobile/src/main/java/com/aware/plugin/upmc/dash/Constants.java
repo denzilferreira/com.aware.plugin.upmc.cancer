@@ -27,13 +27,12 @@ public final class Constants {
 
     //replies from wear
 
-
-
-
     public static final String COMM_KEY_UPMC = "message_upmc";  // key in putExtra
     public static final String COMM_KEY_NOTIF = "message_notif";  // key in putExtra
-
     public static final String COMM_KEY_MSGSERVICE = "message_msgservice";  // key in putExtra
+
+    //messages from wear
+    public static final String NOTIFY_INACTIVITY = "user is inactive";
 
 
     // states

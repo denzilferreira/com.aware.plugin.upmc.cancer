@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -162,7 +163,7 @@ public class MessageService extends WearableListenerService implements
         byte[] input = messageEvent.getData();
         String message = new String(input);
         Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message + " " + count);
-        Log.d(Constants.TAG, "MessageService: onMessageReceived: buildPath" + messageEvent.getPath());
+        //Log.d(Constants.TAG, "MessageService: onMessageReceived: buildPath" + messageEvent.getPath());
         count++;
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("wear").path("/upmc-dash").build();
@@ -183,8 +184,34 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:TimeInit");
                     timeInitializeWear();
                 }
+                else if(message.equals((Constants.NOTIFY_INACTIVITY))) {
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:InactiveUser");
+                    notifyUserWithInactivity();
+                }
             }
         }
+
+    }
+
+
+    public void notifyUserWithInactivity() {
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("UPMC Dash Monitor")
+                .setContentText("Ready for a quick walk?")
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+        mNotificationManager.notify(66, messageServiceNotifBuilder.build());
+        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+        vibrator.vibrate(pattern, 0);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                vibrator.cancel();
+            }
+        }, 5000);
 
     }
 

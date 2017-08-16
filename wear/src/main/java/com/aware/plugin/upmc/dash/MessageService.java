@@ -88,10 +88,10 @@ public class MessageService extends WearableListenerService implements
     private BroadcastReceiver mSensorLocalReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra(Constants.SENSOR_INTENT_COMM)) {
-                String message = intent.getStringExtra(Constants.SENSOR_INTENT_COMM);
+            if(intent.hasExtra(Constants.SENSOR_EXTRA_KEY)) {
+                String message = intent.getStringExtra(Constants.SENSOR_EXTRA_KEY);
                 if(message.equals(Constants.SENSOR_ALARM)) {
-                    notifyUser(Constants.NOTIFTEXT_SENDING_MESSAGE);
+                    //notifyUser(Constants.NOTIFTEXT_SENDING_MESSAGE);
                 }
                 else if(message.equals(Constants.NOTIFY_INACTIVITY)) {
                     sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
@@ -171,7 +171,7 @@ public class MessageService extends WearableListenerService implements
             setWearStatus(Constants.STATUS_INIT);
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_ALARM));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
         return START_NOT_STICKY;
     }
 
@@ -402,7 +402,6 @@ public class MessageService extends WearableListenerService implements
         messageServiceNotifBuilder.setContentText(notifContent);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(1, messageServiceNotifBuilder.build());
-
     }
 
 }

@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -152,17 +153,22 @@ public class SensorService extends Service implements SensorEventListener {
         if (sc_count < 100) {
             sensorServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Wear Monitor")
-                    .setContentText("You have been inactive! " + sc_count)
+                    .setContentTitle("UPMC Dash Activity Monitor")
+                    .setContentText("Ready For a quick Walk ?" + sc_count)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setDefaults(Notification.DEFAULT_ALL);
             mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
-            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            long[] vibrationPattern = {0, 500, 50, 300};
-            //-1 - don't repeat
-            final int indexInPatternToRepeat = 2;
-            vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_COMM).putExtra(Constants.SENSOR_INTENT_COMM, Constants.NOTIFY_INACTIVITY));
+            final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
+            long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+            vibrator.vibrate(pattern, 0);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    vibrator.cancel();
+                }
+            }, 5000);
         }
     }
 
@@ -183,7 +189,7 @@ public class SensorService extends Service implements SensorEventListener {
                     initializeStepCount(count);
                     setALARM_1HR_FLAG(false);
                     Log.d(Constants.TAG, "Steps(taken): " + getStepCount());
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_COMM).putExtra(Constants.SENSOR_INTENT_COMM, Constants.SENSOR_ALARM));
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.SENSOR_ALARM));
                     notifyUser(getStepCount());
                 }
 //                else if(ALARM_2HR_FLAG) {

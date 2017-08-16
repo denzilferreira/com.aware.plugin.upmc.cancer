@@ -29,6 +29,11 @@ public final class Constants {
 
 
 
+    // messages to phone
+    public static final String LOW_ACTIVITY = "step count below threshold";
+
+
+
 
     //Bluetooth Communication
     public static final String BLUETOOTH_COMM = "bluetooth_comm";
@@ -53,9 +58,9 @@ public final class Constants {
     public static final String ALARM_LOCAL_RECEIVER_INTENT_FILTER = "alarm_local_broadcast_receiver";
     public static final int ALARM_TYPE_1HR = 0;
     public static final int ALARM_TYPE_2HR = 1;
-    public static final String SENSOR_COMM = "sensor comm key";
+    public static final String SENSOR_INTENT_FILTER = "sensor comm key";
     public static final String NOTIFY_INACTIVITY = "user is inactive";
-    public static final String SENSOR_INTENT_COMM = "sensor intent comm";
+    public static final String SENSOR_EXTRA_KEY = "sensor intent comm";
     public static final String SENSOR_ALARM = "1hr/2hr sensor alarm";
 
 
