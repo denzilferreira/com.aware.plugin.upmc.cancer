@@ -124,6 +124,13 @@ public class SensorService extends Service implements SensorEventListener {
         stopSelf();
     }
 
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -192,17 +199,16 @@ public class SensorService extends Service implements SensorEventListener {
                     LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.SENSOR_ALARM));
                     notifyUser(getStepCount());
                 }
-//                else if(ALARM_2HR_FLAG) {
-//                    Log.d(Constants.TAG, "Step(2hr):  " + count);
-//                    unregisterSensorListener();
-//                    if(hasStepCountChanged()) {
-//                        calculateStepCount(count);
-//                        initializeStepCount(count);
-//                        setALARM_1HR_FLAG(false);
-//                    }
-//                    Log.d(Constants.TAG, "Steps(taken): " + getStepCount() );
-//
-//                }
+                else if(ALARM_2HR_FLAG) {
+                    Log.d(Constants.TAG, "Step(2hr):  " + count);
+                    unregisterSensorListener();
+                    calculateStepCount(count);
+                    initializeStepCount(count);
+                    setALARM_2HR_FLAG(false);
+                    Log.d(Constants.TAG, "Steps(taken): " + getStepCount());
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.SENSOR_ALARM));
+                    notifyUser(getStepCount());
+                }
             }
         }
     }

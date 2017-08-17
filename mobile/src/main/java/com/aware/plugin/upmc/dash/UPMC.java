@@ -41,6 +41,7 @@ import com.aware.ui.PermissionsHandler;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class UPMC extends AppCompatActivity {
 
@@ -49,6 +50,7 @@ public class UPMC extends AppCompatActivity {
     private boolean debug = false;
     private boolean firstRun = true;
     private boolean timeInvalid = false;
+    private List<Integer> ratingList;
     private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -56,8 +58,6 @@ public class UPMC extends AppCompatActivity {
                 Log.d(Constants.TAG, "UPMC:BR:wearStopMessageReceived, killing application");
                 finish();
             }
-
-
         }
     };
 
@@ -76,7 +76,6 @@ public class UPMC extends AppCompatActivity {
         startService(aware);
         Log.d("DASH", "UPMC:onCreate");
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
-
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -156,6 +155,7 @@ public class UPMC extends AppCompatActivity {
             morning_timer.setCurrentMinute(0);
         }
 
+
         saveSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,13 +170,6 @@ public class UPMC extends AppCompatActivity {
                         }
                         dialog.setInverseBackgroundForced(true);
 
-
-//                        if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) != null) {
-//                            Log.d(Constants.TAG, "Stuff: " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-//                            isFirstTime = false;
-//                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_COMM, Constants.SETTINGS_CHANGED));
-//                        }
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -188,7 +181,7 @@ public class UPMC extends AppCompatActivity {
 
                         // start MessageService
 
-                        if(!isTimeInitialized()) {
+                        if (!isTimeInitialized()) {
                             Log.d(Constants.TAG, "trig::" + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
                             writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue());
                             if (!isMyServiceRunning(MessageService.class)) {
@@ -199,8 +192,7 @@ public class UPMC extends AppCompatActivity {
                                 Log.d("DASH", "Message Service already running");
                             setTimeInitilaized(true);
 
-                        }
-                        else {
+                        } else {
                             Log.d(Constants.TAG, "Sending Settings Changed Broadcast");
                             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_COMM, Constants.SETTINGS_CHANGED));
                             writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue());
@@ -257,6 +249,10 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        ratingList = new ArrayList<>(12);
+        for (int i=0;i<12;i++) {
+            ratingList.add(i,-1);
+        }
         ArrayList<String> REQUIRED_PERMISSIONS = new ArrayList<>();
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -271,7 +267,6 @@ public class UPMC extends AppCompatActivity {
         if (permissions_ok) {
 
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
-
             //NOTE: needed for demo to participants
             Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
             Aware.startESM(this);
@@ -313,6 +308,7 @@ public class UPMC extends AppCompatActivity {
                     already_answered.close();
             }
 
+
             final TextView pain_rating = (TextView) findViewById(R.id.pain_rating);
             pain_rating.setText("-1");
             SeekBar pain = (SeekBar) findViewById(R.id.rate_pain);
@@ -320,6 +316,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     pain_rating.setText(String.valueOf(i));
+                    ratingList.set(0, i);
                 }
 
                 @Override
@@ -338,6 +335,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     fatigue_rating.setText(String.valueOf(i));
+                    ratingList.set(1, i);
                 }
 
                 @Override
@@ -358,6 +356,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     concentrating_rating.setText(String.valueOf(i));
+                    ratingList.set(2, i);
                 }
 
                 @Override
@@ -378,6 +377,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     sad_rating.setText(String.valueOf(i));
+                    ratingList.set(3, i);
                 }
 
                 @Override
@@ -398,6 +398,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     anxious_rating.setText(String.valueOf(i));
+                    ratingList.set(4, i);
                 }
 
                 @Override
@@ -418,6 +419,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     breath_rating.setText(String.valueOf(i));
+                    ratingList.set(5, i);
                 }
 
                 @Override
@@ -438,6 +440,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     numb_rating.setText(String.valueOf(i));
+                    ratingList.set(6, i);
                 }
 
                 @Override
@@ -458,6 +461,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     nausea_rating.setText(String.valueOf(i));
+                    ratingList.set(7, i);
                 }
 
                 @Override
@@ -478,6 +482,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     sleep_disturb_rating.setText(String.valueOf(i));
+                    ratingList.set(8, i);
                 }
 
                 @Override
@@ -498,6 +503,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     diarrhea_rating.setText(String.valueOf(i));
+                    ratingList.set(9, i);
                 }
 
                 @Override
@@ -553,6 +559,7 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     other_rating.setText(String.valueOf(i));
+                    ratingList.set(10, i);
                 }
 
                 @Override
@@ -599,7 +606,7 @@ public class UPMC extends AppCompatActivity {
             answer_questions.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Log.d(Constants.TAG, "Trig::Questionnaire");
                     ContentValues answer = new ContentValues();
                     answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
                     answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
@@ -622,11 +629,10 @@ public class UPMC extends AppCompatActivity {
                     answer.put(Provider.Symptom_Data.SCORE_DIARRHEA, diarrhea_rating.getText().toString());
                     answer.put(Provider.Symptom_Data.SCORE_OTHER, other_rating.getText().toString());
                     answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
-
+                    Log.d(Constants.TAG, "Trig::Questionnaire" + Integer.parseInt(pain_rating.getText().toString()));
                     getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
-
+                    checkSymptoms();
                     Log.d("UPMC", "Answers:" + answer.toString());
-
                     Toast.makeText(getApplicationContext(), "Saved successfully.", Toast.LENGTH_LONG).show();
                     finish();
                 }
@@ -639,6 +645,21 @@ public class UPMC extends AppCompatActivity {
             permissions.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(permissions);
         }
+
+
+    }
+
+    public void checkSymptoms() {
+        for (Integer i : ratingList) {
+            if (i >= 7) {
+                Log.d(Constants.TAG, "Bad Symptoms");
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SYMPTOMS_INTENT_FILTER).putExtra(Constants.SYMPTOMS_KEY, Constants.SYMPTOMS_1));
+                return;
+            }
+        }
+        Log.d(Constants.TAG, "Good Symptoms");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SYMPTOMS_INTENT_FILTER).putExtra(Constants.SYMPTOMS_KEY, Constants.SYMPTOMS_0));
+
     }
 
     @Override

@@ -8,10 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -87,6 +89,44 @@ public class MessageService extends WearableListenerService implements
         }
     };
 
+    public void writeSymptomPref(int type) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(Constants.SYMPTOMS_PREFS, type);
+        editor.apply();
+    }
+
+    public int readSymptomsPref() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int type = sharedPref.getInt(Constants.SYMPTOMS_PREFS, -1);
+        return type;
+    }
+
+    public boolean isSympInitialized() {
+        if(readSymptomsPref()==-1) {
+            return false;
+        }
+        else
+            return true;
+    }
+
+
+    private BroadcastReceiver mSymptomsLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(isSympInitialized()) {
+                if(intent.getIntExtra(Constants.SYMPTOMS_KEY,-1) != readSymptomsPref()) {
+                    sympResetWear(intent.getIntExtra(Constants.SYMPTOMS_KEY,-1));
+                }
+            }
+            else if(!isSympInitialized()){
+                writeSymptomPref(intent.getIntExtra(Constants.SYMPTOMS_KEY,-1));
+                Log.d(Constants.TAG, "MessageService:SymptomsReceiver" + intent.getIntExtra(Constants.SYMPTOMS_KEY,-1));
+                initializeWear();
+            }
+        }
+    };
+
     public boolean isNodeSaved() {
         return isNodeSaved;
     }
@@ -100,6 +140,9 @@ public class MessageService extends WearableListenerService implements
                 + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
     }
 
+    private void sympResetWear(int type) {
+        sendMessageToWear(Constants.SYMP_RESET + " " + type);
+    }
 
     @Override
     public void onDestroy() {
@@ -113,6 +156,7 @@ public class MessageService extends WearableListenerService implements
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mSettingsLocalReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSymptomsLocalReceiver);
         stopSelf();
     }
 
@@ -182,7 +226,9 @@ public class MessageService extends WearableListenerService implements
                     notifyUser(Constants.NOTIFTEXT_IN_PROGRESS);
                 } else if (message.equals(Constants.STATUS_INIT)) {
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:TimeInit");
-                    timeInitializeWear();
+                    if(isSympInitialized()){
+                        initializeWear();
+                    }
                 }
                 else if(message.equals((Constants.NOTIFY_INACTIVITY))) {
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:InactiveUser");
@@ -215,9 +261,10 @@ public class MessageService extends WearableListenerService implements
 
     }
 
-    public void timeInitializeWear() {
-        sendMessageToWear(Constants.MORNING_TIME + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)
-                + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+    public void initializeWear() {
+
+        sendMessageToWear(Constants.INIT_TS + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)
+                + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE) + " " + readSymptomsPref());
     }
 
     @Override
@@ -227,6 +274,7 @@ public class MessageService extends WearableListenerService implements
         startClientNotif();
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mSymptomsLocalReceiver, new IntentFilter(Constants.SYMPTOMS_INTENT_FILTER));
         return i;
     }
 
@@ -382,6 +430,7 @@ public class MessageService extends WearableListenerService implements
             public void run() {
                 if (isWearConnected()) {
                     Log.d(Constants.TAG, "MessageService:: Wear replied with ACK");
+
 
                 } else {
                     Log.d(Constants.TAG, "MessageService:: Wear gave no ACK response");

@@ -23,7 +23,7 @@ public final class Constants {
     public static final String IS_WEAR_RUNNING = "is wear running";
     public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
     public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
-    public static final String MORNING_TIME = "morningtimestamp"; // Morning timestamp plus
+    public static final String INIT_TS = "morningtimestamp&symptoms"; // Morning timestamp plus
     public static final String MORNING_TIME_RESET = "resetmorningtimestamp"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
 
@@ -75,5 +75,18 @@ public final class Constants {
     //sensors
     public static final int SENSOR_INTERVAL_1HR = 60 * 1000;
     public static final int SENSOR_INTERVAL_2HR = 120 * 1000;
+    public static final String SENSOR_START_INTENT_KEY = "onstartcommmand intent extra";
+
+
+    //Symptoms
+    public static final int SYMPTOMS_0 = 0;
+    public static final int SYMPTOMS_1 = 1;
+    public static final String SYMPTOMS_INTENT_FILTER = "symptoms filter";
+    public static final String SYMPTOMS_KEY = "symptoms keys";
+    public static final String SYMPTOMS_PREFS = "symptoms prefs";
+    public static final String SYMP_RESET = "symptoms changed";
+
+
+
 
 }

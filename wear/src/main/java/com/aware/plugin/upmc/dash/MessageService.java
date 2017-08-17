@@ -54,6 +54,18 @@ public class MessageService extends WearableListenerService implements
         return isNodeSaved;
     }
 
+    public void writeSymptomPref(int type) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(Constants.SYMPTOMS_PREFS, type);
+    }
+
+    public int readSymptomsPref() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int type = sharedPref.getInt(Constants.SYMPTOMS_PREFS, -1);
+        return type;
+    }
+
     public void setNodeSaved(boolean nodeSaved) {
         isNodeSaved = nodeSaved;
     }
@@ -160,7 +172,7 @@ public class MessageService extends WearableListenerService implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Constants.TAG, "MessageService:onStartCommand");
         startClientNotif();
-        if (isTimeInitialized()) {
+        if (isTimeInitialized()&& isSympInitialized()) {
             if (!isMyServiceRunning(SensorService.class)) {
                 startService(new Intent(this, SensorService.class));
                 Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
@@ -170,6 +182,8 @@ public class MessageService extends WearableListenerService implements
             Log.d(Constants.TAG, "onStartCommand:Need TimeInitialization , Requesting Phone:");
             setWearStatus(Constants.STATUS_INIT);
         }
+
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
         return START_NOT_STICKY;
@@ -257,6 +271,12 @@ public class MessageService extends WearableListenerService implements
         return this.timeInvalid;
     }
 
+    public boolean isSympInitialized() {
+        if(readSymptomsPref()==-1)
+            return false;
+        return true;
+    }
+
     public void setTimeInitilaized(boolean isinit) {
         this.timeInvalid = isinit;
     }
@@ -306,15 +326,17 @@ public class MessageService extends WearableListenerService implements
             }
             else {
                 sendMessageToPhone(Constants.ACK);
-                if (message.contains(Constants.MORNING_TIME)) {
+                if (message.contains(Constants.INIT_TS)) {
                     String[] arr = message.split("\\s+");
                     int hour = Integer.parseInt(arr[1]);
                     int minute = Integer.parseInt(arr[2]);
+                    int type = Integer.parseInt(arr[3]);
                     writeTimePref(hour, minute);
-                    Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
+                    writeSymptomPref(type);
+                    Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + hour + " " + minute + " " + type);
                     setWearStatus(Constants.STATUS_LOGGING);
                     if(!isMyServiceRunning(SensorService.class)) {
-                        startService(new Intent(this, SensorService.class));
+                        startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, message.substring(1)));
                     }
                     sendStateToPhone();
                 } else if(message.contains(Constants.MORNING_TIME_RESET)) {
@@ -322,7 +344,13 @@ public class MessageService extends WearableListenerService implements
                     int hour = Integer.parseInt(arr[1]);
                     int minute = Integer.parseInt(arr[2]);
                     writeTimePref(hour, minute);
-                    Log.d(Constants.TAG, "Stuff: " + hour + " " + minute);
+                    Log.d(Constants.TAG, "onMessageReceived:MORNING RESET " + hour + " " + minute);
+                }
+                else if(message.contains(Constants.SYMP_RESET)) {
+                    String[] arr = message.split("\\s+");
+                    int type = Integer.parseInt(arr[1]);
+                    writeSymptomPref(type);
+                    Log.d(Constants.TAG, "onMessageReceived:SYMP RESET " + type);
                 }
                 else if(message.contains(Constants.IS_WEAR_RUNNING)) {
                     if(!isSyncedWithPhone()) {
