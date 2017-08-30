@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.RingtoneManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -124,11 +125,48 @@ public class SensorService extends Service implements SensorEventListener {
         stopSelf();
     }
 
+    public int[] parseConfig(Intent intent) {
+        if(intent.hasExtra(Constants.SENSOR_START_INTENT_KEY)) {
+            String extra = intent.getStringExtra(Constants.SENSOR_START_INTENT_KEY);
+            Log.d(Constants.TAG, "SensorService:parseConfig " + extra);
+            String[] extraArray = extra.split("\\s+");
+            int[] configArray = new int[3];
+            configArray[0] = Integer.parseInt(extraArray[0]);
+            configArray[1] = Integer.parseInt(extraArray[1]);
+            configArray[2] = Integer.parseInt(extraArray[2]);
+            return configArray;
+        }
+        return null;
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        int[] config = parseConfig(intent);
+        int type = config[2];
+        LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
+        Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + type);
+        startAlarmOfType(type);
         return super.onStartCommand(intent, flags, startId);
+    }
 
+    public void startAlarmOfType(int type) {
+        myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent alarmIntent_1hr = new Intent(this, AlarmReceiver.class);
+        Intent alarmIntent_2hr = new Intent(this, AlarmReceiver.class);
+        alarmIntent_1hr.putExtra(Constants.ALARM_COMM, 0);
+        alarmIntent_2hr.putExtra(Constants.ALARM_COMM, 1);
+        if(type==Constants.SYMPTOMS_0) {
+            alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
+            int interval = 60 * 1000 * 60;
+            myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, alarmPendingIntent_1hr);
+        }
+        else if(type==Constants.SYMPTOMS_1) {
+            alarmPendingIntent_2hr = PendingIntent.getBroadcast(this,667,alarmIntent_2hr,0);
+            int interval = 60 * 1000 * 60 * 2;
+            myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,  interval, alarmPendingIntent_2hr);
+
+        }
     }
 
     @Override
@@ -143,16 +181,6 @@ public class SensorService extends Service implements SensorEventListener {
                 .setContentText("Monitoring")
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
         startForeground(3, sensorServiceNotifBuilder.build());
-        myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent alarmIntent_1hr = new Intent(this, AlarmReceiver.class);
-        Intent alarmIntent_2hr = new Intent(this, AlarmReceiver.class);
-        alarmIntent_1hr.putExtra(Constants.ALARM_COMM, 0);
-        alarmIntent_2hr.putExtra(Constants.ALARM_COMM, 1);
-        alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
-        //alarmPendingIntent_2hr = PendingIntent.getBroadcast(this,(int)System.currentTimeMillis(),alarmIntent_2hr,0);
-        myAlarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60 * 1000, alarmPendingIntent_1hr);
-        //myAlarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),  120*1000, alarmPendingIntent_2hr);
-        LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
     }
 
     public void notifyUser(int sc_count) {
@@ -161,7 +189,8 @@ public class SensorService extends Service implements SensorEventListener {
             sensorServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Activity Monitor")
-                    .setContentText("Ready For a quick Walk ?" + sc_count)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setContentText("Ready for a quick walk ? #" + sc_count)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setDefaults(Notification.DEFAULT_ALL);
             mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
@@ -175,7 +204,7 @@ public class SensorService extends Service implements SensorEventListener {
                 public void run() {
                     vibrator.cancel();
                 }
-            }, 5000);
+            }, 3000);
         }
     }
 

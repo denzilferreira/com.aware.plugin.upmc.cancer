@@ -269,7 +269,7 @@ public class UPMC extends AppCompatActivity {
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
             //NOTE: needed for demo to participants
             Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
-            Aware.startESM(this);
+            //Aware.startESM(this);
 
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
                 loadSchedule();

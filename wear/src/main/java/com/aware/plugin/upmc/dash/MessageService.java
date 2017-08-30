@@ -58,11 +58,13 @@ public class MessageService extends WearableListenerService implements
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(Constants.SYMPTOMS_PREFS, type);
+        editor.apply();
     }
 
     public int readSymptomsPref() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int type = sharedPref.getInt(Constants.SYMPTOMS_PREFS, -1);
+        Log.d(Constants.TAG, "MessageService:readSymptomsPref: " + type);
         return type;
     }
 
@@ -174,7 +176,7 @@ public class MessageService extends WearableListenerService implements
         startClientNotif();
         if (isTimeInitialized()&& isSympInitialized()) {
             if (!isMyServiceRunning(SensorService.class)) {
-                startService(new Intent(this, SensorService.class));
+                startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()));
                 Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
                 setWearStatus(Constants.STATUS_LOGGING);
             }
@@ -245,8 +247,8 @@ public class MessageService extends WearableListenerService implements
     public void readTimePref() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
-        Log.d(Constants.TAG, "READ SOME PREFS " + minute);
         int hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
+        Log.d(Constants.TAG, "MessageService:readTimePref:" + minute + " " + hour);
         storeMorningTime(hour, minute);
     }
 
@@ -336,7 +338,7 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + hour + " " + minute + " " + type);
                     setWearStatus(Constants.STATUS_LOGGING);
                     if(!isMyServiceRunning(SensorService.class)) {
-                        startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, message.substring(1)));
+                        startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()));
                     }
                     sendStateToPhone();
                 } else if(message.contains(Constants.MORNING_TIME_RESET)) {
@@ -363,6 +365,18 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
+    private String buildInitMessage() {
+        StringBuilder messageBuilder = new StringBuilder();
+        int[] morningTime = getMorningTime();
+        int symptom = readSymptomsPref();
+        messageBuilder.append(morningTime[0]);
+        messageBuilder.append(" ");
+        messageBuilder.append(morningTime[1]);
+        messageBuilder.append(" ");
+        messageBuilder.append(symptom);
+        return messageBuilder.toString();
+    }
+
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -377,6 +391,7 @@ public class MessageService extends WearableListenerService implements
     public void onConnectionSuspended(int i) {
         Log.d(Constants.TAG, "MessageService: onConnectionSuspended");
     }
+
 
     private void sendMessageToPhone(final String message) {
 

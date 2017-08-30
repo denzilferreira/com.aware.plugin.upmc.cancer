@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -246,19 +248,11 @@ public class MessageService extends WearableListenerService implements
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                 .setContentTitle("UPMC Dash Monitor")
                 .setContentText("Ready for a quick walk?")
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setPriority(NotificationCompat.PRIORITY_MAX);
         mNotificationManager.notify(66, messageServiceNotifBuilder.build());
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
-        vibrator.vibrate(pattern, 0);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                vibrator.cancel();
-            }
-        }, 5000);
-
+        vibrator.vibrate(3000);
     }
 
     public void initializeWear() {
