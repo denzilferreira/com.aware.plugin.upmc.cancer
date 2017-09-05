@@ -108,8 +108,13 @@
             </intent-filter>
         </receiver>
 
-
-
+        <receiver
+            android:name="com.aware.plugin.upmc.dash.NotifReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="SNOOZE_ACTION"/>
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="com.aware.plugin.upmc.dash.Provider"
@@ -124,6 +129,8 @@
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name="com.aware.plugin.upmc.dash.AlarmReceiver"/>
 
 
     </application>

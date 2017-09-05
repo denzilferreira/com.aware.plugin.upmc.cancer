@@ -1,6 +1,8 @@
 package com.aware.plugin.upmc.dash;
 
 
+import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -49,6 +51,8 @@ public class MessageService extends WearableListenerService implements
     public boolean wearConnected = false;
     private GoogleApiClient mGoogleApiClient;
     private NotificationCompat.Builder messageServiceNotifBuilder;
+    private NotificationCompat.Builder watchClientNotifBuilder;
+    private AlarmManager mAlarmManager;
     private int count = 0;
     private String NODE_ID;
     private boolean isNodeSaved = false;
@@ -91,6 +95,19 @@ public class MessageService extends WearableListenerService implements
         }
     };
 
+    private BroadcastReceiver mSnoozeAlarmLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.hasExtra(Constants.SNOOZE_ALARM_EXTRA_KEY)) {
+                afterSnoozeInactivityNotif();
+            }
+        }
+    };
+
+    public void afterSnoozeInactivityNotif() {
+        Log.d(Constants.TAG, "Snooze done!");
+    }
+
     public void writeSymptomPref(int type) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -129,6 +146,26 @@ public class MessageService extends WearableListenerService implements
         }
     };
 
+    private BroadcastReceiver mNotifLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.hasExtra(Constants.NOTIF_KEY)) {
+                Log.d(Constants.TAG, "MessageService: NotifLocalReceiver:Received :  " + intent.getStringExtra(Constants.NOTIF_KEY));
+                snoozeInactivityNotif();
+            }
+        }
+    };
+
+    public void snoozeInactivityNotif() {
+        Intent snoozeInt = new Intent(this, AlarmReceiver.class);
+        snoozeInt.putExtra(Constants.ALARM_COMM,Constants.SNOOZE_ALARM_EXTRA);
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent snoozePendInt = PendingIntent.getBroadcast(this, 56, snoozeInt, 0);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 60*1000, snoozePendInt);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(66);
+    }
+
     public boolean isNodeSaved() {
         return isNodeSaved;
     }
@@ -159,6 +196,8 @@ public class MessageService extends WearableListenerService implements
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mSettingsLocalReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mSymptomsLocalReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifLocalReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSnoozeAlarmLocalReceiver);
         stopSelf();
     }
 
@@ -243,14 +282,20 @@ public class MessageService extends WearableListenerService implements
 
 
     public void notifyUserWithInactivity() {
+        Intent snoozeIntent = new Intent();
+        snoozeIntent.setAction(Constants.SNOOZE_ACTION);
+        PendingIntent pendingIntentSnooze = PendingIntent.getBroadcast(this, 555, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+        watchClientNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                 .setContentTitle("UPMC Dash Monitor")
                 .setContentText("Ready for a quick walk?")
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_MAX)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setPriority(NotificationCompat.PRIORITY_MAX);
-        mNotificationManager.notify(66, messageServiceNotifBuilder.build());
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .addAction(R.drawable.ic_action_timer, "Snooze", pendingIntentSnooze);
+        mNotificationManager.notify(66, watchClientNotifBuilder.build());
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(3000);
     }
@@ -280,6 +325,9 @@ public class MessageService extends WearableListenerService implements
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
         LocalBroadcastManager.getInstance(this).registerReceiver(mSymptomsLocalReceiver, new IntentFilter(Constants.SYMPTOMS_INTENT_FILTER));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mNotifLocalReceiver, new IntentFilter(Constants.NOTIF_COMM));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mSnoozeAlarmLocalReceiver, new IntentFilter(Constants.SNOOZE_ALARM_INTENT_FILTER));
+        notifyUserWithInactivity();
         return i;
     }
 

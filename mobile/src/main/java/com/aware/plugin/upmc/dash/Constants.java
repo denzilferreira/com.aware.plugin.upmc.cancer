@@ -7,6 +7,12 @@ package com.aware.plugin.upmc.dash;
 public final class Constants {
 
 
+    //Action buttons
+
+    public static final String SNOOZE_ACTION = "SNOOZE_ACTION";
+
+
+
     public static final String TAG = "CANCER";
     public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";
     //local broadcast receivers/ MessageService stuff
@@ -73,6 +79,19 @@ public final class Constants {
     public static final String SYMPTOMS_INTENT_FILTER = "symptoms filter";
     public static final String SYMPTOMS_KEY = "symptoms keys";
     public static final String SYMPTOMS_PREFS = "symptoms prefs";
+
+
+    //NotifReceiver
+    public static final String NOTIF_COMM = "notif_comm";
+    public static final String NOTIF_KEY = "notif_key";
+
+
+
+    public static final String ALARM_COMM = "AlarmComm";
+    public static final String ALARM_SNOOZE = "Alarm Snooze";
+    public static final String SNOOZE_ALARM_INTENT_FILTER = "snooze alarm intent filter";
+    public static final String SNOOZE_ALARM_EXTRA_KEY = "snooze alarm extra key";
+    public static final String SNOOZE_ALARM_EXTRA = "snooze alarm extra";
 
 
 }
