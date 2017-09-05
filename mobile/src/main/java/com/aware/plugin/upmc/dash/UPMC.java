@@ -47,6 +47,7 @@ public class UPMC extends AppCompatActivity {
 
     private static ProgressDialog dialog;
     int[] morningTime = {-1, -1};
+    int[] nightTime = {-1, -1};
     private boolean debug = false;
     private boolean firstRun = true;
     private boolean timeInvalid = false;
@@ -90,30 +91,33 @@ public class UPMC extends AppCompatActivity {
     }
 
 
-    public void writeTimePref(int hour, int minute) {
+    public void writeTimePref(int morning_hour, int morning_minute, int night_hour, int night_minute) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(Constants.MORNING_HOUR, hour);
-        editor.putInt(Constants.MORNING_MINUTE, minute);
+        editor.putInt(Constants.MORNING_HOUR, morning_hour);
+        editor.putInt(Constants.MORNING_MINUTE, morning_minute);
+        editor.putInt(Constants.NIGHT_HOUR, night_hour);
+        editor.putInt(Constants.NIGHT_MINUTE, night_minute);
         editor.apply();
     }
 
     public void readTimePref() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        int minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
-        Log.d(Constants.TAG, "READ SOME PREFS " + minute);
-        int hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
-        setMorningTime(hour, minute);
+
+        int morning_hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
+        int morning_minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
+        this.morningTime[0] = morning_hour;
+        this.morningTime[1] = morning_minute;
+        int night_hour = sharedPref.getInt(Constants.NIGHT_HOUR, -1);
+        int night_minute = sharedPref.getInt(Constants.NIGHT_MINUTE, -1);
+        this.nightTime[0] = night_hour;
+        this.nightTime[1] = night_minute;
+        Log.d(Constants.TAG, "UPMC:readTimePref: " + morning_minute + " " + morning_minute + " " + night_hour + " " + night_minute);
     }
 
-    public void setMorningTime(int hour, int minute) {
-        this.morningTime[0] = hour;
-        this.morningTime[1] = minute;
-    }
-
-    public int[] getMorningTime() {
+    public int[] getTime() {
         readTimePref();
-        if (this.morningTime[0] == -1) {
+        if ((this.morningTime[0] == -1) || (this.nightTime[0] == -1)) {
             setTimeInitilaized(false);
         } else {
             setTimeInitilaized(true);
@@ -121,9 +125,8 @@ public class UPMC extends AppCompatActivity {
         return this.morningTime;
     }
 
-
     public boolean isTimeInitialized() {
-        getMorningTime();
+        getTime();
         return this.timeInvalid;
     }
 
@@ -144,6 +147,7 @@ public class UPMC extends AppCompatActivity {
         Button saveSchedule = (Button) findViewById(R.id.save_button);
 
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
+        final TimePicker night_timer = (TimePicker) findViewById(R.id.night_sleep_time);
         if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0) {
             morning_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
         } else {
@@ -153,6 +157,20 @@ public class UPMC extends AppCompatActivity {
             morning_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)));
         } else {
             morning_timer.setCurrentMinute(0);
+        }
+
+
+        if(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR).length() > 0) {
+            night_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)));
+        }
+        else {
+            night_timer.setCurrentHour(21);
+        }
+        if(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE).length() > 0) {
+            night_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)));
+        }
+        else {
+            night_timer.setCurrentMinute(0);
         }
 
 
@@ -178,24 +196,25 @@ public class UPMC extends AppCompatActivity {
                         });
                         Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
                         Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
+                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, night_timer.getCurrentHour().intValue());
+                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, night_timer.getCurrentMinute().intValue());
 
                         // start MessageService
-
                         if (!isTimeInitialized()) {
-                            Log.d(Constants.TAG, "trig::" + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue());
+                            Log.d(Constants.TAG, "UPMC:" + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE  + " " + Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR + " " + Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE ));
+                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue(), night_timer.getCurrentHour().intValue(), night_timer.getCurrentMinute().intValue());
+                            readTimePref();
                             if (!isMyServiceRunning(MessageService.class)) {
-
                                 startService(new Intent(getApplicationContext(), MessageService.class));
-                                Log.d("DASH", "Started Message Service");
+                                Log.d(Constants.TAG, "UPMC: Started Message Service");
                             } else
-                                Log.d("DASH", "Message Service already running");
+                                Log.d(Constants.TAG, "UPMC: Message Service already running");
                             setTimeInitilaized(true);
 
                         } else {
-                            Log.d(Constants.TAG, "Sending Settings Changed Broadcast");
+                            Log.d(Constants.TAG, "UPMC: Sending Settings Changed Broadcast");
                             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_COMM, Constants.SETTINGS_CHANGED));
-                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue());
+                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue(), night_timer.getCurrentHour().intValue(), night_timer.getCurrentMinute().intValue());
                         }
 
                         Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);

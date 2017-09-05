@@ -64,6 +64,8 @@ public final class Constants {
 
     public static final String MORNING_HOUR = "morning hour key";
     public static final String MORNING_MINUTE = "morning minute key";
+    public static final String NIGHT_HOUR = "night hour key";
+    public static final String NIGHT_MINUTE = "night minute key";
 
     //Symptoms
     public static final int SYMPTOMS_0 = 0;

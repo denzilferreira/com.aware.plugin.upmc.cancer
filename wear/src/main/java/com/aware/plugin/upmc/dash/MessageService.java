@@ -42,6 +42,7 @@ public class MessageService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks {
 
     int[] morningTime = {-1, -1};
+    int[] nightTime = {-1, -1};
     boolean isSyncedWithPhone;
     private GoogleApiClient mGoogleApiClient;
     private NotificationCompat.Builder messageServiceNotifBuilder;
@@ -179,6 +180,7 @@ public class MessageService extends WearableListenerService implements
                 startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()));
                 Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
                 setWearStatus(Constants.STATUS_LOGGING);
+                setUpNodeIdentities();
             }
         } else {
             Log.d(Constants.TAG, "onStartCommand:Need TimeInitialization , Requesting Phone:");
@@ -236,36 +238,46 @@ public class MessageService extends WearableListenerService implements
         startForeground(1, messageServiceNotifBuilder.build());
     }
 
-    public void writeTimePref(int hour, int minute) {
+    public void writeTimePref(int morn_hour, int morn_minute, int night_hour, int night_minute) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(Constants.MORNING_HOUR, hour);
-        editor.putInt(Constants.MORNING_MINUTE, minute);
+        editor.putInt(Constants.MORNING_HOUR, morn_hour);
+        editor.putInt(Constants.MORNING_MINUTE, morn_minute);
+        editor.putInt(Constants.NIGHT_HOUR, night_hour);
+        editor.putInt(Constants.NIGHT_MINUTE, night_minute);
         editor.apply();
+        storeTime(morn_hour, morn_minute,night_hour, night_minute);
     }
 
     public void readTimePref() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        int minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
-        int hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
-        Log.d(Constants.TAG, "MessageService:readTimePref:" + minute + " " + hour);
-        storeMorningTime(hour, minute);
+        int morn_hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
+        int morn_minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
+        int night_hour = sharedPref.getInt(Constants.NIGHT_HOUR, -1);
+        int night_minute = sharedPref.getInt(Constants.NIGHT_MINUTE, -1);
+        Log.d(Constants.TAG, "MessageService:readTimePref:" + morn_hour + " " + morn_minute);
+        storeTime(morn_hour, morn_minute,night_hour, night_minute);
     }
 
-    private void storeMorningTime(int hour, int minute) {
-        this.morningTime[0] = hour;
-        this.morningTime[1] = minute;
+    private void storeTime(int morn_hour, int morn_minute, int night_hour, int night_minute) {
+        this.morningTime[0] = morn_hour;
+        this.morningTime[1] = morn_minute;
+        this.nightTime[0] = night_hour;
+        this.nightTime[1] = night_minute;
 
     }
 
     public int[] getMorningTime() {
-        readTimePref();
         return this.morningTime;
     }
 
+    public int[] getNightTime() {
+        return this.nightTime;
+    }
+
     public boolean isTimeInitialized() {
-        getMorningTime();
-        if (this.morningTime[0] == -1) {
+        readTimePref();
+        if ((this.morningTime[0] == -1)||(this.nightTime[0] == -1)) {
             setTimeInitilaized(false);
         } else {
             setTimeInitilaized(true);
@@ -330,23 +342,25 @@ public class MessageService extends WearableListenerService implements
                 sendMessageToPhone(Constants.ACK);
                 if (message.contains(Constants.INIT_TS)) {
                     String[] arr = message.split("\\s+");
-                    int hour = Integer.parseInt(arr[1]);
-                    int minute = Integer.parseInt(arr[2]);
-                    int type = Integer.parseInt(arr[3]);
-                    writeTimePref(hour, minute);
+                    int morn_hour = Integer.parseInt(arr[1]);
+                    int morn_minute = Integer.parseInt(arr[2]);
+                    int night_hour = Integer.parseInt(arr[3]);
+                    int nigh_minute = Integer.parseInt(arr[4]);
+                    int type = Integer.parseInt(arr[5]);
+                    writeTimePref(morn_hour, morn_minute, night_hour, nigh_minute);
                     writeSymptomPref(type);
-                    Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + hour + " " + minute + " " + type);
+                    Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + morn_hour + " " + morn_minute + " " + night_hour  + " " + nigh_minute + " " + type);
                     setWearStatus(Constants.STATUS_LOGGING);
                     if(!isMyServiceRunning(SensorService.class)) {
                         startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()));
                     }
                     sendStateToPhone();
                 } else if(message.contains(Constants.MORNING_TIME_RESET)) {
-                    String[] arr = message.split("\\s+");
-                    int hour = Integer.parseInt(arr[1]);
-                    int minute = Integer.parseInt(arr[2]);
-                    writeTimePref(hour, minute);
-                    Log.d(Constants.TAG, "onMessageReceived:MORNING RESET " + hour + " " + minute);
+//                    String[] arr = message.split("\\s+");
+//                    int hour = Integer.parseInt(arr[1]);
+//                    int minute = Integer.parseInt(arr[2]);
+//                    writeTimePref(hour, minute);
+//                    Log.d(Constants.TAG, "onMessageReceived:MORNING RESET " + hour + " " + minute);
                 }
                 else if(message.contains(Constants.SYMP_RESET)) {
                     String[] arr = message.split("\\s+");
@@ -368,10 +382,15 @@ public class MessageService extends WearableListenerService implements
     private String buildInitMessage() {
         StringBuilder messageBuilder = new StringBuilder();
         int[] morningTime = getMorningTime();
+        int[] nightTime = getNightTime();
         int symptom = readSymptomsPref();
         messageBuilder.append(morningTime[0]);
         messageBuilder.append(" ");
         messageBuilder.append(morningTime[1]);
+        messageBuilder.append(" ");
+        messageBuilder.append(nightTime[0]);
+        messageBuilder.append(" ");
+        messageBuilder.append(nightTime[1]);
         messageBuilder.append(" ");
         messageBuilder.append(symptom);
         return messageBuilder.toString();

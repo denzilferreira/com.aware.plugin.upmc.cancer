@@ -24,10 +24,10 @@ public class Plugin extends Aware_Plugin {
         super.onCreate();
 
         TAG = "UPMC Cancer";
-
-        DATABASE_TABLES = Provider.DATABASE_TABLES;
-        TABLES_FIELDS = Provider.TABLES_FIELDS;
-        CONTEXT_URIS = new Uri[]{Provider.Symptom_Data.CONTENT_URI, Provider.Motivational_Data.CONTENT_URI};
+//
+//        DATABASE_TABLES = Provider.DATABASE_TABLES;
+//        TABLES_FIELDS = Provider.TABLES_FIELDS;
+//        CONTEXT_URIS = new Uri[]{Provider.Symptom_Data.CONTENT_URI, Provider.Motivational_Data.CONTENT_URI};
     }
 
     public static class SurveyListener extends BroadcastReceiver {

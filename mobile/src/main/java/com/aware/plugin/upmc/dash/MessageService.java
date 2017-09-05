@@ -257,8 +257,19 @@ public class MessageService extends WearableListenerService implements
 
     public void initializeWear() {
 
-        sendMessageToWear(Constants.INIT_TS + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)
-                + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE) + " " + readSymptomsPref());
+        StringBuilder initBuilder = new StringBuilder();
+        initBuilder.append(Constants.INIT_TS);
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(readSymptomsPref());
+        sendMessageToWear(initBuilder.toString());
     }
 
     @Override

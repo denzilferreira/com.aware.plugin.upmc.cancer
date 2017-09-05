@@ -23,6 +23,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by RaghuTeja on 6/24/17.
  */
@@ -31,6 +35,7 @@ public class SensorService extends Service implements SensorEventListener {
     boolean FIRST_TIME = true;
     private SensorManager sensorManager;
     private Sensor stepSensor;
+    int[] config;
     private AlarmManager myAlarmManager;
     private PendingIntent alarmPendingIntent_1hr;
     private PendingIntent alarmPendingIntent_2hr;
@@ -130,20 +135,41 @@ public class SensorService extends Service implements SensorEventListener {
             String extra = intent.getStringExtra(Constants.SENSOR_START_INTENT_KEY);
             Log.d(Constants.TAG, "SensorService:parseConfig " + extra);
             String[] extraArray = extra.split("\\s+");
-            int[] configArray = new int[3];
+            int[] configArray = new int[5];
             configArray[0] = Integer.parseInt(extraArray[0]);
             configArray[1] = Integer.parseInt(extraArray[1]);
             configArray[2] = Integer.parseInt(extraArray[2]);
+            configArray[3] = Integer.parseInt(extraArray[3]);
+            configArray[4] = Integer.parseInt(extraArray[4]);
             return configArray;
         }
         return null;
+    }
+
+    public void storeConfig(int[] config) {
+        this.config = config;
+    }
+
+    public int[] getMorningTime() {
+        int[] morn_time = new int[2];
+        morn_time[0] = this.config[0];
+        morn_time[1] = this.config[1];
+        return morn_time;
+    }
+
+    public int[] getNightTime() {
+        int[] night_time = new int[2];
+        night_time[0] = this.config[2];
+        night_time[1] = this.config[3];
+        return night_time;
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int[] config = parseConfig(intent);
-        int type = config[2];
+        storeConfig(config);
+        int type = config[4];
         LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
         Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + type);
         startAlarmOfType(type);
@@ -158,15 +184,86 @@ public class SensorService extends Service implements SensorEventListener {
         alarmIntent_2hr.putExtra(Constants.ALARM_COMM, 1);
         if(type==Constants.SYMPTOMS_0) {
             alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
-            int interval = 60 * 1000 * 60;
+            //int interval = 60 * 1000 * 60;
+            int interval = 60 * 1000;
             myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, alarmPendingIntent_1hr);
         }
         else if(type==Constants.SYMPTOMS_1) {
             alarmPendingIntent_2hr = PendingIntent.getBroadcast(this,667,alarmIntent_2hr,0);
-            int interval = 60 * 1000 * 60 * 2;
+            //int interval = 60 * 1000 * 60 * 2;
+            int interval = 120 * 1000;
             myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,  interval, alarmPendingIntent_2hr);
 
         }
+    }
+
+    public boolean isTimeToNotify() {
+        int[] morn_time = getMorningTime();
+        int[] night_time = getNightTime();
+        Calendar now = Calendar.getInstance();
+        Calendar morningTime = Calendar.getInstance();
+        Calendar nightTime = Calendar.getInstance();
+        morningTime.set(Calendar.HOUR_OF_DAY, morn_time[0]);
+        morningTime.set(Calendar.MINUTE, morn_time[1]);
+        nightTime.set(Calendar.HOUR_OF_DAY, night_time[0]);
+        nightTime.set(Calendar.MINUTE, night_time[1]);
+
+        Log.d(Constants.TAG, "isTimeNotify: Now: " + now.get(Calendar.HOUR_OF_DAY) + " " + now.get(Calendar.MINUTE));
+        Log.d(Constants.TAG, "isTimeNotify: Morn: " + morningTime.get(Calendar.HOUR_OF_DAY) + " " + morningTime.get(Calendar.MINUTE));
+        Log.d(Constants.TAG, "isTimeNotify: Night: " + nightTime.get(Calendar.HOUR_OF_DAY) + " " + nightTime.get(Calendar.MINUTE));
+
+        int now_hour = now.get(Calendar.HOUR_OF_DAY);
+        int now_minute = now.get(Calendar.MINUTE);
+        int morn_hour = morningTime.get(Calendar.HOUR_OF_DAY);
+        int morn_minute = morningTime.get(Calendar.MINUTE);
+        int night_hour = nightTime.get(Calendar.HOUR_OF_DAY);
+        int night_minute = nightTime.get(Calendar.MINUTE);
+        if (morn_hour > night_hour) {
+            if (now_hour >= morn_hour) {
+                if (now_hour == morn_hour) {
+                    if (now_minute >= morn_minute) {
+                        Log.d(Constants.TAG,"isTimeToNotify: True - Worked at minute level 1");
+                        return true;
+                    }
+                }
+                else {
+                    Log.d(Constants.TAG,"isTimeToNotify: True - Worked at hour level 1");
+                    return true;
+                }
+
+            } else if (now_hour <= night_hour) {
+                if(now_hour == night_hour) {
+                    if(now_minute <= night_minute) {
+                        Log.d(Constants.TAG,"isTimeToNotify: True - Worked at minute level 2");
+                        return true;
+                    }
+                }
+                else {
+                    Log.d(Constants.TAG,"isTimeToNotify: True - Worked at hour level 2");
+                    return true;
+                }
+
+            }
+        } else if (morn_hour < night_hour) {
+            if ((now_hour > morn_hour) && (now_hour < night_hour)) {
+                Log.d(Constants.TAG,"isTimeToNotify: True - Worked at hour level 3");
+                return true;
+            } else if (now_hour == morn_hour) {
+                if (now_minute >= morn_minute) {
+                    Log.d(Constants.TAG,"isTimeToNotify: True - Worked at minute level 3");
+                    return true;
+                }
+            } else if (now_hour == night_hour) {
+                if (now_minute <= night_minute) {
+                    Log.d(Constants.TAG,"isTimeToNotify: True - Worked at minute level 4");
+                    return true;
+                }
+            }
+        }
+
+        Log.d(Constants.TAG,"isTimeToNotify: False - Exit");
+        return false;
+
     }
 
     @Override
@@ -185,26 +282,28 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void notifyUser(int sc_count) {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (sc_count < 100) {
-            sensorServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Activity Monitor")
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setContentText("Ready for a quick walk ? #" + sc_count)
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setDefaults(Notification.DEFAULT_ALL);
-            mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
-            final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
-            long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
-            vibrator.vibrate(pattern, 0);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    vibrator.cancel();
-                }
-            }, 3000);
+        if(isTimeToNotify()) {
+            if (sc_count < 100) {
+                sensorServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                        .setContentTitle("UPMC Dash Activity Monitor")
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setContentText("Ready for a quick walk ? #" + sc_count)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setDefaults(Notification.DEFAULT_ALL);
+                mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
+                final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
+                long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+                vibrator.vibrate(pattern, 0);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        vibrator.cancel();
+                    }
+                }, 3000);
+            }
         }
     }
 
