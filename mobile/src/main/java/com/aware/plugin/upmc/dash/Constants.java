@@ -7,9 +7,7 @@ package com.aware.plugin.upmc.dash;
 public final class Constants {
 
 
-    //Action buttons
 
-    public static final String SNOOZE_ACTION = "SNOOZE_ACTION";
 
 
 
@@ -87,11 +85,20 @@ public final class Constants {
 
 
 
+    // Snooze Action
+
+    public static final String SNOOZE_ACTION = "SNOOZE_ACTION";
     public static final String ALARM_COMM = "AlarmComm";
-    public static final String ALARM_SNOOZE = "Alarm Snooze";
     public static final String SNOOZE_ALARM_INTENT_FILTER = "snooze alarm intent filter";
     public static final String SNOOZE_ALARM_EXTRA_KEY = "snooze alarm extra key";
     public static final String SNOOZE_ALARM_EXTRA = "snooze alarm extra";
+
+
+    // Ok Action
+    public static final String OK_ACTION = "OK_ACTION";
+
+    //No Action
+    public static final String NO_ACTION = "NO_ACTION";
 
 
 }

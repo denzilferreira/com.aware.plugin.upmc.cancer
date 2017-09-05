@@ -15,9 +15,10 @@ import java.util.Locale;
 public class NotifReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(Constants.TAG, "NotifRecevier: Received: " + intent.getAction());
-        if(intent.getAction().equals(Constants.SNOOZE_ACTION)) {
+        if(intent.getAction()!=null) {
+            Log.d(Constants.TAG, "NotifRecevier: Received: " + intent.getAction());
             LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.NOTIF_COMM).putExtra(Constants.NOTIF_KEY, intent.getAction()));
         }
+
     }
 }

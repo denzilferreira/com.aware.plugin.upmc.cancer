@@ -151,10 +151,20 @@ public class MessageService extends WearableListenerService implements
         public void onReceive(Context context, Intent intent) {
             if(intent.hasExtra(Constants.NOTIF_KEY)) {
                 Log.d(Constants.TAG, "MessageService: NotifLocalReceiver:Received :  " + intent.getStringExtra(Constants.NOTIF_KEY));
-                snoozeInactivityNotif();
+                if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.SNOOZE_ACTION)) {
+                    snoozeInactivityNotif();
+                }
+                else if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.OK_ACTION)) {
+                    dismissInactivtyNotifi();
+                }
             }
         }
     };
+
+    public void dismissInactivtyNotifi() {
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(66);
+    }
 
     public void snoozeInactivityNotif() {
         Intent snoozeInt = new Intent(this, AlarmReceiver.class);
@@ -285,6 +295,15 @@ public class MessageService extends WearableListenerService implements
         Intent snoozeIntent = new Intent();
         snoozeIntent.setAction(Constants.SNOOZE_ACTION);
         PendingIntent pendingIntentSnooze = PendingIntent.getBroadcast(this, 555, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent okIntent = new Intent();
+        okIntent.setAction(Constants.OK_ACTION);
+        PendingIntent pendingIntentOk = PendingIntent.getBroadcast(this, 555, okIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent noIntent = new Intent();
+        noIntent.setAction(Constants.NO_ACTION);
+        PendingIntent pendingIntentNo = PendingIntent.getBroadcast(this, 555, noIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         watchClientNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
@@ -294,7 +313,9 @@ public class MessageService extends WearableListenerService implements
                 .setPriority(Notification.PRIORITY_MAX)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .addAction(R.drawable.ic_action_timer, "Snooze", pendingIntentSnooze);
+                .addAction(R.drawable.ic_done_black_18dp, "OK!", pendingIntentOk)
+                .addAction(R.drawable.ic_snooze_black_18dp, "Snooze", pendingIntentSnooze)
+                .addAction(R.drawable.ic_not_interested_black_18dp, "No", pendingIntentNo);
         mNotificationManager.notify(66, watchClientNotifBuilder.build());
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(3000);
