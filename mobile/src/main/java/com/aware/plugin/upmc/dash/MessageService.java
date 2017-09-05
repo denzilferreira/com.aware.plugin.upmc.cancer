@@ -2,12 +2,15 @@ package com.aware.plugin.upmc.dash;
 
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -23,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.aware.Aware;
@@ -155,13 +159,25 @@ public class MessageService extends WearableListenerService implements
                     snoozeInactivityNotif();
                 }
                 else if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.OK_ACTION)) {
-                    dismissInactivtyNotifi();
+                    dismissInactivtyNotif();
+                }
+                else if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.NO_ACTION)) {
+                    dismissInactivtyNotif();
+                    showResponseForm();
                 }
             }
         }
     };
 
-    public void dismissInactivtyNotifi() {
+    public void showResponseForm() {
+        Intent respIntent = new Intent(this, InabilityResponseForm.class);
+        respIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(respIntent);
+    }
+
+
+
+    public void dismissInactivtyNotif() {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(66);
     }
@@ -292,17 +308,19 @@ public class MessageService extends WearableListenerService implements
 
 
     public void notifyUserWithInactivity() {
-        Intent snoozeIntent = new Intent();
-        snoozeIntent.setAction(Constants.SNOOZE_ACTION);
-        PendingIntent pendingIntentSnooze = PendingIntent.getBroadcast(this, 555, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         Intent okIntent = new Intent();
         okIntent.setAction(Constants.OK_ACTION);
-        PendingIntent pendingIntentOk = PendingIntent.getBroadcast(this, 555, okIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntentOk = PendingIntent.getBroadcast(this, 555, okIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        Intent snoozeIntent = new Intent();
+        snoozeIntent.setAction(Constants.SNOOZE_ACTION);
+        PendingIntent pendingIntentSnooze = PendingIntent.getBroadcast(this, 555, snoozeIntent, PendingIntent.FLAG_ONE_SHOT);
 
         Intent noIntent = new Intent();
         noIntent.setAction(Constants.NO_ACTION);
-        PendingIntent pendingIntentNo = PendingIntent.getBroadcast(this, 555, noIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntentNo = PendingIntent.getBroadcast(this, 555, noIntent, PendingIntent.FLAG_ONE_SHOT);
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         watchClientNotifBuilder = new NotificationCompat.Builder(getApplicationContext())

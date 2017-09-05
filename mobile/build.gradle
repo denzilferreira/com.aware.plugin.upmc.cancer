@@ -59,6 +59,7 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+
 dependencies {
     //noinspection GradleCompatible
     implementation "com.android.support:gridlayout-v7:$support_libs"
@@ -67,6 +68,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support_libs"
     implementation "com.github.denzilferreira:aware-client:$aware_libs"
     implementation "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
+    implementation 'com.android.support:design:26.0.2'
     wearApp project(':wear')
     //compile 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
     //compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'

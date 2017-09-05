@@ -3,9 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.aware.plugin.upmc.dash">
 
+    <uses-feature
+        android:name="android.hardware.sensor.stepcounter"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.sensor.stepdetector"
+        android:required="false" />
 
-    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false"/>
-    <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="false"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -28,33 +32,34 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name="com.aware.plugin.upmc.dash.UPMC"
+            android:name=".UPMC"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
-             <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
-             </intent-filter>
+            </intent-filter>
         </activity>
         <activity
-            android:name="com.aware.plugin.upmc.dash.Settings"
+            android:name=".Settings"
             android:exported="true"
             android:label="UPMC Settings" />
         <activity
-            android:name="com.aware.plugin.upmc.dash.UPMC_Motivation"
+            android:name=".UPMC_Motivation"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <service
-            android:name="com.aware.plugin.upmc.dash.Plugin"
+            android:name=".Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Cancer" />
         <service
-            android:name="com.aware.plugin.upmc.dash.Survey"
+            android:name=".Survey"
             android:exported="true"
             android:label="UPMC Survey" />
         <service
@@ -73,66 +78,64 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/aware_accessibility_config" />
         </service>
-
-
         <service
-            android:name="com.aware.plugin.upmc.dash.MessageService"  android:exported="false" >
-            <!--<intent-filter>-->
-                <!--<action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />-->
-                <!--<data android:scheme="wear" android:host="*"/>-->
-            <!--</intent-filter>-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />-->
-                <!--<data android:scheme="wear" android:host="*" android:pathPrefix="/upmc-dash"/>-->
-            <!--</intent-filter>-->
+            android:name=".MessageService"
+            android:exported="false">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" /> -->
+            <!-- <data android:scheme="wear" android:host="*"/> -->
+            <!-- </intent-filter> -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" /> -->
+            <!-- <data android:scheme="wear" android:host="*" android:pathPrefix="/upmc-dash"/> -->
+            <!-- </intent-filter> -->
         </service>
 
-
-
-
         <receiver
-            android:name="com.aware.plugin.upmc.dash.BluetoothReceiver"
+            android:name=".BluetoothReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
             </intent-filter>
         </receiver>
-
-
         <receiver
-            android:name="com.aware.plugin.upmc.dash.BootReceiver"
+            android:name=".BootReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-
         <receiver
-            android:name="com.aware.plugin.upmc.dash.NotifReceiver"
+            android:name=".NotifReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="SNOOZE_ACTION"/>
+                <action android:name="OK_ACTION"/>
+                <action android:name="NO_ACTION"/>
             </intent-filter>
         </receiver>
 
         <provider
-            android:name="com.aware.plugin.upmc.dash.Provider"
+            android:name=".Provider"
             android:authorities="${applicationId}.provider.survey"
             android:exported="true"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name="com.aware.plugin.upmc.dash.Plugin$SurveyListener">
+        <receiver android:name=".Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".AlarmReceiver" />
 
-        <receiver android:name="com.aware.plugin.upmc.dash.AlarmReceiver"/>
-
-
+        <activity
+            android:name=".InabilityResponseForm"
+            android:label="@string/title_activity_inability_response_form"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
