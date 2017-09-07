@@ -7,26 +7,36 @@
     android:layout_height="fill_parent">
 
     <CheckBox
+        android:id="@+id/busy_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClocked"
         android:text="Busy"/>
     <CheckBox
+        android:id="@+id/pain_heckbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClocked"
         android:text="Pain"/>
     <CheckBox
+        android:id="@+id/nausea_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClocked"
         android:text="Nausea"/>
     <CheckBox
+        android:id="@+id/other_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClocked"
         android:text="Other"/>
 
-    <TextView
+    <EditText
+        android:id="@+id/reason_field"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello, text!" />
+        android:hint="Please enter reason here"
+        />
 
 
 </LinearLayout>
