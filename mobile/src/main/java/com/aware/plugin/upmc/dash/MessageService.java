@@ -89,10 +89,31 @@ public class MessageService extends WearableListenerService implements
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.hasExtra(Constants.SETTINGS_COMM)) {
-                if (intent.getStringExtra(Constants.SETTINGS_COMM).equals(Constants.SETTINGS_CHANGED)) {
+            if (intent.hasExtra(Constants.SETTINGS_EXTRA_KEY)) {
+                if (intent.getStringExtra(Constants.SETTINGS_EXTRA_KEY).equals(Constants.SETTINGS_CHANGED)) {
                     Log.d(Constants.TAG, "MessageService: mSettingsLocalReceiver");
                     timeResetWear();
+                }
+                else if(intent.getStringExtra(Constants.SETTINGS_EXTRA_KEY).equals(Constants.VICINITY_CHECK)) {
+                    Log.d(Constants.TAG, "MessageService: vicinity check");
+                    isWearServiceRunning(getNODE_ID());
+                    Handler handler = new Handler();
+                    final Context mContext = context;
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(isWearConnected()) {
+                                LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_IN_RANGE));
+                                Log.d(Constants.TAG, "MessageService: vicinity check pass");
+
+                            }
+                            else {
+                                LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
+                                Log.d(Constants.TAG, "MessageService: vicinity check fail");
+                            }
+                        }
+                    }, 5000);
+
 
                 }
             }
@@ -138,8 +159,9 @@ public class MessageService extends WearableListenerService implements
         @Override
         public void onReceive(Context context, Intent intent) {
             if(isSympInitialized()) {
-                if(intent.getIntExtra(Constants.SYMPTOMS_KEY,-1) != readSymptomsPref()) {
+                if(intent.getIntExtra(Constants.SYMPTOMS_KEY,-1)!=-1) {
                     sympResetWear(intent.getIntExtra(Constants.SYMPTOMS_KEY,-1));
+                    writeSymptomPref(intent.getIntExtra(Constants.SYMPTOMS_KEY, -1));
                 }
             }
             else if(!isSympInitialized()){
@@ -201,8 +223,19 @@ public class MessageService extends WearableListenerService implements
     }
 
     private void timeResetWear() {
-        sendMessageToWear(Constants.MORNING_TIME_RESET + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)
-                + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        StringBuilder initBuilder = new StringBuilder();
+        initBuilder.append(Constants.TIME_RESET);
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(readSymptomsPref());
+        sendMessageToWear(initBuilder.toString());
     }
 
     private void sympResetWear(int type) {
@@ -293,6 +326,7 @@ public class MessageService extends WearableListenerService implements
                     notifyUser(Constants.NOTIFTEXT_IN_PROGRESS);
                 } else if (message.equals(Constants.STATUS_INIT)) {
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:TimeInit");
+                    notifyUser(Constants.NOTIFTEXT_IN_PROGRESS);
                     if(isSympInitialized()){
                         initializeWear();
                     }

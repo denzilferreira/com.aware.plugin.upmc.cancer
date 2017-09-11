@@ -24,7 +24,7 @@ public final class Constants {
     public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
     public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
     public static final String INIT_TS = "morningtimestamp&symptoms"; // Morning timestamp plus
-    public static final String MORNING_TIME_RESET = "resetmorningtimestamp"; // Morning timestamp plus
+    public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
 
 
@@ -86,7 +86,13 @@ public final class Constants {
     public static final String SYMPTOMS_INTENT_FILTER = "symptoms filter";
     public static final String SYMPTOMS_KEY = "symptoms keys";
     public static final String SYMPTOMS_PREFS = "symptoms prefs";
-    public static final String SYMP_RESET = "symptoms changed";
+    public static final String SYMP_RESET = "symptomschanged";
+
+
+    // symptoms/time reset broadcast
+    public static final String RESET_BROADCAST_INTENT_FILTER = "broadcast reset";
+    public static final String TIME_RESET_KEY = "time reset key";
+    public static final String SYMP_RESET_KEY = "symp reset key";
 
 
 

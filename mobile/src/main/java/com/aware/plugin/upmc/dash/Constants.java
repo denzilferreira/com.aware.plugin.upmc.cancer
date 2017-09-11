@@ -26,9 +26,9 @@ public final class Constants {
     public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
     public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
     public static final String INIT_TS = "morningtimestamp&symptoms"; // Morning timestamp plus
-    public static final String MORNING_TIME_RESET = "resetmorningtimestamp"; // Morning timestamp plus
+    public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
-    public static final String SYMP_RESET = "symptoms changed";
+    public static final String SYMP_RESET = "symptomschanged";
 
     //replies from wear
 
@@ -60,8 +60,9 @@ public final class Constants {
 
 
     //Broadcasts from UPMC Settings Panel
-    public static final String SETTINGS_COMM = "settings comm";
+    public static final String SETTINGS_EXTRA_KEY = "settings comm";
     public static final String SETTING_INTENT_FILTER = "settings intent filter";
+    public static final String VICINITY_CHECK = "vcheck";
     public static final String SETTINGS_CHANGED = "settings panel changed";
 
 
@@ -99,6 +100,16 @@ public final class Constants {
 
     //No Action
     public static final String NO_ACTION = "NO_ACTION";
+
+
+    //vicinity check
+    public static final String VICINITY_CHECK_INTENT_FILTER = "vcheckfilter";
+    public static final String VICINITY_INTENT_FILTER = "vicinity intent filter";
+    public static final String VICINITY_RESULT_KEY = "vicinity result key";
+    public static final int WEAR_IN_RANGE = 1;
+    public static final int WEAR_NOT_IN_RANGE = 0;
+    public static final int WEAR_VICINITY_CHECK_FAILED = -1;
+
 
 
 }

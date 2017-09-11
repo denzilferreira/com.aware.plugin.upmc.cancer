@@ -32,10 +32,7 @@ public class InabilityResponseForm extends AppCompatActivity {
         final CharSequence[] items = {"Busy", "Pain", "Nausea", "Other"};
         LayoutInflater factory = LayoutInflater.from(this);
         View inabilityForm = factory.inflate(R.layout.content_inability_response_form,null);
-
-
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
         dialogBuilder.setTitle("Why are you unable to walk?")
                 .setCancelable(false)
                 .setView(inabilityForm)

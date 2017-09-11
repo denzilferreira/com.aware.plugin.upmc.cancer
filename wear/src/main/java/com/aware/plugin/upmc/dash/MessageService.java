@@ -355,18 +355,22 @@ public class MessageService extends WearableListenerService implements
                         startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()));
                     }
                     sendStateToPhone();
-                } else if(message.contains(Constants.MORNING_TIME_RESET)) {
-//                    String[] arr = message.split("\\s+");
-//                    int hour = Integer.parseInt(arr[1]);
-//                    int minute = Integer.parseInt(arr[2]);
-//                    writeTimePref(hour, minute);
-//                    Log.d(Constants.TAG, "onMessageReceived:MORNING RESET " + hour + " " + minute);
+                } else if(message.contains(Constants.TIME_RESET)) {
+                    String[] arr = message.split("\\s+");
+                    int morn_hour = Integer.parseInt(arr[1]);
+                    int morn_minute = Integer.parseInt(arr[2]);
+                    int night_hour = Integer.parseInt(arr[3]);
+                    int night_minute = Integer.parseInt(arr[4]);
+                    writeTimePref(morn_hour, morn_minute, night_hour, night_minute);
+                    Log.d(Constants.TAG, "onMessageReceived:MORNING RESET " + morn_hour + " " + morn_minute + " " + night_hour + " " + night_minute);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.RESET_BROADCAST_INTENT_FILTER).putExtra(Constants.TIME_RESET_KEY, buildInitMessage()));
                 }
                 else if(message.contains(Constants.SYMP_RESET)) {
                     String[] arr = message.split("\\s+");
                     int type = Integer.parseInt(arr[1]);
                     writeSymptomPref(type);
                     Log.d(Constants.TAG, "onMessageReceived:SYMP RESET " + type);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.RESET_BROADCAST_INTENT_FILTER).putExtra(Constants.SYMP_RESET_KEY, readSymptomsPref()));
                 }
                 else if(message.contains(Constants.IS_WEAR_RUNNING)) {
                     if(!isSyncedWithPhone()) {

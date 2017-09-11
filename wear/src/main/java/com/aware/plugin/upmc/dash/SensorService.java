@@ -14,6 +14,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.RingtoneManager;
+import android.opengl.Visibility;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -33,6 +34,7 @@ import java.util.Date;
 
 public class SensorService extends Service implements SensorEventListener {
     boolean FIRST_TIME = true;
+    private int alarmType;
     private SensorManager sensorManager;
     private Sensor stepSensor;
     int[] config;
@@ -59,11 +61,42 @@ public class SensorService extends Service implements SensorEventListener {
             }
         }
     };
-    private NotificationCompat.Builder sensorServiceNotifBuilder;
 
-    public boolean isALARM_1HR_FLAG() {
-        return ALARM_1HR_FLAG;
+    public BroadcastReceiver resetLocalBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.hasExtra(Constants.TIME_RESET_KEY)) {
+                Log.d(Constants.TAG, "SensorService:: resetLocalBroadcastReceiver: time reset " + intent.getStringExtra(Constants.TIME_RESET_KEY));
+            }
+            else if(intent.hasExtra(Constants.SYMP_RESET_KEY)) {
+                Log.d(Constants.TAG, "SensorService:: resetLocalBroadcastReceiver: symp reset " + intent.getIntExtra(Constants.SYMP_RESET_KEY, -1));
+                if(getCurrentAlarmType() != intent.getIntExtra(Constants.SYMP_RESET_KEY, -1)) {
+                    if(intent.getIntExtra(Constants.SYMP_RESET_KEY, -1)==Constants.SYMPTOMS_0) {
+                        cancelAlarmOfType(Constants.SYMPTOMS_1);
+                        startAlarmOfType(Constants.SYMPTOMS_0);
+                        Log.d(Constants.TAG, "SensorService: Changing to 0");
+                    }
+                    else if(intent.getIntExtra(Constants.SYMP_RESET_KEY, -1)==Constants.SYMPTOMS_1) {
+                        cancelAlarmOfType(Constants.SYMPTOMS_0);
+                        startAlarmOfType(Constants.SYMPTOMS_1);
+                        Log.d(Constants.TAG, "SensorService: Changing to 1");
+                    }
+                }
+            }
+
+        }
+    };
+    private Notification.Builder sensorServiceNotifBuilder;
+
+    public int getCurrentAlarmType() {
+        return alarmType;
     }
+
+    public void setCurrentAlarmType(int alarmType) {
+        this.alarmType = alarmType;
+    }
+
+
 
     public void setALARM_1HR_FLAG(boolean ALARM_1HR_FLAG) {
         this.ALARM_1HR_FLAG = ALARM_1HR_FLAG;
@@ -97,9 +130,6 @@ public class SensorService extends Service implements SensorEventListener {
             stepCountHasChanged = true;
     }
 
-    public boolean isALARM_2HR_FLAG() {
-        return ALARM_2HR_FLAG;
-    }
 
     public void setALARM_2HR_FLAG(boolean ALARM_2HR_FLAG) {
         this.ALARM_2HR_FLAG = ALARM_2HR_FLAG;
@@ -118,17 +148,21 @@ public class SensorService extends Service implements SensorEventListener {
             unregisterSensorListener();
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(alarmLocalBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(resetLocalBroadcastReceiver);
         Log.d(Constants.TAG, "SensorService : onDestroy");
         stopForeground(true);
-        Intent alarmIntent_1hr = new Intent(this, AlarmReceiver.class);
-        alarmIntent_1hr.putExtra(Constants.ALARM_COMM, 0);
-        myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
-        myAlarmManager.cancel(alarmPendingIntent_1hr);
-        setALARM_1HR_FLAG(false);
-        setALARM_2HR_FLAG(false);
+        cancelAlarmOfType(getCurrentAlarmType());
+//        Intent alarmIntent_1hr = new Intent(this, AlarmReceiver.class);
+//        alarmIntent_1hr.putExtra(Constants.ALARM_COMM, 0);
+//        myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//        alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
+//        myAlarmManager.cancel(alarmPendingIntent_1hr);
+//        setALARM_1HR_FLAG(false);
+//        setALARM_2HR_FLAG(false);
         stopSelf();
     }
+
+
 
     public int[] parseConfig(Intent intent) {
         if(intent.hasExtra(Constants.SENSOR_START_INTENT_KEY)) {
@@ -171,6 +205,7 @@ public class SensorService extends Service implements SensorEventListener {
         storeConfig(config);
         int type = config[4];
         LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
+        LocalBroadcastManager.getInstance(this).registerReceiver(resetLocalBroadcastReceiver, new IntentFilter(Constants.RESET_BROADCAST_INTENT_FILTER));
         Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + type);
         startAlarmOfType(type);
         return super.onStartCommand(intent, flags, startId);
@@ -184,16 +219,39 @@ public class SensorService extends Service implements SensorEventListener {
         alarmIntent_2hr.putExtra(Constants.ALARM_COMM, 1);
         if(type==Constants.SYMPTOMS_0) {
             alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
-            //int interval = 60 * 1000 * 60;
-            int interval = 60 * 1000;
-            myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, alarmPendingIntent_1hr);
+            int interval = 60 * 1000 * 60;
+            //int interval = 60 * 1000;
+            myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPendingIntent_1hr);
+            //myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, alarmPendingIntent_1hr);
+            setCurrentAlarmType(Constants.SYMPTOMS_0);
         }
         else if(type==Constants.SYMPTOMS_1) {
             alarmPendingIntent_2hr = PendingIntent.getBroadcast(this,667,alarmIntent_2hr,0);
-            //int interval = 60 * 1000 * 60 * 2;
-            int interval = 120 * 1000;
-            myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,  interval, alarmPendingIntent_2hr);
+            int interval = 60 * 1000 * 60 * 2;
+            //int interval = 120 * 1000;
+            myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPendingIntent_2hr);
 
+            //myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,  interval, alarmPendingIntent_2hr);
+            setCurrentAlarmType(Constants.SYMPTOMS_1);
+
+        }
+    }
+
+    public void cancelAlarmOfType(int type) {
+        myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent alarmIntent_1hr = new Intent(this, AlarmReceiver.class);
+        Intent alarmIntent_2hr = new Intent(this, AlarmReceiver.class);
+        alarmIntent_1hr.putExtra(Constants.ALARM_COMM, 0);
+        alarmIntent_2hr.putExtra(Constants.ALARM_COMM, 1);
+        if(type==Constants.SYMPTOMS_0) {
+            alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
+            myAlarmManager.cancel(alarmPendingIntent_1hr);
+            setALARM_1HR_FLAG(false);
+        }
+        else if(type==Constants.SYMPTOMS_1) {
+            alarmPendingIntent_2hr = PendingIntent.getBroadcast(this,667,alarmIntent_2hr,0);
+            myAlarmManager.cancel(alarmPendingIntent_2hr);
+            setALARM_1HR_FLAG(false);
         }
     }
 
@@ -272,37 +330,58 @@ public class SensorService extends Service implements SensorEventListener {
         Log.d(Constants.TAG, "SensorService : onCreate");
         sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        sensorServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+        sensorServiceNotifBuilder = new Notification.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                 .setContentTitle("UPMC Dash Wear Monitor")
                 .setContentText("Monitoring")
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setPriority(Notification.PRIORITY_HIGH);
         startForeground(3, sensorServiceNotifBuilder.build());
     }
 
     public void notifyUser(int sc_count) {
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(isTimeToNotify()) {
             if (sc_count < 100) {
-                sensorServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                sensorServiceNotifBuilder = new Notification.Builder(getApplicationContext())
                         .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                         .setContentTitle("UPMC Dash Activity Monitor")
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setContentText("Ready for a quick walk ? #" + sc_count)
-                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setPriority(Notification.PRIORITY_MAX)
                         .setDefaults(Notification.DEFAULT_ALL);
+
+
                 mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
+
                 final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
                 long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
                 vibrator.vibrate(pattern, 0);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                Handler handler2 = new Handler();
+                handler2.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         vibrator.cancel();
                     }
                 }, 3000);
+
+                Handler handler3 = new Handler();
+                handler3.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sensorServiceNotifBuilder = new Notification.Builder(getApplicationContext())
+                                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                                .setContentTitle("UPMC Dash Activity Monitor")
+                                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                                .setContentText("Monitoring")
+                                .setPriority(Notification.PRIORITY_MAX)
+                                .setDefaults(Notification.DEFAULT_ALL);
+
+                        mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
+                    }
+                }, 15000);
             }
         }
     }
@@ -326,6 +405,8 @@ public class SensorService extends Service implements SensorEventListener {
                     Log.d(Constants.TAG, "Steps(taken): " + getStepCount());
                     LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.SENSOR_ALARM));
                     notifyUser(getStepCount());
+                    cancelAlarmOfType(getCurrentAlarmType());
+                    startAlarmOfType(getCurrentAlarmType());
                 }
                 else if(ALARM_2HR_FLAG) {
                     Log.d(Constants.TAG, "Step(2hr):  " + count);
@@ -336,6 +417,8 @@ public class SensorService extends Service implements SensorEventListener {
                     Log.d(Constants.TAG, "Steps(taken): " + getStepCount());
                     LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.SENSOR_ALARM));
                     notifyUser(getStepCount());
+                    cancelAlarmOfType(getCurrentAlarmType());
+                    startAlarmOfType(getCurrentAlarmType());
                 }
             }
         }
