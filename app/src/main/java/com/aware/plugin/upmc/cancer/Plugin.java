@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 
 import com.aware.Aware;
@@ -29,9 +28,6 @@ public class Plugin extends Aware_Plugin {
 
         TAG = "UPMC Cancer";
 
-        DATABASE_TABLES = Provider.DATABASE_TABLES;
-        TABLES_FIELDS = Provider.TABLES_FIELDS;
-        CONTEXT_URIS = new Uri[]{Provider.Symptom_Data.CONTENT_URI, Provider.Motivational_Data.CONTENT_URI};
     }
 
     public static class SurveyListener extends BroadcastReceiver {

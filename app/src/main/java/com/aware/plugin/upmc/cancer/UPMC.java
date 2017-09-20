@@ -3,14 +3,14 @@ package com.aware.plugin.upmc.cancer;
 import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +34,6 @@ import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.ui.PermissionsHandler;
-import com.aware.utils.PluginsManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,6 +42,17 @@ public class UPMC extends AppCompatActivity {
 
     private boolean debug = true;
     private static ProgressDialog dialog;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+
+        //initialise framework + assign UUID
+        if (!Aware.IS_CORE_RUNNING) {
+            Intent aware = new Intent(this, Aware.class);
+            startService(aware);
+        }
+    }
 
     private void loadSchedule() {
 
@@ -203,12 +213,6 @@ public class UPMC extends AppCompatActivity {
         }
 
         if (permissions_ok) {
-
-            //initialise framework + assign UUID
-            if (!Aware.isServiceRunning(this, Aware.class)) {
-                Intent aware = new Intent(this, Aware.class);
-                startService(aware);
-            }
 
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 

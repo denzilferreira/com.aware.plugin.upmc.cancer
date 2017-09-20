@@ -35,7 +35,7 @@ public class Provider extends ContentProvider {
         private Symptom_Data() {
         }
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.cancer";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.cancer";
 
@@ -69,7 +69,7 @@ public class Provider extends ContentProvider {
     public static final class Motivational_Data implements BaseColumns {
         private Motivational_Data(){}
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer_motivation");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_cancer_motivation");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.cancer.motivation";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.cancer.motivation";
 
@@ -119,9 +119,9 @@ public class Provider extends ContentProvider {
             Motivational_Data.RATIONALE + " text default ''"
     };
 
-    private static UriMatcher sUriMatcher = null;
-    private static HashMap<String, String> surveyMap = null;
-    private static HashMap<String, String> motivationMap = null;
+    private UriMatcher sUriMatcher = null;
+    private HashMap<String, String> surveyMap = null;
+    private HashMap<String, String> motivationMap = null;
     private DatabaseHelper dbHelper = null;
     private static SQLiteDatabase database = null;
 
