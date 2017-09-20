@@ -3,6 +3,7 @@ package com.aware.plugin.upmc.cancer;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -34,7 +35,7 @@ public class Provider extends ContentProvider {
         private Symptom_Data() {
         }
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_rhythms");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_rhythms");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.rhythms";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.rhythms";
 
@@ -67,7 +68,7 @@ public class Provider extends ContentProvider {
         private Motivational_Data() {
         }
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_rhythms_motivation");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_rhythms_motivation");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.rhythms.motivation";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.rhythms.motivation";
 
@@ -115,11 +116,20 @@ public class Provider extends ContentProvider {
                     Motivational_Data.RATIONALE + " text default ''"
     };
 
-    private static UriMatcher sUriMatcher = null;
-    private static HashMap<String, String> surveyMap = null;
-    private static HashMap<String, String> motivationMap = null;
+    private UriMatcher sUriMatcher = null;
+    private HashMap<String, String> surveyMap = null;
+    private HashMap<String, String> motivationMap = null;
     private DatabaseHelper dbHelper = null;
     private static SQLiteDatabase database = null;
+
+    /**
+     * Returns the provider authority that is dynamic
+     * @return
+     */
+    public static String getAuthority(Context context) {
+        AUTHORITY = context.getPackageName() + ".provider.survey";
+        return AUTHORITY;
+    }
 
     private void initialiseDatabase() {
         if (dbHelper == null)
@@ -130,7 +140,7 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        AUTHORITY = getContext().getPackageName() + ".provider.survey";
+        AUTHORITY = getAuthority(getContext());
 
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0], ANSWERS);

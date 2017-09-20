@@ -6,10 +6,10 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +41,16 @@ public class UPMC extends AppCompatActivity {
 
     private boolean debug = true;
     private static ProgressDialog dialog;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+
+        if (!Aware.IS_CORE_RUNNING) {
+            Intent aware = new Intent(this, Aware.class);
+            startService(aware);
+        }
+    }
 
     private void loadSchedule() {
 
@@ -186,11 +196,6 @@ public class UPMC extends AppCompatActivity {
         }
 
         if (permissions_ok) {
-
-            if (!Aware.isServiceRunning(this, Aware.class)) {
-                Intent aware = new Intent(this, Aware.class);
-                startService(aware);
-            }
 
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 

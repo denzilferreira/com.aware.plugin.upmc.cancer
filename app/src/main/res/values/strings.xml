@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">UPMC Rhythms</string>
+    <string name="plugin_upmc">Plugin: UPMC Rhythms</string>
     <string name="cancer_intro">Please rate how severe the following symptoms are <b><u>right now</u></b> from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be).</string>
     <string name="dash_intro">Please rate how severe the following symptoms have been <b><u>in the last 24 hours</u></b> from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be).</string>
     <string name="evening_intro">What was the most stressful or negative event you experienced today?</string>

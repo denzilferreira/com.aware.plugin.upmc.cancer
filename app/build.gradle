@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion compile_sdk
+    buildToolsVersion build_tools
 
     defaultConfig {
         applicationId "com.aware.plugin.upmc.cancer"
-        minSdkVersion 14
-        targetSdkVersion 25
-        versionCode 40
-        versionName "4.9"
+        minSdkVersion minimum_sdk
+        targetSdkVersion target_sdk
+        versionCode 41
+        versionName "5.0"
     }
 
     splits {
@@ -56,18 +56,20 @@ configurations.all {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile "com.google.android.gms:play-services-location:$google_libs"
-    compile "com.android.support:appcompat-v7:$support_libs"
-    compile "com.android.support:gridlayout-v7:$support_libs"
-    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_libs"
-    compile "com.koushikdutta.ion:ion:$ion_libs"
+    implementation "com.google.android.gms:play-services-location:$google_libs"
+    implementation "com.android.support:appcompat-v7:$support_libs"
+    implementation "com.android.support:gridlayout-v7:$support_libs"
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_libs"
+    implementation "com.koushikdutta.ion:ion:$ion_libs"
+    implementation 'com.github.scribejava:scribejava-apis:4.2.0'
+    implementation 'net.danlew:android.joda:2.9.5.1'
 
-    compile 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
-    compile 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
+    implementation 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
+    implementation 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
+    implementation 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
+    implementation 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
+    implementation 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
+    implementation 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
 }
