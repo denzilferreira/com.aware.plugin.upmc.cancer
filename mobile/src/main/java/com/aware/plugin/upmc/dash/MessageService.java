@@ -19,6 +19,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -356,13 +357,18 @@ public class MessageService extends WearableListenerService implements
         noIntent.setAction(Constants.NO_ACTION);
         PendingIntent pendingIntentNo = PendingIntent.getBroadcast(this, 555, noIntent, PendingIntent.FLAG_ONE_SHOT);
 
+        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+
+        wl.acquire(6000);
+
+
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         watchClientNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                 .setContentTitle("UPMC Dash Monitor")
                 .setContentText("Ready for a quick walk?")
                 .setOngoing(true)
-                .setPriority(Notification.PRIORITY_MAX)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .addAction(R.drawable.ic_done_black_18dp, "OK!", pendingIntentOk)
@@ -371,6 +377,9 @@ public class MessageService extends WearableListenerService implements
         mNotificationManager.notify(66, watchClientNotifBuilder.build());
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(3000);
+
+
+
     }
 
     public void initializeWear() {
