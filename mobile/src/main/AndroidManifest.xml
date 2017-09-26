@@ -114,6 +114,7 @@
                 <action android:name="SNOOZE_ACTION"/>
                 <action android:name="OK_ACTION"/>
                 <action android:name="NO_ACTION"/>
+                <action android:name="RETRY_ACTION"/>
             </intent-filter>
         </receiver>
 

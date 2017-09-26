@@ -54,9 +54,8 @@ public final class Constants {
     public static final String NOTIFTEXT_SYNC_FAILED = "Sync Failed: Cannot display alerts from watch";
     public static final String NOTIFTEXT_SYNC_SUCCESS = "Synced with watch";
     public static final String NOTIFTEXT_SYNC_FAILED_BLUETOOTH = "Sync Failed : Switch on Bluetooth";
-    public static final String NOTIFTEXT_SENDING_MESSAGE = "Sending message...";
     public static final String NOTIFTEXT_IN_PROGRESS = "Watch is logging your activity..";
-    public static final String NOTIFTEXT_TRY_CONNECT = "Syncing with watch...";
+    public static final String NOTIFTEXT_TRY_CONNECT = "Scanning for watch...";
 
 
     //Broadcasts from UPMC Settings Panel
@@ -100,6 +99,10 @@ public final class Constants {
 
     //No Action
     public static final String NO_ACTION = "NO_ACTION";
+
+    //Retry Action
+    public static final String RETRY_ACTION = "RETRY_ACTION";
+
 
 
     //vicinity check

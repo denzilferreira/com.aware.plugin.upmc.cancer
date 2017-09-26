@@ -95,6 +95,12 @@ public final class Constants {
     public static final String SYMP_RESET_KEY = "symp reset key";
 
 
+    //ConnectivityChecker
+    public static final String CHECK_CONNECTIVITY_EXTRA_KEY = "ccik";
+    public static final String ALARM_CHECK_CONN = "acc";
+
+
+
 
 
 }

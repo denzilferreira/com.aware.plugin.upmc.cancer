@@ -1,20 +1,14 @@
 package com.aware.plugin.upmc.dash;
 
-
 import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,9 +21,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.WindowManager;
 import android.widget.Toast;
-
 import com.aware.Aware;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -41,7 +33,6 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
-
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -69,11 +60,11 @@ public class MessageService extends WearableListenerService implements
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
-                        notifyUser(Constants.NOTIFTEXT_SYNC_FAILED_BLUETOOTH);
+                        notifyUserSyncFailed(Constants.NOTIFTEXT_SYNC_FAILED_BLUETOOTH);
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
-                        notifyUser(Constants.NOTIFTEXT_SYNC_FAILED_BLUETOOTH);
+                        notifyUserSyncFailed(Constants.NOTIFTEXT_SYNC_FAILED_BLUETOOTH);
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
@@ -187,6 +178,10 @@ public class MessageService extends WearableListenerService implements
                 else if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.NO_ACTION)) {
                     dismissInactivtyNotif();
                     showResponseForm();
+                }
+                else if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.RETRY_ACTION)) {
+                    Log.d(Constants.TAG, "Retry action happened");
+                    isWearServiceRunning(getNODE_ID());
                 }
             }
         }
@@ -341,9 +336,7 @@ public class MessageService extends WearableListenerService implements
 
     }
 
-
     public void notifyUserWithInactivity() {
-
 
         Intent okIntent = new Intent();
         okIntent.setAction(Constants.OK_ACTION);
@@ -377,13 +370,9 @@ public class MessageService extends WearableListenerService implements
         mNotificationManager.notify(66, watchClientNotifBuilder.build());
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(3000);
-
-
-
     }
 
     public void initializeWear() {
-
         StringBuilder initBuilder = new StringBuilder();
         initBuilder.append(Constants.INIT_TS);
         initBuilder.append(" ");
@@ -404,6 +393,7 @@ public class MessageService extends WearableListenerService implements
         int i = super.onStartCommand(intent, flags, startId);
         Log.d(Constants.TAG, "MessageService: onStartCommand");
         startClientNotif();
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
         LocalBroadcastManager.getInstance(this).registerReceiver(mSymptomsLocalReceiver, new IntentFilter(Constants.SYMPTOMS_INTENT_FILTER));
@@ -421,7 +411,7 @@ public class MessageService extends WearableListenerService implements
         messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                 .setContentTitle("UPMC Dash")
-                .setContentText(Constants.NOTIFTEXT_SYNC_FAILED)
+                .setContentText(Constants.NOTIFTEXT_TRY_CONNECT)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(dashPendingIntent);
         startForeground(1, messageServiceNotifBuilder.build());
@@ -501,7 +491,7 @@ public class MessageService extends WearableListenerService implements
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if (!sendMessageResult.getStatus().isSuccess()) {
                     Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed" + message);
-                    notifyUser(Constants.NOTIFTEXT_SYNC_FAILED);
+                    notifyUserSyncFailed(Constants.NOTIFTEXT_SYNC_FAILED);
                 } else {
                     Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent" + message);
                 }
@@ -569,11 +559,33 @@ public class MessageService extends WearableListenerService implements
 
                 } else {
                     Log.d(Constants.TAG, "MessageService:: Wear gave no ACK response");
-                    notifyUser(Constants.NOTIFTEXT_SYNC_FAILED);
+                    notifyUserSyncFailed(Constants.NOTIFTEXT_SYNC_FAILED);
                 }
             }
         }, 5000);
     }
+
+    public void notifyUserSyncFailed(String message) {
+        Intent okIntent = new Intent();
+        okIntent.setAction(Constants.RETRY_ACTION);
+        PendingIntent pendingIntentRetry = PendingIntent.getBroadcast(this, 111, okIntent, PendingIntent.FLAG_ONE_SHOT);
+        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+        wl.acquire(6000);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        watchClientNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("UPMC Dash Monitor")
+                .setContentText(message)
+                .setOngoing(true)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .addAction(R.drawable.ic_undo_black_24dp, "RETRY", pendingIntentRetry);
+        mNotificationManager.notify(1, watchClientNotifBuilder.build());
+        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        vibrator.vibrate(3000);
+    }
+
 
     public void notifyUser(String notifContent) {
         messageServiceNotifBuilder.setContentText(notifContent);
@@ -581,5 +593,3 @@ public class MessageService extends WearableListenerService implements
         mNotificationManager.notify(1, messageServiceNotifBuilder.build());
     }
 }
-
-
