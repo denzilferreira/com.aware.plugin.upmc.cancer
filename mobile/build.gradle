@@ -8,8 +8,8 @@ android {
         applicationId "com.aware.plugin.upmc.dash"
         minSdkVersion minimum_sdk
         targetSdkVersion target_sdk
-        versionCode 6
-        versionName "1.5"
+        versionCode 7
+        versionName "1.6"
     }
 
     lintOptions {
@@ -58,6 +58,7 @@ repositories {
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
+
 
 
 dependencies {

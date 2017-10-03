@@ -26,6 +26,8 @@ public final class Constants {
     public static final String INIT_TS = "morningtimestamp&symptoms"; // Morning timestamp plus
     public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
+    public static final String DEMO_NOTIF = "demonotif";
+
 
 
 
@@ -98,6 +100,9 @@ public final class Constants {
     //ConnectivityChecker
     public static final String CHECK_CONNECTIVITY_EXTRA_KEY = "ccik";
     public static final String ALARM_CHECK_CONN = "acc";
+
+
+
 
 
 

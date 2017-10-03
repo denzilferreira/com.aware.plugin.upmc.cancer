@@ -29,6 +29,7 @@ public final class Constants {
     public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
     public static final String SYMP_RESET = "symptomschanged";
+    public static final String DEMO_NOTIF = "demonotif";
 
     //replies from wear
 
@@ -112,6 +113,18 @@ public final class Constants {
     public static final int WEAR_IN_RANGE = 1;
     public static final int WEAR_NOT_IN_RANGE = 0;
     public static final int WEAR_VICINITY_CHECK_FAILED = -1;
+
+    //complete survey
+
+    public static final String COMPLETE_SURVEY = "Tap to begin your survey";
+
+    //msg_comm
+    public static final String DEMO_MODE = "demomodemsgservice";
+
+
+    // Kill demo
+    public static final String KILL_DEMO = "killdemo";
+
 
 
 

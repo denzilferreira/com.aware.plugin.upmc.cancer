@@ -219,16 +219,16 @@ public class SensorService extends Service implements SensorEventListener {
         alarmIntent_2hr.putExtra(Constants.ALARM_COMM, 1);
         if(type==Constants.SYMPTOMS_0) {
             alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
-            //int interval = 60 * 1000 * 60;
-            int interval = 60 * 1000;
+            int interval = 60 * 1000 * 60;
+            //int interval = 60 * 1000;
             myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPendingIntent_1hr);
             //myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, interval, alarmPendingIntent_1hr);
             setCurrentAlarmType(Constants.SYMPTOMS_0);
         }
         else if(type==Constants.SYMPTOMS_1) {
             alarmPendingIntent_2hr = PendingIntent.getBroadcast(this,667,alarmIntent_2hr,0);
-            //int interval = 60 * 1000 * 60 * 2;
-            int interval = 120 * 1000;
+            int interval = 60 * 1000 * 60 * 2;
+            //int interval = 120 * 1000;
             myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPendingIntent_2hr);
 
             //myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,  interval, alarmPendingIntent_2hr);

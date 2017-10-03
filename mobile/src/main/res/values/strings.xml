@@ -9,5 +9,6 @@
     <string name="aware_activate_accessibility">Activate UPMC DASH in the accessibility services.</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_inability_response_form">InabilityResponseForm</string>
+    <string name="title_activity_demo_esm">DemoESM</string>
 
 </resources>

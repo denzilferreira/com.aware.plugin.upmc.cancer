@@ -44,7 +44,7 @@ public class UPMC extends AppCompatActivity {
 
     private void loadSchedule() {
 
-        dialog = new ProgressDialog(UPMC.this);
+        dialog = new ProgressDialog(InabilityResponseForm.this);
 
         setContentView(R.layout.settings_upmc_dash);
 
@@ -408,23 +408,23 @@ public class UPMC extends AppCompatActivity {
             other_label.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Dialog other_labeler = new Dialog(UPMC.this);
+                    final Dialog other_labeler = new Dialog(InabilityResponseForm.this);
                     other_labeler.setTitle("Can you be more specific, please?");
                     other_labeler.getWindow().setGravity(Gravity.TOP);
                     other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
-                    LinearLayout editor = new LinearLayout(UPMC.this);
+                    LinearLayout editor = new LinearLayout(InabilityResponseForm.this);
                     editor.setOrientation(LinearLayout.VERTICAL);
                     other_labeler.setContentView(editor);
                     other_labeler.show();
 
-                    final EditText label = new EditText(UPMC.this);
+                    final EditText label = new EditText(InabilityResponseForm.this);
                     label.setHint("Can you be more specific, please?");
                     editor.addView(label);
                     label.requestFocus();
                     other_labeler.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
-                    Button confirm = new Button(UPMC.this);
+                    Button confirm = new Button(InabilityResponseForm.this);
                     confirm.setText("OK");
                     confirm.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -454,22 +454,22 @@ public class UPMC extends AppCompatActivity {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     if (other_label.getText().equals("Other")) {
-                        final Dialog other_labeler = new Dialog(UPMC.this);
+                        final Dialog other_labeler = new Dialog(InabilityResponseForm.this);
                         other_labeler.getWindow().setGravity(Gravity.TOP);
                         other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
 
-                        LinearLayout editor = new LinearLayout(UPMC.this);
+                        LinearLayout editor = new LinearLayout(InabilityResponseForm.this);
                         editor.setOrientation(LinearLayout.VERTICAL);
                         other_labeler.setContentView(editor);
                         other_labeler.show();
 
-                        final EditText label = new EditText(UPMC.this);
+                        final EditText label = new EditText(InabilityResponseForm.this);
                         label.setHint("Can you be more specific, please?");
                         editor.addView(label);
                         label.requestFocus();
                         other_labeler.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
-                        Button confirm = new Button(UPMC.this);
+                        Button confirm = new Button(InabilityResponseForm.this);
                         confirm.setText("OK");
                         confirm.setOnClickListener(new View.OnClickListener() {
 

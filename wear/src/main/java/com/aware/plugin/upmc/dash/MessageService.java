@@ -1,6 +1,7 @@
 package com.aware.plugin.upmc.dash;
 
 import android.app.ActivityManager;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -9,9 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -45,7 +48,7 @@ public class MessageService extends WearableListenerService implements
     int[] nightTime = {-1, -1};
     boolean isSyncedWithPhone;
     private GoogleApiClient mGoogleApiClient;
-    private NotificationCompat.Builder messageServiceNotifBuilder;
+    private Notification.Builder messageServiceNotifBuilder;
     private String NODE_ID;
     private boolean timeInvalid = false;
     private String STATUS_WEAR;
@@ -230,11 +233,11 @@ public class MessageService extends WearableListenerService implements
 
         Intent dashIntent = new Intent(this, MainActivity.class);
         dashIntent.setAction(new Random().nextInt(50) + "_action");
-        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+        messageServiceNotifBuilder = new Notification.Builder(getApplicationContext())
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                 .setContentTitle("UPMC Dash")
                 .setContentText(Constants.NOTIFTEXT_SYNC_FAILED)
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                .setPriority(Notification.PRIORITY_HIGH);
         startForeground(1, messageServiceNotifBuilder.build());
     }
 
@@ -379,8 +382,37 @@ public class MessageService extends WearableListenerService implements
                     }
                     sendStateToPhone();
                 }
+                else if(message.contains(Constants.DEMO_NOTIF)) {
+                    Log.d(Constants.TAG, "MessageService: Demo mode starting on watch");
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
+                    startDemoNotif();
+                }
             }
         }
+    }
+
+
+    public void startDemoNotif() {
+        final NotificationManager notifMnager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        messageServiceNotifBuilder = new Notification.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("UPMC Dash Activity Monitor (DEMO)")
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setContentText("Ready for a quick walk ?")
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setPriority(Notification.PRIORITY_MAX)
+                .setDefaults(Notification.DEFAULT_ALL);
+        notifMnager.notify(444, messageServiceNotifBuilder.build());
+        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+        vibrator.vibrate(pattern,0);
+        Handler handler2 = new Handler();
+        handler2.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                vibrator.cancel();
+            }
+        }, 3000);
     }
 
     private String buildInitMessage() {

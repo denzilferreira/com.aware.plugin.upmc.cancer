@@ -1,6 +1,7 @@
 package com.aware.plugin.upmc.dash;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -53,7 +54,6 @@ public class UPMC extends AppCompatActivity {
     int[] nightTime = {-1, -1};
     public  boolean isWatchAround = false;
     private boolean debug = false;
-    private boolean firstRun = true;
     private boolean timeInvalid = false;
     private List<Integer> ratingList;
     private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
@@ -65,6 +65,8 @@ public class UPMC extends AppCompatActivity {
             }
         }
     };
+
+    private Menu menu;
 
     @Override
     protected void onDestroy() {
@@ -94,6 +96,11 @@ public class UPMC extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    protected boolean onPrepareOptionsPanel(View view, Menu menu) {
+        this.menu = menu;
+        return super.onPrepareOptionsPanel(view, menu);
+    }
 
     public void writeTimePref(int morning_hour, int morning_minute, int night_hour, int night_minute) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -182,120 +189,124 @@ public class UPMC extends AppCompatActivity {
         saveSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(Constants.TAG, "thread started");
-                isWatchAround = false;
-                LocalBroadcastManager.getInstance(context).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
-                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.VICINITY_CHECK));
-                final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar_schedule);
-                progressBar.setVisibility(View.VISIBLE);
-                saveSchedule.setEnabled(false);
-                saveSchedule.setText("Saving Schedule....");
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(!isWatchAround && isTimeInitialized()) {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            saveSchedule.setText("Save Answers");
-                                            Toast.makeText(context, "Failed! Please make sure watch is in range", Toast.LENGTH_SHORT).show();
-                                            progressBar.setVisibility(View.GONE);
-                                            saveSchedule.setEnabled(true);
+                if(menu.getItem(0).getTitle().equals("Demo Watch")) {
+                    Log.d(Constants.TAG, "thread started");
+                    isWatchAround = false;
+                    LocalBroadcastManager.getInstance(context).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.VICINITY_CHECK));
+                    final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar_schedule);
+                    progressBar.setVisibility(View.VISIBLE);
+                    saveSchedule.setEnabled(false);
+                    saveSchedule.setText("Saving Schedule....");
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(!isWatchAround && isTimeInitialized()) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                saveSchedule.setText("Save Answers");
+                                                Toast.makeText(context, "Failed! Please make sure watch is in range", Toast.LENGTH_SHORT).show();
+                                                progressBar.setVisibility(View.GONE);
+                                                saveSchedule.setEnabled(true);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        dialog.setIndeterminate(true);
+                                        if (Aware.isStudy(getApplicationContext())) {
+                                            dialog.setMessage("Please wait...");
+                                        } else {
+                                            dialog.setMessage("Joining study...");
                                         }
-                                    });
+                                        dialog.setInverseBackgroundForced(true);
+
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                dialog.show();
+                                            }
+                                        });
+                                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
+                                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
+                                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, night_timer.getCurrentHour().intValue());
+                                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, night_timer.getCurrentMinute().intValue());
+
+                                        // start MessageService
+                                        if (!isTimeInitialized()) {
+                                            Log.d(Constants.TAG, "UPMC:" + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE  + " " + Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR + " " + Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE ));
+                                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue(), night_timer.getCurrentHour().intValue(), night_timer.getCurrentMinute().intValue());
+                                            readTimePref();
+                                            if (!isMyServiceRunning(MessageService.class)) {
+                                                startService(new Intent(getApplicationContext(), MessageService.class));
+                                                Log.d(Constants.TAG, "UPMC: Started Message Service");
+                                            } else
+                                                Log.d(Constants.TAG, "UPMC: Message Service already running");
+                                            setTimeInitilaized(true);
+
+                                        } else {
+                                            Log.d(Constants.TAG, "UPMC: Sending Settings Changed Broadcast");
+                                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.SETTINGS_CHANGED));
+                                            writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue(), night_timer.getCurrentHour().intValue(), night_timer.getCurrentMinute().intValue());
+                                        }
+
+                                        Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
+                                        applySchedule.putExtra("schedule", true);
+                                        startService(applySchedule);
+
+                                        if (!Aware.isStudy(getApplicationContext())) {
+                                            //UPMC Dash
+                                            Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+
+                                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
+
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+                                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+                                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
+                                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
+
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
+
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
+
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+
+                                            //Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
+
+                                            //Ask accessibility to be activated
+                                            Applications.isAccessibilityServiceActive(getApplicationContext());
+                                        }
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                dialog.dismiss();
+                                                finish();
+                                            }
+                                        });
+                                    }
+                                    LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
+
                                 }
-                                else {
-                                    dialog.setIndeterminate(true);
-                                    if (Aware.isStudy(getApplicationContext())) {
-                                        dialog.setMessage("Please wait...");
-                                    } else {
-                                        dialog.setMessage("Joining study...");
-                                    }
-                                    dialog.setInverseBackgroundForced(true);
-
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            dialog.show();
-                                        }
-                                    });
-                                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
-                                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
-                                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, night_timer.getCurrentHour().intValue());
-                                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, night_timer.getCurrentMinute().intValue());
-
-                                    // start MessageService
-                                    if (!isTimeInitialized()) {
-                                        Log.d(Constants.TAG, "UPMC:" + Aware.getSetting(getApplication(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR) + " " + Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE  + " " + Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR + " " + Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE ));
-                                        writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue(), night_timer.getCurrentHour().intValue(), night_timer.getCurrentMinute().intValue());
-                                        readTimePref();
-                                        if (!isMyServiceRunning(MessageService.class)) {
-                                            startService(new Intent(getApplicationContext(), MessageService.class));
-                                            Log.d(Constants.TAG, "UPMC: Started Message Service");
-                                        } else
-                                            Log.d(Constants.TAG, "UPMC: Message Service already running");
-                                        setTimeInitilaized(true);
-
-                                    } else {
-                                        Log.d(Constants.TAG, "UPMC: Sending Settings Changed Broadcast");
-                                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.SETTINGS_CHANGED));
-                                        writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue(), night_timer.getCurrentHour().intValue(), night_timer.getCurrentMinute().intValue());
-                                    }
-
-                                    Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
-                                    applySchedule.putExtra("schedule", true);
-                                    startService(applySchedule);
-
-                                    if (!Aware.isStudy(getApplicationContext())) {
-                                        //UPMC Dash
-                                        Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
-
-                                        Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
-
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
-                                        Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-                                        Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
-                                        Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
-
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
-
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
-
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
-
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
-                                        Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
-
-                                        //Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
-
-                                        //Ask accessibility to be activated
-                                        Applications.isAccessibilityServiceActive(getApplicationContext());
-                                    }
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            dialog.dismiss();
-                                            finish();
-                                        }
-                                    });
-                                }
-                                LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
-
-                            }
-                        }).start();
-                    }
-                }, 7000);
-
+                            }).start();
+                        }
+                    }, 7000);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Save answers is disabled during demo" + menu.getItem(0).getTitle(), Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -796,8 +807,7 @@ public class UPMC extends AppCompatActivity {
         if (title.equalsIgnoreCase("Settings")) {
             loadSchedule();
             return true;
-        }
-        if (title.equalsIgnoreCase("Participant")) {
+        } else if (title.equalsIgnoreCase("Participant")) {
 
             View participantInfo = getLayoutInflater().inflate(R.layout.participant_info, null);
 
@@ -823,19 +833,98 @@ public class UPMC extends AppCompatActivity {
 
             return true;
         }
+        else if(!isTimeInitialized()) {
+            if (title.equalsIgnoreCase("Demo Watch")) {
+//            Intent walking = new Intent(this, UPMC_Motivation.class);
+//            walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(walking);
+                Log.d(Constants.TAG, "UPMC:Demo Watch happened");
+                final Context context = this;
+                final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                final AlertDialog.Builder dialogBuilder1 = new AlertDialog.Builder(context);
+                final View view = new ProgressBar(UPMC.this);
+                dialogBuilder1.setView(view);
+                dialogBuilder1.setCancelable(false);
+                item.setTitle("Stop Demo");
+                dialogBuilder.setTitle("Demo")
+                        .setMessage("This is a walkthrough of the prompts that you will receive, when you are inactive")
+                        .setCancelable(false)
+                        .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                final AlertDialog diag = dialogBuilder1.create();
+                                diag.show();
+                                Handler handler = new Handler();
+                                if (!isMyServiceRunning(MessageService.class)) {
+                                    startService(new Intent(getApplicationContext(), MessageService.class).putExtra(Constants.COMM_KEY_MSGSERVICE, Constants.DEMO_MODE));
+                                    Log.d(Constants.TAG, "UPMC: Starting demo Message Service");
+                                } else
+                                    Log.d(Constants.TAG, "UPMC: Starting demo Service already running");
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        LocalBroadcastManager.getInstance(context).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
+                                        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.VICINITY_CHECK));
+                                    }
+                                }, 3000);
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if(!isWatchAround) {
+                                            Toast.makeText(getApplicationContext(), "Failed: Could not find your watch ", Toast.LENGTH_LONG).show();
+                                            diag.dismiss();
+                                        }
+                                        else {
+                                            Toast.makeText(getApplicationContext(), "Success: Demo will start in 5 seconds ", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getApplicationContext(), "Save Answers will be disabled during demo. Please cancel demo to enable", Toast.LENGTH_SHORT).show();
+                                            LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
+                                            diag.dismiss();
+                                        }
+                                    }
+                                }, 10000);
+                            }
+                        })
+                        .create();
+                dialogBuilder.create().show();
+                dialogBuilder1.setTitle("Preparing Demo...")
+                        .setView(view);
+                return true;
+            } else if(title.equalsIgnoreCase("Stop Demo")) {
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.KILL_DEMO));
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(isMyServiceRunning(MessageService.class)) {
+                            Intent intent = new Intent(getApplicationContext(), MessageService.class);
+                            stopService(intent);
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Demo has been stopped", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, 2000);
 
-        if (title.equalsIgnoreCase("Demo Fitbit")) {
-            Intent walking = new Intent(this, UPMC_Motivation.class);
-            walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(walking);
+                item.setTitle("Demo Watch");
+                final Button saveSchedule = (Button) findViewById(R.id.save_button);
+                item.setEnabled(false);
+            } else if (title.equalsIgnoreCase("Sync")) {
+                sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
+                Log.d(Constants.TAG, "UPMC:Sync happened");
+                return true;
+            } else if(title.equalsIgnoreCase("Demo ESM")) {
+                Log.d(Constants.TAG, "UPMC:DemoESM happened");
+                Intent intent = new Intent(this, DemoESM.class);
+                startActivity(intent);
+                item.setEnabled(false);
+                return true;
 
-            return true;
+            }
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Unable to start during study",Toast.LENGTH_LONG).show();
         }
 
-        if (title.equalsIgnoreCase("Sync")) {
-            sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 }

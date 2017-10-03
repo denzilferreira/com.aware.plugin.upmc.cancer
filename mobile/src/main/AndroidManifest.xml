@@ -111,10 +111,10 @@
             android:name=".NotifReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="SNOOZE_ACTION"/>
-                <action android:name="OK_ACTION"/>
-                <action android:name="NO_ACTION"/>
-                <action android:name="RETRY_ACTION"/>
+                <action android:name="SNOOZE_ACTION" />
+                <action android:name="OK_ACTION" />
+                <action android:name="NO_ACTION" />
+                <action android:name="RETRY_ACTION" />
             </intent-filter>
         </receiver>
 
@@ -136,6 +136,10 @@
         <activity
             android:name=".InabilityResponseForm"
             android:label="@string/title_activity_inability_response_form"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".DemoESM"
+            android:label="@string/title_activity_demo_esm"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
