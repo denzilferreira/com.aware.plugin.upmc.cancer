@@ -337,6 +337,7 @@ public class SensorService extends Service implements SensorEventListener {
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setPriority(Notification.PRIORITY_HIGH);
         startForeground(3, sensorServiceNotifBuilder.build());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_GREAT_JOB));
     }
 
     public void notifyUser(int sc_count) {
@@ -348,6 +349,47 @@ public class SensorService extends Service implements SensorEventListener {
                         .setContentTitle("UPMC Dash Activity Monitor")
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setContentText("Ready for a quick walk ? #" + sc_count)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setDefaults(Notification.DEFAULT_ALL);
+
+
+                mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
+
+                final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
+                long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+                vibrator.vibrate(pattern, 0);
+                Handler handler2 = new Handler();
+                handler2.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        vibrator.cancel();
+                    }
+                }, 3000);
+
+                Handler handler3 = new Handler();
+                handler3.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sensorServiceNotifBuilder = new Notification.Builder(getApplicationContext())
+                                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                                .setContentTitle("UPMC Dash Activity Monitor")
+                                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                                .setContentText("Monitoring")
+                                .setPriority(Notification.PRIORITY_MAX)
+                                .setDefaults(Notification.DEFAULT_ALL);
+
+                        mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
+                    }
+                }, 15000);
+            }
+            else if(sc_count >= 50) {
+                sensorServiceNotifBuilder = new Notification.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                        .setContentTitle("UPMC Dash Activity Monitor")
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setContentText("Great Job! You are active" + sc_count)
                         .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setPriority(Notification.PRIORITY_MAX)
                         .setDefaults(Notification.DEFAULT_ALL);

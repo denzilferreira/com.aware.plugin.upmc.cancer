@@ -9,8 +9,8 @@ android {
         applicationId "com.aware.plugin.upmc.dash"
         minSdkVersion 25
         targetSdkVersion target_sdk
-        versionCode 7
-        versionName "1.6"
+        versionCode 8
+        versionName "1.7"
     }
     buildTypes {
         release {

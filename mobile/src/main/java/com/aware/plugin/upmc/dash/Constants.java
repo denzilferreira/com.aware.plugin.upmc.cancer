@@ -39,6 +39,7 @@ public final class Constants {
 
     //messages from wear
     public static final String NOTIFY_INACTIVITY = "user is inactive";
+    public static final String NOTIFY_GREAT_JOB = "user is active";
 
 
     // states

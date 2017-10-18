@@ -64,6 +64,7 @@ public final class Constants {
     public static final int ALARM_TYPE_2HR = 1;
     public static final String SENSOR_INTENT_FILTER = "sensor comm key";
     public static final String NOTIFY_INACTIVITY = "user is inactive";
+    public static final String NOTIFY_GREAT_JOB = "user is active";
     public static final String SENSOR_EXTRA_KEY = "sensor intent comm";
     public static final String SENSOR_ALARM = "1hr/2hr sensor alarm";
 

@@ -503,9 +503,45 @@ public class MessageService extends WearableListenerService implements
                         notifyUserWithInactivity();
                     }
                 }
+                else if(message.equals(Constants.NOTIFY_GREAT_JOB)) {
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:GreatJobUser");
+                    notifyUserWithAppraisal();
+                }
             }
         }
 
+    }
+
+    public void notifyUserWithAppraisal() {
+        Intent okIntent = new Intent();
+        okIntent.setAction(Constants.OK_ACTION);
+        PendingIntent pendingIntentOk = PendingIntent.getBroadcast(this, 555, okIntent, PendingIntent.FLAG_ONE_SHOT);
+
+//        Intent snoozeIntent = new Intent();
+//        snoozeIntent.setAction(Constants.SNOOZE_ACTION);
+//        PendingIntent pendingIntentSnooze = PendingIntent.getBroadcast(this, 555, snoozeIntent, PendingIntent.FLAG_ONE_SHOT);
+//
+//        Intent noIntent = new Intent();
+//        noIntent.setAction(Constants.NO_ACTION);
+//        PendingIntent pendingIntentNo = PendingIntent.getBroadcast(this, 555, noIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+
+        wl.acquire(6000);
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        watchClientNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                .setContentTitle("UPMC Dash Monitor")
+                .setContentText("Great Job! You have been active")
+                .setOngoing(true)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .addAction(R.drawable.ic_done_black_18dp, "OK!", pendingIntentOk);
+        mNotificationManager.notify(66, watchClientNotifBuilder.build());
+        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        vibrator.vibrate(3000);
     }
 
     public void demoInactivityNotif() {

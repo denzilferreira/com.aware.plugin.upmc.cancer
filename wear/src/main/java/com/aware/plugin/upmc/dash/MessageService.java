@@ -114,6 +114,9 @@ public class MessageService extends WearableListenerService implements
                 else if(message.equals(Constants.NOTIFY_INACTIVITY)) {
                     sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
                 }
+                else if(message.equals(Constants.NOTIFY_GREAT_JOB)) {
+                    sendMessageToPhone(Constants.NOTIFY_GREAT_JOB);
+                }
             }
         }
     };

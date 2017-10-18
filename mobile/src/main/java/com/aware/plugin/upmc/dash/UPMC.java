@@ -161,11 +161,13 @@ public class UPMC extends AppCompatActivity {
         final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
         final TimePicker night_timer = (TimePicker) findViewById(R.id.night_sleep_time);
         if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0) {
+            Log.d(Constants.TAG, "MORNING_HOUR" + Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
             morning_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
         } else {
             morning_timer.setCurrentHour(9);
         }
         if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() > 0) {
+            Log.d(Constants.TAG, "MORNING_MINUTE" + Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)));
             morning_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)));
         } else {
             morning_timer.setCurrentMinute(0);
@@ -173,13 +175,19 @@ public class UPMC extends AppCompatActivity {
 
 
         if(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR).length() > 0) {
-            night_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)));
+            int hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+            if(hour > 12)
+                hour = hour % 12;
+            night_timer.setCurrentHour(hour);
+            Log.d(Constants.TAG, hour + "NIGHT_HOUR" + Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)));
+
         }
         else {
             night_timer.setCurrentHour(21);
         }
         if(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE).length() > 0) {
-            night_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)));
+            Log.d(Constants.TAG, "NIGHT_MINUTE" + Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)));
+            night_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)));
         }
         else {
             night_timer.setCurrentMinute(0);
