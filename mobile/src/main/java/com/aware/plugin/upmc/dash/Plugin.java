@@ -23,7 +23,16 @@ public class Plugin extends Aware_Plugin {
     public void onCreate() {
         super.onCreate();
 
+
+        AUTHORITY = Provider.getAuthority(this);
         TAG = "UPMC Cancer";
+
+        CONTEXT_PRODUCER = new ContextProducer() {
+            @Override
+            public void onContext() {
+                //Broadcast your context here
+            }
+        };
 //
 //        DATABASE_TABLES = Provider.DATABASE_TABLES;
 //        TABLES_FIELDS = Provider.TABLES_FIELDS;

@@ -86,6 +86,7 @@ public final class Constants {
     //Symptoms
     public static final int SYMPTOMS_0 = 0;
     public static final int SYMPTOMS_1 = 1;
+    public static final int MINUTE_MONITORING = 2;
     public static final String SYMPTOMS_INTENT_FILTER = "symptoms filter";
     public static final String SYMPTOMS_KEY = "symptoms keys";
     public static final String SYMPTOMS_PREFS = "symptoms prefs";

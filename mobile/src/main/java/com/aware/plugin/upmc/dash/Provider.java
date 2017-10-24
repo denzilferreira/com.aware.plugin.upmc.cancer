@@ -3,6 +3,7 @@ package com.aware.plugin.upmc.dash;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -22,25 +23,45 @@ import java.util.HashMap;
  */
 public class Provider extends ContentProvider {
 
-    public static final int DATABASE_VERSION = 6;
-    public static String AUTHORITY = "com.aware.plugin.upmc.cancer.provider.survey";
+    public static String AUTHORITY = "com.aware.plugin.upmc.dash.cancer.provider.survey"; //change to package.provider.your_plugin_name
+
+    public static final int DATABASE_VERSION = 7; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+
+    public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
+
+
+
+    //Add here your database table names, as many as you need
+    public static final String[] DATABASE_TABLES = {
+            "upmc_dash",
+            "upmc_dash_motivation",
+            "upmc_dash_stepcount"
+    };
+
+
 
     private static final int ANSWERS = 1;
     private static final int ANSWERS_ID = 2;
     private static final int MOTIVATIONS = 3;
     private static final int MOTIVATIONS_ID = 4;
+    private static final int STEPCOUNT = 5;
+    private static final int STEPCOUNT_ID = 6;
 
-    public static final class Symptom_Data implements BaseColumns {
+
+    // These are the columns that we need to sync data, don't change this!
+    public interface AWAREColumns extends BaseColumns {
+        String _ID = "_id";
+        String TIMESTAMP = "timestamp";
+        String DEVICE_ID = "device_id";
+    }
+
+    public static final class Symptom_Data implements AWAREColumns {
         private Symptom_Data() {
         }
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash";
-
-        static final String _ID = "_id";
-        static final String TIMESTAMP = "timestamp";
-        static final String DEVICE_ID = "device_id";
         static final String TO_BED = "to_bed";
         static final String FROM_BED = "from_bed";
         static final String SCORE_SLEEP = "score_sleep";
@@ -67,26 +88,30 @@ public class Provider extends ContentProvider {
         static final String OTHER_LABEL = "other_label";
     }
 
-    public static final class Motivational_Data implements BaseColumns {
+    public static final class Motivational_Data implements AWAREColumns {
         private Motivational_Data() {
         }
 
-        static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash_motivation");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash_motivation");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.motivation";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.motivation";
-
-        static final String _ID = "_id";
-        static final String TIMESTAMP = "timestamp";
-        static final String DEVICE_ID = "device_id";
         static final String RATIONALE = "motivation_rationale";
     }
 
-    public static String DATABASE_NAME = "plugin_upmc_dash.db";
 
-    public static final String[] DATABASE_TABLES = {
-            "upmc_dash",
-            "upmc_dash_motivation"
-    };
+    public static final class Stepcount_Data implements AWAREColumns {
+        private Stepcount_Data() {
+
+        }
+        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash_stepcount");
+        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
+        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
+        static final String STEP_COUNT = "stepcount";
+        static final String END_OF_INTERVAL = "end of interval";
+    }
+
+
+
 
     public static final String[] TABLES_FIELDS = {
             Symptom_Data._ID + " integer primary key autoincrement," +
@@ -120,12 +145,19 @@ public class Provider extends ContentProvider {
             Motivational_Data._ID + " integer primary key autoincrement," +
                     Motivational_Data.TIMESTAMP + " real default 0," +
                     Motivational_Data.DEVICE_ID + " text default ''," +
-                    Motivational_Data.RATIONALE + " text default ''"
+                    Motivational_Data.RATIONALE + " text default ''",
+
+            Stepcount_Data._ID + " integer primary key autoincrement," +
+                    Stepcount_Data.TIMESTAMP + " real default 0," +
+                    Stepcount_Data.DEVICE_ID + " text default '',"+
+                    Stepcount_Data.STEP_COUNT + " integer default null," +
+                    Stepcount_Data.END_OF_INTERVAL + " integer default 0"
     };
 
     private static UriMatcher sUriMatcher = null;
     private static HashMap<String, String> surveyMap = null;
     private static HashMap<String, String> motivationMap = null;
+    private static HashMap<String, String> stepcountMap = null;
     private DatabaseHelper dbHelper = null;
     private static SQLiteDatabase database = null;
 
@@ -138,13 +170,15 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        AUTHORITY = getContext().getPackageName() + ".provider.survey";
+        AUTHORITY = getAuthority(getContext());
 
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0], ANSWERS);
         sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0] + "/#", ANSWERS_ID);
         sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[1], MOTIVATIONS);
         sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[1] + "/#", MOTIVATIONS_ID);
+        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[2], STEPCOUNT);
+        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[2] + "/#", STEPCOUNT_ID);
 
         surveyMap = new HashMap<>();
         surveyMap.put(Symptom_Data._ID, Symptom_Data._ID);
@@ -181,6 +215,12 @@ public class Provider extends ContentProvider {
         motivationMap.put(Motivational_Data.DEVICE_ID, Motivational_Data.DEVICE_ID);
         motivationMap.put(Motivational_Data.RATIONALE, Motivational_Data.RATIONALE);
 
+        stepcountMap = new HashMap<>();
+        stepcountMap.put(Stepcount_Data._ID, Stepcount_Data._ID);
+        stepcountMap.put(Stepcount_Data.DEVICE_ID, Stepcount_Data.DEVICE_ID);
+        stepcountMap.put(Stepcount_Data.STEP_COUNT, Stepcount_Data.STEP_COUNT);
+        stepcountMap.put(Stepcount_Data.END_OF_INTERVAL, Stepcount_Data.END_OF_INTERVAL);
+
         return true;
     }
 
@@ -198,6 +238,10 @@ public class Provider extends ContentProvider {
             case MOTIVATIONS:
                 qb.setTables(DATABASE_TABLES[1]);
                 qb.setProjectionMap(motivationMap);
+                break;
+            case STEPCOUNT:
+                qb.setTables(DATABASE_TABLES[2]);
+                qb.setProjectionMap(stepcountMap);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -225,6 +269,8 @@ public class Provider extends ContentProvider {
             case MOTIVATIONS:
                 return Motivational_Data.CONTENT_TYPE;
             case MOTIVATIONS_ID:
+                return Motivational_Data.CONTENT_ITEM_TYPE;
+            case STEPCOUNT_ID:
                 return Motivational_Data.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -267,6 +313,19 @@ public class Provider extends ContentProvider {
                 }
                 database.endTransaction();
                 throw new SQLException("Failed to insert row into " + uri);
+            case STEPCOUNT:
+                long step_id = database.insertWithOnConflict(DATABASE_TABLES[2],
+                        Stepcount_Data.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
+                database.setTransactionSuccessful();
+                database.endTransaction();
+                if(step_id > 0) {
+                    Uri stepUri = ContentUris.withAppendedId(Stepcount_Data.CONTENT_URI,
+                            step_id);
+                    getContext().getContentResolver().notifyChange(stepUri, null);
+                    return stepUri;
+                }
+                database.endTransaction();
+                throw new SQLException("Failed to insert row into " + uri);
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -287,6 +346,9 @@ public class Provider extends ContentProvider {
                 break;
             case MOTIVATIONS:
                 count = database.delete(DATABASE_TABLES[1], selection, selectionArgs);
+                break;
+            case STEPCOUNT:
+                count = database.delete(DATABASE_TABLES[2], selection, selectionArgs);
                 break;
             default:
                 database.endTransaction();
@@ -315,6 +377,9 @@ public class Provider extends ContentProvider {
             case MOTIVATIONS:
                 count = database.update(DATABASE_TABLES[1], values, selection, selectionArgs);
                 break;
+            case STEPCOUNT:
+                count = database.update(DATABASE_TABLES[2], values, selection, selectionArgs);
+                break;
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -324,5 +389,10 @@ public class Provider extends ContentProvider {
         database.endTransaction();
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
+    }
+
+    public static String getAuthority(Context context) {
+        AUTHORITY = context.getPackageName() + ".provider.survey";
+        return AUTHORITY;
     }
 }

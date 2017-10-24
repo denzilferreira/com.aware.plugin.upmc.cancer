@@ -15,8 +15,8 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //Log.d(Constants.TAG, "AlarmReceiver:onReceive:Alarm Received!");
         if(intent.hasExtra(Constants.ALARM_COMM)) {
-            Log.d(Constants.TAG, "AlarmReceiver:onReceive:Extra: " + intent.getIntExtra(Constants.ALARM_COMM,0));
-            int alarm_type = intent.getIntExtra(Constants.ALARM_COMM,0);
+            Log.d(Constants.TAG, "AlarmReceiver:onReceive:Extra: " + intent.getIntExtra(Constants.ALARM_COMM,-1));
+            int alarm_type = intent.getIntExtra(Constants.ALARM_COMM,-1);
             LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER).putExtra(Constants.ALARM_COMM, alarm_type));
         }
     }

@@ -7,10 +7,10 @@ android {
 
     defaultConfig {
         applicationId "com.aware.plugin.upmc.dash"
-        minSdkVersion 25
+        minSdkVersion 24
         targetSdkVersion target_sdk
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
     }
     buildTypes {
         release {
