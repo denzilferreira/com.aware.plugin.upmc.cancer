@@ -1,21 +1,29 @@
 package com.aware.plugin.upmc.dash;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.Wearable;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by RaghuTeja on 10/23/17.
@@ -36,16 +44,6 @@ public class FileManager {
         if(!file.exists())
             file.createNewFile();
         Log.d(Constants.TAG, "FileManager:createFile");
-        PrintWriter writer = new PrintWriter(file);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Time");
-        stringBuilder.append("\t");
-        stringBuilder.append("Count");
-        stringBuilder.append("\t");
-        stringBuilder.append("alarm");
-        writer.println(stringBuilder.toString());
-        writer.flush();
-        writer.close();
     }
 
     public static void writeToFile(int sc_count, int alarm) throws IOException {
@@ -83,10 +81,51 @@ public class FileManager {
         int size = (int) file.length();
         byte[] bytes = new byte[size];
         BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         buf.read(bytes, 0,bytes.length);
         buf.close();
         return Asset.createFromBytes(bytes);
     }
+
+
+    public static InputStream loadLogFileFromAsset(Asset asset, GoogleApiClient googleApiClient) throws IOException {
+        Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset entered ");
+        if(asset == null)
+            throw new IllegalArgumentException("Asset must be non-null");
+        Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset w1 ");
+        if(!googleApiClient.isConnected()) {
+            final ConnectionResult result =
+                    googleApiClient.blockingConnect(5000, TimeUnit.MILLISECONDS);
+            Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset w2 ");
+            if(!result.isSuccess())
+                return null;
+        }
+        Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset 23 ");
+        InputStream assetInputStream = Wearable.DataApi.getFdForAsset(googleApiClient, asset).await().getInputStream();
+        if(assetInputStream == null) {
+            Log.d(Constants.TAG, "Requested an unknown Asset");
+        }
+        Log.d(Constants.TAG,"FileManager: " + assetInputStream.available());
+        return assetInputStream;
+    }
+
+
+
+    public static void saveAssetAsTextFile(InputStream assetInputStream, Context context) throws IOException {
+        createFile();
+        File file = new File(STORAGE_FOLDER+STORAGE_FILE + EXTENSION);
+        OutputStream outputStream = new FileOutputStream(file);
+        int read;
+        byte[] buffer = new byte[4*1024];
+        while((read = assetInputStream.read(buffer))!=-1) {
+            outputStream.write(buffer, 0, read);
+        }
+        outputStream.flush();
+        outputStream.close();
+    }
+
+
+
 
     public static void stressTest() throws IOException {
 //        for(int i=0; i<1000;i++) {

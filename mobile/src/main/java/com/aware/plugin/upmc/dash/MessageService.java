@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,13 +27,24 @@ import com.aware.Aware;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -42,7 +54,7 @@ import java.util.Set;
  */
 
 public class MessageService extends WearableListenerService implements
-        GoogleApiClient.ConnectionCallbacks {
+        GoogleApiClient.ConnectionCallbacks, DataApi.DataListener, SyncFilesResponse{
 
     public boolean wearConnected = false;
     private GoogleApiClient mGoogleApiClient;
@@ -405,6 +417,7 @@ public class MessageService extends WearableListenerService implements
 
         }
         stopForeground(true);
+        Wearable.DataApi.removeListener(mGoogleApiClient, this);
         Wearable.MessageApi.removeListener(mGoogleApiClient, this);
         Wearable.CapabilityApi.removeListener(mGoogleApiClient, this);
         if (mGoogleApiClient.isConnected()) {
@@ -427,10 +440,6 @@ public class MessageService extends WearableListenerService implements
                 .addConnectionCallbacks(this)
                 .build();
         mGoogleApiClient.connect();
-
-
-
-
     }
 
     public String getNODE_ID() {
@@ -443,7 +452,6 @@ public class MessageService extends WearableListenerService implements
     }
 
     private void setUpNodeIdentities() {
-
         Wearable.CapabilityApi.getCapability(mGoogleApiClient, Constants.CAPABILITY_WEAR_APP, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
             @Override
             public void onResult(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
@@ -460,7 +468,6 @@ public class MessageService extends WearableListenerService implements
                 }
             }
         });
-
     }
 
     @Override
@@ -509,7 +516,6 @@ public class MessageService extends WearableListenerService implements
                 }
             }
         }
-
     }
 
     public void notifyUserWithAppraisal() {
@@ -666,6 +672,23 @@ public class MessageService extends WearableListenerService implements
         startForeground(1, messageServiceNotifBuilder.build());
     }
 
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+        Log.d(Constants.TAG, "MessageService:onDataChanged:received");
+        for(DataEvent event : dataEventBuffer) {
+            if (event.getType() == DataEvent.TYPE_CHANGED &&
+                    event.getDataItem().getUri().getPath().equals("/upmc-dash")) {
+                DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                final Asset logfileAsset = dataMapItem.getDataMap().getAsset("logfile");
+                Log.d(Constants.TAG, "MessageService:onDataChanged: received logfileasset");
+                SyncFilesTask syncFilesTask = new SyncFilesTask(MessageService.this);
+                syncFilesTask.execute(new SyncFilesParams(mGoogleApiClient,logfileAsset, getApplicationContext()));
+            }
+        }
+        super.onDataChanged(dataEventBuffer);
+    }
+
+
 
 
     private void startDemoClientNotif() {
@@ -721,6 +744,7 @@ public class MessageService extends WearableListenerService implements
                 Constants.CAPABILITY_WEAR_APP);
         Uri uri = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
         Wearable.MessageApi.addListener(mGoogleApiClient, this, uri, MessageApi.FILTER_PREFIX);
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
         setUpNodeIdentities();
     }
 
@@ -869,6 +893,17 @@ public class MessageService extends WearableListenerService implements
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(11, messageServiceNotifBuilder.build());
         }
+
+    }
+
+    @Override
+    public void onSyncSuccess() {
+        Log.d(Constants.TAG, "MessageService:onSyncSuccess");
+    }
+
+    @Override
+    public void onSyncFailed() {
+        Log.d(Constants.TAG, "MessageService:onSyncFailed");
 
     }
 }

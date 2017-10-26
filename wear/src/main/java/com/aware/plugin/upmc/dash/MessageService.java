@@ -25,14 +25,25 @@ import android.util.Log;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -42,7 +53,7 @@ import java.util.Set;
  */
 
 public class MessageService extends WearableListenerService implements
-        GoogleApiClient.ConnectionCallbacks {
+        GoogleApiClient.ConnectionCallbacks, DataApi.DataListener {
 
     int[] morningTime = {-1, -1};
     int[] nightTime = {-1, -1};
@@ -103,13 +114,36 @@ public class MessageService extends WearableListenerService implements
         }
     };
 
+
+
+
     private BroadcastReceiver mSensorLocalReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.hasExtra(Constants.SENSOR_EXTRA_KEY)) {
                 String message = intent.getStringExtra(Constants.SENSOR_EXTRA_KEY);
+                Log.d(Constants.TAG, "Sending the file over to the phone");
                 if(message.equals(Constants.SENSOR_ALARM)) {
-                    //notifyUser(Constants.NOTIFTEXT_SENDING_MESSAGE);
+                    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
+                    try {
+                        Asset logAsset = FileManager.createAssetFromLogFile();
+                        Log.d(Constants.TAG, "MessageService:onDataChanged: " + logAsset.getData().length);
+                        putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+                    com.google.android.gms.common.api.PendingResult<DataApi.DataItemResult> pendingResult =
+                            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest.setUrgent());
+                    pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                        @Override
+                        public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
+                            if(dataItemResult.getStatus().isSuccess()) {
+                                Log.d(Constants.TAG, "File sent successfully");
+                            }
+                        }
+                    });
+
                 }
                 else if(message.equals(Constants.NOTIFY_INACTIVITY)) {
                     sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
@@ -473,6 +507,11 @@ public class MessageService extends WearableListenerService implements
             }
         });
 
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+        super.onDataChanged(dataEventBuffer);
     }
 
     private void sendStateToPhone() {

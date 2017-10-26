@@ -445,7 +445,7 @@ public class SensorService extends Service implements SensorEventListener {
                 mNotificationManager.notify(3, sensorServiceNotifBuilder.build());
 
                 final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_GREAT_JOB));
                 long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
                 vibrator.vibrate(pattern, 0);
                 Handler handler2 = new Handler();
@@ -485,6 +485,7 @@ public class SensorService extends Service implements SensorEventListener {
                 initializeMinuteStepCount((int) sensorEvent.values[0]);
                 FIRST_TIME = false;
             } else {
+
                 int count = (int) sensorEvent.values[0];
                 if (ALARM_1HR_FLAG) {
                     Log.d(Constants.TAG, "Step(1hr):  " + count);
@@ -522,6 +523,7 @@ public class SensorService extends Service implements SensorEventListener {
 
                 }
                 else if(ALARM_MINUTE_FLAG) {
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.SENSOR_ALARM));
                     Log.d(Constants.TAG, "SensorService: alarm minute flag");
                     unregisterSensorListener();
                     calculateMinuteStepCount(count);
