@@ -23,7 +23,7 @@ import java.util.HashMap;
  */
 public class Provider extends ContentProvider {
 
-    public static String AUTHORITY = "com.aware.plugin.upmc.dash.cancer.provider.survey"; //change to package.provider.your_plugin_name
+    public static String AUTHORITY = "com.aware.plugin.upmc.cancer.provider.survey"; //change to package.provider.your_plugin_name
 
     public static final int DATABASE_VERSION = 7; //increase this if you make changes to the database structure, i.e., rename columns, etc.
 

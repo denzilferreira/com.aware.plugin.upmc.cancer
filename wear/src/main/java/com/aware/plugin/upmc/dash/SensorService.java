@@ -154,7 +154,6 @@ public class SensorService extends Service implements SensorEventListener {
         } else {
             MINUTE_STEP_COUNT = count - INIT_MINUTE_STEP_COUNT;
         }
-
     }
 
     public int getStepCount() {
@@ -241,10 +240,8 @@ public class SensorService extends Service implements SensorEventListener {
         myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent alarmIntent_1hr = new Intent(this, AlarmReceiver.class);
         Intent alarmIntent_2hr = new Intent(this, AlarmReceiver.class);
-
         alarmIntent_1hr.putExtra(Constants.ALARM_COMM, 0);
         alarmIntent_2hr.putExtra(Constants.ALARM_COMM, 1);
-
         if(type==Constants.SYMPTOMS_0) {
             alarmPendingIntent_1hr = PendingIntent.getBroadcast(this, 667, alarmIntent_1hr, 0);
             int interval = 60 * 1000 * 60;
@@ -258,7 +255,6 @@ public class SensorService extends Service implements SensorEventListener {
             //int interval = 120 * 1000;
             myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPendingIntent_2hr);
             setCurrentAlarmType(Constants.SYMPTOMS_1);
-
         }
     }
 
