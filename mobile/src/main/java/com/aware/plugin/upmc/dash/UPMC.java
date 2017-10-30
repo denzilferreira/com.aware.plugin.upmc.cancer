@@ -81,6 +81,7 @@ public class UPMC extends AppCompatActivity {
 
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 1);
         Log.d("DASH", "UPMC:onCreate");
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
     }
@@ -270,7 +271,7 @@ public class UPMC extends AppCompatActivity {
                                             //UPMC Dash
                                             Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
 
-                                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
+                                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
 
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
@@ -288,9 +289,9 @@ public class UPMC extends AppCompatActivity {
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
 
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 360);
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+
 
                                             //Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
 
@@ -338,32 +339,23 @@ public class UPMC extends AppCompatActivity {
         }
 
         if (permissions_ok) {
-
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
             //NOTE: needed for demo to participants
             Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
             //Aware.startESM(this);
-
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
                 loadSchedule();
                 return;
             }
-
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(System.currentTimeMillis());
-
             setContentView(R.layout.activity_upmc_dash);
             if (getSupportActionBar() != null)
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
-
             final LinearLayout morning_questions = (LinearLayout) findViewById(R.id.morning_questions);
-
             final TimePicker to_bed = (TimePicker) findViewById(R.id.bed_time);
             final TimePicker from_bed = (TimePicker) findViewById(R.id.woke_time);
-
             final RadioGroup qos_sleep = (RadioGroup) findViewById(R.id.qos_sleep);
-
             if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
                 morning_questions.setVisibility(View.VISIBLE);
 
@@ -372,7 +364,6 @@ public class UPMC extends AppCompatActivity {
                 today.set(Calendar.HOUR_OF_DAY, 1);
                 today.set(Calendar.MINUTE, 0);
                 today.set(Calendar.SECOND, 0);
-
                 Cursor already_answered = getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.TO_BED + " != '' OR " + Provider.Symptom_Data.FROM_BED + " !='')", null, null);
                 if (already_answered != null && already_answered.getCount() > 0) {
                     morning_questions.setVisibility(View.GONE);
@@ -380,8 +371,6 @@ public class UPMC extends AppCompatActivity {
                 if (already_answered != null && !already_answered.isClosed())
                     already_answered.close();
             }
-
-
             final TextView pain_rating = (TextView) findViewById(R.id.pain_rating);
             pain_rating.setText("-1");
             SeekBar pain = (SeekBar) findViewById(R.id.rate_pain);

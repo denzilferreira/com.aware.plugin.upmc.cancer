@@ -19,13 +19,23 @@ import com.aware.utils.DatabaseHelper;
 import java.util.HashMap;
 
 /**
- * Created by denzil on 25/11/14.
+ * Created by denzil on 25/11/
+ *
+ *
+ * CREATE TABLE `upmc_dash`.`upmc_dash_stepcount` (
+ `_id` INT(11) NOT NULL AUTO_INCREMENT,
+ `timestamp` DOUBLE NULL DEFAULT '0',
+ `device_id` VARCHAR(45) NULL DEFAULT '',
+ `stepcount` INT NULL DEFAULT NULL,
+ `alarmtype` INT NULL DEFAULT NULL,
+ PRIMARY KEY (`_id`));
+
  */
 public class Provider extends ContentProvider {
 
-    public static String AUTHORITY = "com.aware.plugin.upmc.cancer.provider.survey"; //change to package.provider.your_plugin_name
+    public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
 
-    public static final int DATABASE_VERSION = 7; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 8; //increase this if you make changes to the database structure, i.e., rename columns, etc.
 
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
@@ -107,10 +117,8 @@ public class Provider extends ContentProvider {
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
         static final String STEP_COUNT = "stepcount";
-        static final String END_OF_INTERVAL = "end of interval";
+        static final String ALARM_TYPE = "alarmtype";
     }
-
-
 
 
     public static final String[] TABLES_FIELDS = {
@@ -151,7 +159,7 @@ public class Provider extends ContentProvider {
                     Stepcount_Data.TIMESTAMP + " real default 0," +
                     Stepcount_Data.DEVICE_ID + " text default '',"+
                     Stepcount_Data.STEP_COUNT + " integer default null," +
-                    Stepcount_Data.END_OF_INTERVAL + " integer default 0"
+                    Stepcount_Data.ALARM_TYPE + " integer default null"
     };
 
     private static UriMatcher sUriMatcher = null;
@@ -219,7 +227,7 @@ public class Provider extends ContentProvider {
         stepcountMap.put(Stepcount_Data._ID, Stepcount_Data._ID);
         stepcountMap.put(Stepcount_Data.DEVICE_ID, Stepcount_Data.DEVICE_ID);
         stepcountMap.put(Stepcount_Data.STEP_COUNT, Stepcount_Data.STEP_COUNT);
-        stepcountMap.put(Stepcount_Data.END_OF_INTERVAL, Stepcount_Data.END_OF_INTERVAL);
+        stepcountMap.put(Stepcount_Data.ALARM_TYPE, Stepcount_Data.ALARM_TYPE);
 
         return true;
     }
