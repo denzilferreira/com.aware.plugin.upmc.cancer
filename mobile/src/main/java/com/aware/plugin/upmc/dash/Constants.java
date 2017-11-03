@@ -99,6 +99,9 @@ public final class Constants {
     // Ok Action
     public static final String OK_ACTION = "OK_ACTION";
 
+    public static final String OK_ACTION_GJ = "OK_ACTION_GJ";
+
+
     //No Action
     public static final String NO_ACTION = "NO_ACTION";
 

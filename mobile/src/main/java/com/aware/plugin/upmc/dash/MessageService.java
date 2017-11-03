@@ -311,6 +311,7 @@ public class MessageService extends WearableListenerService implements
                     }
                     else {
                         dismissInactivtyNotif();
+                        sendMessageToWear(Constants.OK_ACTION);
                     }
                 }
                 else if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.NO_ACTION)) {
@@ -326,9 +327,17 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "Retry action happened");
                     isWearServiceRunning(getNODE_ID());
                 }
+                else if(intent.getStringExtra(Constants.NOTIF_KEY).equals(Constants.OK_ACTION_GJ)) {
+                    dismissAppraisal();
+                }
             }
         }
     };
+
+    public void dismissAppraisal() {
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(66);
+    }
 
     public void showResponseForm() {
         Intent respIntent = new Intent(this, InabilityResponseForm.class);
@@ -520,7 +529,7 @@ public class MessageService extends WearableListenerService implements
 
     public void notifyUserWithAppraisal() {
         Intent okIntent = new Intent();
-        okIntent.setAction(Constants.OK_ACTION);
+        okIntent.setAction(Constants.OK_ACTION_GJ);
         PendingIntent pendingIntentOk = PendingIntent.getBroadcast(this, 555, okIntent, PendingIntent.FLAG_ONE_SHOT);
 
 //        Intent snoozeIntent = new Intent();

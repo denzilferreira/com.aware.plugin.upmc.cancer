@@ -89,7 +89,7 @@ public class Plugin extends Aware_Plugin {
                         Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60
                 );
             }
-
+            Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true);
             Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());
             Aware.startAWARE(this);
         }

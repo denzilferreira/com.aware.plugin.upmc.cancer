@@ -27,6 +27,8 @@ public final class Constants {
     public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
     public static final String DEMO_NOTIF = "demonotif";
+    public static final String OK_ACTION = "OK_ACTION";
+
 
 
 
@@ -60,6 +62,7 @@ public final class Constants {
 
     //local broadcast
     public static final String ALARM_LOCAL_RECEIVER_INTENT_FILTER = "alarm_local_broadcast_receiver";
+    public static final String FEEDBACK_BROADCAST_INTENT_FILTER = "feedback_broadcast_intent_filter";
     public static final int ALARM_TYPE_1HR = 0;
     public static final int ALARM_TYPE_2HR = 1;
     public static final String SENSOR_INTENT_FILTER = "sensor comm key";
