@@ -45,10 +45,10 @@ public class SensorService extends Service implements SensorEventListener {
     private PendingIntent alarmPendingIntent_1hr;
     private PendingIntent alarmPendingIntent_2hr;
     private PendingIntent alarmPendingIntent_min;
+    private PendingIntent alarmPendingIntent_feedback;
     private int STEP_COUNT = 0;
     private int INIT_STEP_COUNT = 0;
     private int INIT_MINUTE_STEP_COUNT = 0;
-    private int FEEDBACK_STEP_COUNT = 0;
     private boolean feedbackEnabled = false;
     public int getMINUTE_STEP_COUNT() {
         return MINUTE_STEP_COUNT;
@@ -81,6 +81,10 @@ public class SensorService extends Service implements SensorEventListener {
             if (intent.getIntExtra(Constants.ALARM_COMM, -2) == 2) {
                 setALARM_MINUTE_FLAG(true);
                 registerSensorListener();
+            }
+            if(intent.getIntExtra(Constants.ALARM_COMM, -2) == 3) {
+                Log.d(Constants.TAG, "Feedback alarm received");
+                setFeedbackEnabled(false);
             }
         }
     };
@@ -118,6 +122,7 @@ public class SensorService extends Service implements SensorEventListener {
                 if(intent.getStringExtra(Constants.SENSOR_EXTRA_KEY).equals(Constants.OK_ACTION)) {
                     Log.d(Constants.TAG, "SensorService:feedbackLocalBroadcastReceiver:okaction");
                     setFeedbackEnabled(true);
+                    startFeedbackAlarm();
                 }
             }
         }
@@ -251,7 +256,6 @@ public class SensorService extends Service implements SensorEventListener {
         Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + type);
         setFirstRun(true);
         registerSensorListener();
-        setFeedbackEnabled(true);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -318,6 +322,16 @@ public class SensorService extends Service implements SensorEventListener {
             setALARM_1HR_FLAG(false);
         }
     }
+
+
+    public void startFeedbackAlarm() {
+        Intent alarmIntent_feedback = new Intent(this, AlarmReceiver.class);
+        alarmIntent_feedback.putExtra(Constants.ALARM_COMM, 3);
+        int interval = 60 * 1000;
+        alarmPendingIntent_feedback = PendingIntent.getBroadcast(this, 1212, alarmIntent_feedback, 0);
+        myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPendingIntent_feedback);
+    }
+
 
     public boolean isTimeToNotify() {
         int[] morn_time = getMorningTime();
@@ -528,13 +542,13 @@ public class SensorService extends Service implements SensorEventListener {
                     }
 
                     if(isFeedbackEnabled() && peekStepCount(count)>=15) {
-                        Log.d(Constants.TAG, "SensorService: feedback successfully" + peekStepCount(count));
+                        Log.d(Constants.TAG, "SensorService: feedback successful" + peekStepCount(count));
                         notifyFeedback(peekStepCount(count));
                         setFeedbackEnabled(false);
                     }
 
                     if(peekStepCount(count) >= 50) {
-                        Log.d(Constants.TAG, "SensorService: reached threshold before interval");
+                        Log.d(Constants.TAG, "SensorService: rched threshold before interval");
                         calculateStepCount(count);
                         initializeStepCount(count);
                         try {

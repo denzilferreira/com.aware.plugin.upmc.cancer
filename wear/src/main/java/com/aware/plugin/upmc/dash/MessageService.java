@@ -426,7 +426,7 @@ public class MessageService extends WearableListenerService implements
                 }
                 else if(message.contains(Constants.OK_ACTION)) {
                     Log.d(Constants.TAG, "MessageService: feedback starts");
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.OK_ACTION));
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.FEEDBACK_BROADCAST_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.OK_ACTION));
                 }
             }
         }
