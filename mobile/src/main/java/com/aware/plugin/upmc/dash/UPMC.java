@@ -78,10 +78,10 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
         Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 1);
+        Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true);
         Log.d("DASH", "UPMC:onCreate");
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
     }
@@ -291,6 +291,8 @@ public class UPMC extends AppCompatActivity {
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                                             Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 1);
+                                            Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true);
 
 
                                             //Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");

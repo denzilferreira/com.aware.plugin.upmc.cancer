@@ -35,7 +35,7 @@ public class Provider extends ContentProvider {
 
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
 
-    public static final int DATABASE_VERSION = 8; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 9; //increase this if you make changes to the database structure, i.e., rename columns, etc.
 
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
@@ -158,8 +158,8 @@ public class Provider extends ContentProvider {
             Stepcount_Data._ID + " integer primary key autoincrement," +
                     Stepcount_Data.TIMESTAMP + " real default 0," +
                     Stepcount_Data.DEVICE_ID + " text default '',"+
-                    Stepcount_Data.STEP_COUNT + " integer default null," +
-                    Stepcount_Data.ALARM_TYPE + " integer default null"
+                    Stepcount_Data.STEP_COUNT + " integer default -1," +
+                    Stepcount_Data.ALARM_TYPE + " integer default -1"
     };
 
     private static UriMatcher sUriMatcher = null;
