@@ -374,7 +374,8 @@ public class MessageService extends WearableListenerService implements
         snoozeInt.putExtra(Constants.ALARM_COMM,Constants.SNOOZE_ALARM_EXTRA);
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         PendingIntent snoozePendInt = PendingIntent.getBroadcast(this, 56, snoozeInt, 0);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 60*1000, snoozePendInt);
+        int interval = 15 * 60 * 1000;
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + interval, snoozePendInt);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(22);
     }
@@ -755,6 +756,7 @@ public class MessageService extends WearableListenerService implements
         Wearable.MessageApi.addListener(mGoogleApiClient, this, uri, MessageApi.FILTER_PREFIX);
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         setUpNodeIdentities();
+        //notifyUserWithInactivity();
     }
 
     @Override
