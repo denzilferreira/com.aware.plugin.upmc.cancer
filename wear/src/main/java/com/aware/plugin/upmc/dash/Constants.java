@@ -18,6 +18,7 @@ public final class Constants {
 
 
 
+
     // Messages from phone
     public static final String GET_STATUS_WEAR = "get_wear_status";
     public static final String IS_WEAR_RUNNING = "is wear running";
