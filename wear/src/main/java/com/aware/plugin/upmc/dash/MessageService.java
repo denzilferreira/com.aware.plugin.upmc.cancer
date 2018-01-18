@@ -227,7 +227,6 @@ public class MessageService extends WearableListenerService implements
             setWearStatus(Constants.STATUS_INIT);
         }
 
-
         LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
         LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
         return START_NOT_STICKY;
