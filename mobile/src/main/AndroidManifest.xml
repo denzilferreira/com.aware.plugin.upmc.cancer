@@ -23,19 +23,20 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".UPMC"
+            android:name="com.aware.plugin.upmc.dash.UPMC"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -46,25 +47,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".Settings"
+            android:name="com.aware.plugin.upmc.dash.Settings"
             android:exported="true"
             android:label="UPMC Settings" />
+
         <activity
-            android:name=".UPMC_Motivation"
+            android:name="com.aware.plugin.upmc.dash.UPMC_Motivation"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <service
-            android:name=".Plugin"
+            android:name="com.aware.plugin.upmc.dash.Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Cancer" />
+
         <service
-            android:name=".Survey"
+            android:name="com.aware.plugin.upmc.dash.Survey"
             android:exported="true"
             android:label="UPMC Survey" />
+
         <service
             android:name="com.aware.Applications"
             android:enabled="true"
@@ -73,7 +78,6 @@
             tools:replace="android:enabled">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
-
                 <category android:name="android.accessibilityservice.category.FEEDBACK_GENERIC" />
             </intent-filter>
 
@@ -81,8 +85,9 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/aware_accessibility_config" />
         </service>
+
         <service
-            android:name=".MessageService"
+            android:name="com.aware.plugin.upmc.dash.MessageService"
             android:exported="false">
 
             <!-- <intent-filter> -->
@@ -96,280 +101,70 @@
         </service>
 
         <receiver
-            android:name=".BluetoothReceiver"
+            android:name="com.aware.plugin.upmc.dash.BluetoothReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
         <receiver
-            android:name=".BootReceiver"
+            android:name="com.aware.plugin.upmc.dash.BootReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
         <receiver
-            android:name=".NotifReceiver"
+            android:name="com.aware.plugin.upmc.dash.NotifReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="SNOOZE_ACTION" />
                 <action android:name="OK_ACTION" />
                 <action android:name="NO_ACTION" />
                 <action android:name="RETRY_ACTION" />
-                <action android:name="OK_ACTION_GJ"/>
+                <action android:name="OK_ACTION_GJ" />
             </intent-filter>
         </receiver>
 
         <provider
-            android:name=".Provider"
+            android:name="com.aware.plugin.upmc.dash.Provider"
             android:authorities="${applicationId}.provider.survey"
             android:exported="true"
+            android:label="@string/plugin_upmc_dash"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name=".Plugin$SurveyListener">
+        <receiver android:name="com.aware.plugin.upmc.dash.Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".AlarmReceiver" />
+
+        <receiver android:name="com.aware.plugin.upmc.dash.AlarmReceiver" />
 
         <activity
             android:name=".InabilityResponseForm"
             android:label="@string/title_activity_inability_response_form"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
-            android:name=".DemoESM"
+            android:name="com.aware.plugin.upmc.dash.DemoESM"
             android:label="@string/title_activity_demo_esm"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        <!-- AWARE sync adapter services -->
-        <service
-            android:name="com.aware.syncadapters.Accelerometer_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_accelerometer" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Applications_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_applications" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Aware_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_aware_device" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Barometer_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_barometer" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Battery_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_battery" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Bluetooth_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_bluetooth" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Communications_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_communications" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.ESM_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_esms" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Gravity_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_gravity" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Gyroscope_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_gyroscope" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Installations_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_installations" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Keyboard_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_keyboard" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Light_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_light" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.LinearAccelerometer_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_linear_accelerometer" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Locations_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_locations" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Magnetometer_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_magnetometer" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Network_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_network" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Processor_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_processor" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Proximity_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_proximity" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Rotation_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_rotation" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Screen_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_screen" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Significant_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_significant" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Telephony_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_telephony" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Temperature_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_temperature" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Timezone_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_timezones" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Traffic_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_traffic" />
-        </service>
-        <service
-            android:name="com.aware.syncadapters.Wifi_Sync"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_wifi" />
-        </service>
         <service
             android:name="com.aware.plugin.upmc.dash.syncadapters.UPMC_Sync"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_upmc" />
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_upmc" />
         </service>
     </application>
 

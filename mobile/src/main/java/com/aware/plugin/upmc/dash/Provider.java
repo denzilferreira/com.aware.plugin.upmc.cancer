@@ -20,26 +20,23 @@ import java.util.HashMap;
 
 /**
  * Created by denzil on 25/11/
- *
- *
+ * <p>
+ * <p>
  * CREATE TABLE `upmc_dash`.`upmc_dash_stepcount` (
- `_id` INT(11) NOT NULL AUTO_INCREMENT,
- `timestamp` DOUBLE NULL DEFAULT '0',
- `device_id` VARCHAR(45) NULL DEFAULT '',
- `stepcount` INT NULL DEFAULT NULL,
- `alarmtype` INT NULL DEFAULT NULL,
- PRIMARY KEY (`_id`));
-
+ * `_id` INT(11) NOT NULL AUTO_INCREMENT,
+ * `timestamp` DOUBLE NULL DEFAULT '0',
+ * `device_id` VARCHAR(45) NULL DEFAULT '',
+ * `stepcount` INT NULL DEFAULT NULL,
+ * `alarmtype` INT NULL DEFAULT NULL,
+ * PRIMARY KEY (`_id`));
  */
 public class Provider extends ContentProvider {
 
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
 
-    public static final int DATABASE_VERSION = 9; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 10; //increase this if you make changes to the database structure, i.e., rename columns, etc.
 
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
-
-
 
     //Add here your database table names, as many as you need
     public static final String[] DATABASE_TABLES = {
@@ -47,7 +44,6 @@ public class Provider extends ContentProvider {
             "upmc_dash_motivation",
             "upmc_dash_stepcount"
     };
-
 
 
     private static final int ANSWERS = 1;
@@ -82,17 +78,13 @@ public class Provider extends ContentProvider {
         static final String MOST_STRESS_LABEL = "most_stress_label";
         static final String SCORE_PAIN = "score_pain";
         static final String SCORE_FATIGUE = "score_fatigue";
-        //        static final String SCORE_DISCONNECTED = "score_disconnected";
         static final String SCORE_SLEEP_DISTURBANCE = "score_sleep_dist";
         static final String SCORE_CONCENTRATING = "score_concentrating";
         static final String SCORE_SAD = "score_sad";
         static final String SCORE_ANXIOUS = "score_anxious";
-        //        static final String SCORE_ENJOY = "score_enjoy";
-//        static final String SCORE_IRRITABLE = "score_irritable";
         static final String SCORE_SHORT_BREATH = "score_short_breath";
         static final String SCORE_NUMBNESS = "score_numbness";
         static final String SCORE_NAUSEA = "score_nausea";
-        //        static final String SCORE_APPETITE = "score_appetite";
         static final String SCORE_DIARRHEA = "score_diarrhea";
         static final String SCORE_OTHER = "score_other";
         static final String OTHER_LABEL = "other_label";
@@ -111,15 +103,14 @@ public class Provider extends ContentProvider {
 
     public static final class Stepcount_Data implements AWAREColumns {
         private Stepcount_Data() {
-
         }
+
         public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash_stepcount");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
         static final String STEP_COUNT = "stepcount";
         static final String ALARM_TYPE = "alarmtype";
     }
-
 
     public static final String[] TABLES_FIELDS = {
             Symptom_Data._ID + " integer primary key autoincrement," +
@@ -135,17 +126,13 @@ public class Provider extends ContentProvider {
                     Symptom_Data.MOST_STRESS_LABEL + " text default ''," +
                     Symptom_Data.SCORE_PAIN + " text default ''," +
                     Symptom_Data.SCORE_FATIGUE + " text default ''," +
-//                    Symptom_Data.SCORE_DISCONNECTED + " text default ''," +
                     Symptom_Data.SCORE_SLEEP_DISTURBANCE + " text default ''," +
                     Symptom_Data.SCORE_CONCENTRATING + " text default ''," +
                     Symptom_Data.SCORE_SAD + " text default ''," +
                     Symptom_Data.SCORE_ANXIOUS + " text default ''," +
-//                    Symptom_Data.SCORE_ENJOY + " text default ''," +
-//                    Symptom_Data.SCORE_IRRITABLE + " text default ''," +
                     Symptom_Data.SCORE_SHORT_BREATH + " text default ''," +
                     Symptom_Data.SCORE_NUMBNESS + " text default ''," +
                     Symptom_Data.SCORE_NAUSEA + " text default ''," +
-//                    Symptom_Data.SCORE_APPETITE + " text default ''," +
                     Symptom_Data.SCORE_DIARRHEA + " text default ''," +
                     Symptom_Data.SCORE_OTHER + " text default ''," +
                     Symptom_Data.OTHER_LABEL + " text default ''",
@@ -157,7 +144,7 @@ public class Provider extends ContentProvider {
 
             Stepcount_Data._ID + " integer primary key autoincrement," +
                     Stepcount_Data.TIMESTAMP + " real default 0," +
-                    Stepcount_Data.DEVICE_ID + " text default '',"+
+                    Stepcount_Data.DEVICE_ID + " text default ''," +
                     Stepcount_Data.STEP_COUNT + " integer default -1," +
                     Stepcount_Data.ALARM_TYPE + " integer default -1"
     };
@@ -195,24 +182,20 @@ public class Provider extends ContentProvider {
         surveyMap.put(Symptom_Data.TO_BED, Symptom_Data.TO_BED);
         surveyMap.put(Symptom_Data.FROM_BED, Symptom_Data.FROM_BED);
         surveyMap.put(Symptom_Data.SCORE_SLEEP, Symptom_Data.SCORE_SLEEP);
-        surveyMap.put(Symptom_Data.SCORE_MOST_STRESS, Symptom_Data.SCORE_MOST_STRESS);
-        surveyMap.put(Symptom_Data.MOST_STRESS_LABEL, Symptom_Data.MOST_STRESS_LABEL);
         surveyMap.put(Symptom_Data.SCORE_STRESS, Symptom_Data.SCORE_STRESS);
         surveyMap.put(Symptom_Data.SCORE_ANGRY, Symptom_Data.SCORE_ANGRY);
         surveyMap.put(Symptom_Data.SCORE_HAPPY, Symptom_Data.SCORE_HAPPY);
+        surveyMap.put(Symptom_Data.SCORE_MOST_STRESS, Symptom_Data.SCORE_MOST_STRESS);
+        surveyMap.put(Symptom_Data.MOST_STRESS_LABEL, Symptom_Data.MOST_STRESS_LABEL);
         surveyMap.put(Symptom_Data.SCORE_PAIN, Symptom_Data.SCORE_PAIN);
         surveyMap.put(Symptom_Data.SCORE_FATIGUE, Symptom_Data.SCORE_FATIGUE);
-//        surveyMap.put(Symptom_Data.SCORE_DISCONNECTED, Symptom_Data.SCORE_DISCONNECTED);
         surveyMap.put(Symptom_Data.SCORE_SLEEP_DISTURBANCE, Symptom_Data.SCORE_SLEEP_DISTURBANCE);
         surveyMap.put(Symptom_Data.SCORE_CONCENTRATING, Symptom_Data.SCORE_CONCENTRATING);
         surveyMap.put(Symptom_Data.SCORE_SAD, Symptom_Data.SCORE_SAD);
         surveyMap.put(Symptom_Data.SCORE_ANXIOUS, Symptom_Data.SCORE_ANXIOUS);
-//        surveyMap.put(Symptom_Data.SCORE_ENJOY, Symptom_Data.SCORE_ENJOY);
-//        surveyMap.put(Symptom_Data.SCORE_IRRITABLE, Symptom_Data.SCORE_IRRITABLE);
         surveyMap.put(Symptom_Data.SCORE_SHORT_BREATH, Symptom_Data.SCORE_SHORT_BREATH);
         surveyMap.put(Symptom_Data.SCORE_NUMBNESS, Symptom_Data.SCORE_NUMBNESS);
         surveyMap.put(Symptom_Data.SCORE_NAUSEA, Symptom_Data.SCORE_NAUSEA);
-//        surveyMap.put(Symptom_Data.SCORE_APPETITE, Symptom_Data.SCORE_APPETITE);
         surveyMap.put(Symptom_Data.SCORE_DIARRHEA, Symptom_Data.SCORE_DIARRHEA);
         surveyMap.put(Symptom_Data.SCORE_OTHER, Symptom_Data.SCORE_OTHER);
         surveyMap.put(Symptom_Data.OTHER_LABEL, Symptom_Data.OTHER_LABEL);
@@ -225,6 +208,7 @@ public class Provider extends ContentProvider {
 
         stepcountMap = new HashMap<>();
         stepcountMap.put(Stepcount_Data._ID, Stepcount_Data._ID);
+        stepcountMap.put(Stepcount_Data.TIMESTAMP, Stepcount_Data.TIMESTAMP);
         stepcountMap.put(Stepcount_Data.DEVICE_ID, Stepcount_Data.DEVICE_ID);
         stepcountMap.put(Stepcount_Data.STEP_COUNT, Stepcount_Data.STEP_COUNT);
         stepcountMap.put(Stepcount_Data.ALARM_TYPE, Stepcount_Data.ALARM_TYPE);
@@ -278,8 +262,10 @@ public class Provider extends ContentProvider {
                 return Motivational_Data.CONTENT_TYPE;
             case MOTIVATIONS_ID:
                 return Motivational_Data.CONTENT_ITEM_TYPE;
+            case STEPCOUNT:
+                return Stepcount_Data.CONTENT_TYPE;
             case STEPCOUNT_ID:
-                return Motivational_Data.CONTENT_ITEM_TYPE;
+                return Stepcount_Data.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -326,7 +312,7 @@ public class Provider extends ContentProvider {
                         Stepcount_Data.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
                 database.setTransactionSuccessful();
                 database.endTransaction();
-                if(step_id > 0) {
+                if (step_id > 0) {
                     Uri stepUri = ContentUris.withAppendedId(Stepcount_Data.CONTENT_URI,
                             step_id);
                     getContext().getContentResolver().notifyChange(stepUri, null);
