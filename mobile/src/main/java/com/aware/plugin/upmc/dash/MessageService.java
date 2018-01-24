@@ -143,7 +143,7 @@ public class MessageService extends WearableListenerService implements
                                 Log.d(Constants.TAG, "MessageService: vicinity check fail");
                             }
                         }
-                    }, 5000);
+                    }, 10000);
                 }
                 else if(intent.getStringExtra(Constants.SETTINGS_EXTRA_KEY).equals(Constants.KILL_DEMO)) {
                     Log.d(Constants.TAG, "MessageService:EndingDemo");

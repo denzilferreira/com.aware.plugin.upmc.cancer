@@ -4,3 +4,5 @@ wear/wear.iml
 *.iml
 .gradle/*
 
+local.properties mobile/ wear/
+local.properties mobile/mobile.iml wear/wear.iml

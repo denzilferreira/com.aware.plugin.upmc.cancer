@@ -255,10 +255,6 @@ public class UPMC extends AppCompatActivity {
                                         writeTimePref(morning_timer.getCurrentHour().intValue(), morning_timer.getCurrentMinute().intValue(), night_timer.getCurrentHour().intValue(), night_timer.getCurrentMinute().intValue());
                                     }
 
-                                    Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
-                                    applySchedule.putExtra("schedule", true);
-                                    startService(applySchedule);
-
                                     if (!Aware.isStudy(getApplicationContext())) {
                                         new AsyncJoin().execute();
                                     }
@@ -320,6 +316,9 @@ public class UPMC extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             Toast.makeText(getApplicationContext(),"Joined OK!", Toast.LENGTH_LONG).show();
+            Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
+            applySchedule.putExtra("schedule", true);
+            startService(applySchedule);
             finish();
         }
     }
@@ -840,7 +839,7 @@ public class UPMC extends AppCompatActivity {
                                         LocalBroadcastManager.getInstance(context).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
                                         LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.VICINITY_CHECK));
                                     }
-                                }, 3000);
+                                }, 5000);
                                 handler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -854,7 +853,7 @@ public class UPMC extends AppCompatActivity {
                                             diag.dismiss();
                                         }
                                     }
-                                }, 10000);
+                                }, 17000);
                             }
                         })
                         .create();
