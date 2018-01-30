@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "329259861821",
+    "firebase_url": "https://popping-torch-7590.firebaseio.com",
+    "project_id": "popping-torch-7590",
+    "storage_bucket": "popping-torch-7590.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329259861821:android:573bc6359da19914",
+        "android_client_info": {
+          "package_name": "com.aware.plugin.cmu.sup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329259861821-qqfgq3ptsjv49n3crng1df4rckkstm2j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKel3SEjc5_b1GBuSOTKHeklQds1Cod8c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329259861821:android:9bd1dca8c9ce6f7f",
+        "android_client_info": {
+          "package_name": "com.aware.plugin.upmc.cancer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329259861821-qqfgq3ptsjv49n3crng1df4rckkstm2j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKel3SEjc5_b1GBuSOTKHeklQds1Cod8c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
