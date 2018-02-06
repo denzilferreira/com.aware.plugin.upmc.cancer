@@ -182,6 +182,11 @@ public class UPMC extends AppCompatActivity {
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
 
+        REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_SYNC_SETTINGS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_SETTINGS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_STATS);
+
         boolean permissions_ok = true;
         for (String p : REQUIRED_PERMISSIONS) {
             if (PermissionChecker.checkSelfPermission(this, p) != PermissionChecker.PERMISSION_GRANTED) {
