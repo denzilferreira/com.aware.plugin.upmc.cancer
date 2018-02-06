@@ -45,11 +45,6 @@ public class UPMC extends AppCompatActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
-
-        if (!Aware.IS_CORE_RUNNING) {
-            Intent aware = new Intent(this, Aware.class);
-            startService(aware);
-        }
     }
 
     private void loadSchedule() {
@@ -196,6 +191,11 @@ public class UPMC extends AppCompatActivity {
         }
 
         if (permissions_ok) {
+
+            if (!Aware.IS_CORE_RUNNING) {
+                Intent aware = new Intent(this, Aware.class);
+                startService(aware);
+            }
 
             Aware.setSetting(this, Aware_Preferences.DEBUG_FLAG, debug);
 

@@ -140,7 +140,7 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        AUTHORITY = getAuthority(getContext());
+        AUTHORITY = getContext().getPackageName() + ".provider.survey";
 
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0], ANSWERS);
@@ -247,7 +247,7 @@ public class Provider extends ContentProvider {
                 if (quest_id > 0) {
                     Uri questUri = ContentUris.withAppendedId(Symptom_Data.CONTENT_URI,
                             quest_id);
-                    getContext().getContentResolver().notifyChange(questUri, null);
+                    getContext().getContentResolver().notifyChange(questUri, null, false);
                     return questUri;
                 }
                 database.endTransaction();
@@ -260,7 +260,7 @@ public class Provider extends ContentProvider {
                 if (motiv_id > 0) {
                     Uri questUri = ContentUris.withAppendedId(Motivational_Data.CONTENT_URI,
                             motiv_id);
-                    getContext().getContentResolver().notifyChange(questUri, null);
+                    getContext().getContentResolver().notifyChange(questUri, null, false);
                     return questUri;
                 }
                 database.endTransaction();
@@ -294,7 +294,7 @@ public class Provider extends ContentProvider {
         database.setTransactionSuccessful();
         database.endTransaction();
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return count;
     }
 
@@ -320,7 +320,7 @@ public class Provider extends ContentProvider {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return count;
     }
 }

@@ -9,8 +9,45 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion minimum_sdk
         targetSdkVersion target_sdk
-        versionCode 43
-        versionName "5.3"
+        versionCode 44
+        versionName "5.4"
+
+        //AWARE core sensors provider authority overrides
+        resValue "string", "provider_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer"
+        resValue "string", "provider_applications", android.defaultConfig.applicationId + ".provider.applications"
+        resValue "string", "provider_aware", android.defaultConfig.applicationId + ".provider.aware"
+        resValue "string", "provider_barometer", android.defaultConfig.applicationId + ".provider.barometer"
+        resValue "string", "provider_battery", android.defaultConfig.applicationId + ".provider.battery"
+        resValue "string", "provider_bluetooth", android.defaultConfig.applicationId + ".provider.bluetooth"
+        resValue "string", "provider_communication", android.defaultConfig.applicationId + ".provider.communication"
+        resValue "string", "provider_esm", android.defaultConfig.applicationId + ".provider.esm"
+        resValue "string", "provider_gravity", android.defaultConfig.applicationId + ".provider.gravity"
+        resValue "string", "provider_gyroscope", android.defaultConfig.applicationId + ".provider.gyroscope"
+        resValue "string", "provider_installations", android.defaultConfig.applicationId + ".provider.installations"
+        resValue "string", "provider_keyboard", android.defaultConfig.applicationId + ".provider.keyboard"
+        resValue "string", "provider_light", android.defaultConfig.applicationId + ".provider.light"
+        resValue "string", "provider_linear_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer.linear"
+        resValue "string", "provider_locations", android.defaultConfig.applicationId + ".provider.locations"
+        resValue "string", "provider_magnetometer", android.defaultConfig.applicationId + ".provider.magnetometer"
+        resValue "string", "provider_network", android.defaultConfig.applicationId + ".provider.network"
+        resValue "string", "provider_processor", android.defaultConfig.applicationId + ".provider.processor"
+        resValue "string", "provider_proximity", android.defaultConfig.applicationId + ".provider.proximity"
+        resValue "string", "provider_rotation", android.defaultConfig.applicationId + ".provider.rotation"
+        resValue "string", "provider_screen", android.defaultConfig.applicationId + ".provider.screen"
+        resValue "string", "provider_significant", android.defaultConfig.applicationId + ".provider.significant"
+        resValue "string", "provider_telephony", android.defaultConfig.applicationId + ".provider.telephony"
+        resValue "string", "provider_temperature", android.defaultConfig.applicationId + ".provider.temperature"
+        resValue "string", "provider_timezones", android.defaultConfig.applicationId + ".provider.timezone"
+        resValue "string", "provider_traffic", android.defaultConfig.applicationId + ".provider.traffic"
+        resValue "string", "provider_wifi", android.defaultConfig.applicationId + ".provider.wifi"
+
+        //Bundled plugins provider authority overrides
+        resValue "string", "provider_google_activity_recognition", android.defaultConfig.applicationId + ".provider.gar"
+        resValue "string", "provider_device_usage", android.defaultConfig.applicationId + ".provider.device_usage"
+        resValue "string", "provider_google_fused", android.defaultConfig.applicationId + ".provider.geofences"
+        resValue "string", "provider_fitbit", android.defaultConfig.applicationId + ".provider.fitbit"
+        resValue "string", "provider_conversations", android.defaultConfig.applicationId + ".provider.audio_final"
+
     }
 
     splits {
@@ -58,21 +95,12 @@ configurations.all {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation "com.google.android.gms:play-services-location:$google_libs"
-    implementation "com.android.support:appcompat-v7:$support_libs"
-    implementation "com.android.support:gridlayout-v7:$support_libs"
-    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_libs"
-    implementation "com.koushikdutta.ion:ion:$ion_libs"
-    implementation 'com.github.scribejava:scribejava-apis:4.2.0'
-    implementation 'net.danlew:android.joda:2.9.5.1'
-
-    implementation 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
-    implementation 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
-    implementation 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
-    implementation 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
-    implementation 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
-    implementation 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
+    api 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
         transitive = true
