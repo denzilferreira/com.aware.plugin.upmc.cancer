@@ -72,10 +72,6 @@ dependencies {
     implementation "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
     implementation "com.android.support:design:$support_libs"
     wearApp project(':wear')
-    //compile 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
-    //compile 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
-    //compile 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
-    //compile 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
     implementation "com.android.support.constraint:constraint-layout:1.0.2"
     implementation "com.koushikdutta.ion:ion:$ion_libs"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_libs"

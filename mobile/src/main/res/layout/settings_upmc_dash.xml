@@ -28,6 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Morning schedule"
+
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="30sp"
                 android:textColor="@color/colorPrimary"
@@ -36,6 +37,7 @@
             <TimePicker
                 android:id="@+id/morning_start_time"
                 android:layout_width="fill_parent"
+                android:timePickerMode="spinner"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal" />
 
@@ -52,6 +54,7 @@
             <TimePicker
                 android:id="@+id/night_sleep_time"
                 android:layout_width="fill_parent"
+                android:timePickerMode="spinner"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal" />
 

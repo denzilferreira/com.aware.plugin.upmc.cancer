@@ -363,7 +363,7 @@ public class MessageService extends WearableListenerService implements
         snoozeInt.putExtra(Constants.ALARM_COMM,Constants.SNOOZE_ALARM_EXTRA);
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         PendingIntent snoozePendInt = PendingIntent.getBroadcast(this, 56, snoozeInt, 0);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 60*1000, snoozePendInt);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 15*60*1000, snoozePendInt);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(66);
     }
