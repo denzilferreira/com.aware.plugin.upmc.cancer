@@ -97,6 +97,13 @@ public class UPMC extends AppCompatActivity {
             startActivity(permissions);
             finish();
         }
+        else {
+            if(!Aware.IS_CORE_RUNNING) {
+                //This initialises the core framework, assigns Device ID if it doesn't exist yet, etc.
+                Intent aware = new Intent(getApplicationContext(), Aware.class);
+                startService(aware);
+            }
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
