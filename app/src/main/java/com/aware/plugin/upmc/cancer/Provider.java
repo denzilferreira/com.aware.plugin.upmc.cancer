@@ -68,7 +68,7 @@ public class Provider extends ContentProvider {
         private Motivational_Data() {
         }
 
-        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_rhythms_motivation");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_rhythms_motivation");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.rhythms.motivation";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.rhythms.motivation";
 

@@ -9,8 +9,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion minimum_sdk
         targetSdkVersion target_sdk
-        versionCode 44
-        versionName "5.4"
+        versionCode 45
+        versionName "5.5"
 
         multiDexEnabled true
 
@@ -98,7 +98,7 @@ configurations.all {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:multidex:1.0.1'
+    implementation 'com.android.support:multidex:1.0.2'
 
     api 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
     api 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'

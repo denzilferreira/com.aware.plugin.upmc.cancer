@@ -47,127 +47,6 @@ public class UPMC extends AppCompatActivity {
         super.onCreate(savedInstanceState, persistentState);
     }
 
-    private void loadSchedule() {
-
-        dialog = new ProgressDialog(UPMC.this);
-
-        setContentView(R.layout.settings_upmc_dash);
-
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        Button saveSchedule = (Button) findViewById(R.id.save_button);
-
-        final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
-        if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0) {
-            morning_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
-        } else {
-            morning_timer.setCurrentHour(9);
-        }
-        if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() > 0) {
-            morning_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)));
-        } else {
-            morning_timer.setCurrentMinute(0);
-        }
-
-        saveSchedule.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        dialog.setIndeterminate(true);
-                        if (Aware.isStudy(getApplicationContext())) {
-                            dialog.setMessage("Please wait...");
-                        } else {
-                            dialog.setMessage("Joining study...");
-                        }
-                        dialog.setInverseBackgroundForced(true);
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.show();
-                            }
-                        });
-
-                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
-                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
-
-                        Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
-                        applySchedule.putExtra("schedule", true);
-                        startService(applySchedule);
-
-                        if (!Aware.isStudy(getApplicationContext())) {
-
-                            //UPMC Rhythms
-                            Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/82/yLxV9leTNGK3");
-
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
-
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
-
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
-
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NOTIFICATIONS, true);
-
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
-                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
-
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.device_usage.Settings.STATUS_PLUGIN_DEVICE_USAGE, true);
-                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.device_usage");
-
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.STATUS_GOOGLE_FUSED_LOCATION, true);
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.MAX_FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.ACCURACY_GOOGLE_FUSED_LOCATION, 102);
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FALLBACK_LOCATION_TIMEOUT, 20);
-                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.LOCATION_SENSITIVITY, 5);
-                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.fused_location");
-
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
-
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_CALLS, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_MESSAGES, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
-
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
-                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
-
-                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
-                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
-                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
-
-                            //Ask accessibility to be activated
-                            Applications.isAccessibilityServiceActive(getApplicationContext());
-
-                            //Ask doze to be disabled
-                            Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.dismiss();
-                                finish();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -627,5 +506,126 @@ public class UPMC extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadSchedule() {
+
+        dialog = new ProgressDialog(UPMC.this);
+
+        setContentView(R.layout.settings_upmc_dash);
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Button saveSchedule = (Button) findViewById(R.id.save_button);
+
+        final TimePicker morning_timer = (TimePicker) findViewById(R.id.morning_start_time);
+        if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() > 0) {
+            morning_timer.setCurrentHour(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)));
+        } else {
+            morning_timer.setCurrentHour(9);
+        }
+        if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() > 0) {
+            morning_timer.setCurrentMinute(Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)));
+        } else {
+            morning_timer.setCurrentMinute(0);
+        }
+
+        saveSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        dialog.setIndeterminate(true);
+                        if (Aware.isStudy(getApplicationContext())) {
+                            dialog.setMessage("Please wait...");
+                        } else {
+                            dialog.setMessage("Joining study...");
+                        }
+                        dialog.setInverseBackgroundForced(true);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.show();
+                            }
+                        });
+
+                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour().intValue());
+                        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute().intValue());
+
+                        Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
+                        applySchedule.putExtra("schedule", true);
+                        startService(applySchedule);
+
+                        if (!Aware.isStudy(getApplicationContext())) {
+
+                            //UPMC Rhythms
+                            Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/82/yLxV9leTNGK3");
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NOTIFICATIONS, true);
+
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
+
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.device_usage.Settings.STATUS_PLUGIN_DEVICE_USAGE, true);
+
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.STATUS_GOOGLE_FUSED_LOCATION, true);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.MAX_FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.ACCURACY_GOOGLE_FUSED_LOCATION, 102);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FALLBACK_LOCATION_TIMEOUT, 20);
+                            Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.LOCATION_SENSITIVITY, 5);
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_CALLS, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_MESSAGES, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
+
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
+                            Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.device_usage");
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.fused_location");
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
+                            Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.cancer");
+
+                            //Ask accessibility to be activated
+                            Applications.isAccessibilityServiceActive(getApplicationContext());
+
+                            //Ask doze to be disabled
+                            Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
     }
 }

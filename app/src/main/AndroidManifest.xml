@@ -11,6 +11,21 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+
+    <permission
+        android:name="com.aware.READ_CONTEXT_DATA"
+        android:description="@string/read_permission"
+        android:icon="@drawable/ic_launcher_settings"
+        android:label="Read AWARE&apos;s Context data"
+        android:protectionLevel="normal" />
+    <permission
+        android:name="com.aware.WRITE_CONTEXT_DATA"
+        android:description="@string/write_permission"
+        android:icon="@drawable/ic_launcher_settings"
+        android:label="Write to AWARE&apos;s Context data"
+        android:protectionLevel="normal" />
+
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -30,17 +45,17 @@
         </activity>
 
         <activity
-            android:name=".Settings"
+            android:name="com.aware.plugin.upmc.cancer.Settings"
             android:exported="true"
             android:label="UPMC Settings" />
 
         <service
-            android:name=".Plugin"
+            android:name="com.aware.plugin.upmc.cancer.Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Rhythms" />
 
         <service
-            android:name=".Survey"
+            android:name="com.aware.plugin.upmc.cancer.Survey"
             android:exported="true"
             android:label="UPMC Survey" />
 
