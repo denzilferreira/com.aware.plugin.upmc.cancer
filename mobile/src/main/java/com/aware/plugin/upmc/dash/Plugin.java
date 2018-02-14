@@ -1,9 +1,11 @@
 package com.aware.plugin.upmc.dash;
 
+import android.accounts.Account;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SyncRequest;
 import android.database.Cursor;
 import android.os.Bundle;
 
@@ -65,13 +67,26 @@ public class Plugin extends Aware_Plugin {
             }
 
             if (Aware.isStudy(this) && !Aware.isSyncEnabled(this, Provider.getAuthority(this))) {
-                ContentResolver.setIsSyncable(Aware.getAWAREAccount(this), Provider.getAuthority(this), 1);
-                ContentResolver.addPeriodicSync(
-                        Aware.getAWAREAccount(this),
-                        Provider.getAuthority(this),
-                        Bundle.EMPTY,
-                        Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60
-                );
+
+                Account aware_account = Aware.getAWAREAccount(getApplicationContext());
+                String authority = Provider.getAuthority(getApplicationContext());
+                long frequency = Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
+
+                ContentResolver.setIsSyncable(aware_account, authority, 1);
+                ContentResolver.setSyncAutomatically(aware_account, authority, true);
+                SyncRequest request = new SyncRequest.Builder()
+                        .syncPeriodic(frequency, frequency/3)
+                        .setSyncAdapter(aware_account, authority)
+                        .setExtras(new Bundle()).build();
+                ContentResolver.requestSync(request);
+
+//                ContentResolver.setIsSyncable(Aware.getAWAREAccount(this), Provider.getAuthority(this), 1);
+//                ContentResolver.addPeriodicSync(
+//                        Aware.getAWAREAccount(this),
+//                        Provider.getAuthority(this),
+//                        Bundle.EMPTY,
+//                        Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60
+//                );
             }
 
             Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());
@@ -192,7 +207,7 @@ public class Plugin extends Aware_Plugin {
     public void onDestroy() {
         super.onDestroy();
         //Turn off the sync-adapter if part of a study
-        if (Aware.isStudy(this) && Aware.isSyncEnabled(this, Provider.getAuthority(this))) {
+        if (Aware.isSyncEnabled(this, Provider.getAuthority(this))) {
             ContentResolver.removePeriodicSync(
                     Aware.getAWAREAccount(this),
                     Provider.getAuthority(this),

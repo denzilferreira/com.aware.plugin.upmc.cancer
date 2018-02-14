@@ -65,7 +65,7 @@ public class Provider extends ContentProvider {
         private Symptom_Data() {
         }
 
-        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash";
         static final String TO_BED = "to_bed";
@@ -94,7 +94,7 @@ public class Provider extends ContentProvider {
         private Motivational_Data() {
         }
 
-        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash_motivation");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_motivation");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.motivation";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.motivation";
         static final String RATIONALE = "motivation_rationale";
@@ -105,7 +105,7 @@ public class Provider extends ContentProvider {
         private Stepcount_Data() {
         }
 
-        public static final Uri CONTENT_URI = Uri.parse("content://" + Provider.AUTHORITY + "/upmc_dash_stepcount");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_stepcount");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
         static final String STEP_COUNT = "stepcount";
@@ -165,15 +165,15 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        AUTHORITY = getAuthority(getContext());
+        AUTHORITY = getContext().getPackageName() + ".provider.survey";
 
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0], ANSWERS);
-        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[0] + "/#", ANSWERS_ID);
-        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[1], MOTIVATIONS);
-        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[1] + "/#", MOTIVATIONS_ID);
-        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[2], STEPCOUNT);
-        sUriMatcher.addURI(Provider.AUTHORITY, DATABASE_TABLES[2] + "/#", STEPCOUNT_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[0], ANSWERS);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[0] + "/#", ANSWERS_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1], MOTIVATIONS);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1] + "/#", MOTIVATIONS_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2], STEPCOUNT);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2] + "/#", STEPCOUNT_ID);
 
         surveyMap = new HashMap<>();
         surveyMap.put(Symptom_Data._ID, Symptom_Data._ID);
@@ -289,7 +289,7 @@ public class Provider extends ContentProvider {
                 if (quest_id > 0) {
                     Uri questUri = ContentUris.withAppendedId(Symptom_Data.CONTENT_URI,
                             quest_id);
-                    getContext().getContentResolver().notifyChange(questUri, null);
+                    getContext().getContentResolver().notifyChange(questUri, null, false);
                     return questUri;
                 }
                 database.endTransaction();
@@ -302,7 +302,7 @@ public class Provider extends ContentProvider {
                 if (motiv_id > 0) {
                     Uri questUri = ContentUris.withAppendedId(Motivational_Data.CONTENT_URI,
                             motiv_id);
-                    getContext().getContentResolver().notifyChange(questUri, null);
+                    getContext().getContentResolver().notifyChange(questUri, null, false);
                     return questUri;
                 }
                 database.endTransaction();
@@ -315,7 +315,7 @@ public class Provider extends ContentProvider {
                 if (step_id > 0) {
                     Uri stepUri = ContentUris.withAppendedId(Stepcount_Data.CONTENT_URI,
                             step_id);
-                    getContext().getContentResolver().notifyChange(stepUri, null);
+                    getContext().getContentResolver().notifyChange(stepUri, null, false);
                     return stepUri;
                 }
                 database.endTransaction();
@@ -352,7 +352,7 @@ public class Provider extends ContentProvider {
         database.setTransactionSuccessful();
         database.endTransaction();
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return count;
     }
 
@@ -381,7 +381,7 @@ public class Provider extends ContentProvider {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return count;
     }
 

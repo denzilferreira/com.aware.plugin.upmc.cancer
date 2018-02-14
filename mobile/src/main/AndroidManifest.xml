@@ -133,6 +133,7 @@
             android:name="com.aware.plugin.upmc.dash.Provider"
             android:authorities="${applicationId}.provider.survey"
             android:exported="true"
+            android:syncable="true"
             android:label="@string/plugin_upmc_dash"
             android:readPermission="com.aware.READ_CONTEXT_DATA"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />

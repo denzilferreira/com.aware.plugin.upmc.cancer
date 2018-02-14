@@ -10,19 +10,44 @@ android {
         targetSdkVersion target_sdk
         versionCode 12
         versionName "2.0"
+
+        //AWARE core sensors provider authority overrides
+        resValue "string", "provider_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer"
+        resValue "string", "provider_applications", android.defaultConfig.applicationId + ".provider.applications"
+        resValue "string", "provider_aware", android.defaultConfig.applicationId + ".provider.aware"
+        resValue "string", "provider_barometer", android.defaultConfig.applicationId + ".provider.barometer"
+        resValue "string", "provider_battery", android.defaultConfig.applicationId + ".provider.battery"
+        resValue "string", "provider_bluetooth", android.defaultConfig.applicationId + ".provider.bluetooth"
+        resValue "string", "provider_communication", android.defaultConfig.applicationId + ".provider.communication"
+        resValue "string", "provider_esm", android.defaultConfig.applicationId + ".provider.esm"
+        resValue "string", "provider_gravity", android.defaultConfig.applicationId + ".provider.gravity"
+        resValue "string", "provider_gyroscope", android.defaultConfig.applicationId + ".provider.gyroscope"
+        resValue "string", "provider_installations", android.defaultConfig.applicationId + ".provider.installations"
+        resValue "string", "provider_keyboard", android.defaultConfig.applicationId + ".provider.keyboard"
+        resValue "string", "provider_light", android.defaultConfig.applicationId + ".provider.light"
+        resValue "string", "provider_linear_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer.linear"
+        resValue "string", "provider_locations", android.defaultConfig.applicationId + ".provider.locations"
+        resValue "string", "provider_magnetometer", android.defaultConfig.applicationId + ".provider.magnetometer"
+        resValue "string", "provider_network", android.defaultConfig.applicationId + ".provider.network"
+        resValue "string", "provider_processor", android.defaultConfig.applicationId + ".provider.processor"
+        resValue "string", "provider_proximity", android.defaultConfig.applicationId + ".provider.proximity"
+        resValue "string", "provider_rotation", android.defaultConfig.applicationId + ".provider.rotation"
+        resValue "string", "provider_screen", android.defaultConfig.applicationId + ".provider.screen"
+        resValue "string", "provider_significant", android.defaultConfig.applicationId + ".provider.significant"
+        resValue "string", "provider_telephony", android.defaultConfig.applicationId + ".provider.telephony"
+        resValue "string", "provider_temperature", android.defaultConfig.applicationId + ".provider.temperature"
+        resValue "string", "provider_timezones", android.defaultConfig.applicationId + ".provider.timezone"
+        resValue "string", "provider_traffic", android.defaultConfig.applicationId + ".provider.traffic"
+        resValue "string", "provider_wifi", android.defaultConfig.applicationId + ".provider.wifi"
+
+        //Bundled plugins provider authority overrides
+        resValue "string", "provider_google_activity_recognition", android.defaultConfig.applicationId + ".provider.gar"
+
     }
 
     lintOptions {
         checkReleaseBuilds false
     }
-//
-//    splits {
-//        abi {
-//            enable true
-//            reset()
-//            include 'armeabi'
-//        }
-//    }
 
     signingConfigs {
         release
@@ -39,7 +64,7 @@ android {
     lintOptions {
         abortOnError false
     }
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
 }
 
 if (System.getenv("storeFile") != null && System.getenv("storePassword") != null && System.getenv("keyAlias") != null && System.getenv("keyPassword") != null) {
@@ -60,19 +85,13 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-
-
 dependencies {
-    //noinspection GradleCompatible
-    implementation "com.android.support:gridlayout-v7:$support_libs"
-    implementation "com.google.android.gms:play-services-location:$google_libs"
+    //AWARE is now self-contained. No more leftover dependencies!
+    api "com.github.denzilferreira:aware-client:$aware_libs"
+    api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
     implementation "com.google.android.gms:play-services-wearable:$google_libs"
-    implementation "com.android.support:appcompat-v7:$support_libs"
-    implementation "com.github.denzilferreira:aware-client:$aware_libs"
-    implementation "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
-    implementation "com.android.support:design:$support_libs"
+    //implementation "com.android.support:design:$support_libs"
+    //implementation "com.android.support.constraint:constraint-layout:1.0.2"
+
     wearApp project(':wear')
-    implementation "com.android.support.constraint:constraint-layout:1.0.2"
-    implementation "com.koushikdutta.ion:ion:$ion_libs"
-    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_libs"
 }
