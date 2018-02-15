@@ -1,5 +1,6 @@
 package com.aware.plugin.upmc.dash;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncRequest;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.aware.Aware;
@@ -28,6 +30,27 @@ public class Plugin extends Aware_Plugin {
 
         AUTHORITY = Provider.getAuthority(this);
         TAG = "UPMC Cancer";
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            REQUIRED_PERMISSIONS.add(Manifest.permission.BODY_SENSORS);
+        }
+        REQUIRED_PERMISSIONS.add(Manifest.permission.VIBRATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH_ADMIN);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CALL_LOG);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CONTACTS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WAKE_LOCK);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        //these are needed for the sync adapter to work...
+        REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_SYNC_SETTINGS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_SETTINGS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_STATS);
     }
 
     public static class SurveyListener extends BroadcastReceiver {
@@ -79,14 +102,6 @@ public class Plugin extends Aware_Plugin {
                         .setSyncAdapter(aware_account, authority)
                         .setExtras(new Bundle()).build();
                 ContentResolver.requestSync(request);
-
-//                ContentResolver.setIsSyncable(Aware.getAWAREAccount(this), Provider.getAuthority(this), 1);
-//                ContentResolver.addPeriodicSync(
-//                        Aware.getAWAREAccount(this),
-//                        Provider.getAuthority(this),
-//                        Bundle.EMPTY,
-//                        Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60
-//                );
             }
 
             Aware.isBatteryOptimizationIgnored(getApplicationContext(), getPackageName());

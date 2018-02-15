@@ -42,7 +42,7 @@ android {
 
         //Bundled plugins provider authority overrides
         resValue "string", "provider_google_activity_recognition", android.defaultConfig.applicationId + ".provider.gar"
-
+        resValue "string", "provider_upmc", android.defaultConfig.applicationId + ".provider.survey"
     }
 
     lintOptions {
@@ -64,7 +64,6 @@ android {
     lintOptions {
         abortOnError false
     }
-    buildToolsVersion '27.0.3'
 }
 
 if (System.getenv("storeFile") != null && System.getenv("storePassword") != null && System.getenv("keyAlias") != null && System.getenv("keyPassword") != null) {
@@ -89,9 +88,8 @@ dependencies {
     //AWARE is now self-contained. No more leftover dependencies!
     api "com.github.denzilferreira:aware-client:$aware_libs"
     api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
-    implementation "com.google.android.gms:play-services-wearable:$google_libs"
-    //implementation "com.android.support:design:$support_libs"
-    //implementation "com.android.support.constraint:constraint-layout:1.0.2"
+    api "com.google.android.gms:play-services-wearable:$google_libs"
+    api "com.android.support:design:$support_libs"
 
     wearApp project(':wear')
 }
