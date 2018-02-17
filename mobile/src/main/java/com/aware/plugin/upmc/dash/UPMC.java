@@ -26,6 +26,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -76,11 +77,11 @@ public class UPMC extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("DASH", "UPMC:onCreate");
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
-
         Intent aware = new Intent(this, Aware.class);
         startService(aware);
+
+
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -147,11 +148,14 @@ public class UPMC extends AppCompatActivity {
 
         final Button saveSchedule = findViewById(R.id.save_button);
 
+
         morning_timer = findViewById(R.id.morning_start_time);
         night_timer = findViewById(R.id.night_sleep_time);
         Log.d(Constants.TAG, "UPMC:loadSchedule:firstRun" + firstRun);
 
         if (firstRun) {
+
+            saveSchedule.setText("Join Study");
 
             IntentFilter filter = new IntentFilter();
             filter.addAction(Aware.ACTION_JOINED_STUDY);
@@ -339,23 +343,55 @@ public class UPMC extends AppCompatActivity {
                 Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
                 applySchedule.putExtra("schedule", true);
 
-                Toast.makeText(getApplicationContext(), "DEVICE ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), "LABEL:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL), Toast.LENGTH_SHORT).show();
 
                 startService(applySchedule);
 
                 unregisterReceiver(joinedObserver);
+
+                Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
+                Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+
+
+                Intent messageService = new Intent(getApplicationContext(), MessageService.class);
+                messageService.setAction(Constants.ACTION_FIRST_RUN);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    startForegroundService(messageService);
+                else
+                    startService(messageService);
+
+
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        final ProgressBar progressBar = findViewById(R.id.progress_bar_schedule);
+                        progressBar.setVisibility(View.GONE);
+                        finish();
+                    }
+                }, 10000);
+
+
+
+
+
+
+
             }
         }
 
-        private class AsyncJoin extends AsyncTask<Void, Void, Void> {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                //UPMC Dash
-                //Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
-                Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
-                return null;
-            }
+
+    }
+
+
+
+    private class AsyncJoin extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            //UPMC Dash
+            //Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+            Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
+            return null;
         }
     }
 
@@ -416,253 +452,324 @@ public class UPMC extends AppCompatActivity {
                 return;
             }
 
-            ratingList = new ArrayList<>(12);
-            for (int i = 0; i < 12; i++) {
-                ratingList.add(i, -1);
+            //check if watch is around
+
+
+
+            setContentView(R.layout.activity_upmc_loading);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            }, 10000);
+
+        }
+    }
+
+
+
+
+
+
+
+    public void showSymptomSurvey(){
+
+        ratingList = new ArrayList<>(12);
+        for (int i = 0; i < 12; i++) {
+            ratingList.add(i, -1);
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+        setContentView(R.layout.activity_upmc_dash);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        final LinearLayout morning_questions = findViewById(R.id.morning_questions);
+        final TimePicker to_bed = findViewById(R.id.bed_time);
+        final TimePicker from_bed = findViewById(R.id.woke_time);
+        final RadioGroup qos_sleep = findViewById(R.id.qos_sleep);
+        if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
+            morning_questions.setVisibility(View.VISIBLE);
+
+            Calendar today = Calendar.getInstance();
+            today.setTimeInMillis(System.currentTimeMillis());
+            today.set(Calendar.HOUR_OF_DAY, 1);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            Cursor already_answered = getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.TO_BED + " != '' OR " + Provider.Symptom_Data.FROM_BED + " !='')", null, null);
+            if (already_answered != null && already_answered.getCount() > 0) {
+                morning_questions.setVisibility(View.GONE);
             }
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(System.currentTimeMillis());
-            setContentView(R.layout.activity_upmc_dash);
-            if (getSupportActionBar() != null)
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            final LinearLayout morning_questions = findViewById(R.id.morning_questions);
-            final TimePicker to_bed = findViewById(R.id.bed_time);
-            final TimePicker from_bed = findViewById(R.id.woke_time);
-            final RadioGroup qos_sleep = findViewById(R.id.qos_sleep);
-            if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
-                morning_questions.setVisibility(View.VISIBLE);
-
-                Calendar today = Calendar.getInstance();
-                today.setTimeInMillis(System.currentTimeMillis());
-                today.set(Calendar.HOUR_OF_DAY, 1);
-                today.set(Calendar.MINUTE, 0);
-                today.set(Calendar.SECOND, 0);
-                Cursor already_answered = getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.TO_BED + " != '' OR " + Provider.Symptom_Data.FROM_BED + " !='')", null, null);
-                if (already_answered != null && already_answered.getCount() > 0) {
-                    morning_questions.setVisibility(View.GONE);
-                }
-                if (already_answered != null && !already_answered.isClosed())
-                    already_answered.close();
+            if (already_answered != null && !already_answered.isClosed())
+                already_answered.close();
+        }
+        final TextView pain_rating = findViewById(R.id.pain_rating);
+        pain_rating.setText("?");
+        SeekBar pain = findViewById(R.id.rate_pain);
+        pain.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                pain_rating.setText(String.valueOf(i));
+                ratingList.set(0, i);
             }
-            final TextView pain_rating = findViewById(R.id.pain_rating);
-            pain_rating.setText("?");
-            SeekBar pain = findViewById(R.id.rate_pain);
-            pain.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    pain_rating.setText(String.valueOf(i));
-                    ratingList.set(0, i);
-                }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                }
-            });
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
 
-            final TextView fatigue_rating = findViewById(R.id.fatigue_rating);
-            fatigue_rating.setText("?");
-            SeekBar fatigue = findViewById(R.id.rate_fatigue);
-            fatigue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    fatigue_rating.setText(String.valueOf(i));
-                    ratingList.set(1, i);
-                }
+        final TextView fatigue_rating = findViewById(R.id.fatigue_rating);
+        fatigue_rating.setText("?");
+        SeekBar fatigue = findViewById(R.id.rate_fatigue);
+        fatigue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                fatigue_rating.setText(String.valueOf(i));
+                ratingList.set(1, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView concentrating_rating = findViewById(R.id.concentrating_rating);
-            concentrating_rating.setText("?");
-            SeekBar concentrating = findViewById(R.id.rate_concentrating);
-            concentrating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    concentrating_rating.setText(String.valueOf(i));
-                    ratingList.set(2, i);
-                }
+        final TextView concentrating_rating = findViewById(R.id.concentrating_rating);
+        concentrating_rating.setText("?");
+        SeekBar concentrating = findViewById(R.id.rate_concentrating);
+        concentrating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                concentrating_rating.setText(String.valueOf(i));
+                ratingList.set(2, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView sad_rating = findViewById(R.id.sad_rating);
-            sad_rating.setText("?");
-            SeekBar sad = findViewById(R.id.rate_sad);
-            sad.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    sad_rating.setText(String.valueOf(i));
-                    ratingList.set(3, i);
-                }
+        final TextView sad_rating = findViewById(R.id.sad_rating);
+        sad_rating.setText("?");
+        SeekBar sad = findViewById(R.id.rate_sad);
+        sad.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                sad_rating.setText(String.valueOf(i));
+                ratingList.set(3, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView anxious_rating = findViewById(R.id.anxious_rating);
-            anxious_rating.setText("?");
-            SeekBar anxious = findViewById(R.id.rate_anxious);
-            anxious.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    anxious_rating.setText(String.valueOf(i));
-                    ratingList.set(4, i);
-                }
+        final TextView anxious_rating = findViewById(R.id.anxious_rating);
+        anxious_rating.setText("?");
+        SeekBar anxious = findViewById(R.id.rate_anxious);
+        anxious.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                anxious_rating.setText(String.valueOf(i));
+                ratingList.set(4, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView breath_rating = findViewById(R.id.breath_rating);
-            breath_rating.setText("?");
-            SeekBar breath = findViewById(R.id.rate_breath);
-            breath.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    breath_rating.setText(String.valueOf(i));
-                    ratingList.set(5, i);
-                }
+        final TextView breath_rating = findViewById(R.id.breath_rating);
+        breath_rating.setText("?");
+        SeekBar breath = findViewById(R.id.rate_breath);
+        breath.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                breath_rating.setText(String.valueOf(i));
+                ratingList.set(5, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView numb_rating = findViewById(R.id.numb_rating);
-            numb_rating.setText("?");
-            SeekBar numb = findViewById(R.id.rate_numb);
-            numb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    numb_rating.setText(String.valueOf(i));
-                    ratingList.set(6, i);
-                }
+        final TextView numb_rating = findViewById(R.id.numb_rating);
+        numb_rating.setText("?");
+        SeekBar numb = findViewById(R.id.rate_numb);
+        numb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                numb_rating.setText(String.valueOf(i));
+                ratingList.set(6, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView nausea_rating = findViewById(R.id.nausea_rating);
-            nausea_rating.setText("?");
-            SeekBar nausea = findViewById(R.id.rate_nausea);
-            nausea.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    nausea_rating.setText(String.valueOf(i));
-                    ratingList.set(7, i);
-                }
+        final TextView nausea_rating = findViewById(R.id.nausea_rating);
+        nausea_rating.setText("?");
+        SeekBar nausea = findViewById(R.id.rate_nausea);
+        nausea.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                nausea_rating.setText(String.valueOf(i));
+                ratingList.set(7, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView sleep_disturb_rating = findViewById(R.id.sleep_disturbance_rating);
-            sleep_disturb_rating.setText("?");
-            SeekBar sleep_disturb = findViewById(R.id.rate_sleep_disturbance);
-            sleep_disturb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    sleep_disturb_rating.setText(String.valueOf(i));
-                    ratingList.set(8, i);
-                }
+        final TextView sleep_disturb_rating = findViewById(R.id.sleep_disturbance_rating);
+        sleep_disturb_rating.setText("?");
+        SeekBar sleep_disturb = findViewById(R.id.rate_sleep_disturbance);
+        sleep_disturb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                sleep_disturb_rating.setText(String.valueOf(i));
+                ratingList.set(8, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView diarrhea_rating = findViewById(R.id.diarrhea_rating);
-            diarrhea_rating.setText("?");
-            SeekBar diarrhea = findViewById(R.id.rate_diarrhea);
-            diarrhea.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    diarrhea_rating.setText(String.valueOf(i));
-                    ratingList.set(9, i);
-                }
+        final TextView diarrhea_rating = findViewById(R.id.diarrhea_rating);
+        diarrhea_rating.setText("?");
+        SeekBar diarrhea = findViewById(R.id.rate_diarrhea);
+        diarrhea.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                diarrhea_rating.setText(String.valueOf(i));
+                ratingList.set(9, i);
+            }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
+            }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                }
-            });
+            }
+        });
 
-            final TextView other_rating = findViewById(R.id.other_rating);
-            other_rating.setText("?");
-            final TextView other_label = findViewById(R.id.lbl_other);
-            other_label.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View v) {
+        final TextView other_rating = findViewById(R.id.other_rating);
+        other_rating.setText("?");
+        final TextView other_label = findViewById(R.id.lbl_other);
+        other_label.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                final Dialog other_labeler = new Dialog(UPMC.this);
+                other_labeler.setTitle("Can you be more specific, please?");
+                other_labeler.getWindow().setGravity(Gravity.TOP);
+                other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+
+                LinearLayout editor = new LinearLayout(UPMC.this);
+                editor.setOrientation(LinearLayout.VERTICAL);
+                other_labeler.setContentView(editor);
+                other_labeler.show();
+
+                final EditText label = new EditText(UPMC.this);
+                label.setHint("Can you be more specific, please?");
+                editor.addView(label);
+                label.requestFocus();
+                other_labeler.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+                Button confirm = new Button(UPMC.this);
+                confirm.setText("OK");
+                confirm.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onClick(View v) {
+                        if (label.getText().length() == 0) label.setText("Other");
+                        other_label.setText(label.getText().toString());
+                        other_labeler.dismiss();
+                    }
+                });
+
+                editor.addView(confirm);
+            }
+        });
+
+        SeekBar other = findViewById(R.id.rate_other);
+        other.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                other_rating.setText(String.valueOf(i));
+                ratingList.set(10, i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (other_label.getText().equals("Other")) {
                     final Dialog other_labeler = new Dialog(UPMC.this);
-                    other_labeler.setTitle("Can you be more specific, please?");
                     other_labeler.getWindow().setGravity(Gravity.TOP);
-                    other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                    other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
 
                     LinearLayout editor = new LinearLayout(UPMC.this);
                     editor.setOrientation(LinearLayout.VERTICAL);
@@ -678,6 +785,7 @@ public class UPMC extends AppCompatActivity {
                     Button confirm = new Button(UPMC.this);
                     confirm.setText("OK");
                     confirm.setOnClickListener(new View.OnClickListener() {
+
                         @SuppressLint("SetTextI18n")
                         @Override
                         public void onClick(View v) {
@@ -689,125 +797,117 @@ public class UPMC extends AppCompatActivity {
 
                     editor.addView(confirm);
                 }
-            });
+            }
+        });
 
-            SeekBar other = findViewById(R.id.rate_other);
-            other.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    other_rating.setText(String.valueOf(i));
-                    ratingList.set(10, i);
+        final Button answer_questions = findViewById(R.id.answer_questionnaire);
+        final ProgressBar progressBar = findViewById(R.id.progress_bar_syms);
+        final Context context = this;
+
+        answer_questions.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                answer_questions.setEnabled(false);
+                answer_questions.setText("Saving answers..");
+                Log.d(Constants.TAG, "Trig::Questionnaire");
+                progressBar.setVisibility(View.VISIBLE);
+                ContentValues answer = new ContentValues();
+                answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+                answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
+                if (morning_questions != null && morning_questions.getVisibility() == View.VISIBLE) {
+                    answer.put(Provider.Symptom_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
+                    answer.put(Provider.Symptom_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h" + from_bed.getCurrentMinute() : "");
+                    answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
                 }
+                answer.put(Provider.Symptom_Data.SCORE_PAIN, parseAnswer(pain_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_FATIGUE, parseAnswer(fatigue_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE, parseAnswer(sleep_disturb_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_CONCENTRATING, parseAnswer(concentrating_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_SAD, parseAnswer(sad_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_ANXIOUS, parseAnswer(anxious_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_SHORT_BREATH, parseAnswer(breath_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_NUMBNESS, parseAnswer(numb_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_NAUSEA, parseAnswer(nausea_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_DIARRHEA, parseAnswer(diarrhea_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.SCORE_OTHER, parseAnswer(other_rating.getText().toString()));
+                answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
+                getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
 
-                }
 
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                    if (other_label.getText().equals("Other")) {
-                        final Dialog other_labeler = new Dialog(UPMC.this);
-                        other_labeler.getWindow().setGravity(Gravity.TOP);
-                        other_labeler.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-
-                        LinearLayout editor = new LinearLayout(UPMC.this);
-                        editor.setOrientation(LinearLayout.VERTICAL);
-                        other_labeler.setContentView(editor);
-                        other_labeler.show();
-
-                        final EditText label = new EditText(UPMC.this);
-                        label.setHint("Can you be more specific, please?");
-                        editor.addView(label);
-                        label.requestFocus();
-                        other_labeler.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-
-                        Button confirm = new Button(UPMC.this);
-                        confirm.setText("OK");
-                        confirm.setOnClickListener(new View.OnClickListener() {
-
-                            @SuppressLint("SetTextI18n")
-                            @Override
-                            public void onClick(View v) {
-                                if (label.getText().length() == 0) label.setText("Other");
-                                other_label.setText(label.getText().toString());
-                                other_labeler.dismiss();
-                            }
-                        });
-
-                        editor.addView(confirm);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
                     }
-                }
-            });
+                }, 10000);
 
-            final Button answer_questions = findViewById(R.id.answer_questionnaire);
-            final ProgressBar progressBar = findViewById(R.id.progress_bar_syms);
-            final Context context = this;
 
-            answer_questions.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View v) {
-                    answer_questions.setEnabled(false);
-                    answer_questions.setText("Saving answers..");
-                    Log.d(Constants.TAG, "Trig::Questionnaire");
-                    progressBar.setVisibility(View.VISIBLE);
 
-                    Log.d(Constants.TAG, "UPMC: Progress&Vicinity Thread starts");
-                    LocalBroadcastManager.getInstance(context).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.VICINITY_CHECK));
 
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(Constants.TAG, "UPMC:: Handler is running");
+//
+//                    Log.d(Constants.TAG, "UPMC: Progress&Vicinity Thread starts");
+//                    LocalBroadcastManager.getInstance(context).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
+//                    LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.VICINITY_CHECK));
+//
 
-                            if (!isWatchAround) {
-                                Toast.makeText(context, "Failed to save settings. Please try again with watch around!", Toast.LENGTH_LONG).show();
-                                LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
-                                progressBar.setVisibility(View.GONE);
-                                answer_questions.setText("Save Answers");
-                                answer_questions.setEnabled(true);
-                            } else {
-                                ContentValues answer = new ContentValues();
-                                answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-                                answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
-                                if (morning_questions != null && morning_questions.getVisibility() == View.VISIBLE) {
-                                    answer.put(Provider.Symptom_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
-                                    answer.put(Provider.Symptom_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h" + from_bed.getCurrentMinute() : "");
-                                    answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
-                                }
-                                answer.put(Provider.Symptom_Data.SCORE_PAIN, parseAnswer(pain_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_FATIGUE, parseAnswer(fatigue_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE, parseAnswer(sleep_disturb_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_CONCENTRATING, parseAnswer(concentrating_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_SAD, parseAnswer(sad_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_ANXIOUS, parseAnswer(anxious_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_SHORT_BREATH, parseAnswer(breath_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_NUMBNESS, parseAnswer(numb_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_NAUSEA, parseAnswer(nausea_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_DIARRHEA, parseAnswer(diarrhea_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.SCORE_OTHER, parseAnswer(other_rating.getText().toString()));
-                                answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
 
-                                getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
-                                checkSymptoms();
 
-                                Log.d("UPMC", "Answers:" + answer.toString());
-                                Toast.makeText(getApplicationContext(), "Saved successfully.", Toast.LENGTH_LONG).show();
 
-                                LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
-                                finish();
-                            }
-                        }
-                    }, 7000);
-                }
-            });
+//                    Handler handler = new Handler();
+//                    handler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Log.d(Constants.TAG, "UPMC:: Handler is running");
+//
+//                            if (!isWatchAround) {
+//                                Toast.makeText(context, "Failed to save settings. Please try again with watch around!", Toast.LENGTH_LONG).show();
+//                                LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
+//                                progressBar.setVisibility(View.GONE);
+//                                answer_questions.setText("Save Answers");
+//                                answer_questions.setEnabled(true);
+//                            } else {
+//                                ContentValues answer = new ContentValues();
+//                                answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+//                                answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
+//                                if (morning_questions != null && morning_questions.getVisibility() == View.VISIBLE) {
+//                                    answer.put(Provider.Symptom_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
+//                                    answer.put(Provider.Symptom_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h" + from_bed.getCurrentMinute() : "");
+//                                    answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
+//                                }
+//                                answer.put(Provider.Symptom_Data.SCORE_PAIN, parseAnswer(pain_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_FATIGUE, parseAnswer(fatigue_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE, parseAnswer(sleep_disturb_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_CONCENTRATING, parseAnswer(concentrating_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_SAD, parseAnswer(sad_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_ANXIOUS, parseAnswer(anxious_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_SHORT_BREATH, parseAnswer(breath_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_NUMBNESS, parseAnswer(numb_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_NAUSEA, parseAnswer(nausea_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_DIARRHEA, parseAnswer(diarrhea_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.SCORE_OTHER, parseAnswer(other_rating.getText().toString()));
+//                                answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
+//
+//                                getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
+//                                checkSymptoms();
+//
+//                                Log.d("UPMC", "Answers:" + answer.toString());
+//                                Toast.makeText(getApplicationContext(), "Saved successfully.", Toast.LENGTH_LONG).show();
+//
+//                                LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
+//                                finish();
+//                            }
+//                        }
+//                    }, 7000);
+            }
+        });
 
-        }
     }
+
+
+
+
 
     //Handles ? as scores. Can't use ? in SQLite
     private String parseAnswer(String rating) {
@@ -823,9 +923,10 @@ public class UPMC extends AppCompatActivity {
             if (intent.hasExtra(Constants.VICINITY_RESULT_KEY)) {
                 if ((intent.getIntExtra(Constants.VICINITY_RESULT_KEY, -1) == Constants.WEAR_VICINITY_CHECK_FAILED)
                         || (intent.getIntExtra(Constants.VICINITY_RESULT_KEY, -1) == Constants.WEAR_NOT_IN_RANGE)) {
-                    isWatchAround = false;
+
+                    //showWearError()
                 } else if (intent.getIntExtra(Constants.VICINITY_RESULT_KEY, -1) == Constants.WEAR_IN_RANGE) {
-                    isWatchAround = true;
+                    showSymptomSurvey();
                 }
             }
 
@@ -856,6 +957,9 @@ public class UPMC extends AppCompatActivity {
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
             if (item.getTitle().toString().equalsIgnoreCase("Sync") && !Aware.isStudy(getApplicationContext())) {
+                item.setVisible(false);
+            }
+            if(item.getTitle().toString().equalsIgnoreCase("settings") && !Aware.isStudy(getApplicationContext())) {
                 item.setVisible(false);
             }
         }

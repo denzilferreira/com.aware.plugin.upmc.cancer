@@ -110,6 +110,12 @@ public final class Constants {
 
 
 
+
+    //MessageService Actions
+    public static final String ACTION_SETUP_WEAR = "setup_wear";
+
+
+
     //vicinity check
     public static final String VICINITY_CHECK_INTENT_FILTER = "vcheckfilter";
     public static final String VICINITY_INTENT_FILTER = "vicinity intent filter";
@@ -121,6 +127,12 @@ public final class Constants {
     //complete survey
 
     public static final String COMPLETE_SURVEY = "Tap to begin your survey";
+    public static final String ACTION_SURVEY = "action_survey";
+    public static final String ACTION_FIRST_RUN = "first_run";
+
+
+    // Wear setup
+    public static final String SETUP_WEAR = "Tap to setup wear";
 
     //msg_comm
     public static final String DEMO_MODE = "demomodemsgservice";
@@ -128,6 +140,15 @@ public final class Constants {
 
     // Kill demo
     public static final String KILL_DEMO = "killdemo";
+
+
+
+
+
+    //Notification Channel ID
+    public static final String NOTIFICATION_CHANNEL_ID = "upmc_dash";
+
+
 
 
 

@@ -1,6 +1,8 @@
 package com.aware.plugin.upmc.dash;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -10,8 +12,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -646,40 +650,129 @@ public class MessageService extends WearableListenerService implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int i = super.onStartCommand(intent, flags, startId);
-        if(intent.hasExtra(Constants.COMM_KEY_MSGSERVICE)) {
-            if(intent.getStringExtra(Constants.COMM_KEY_MSGSERVICE).equals(Constants.DEMO_MODE)) {
-                Log.d(Constants.TAG, "MessageService:starting msgservice in demo mode");
-                setDemoMode(true);
-                startDemoClientNotif();
-                LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
-                LocalBroadcastManager.getInstance(this).registerReceiver(mNotifLocalReceiver, new IntentFilter(Constants.NOTIF_COMM));
-                LocalBroadcastManager.getInstance(this).registerReceiver(mSnoozeAlarmLocalReceiver, new IntentFilter(Constants.SNOOZE_ALARM_INTENT_FILTER));
-                return i;
-            }
+          Log.d(Constants.TAG, "MessageService: onStartCommand");
+
+//        if(intent.hasExtra(Constants.COMM_KEY_MSGSERVICE)) {
+//            if(intent.getStringExtra(Constants.COMM_KEY_MSGSERVICE).equals(Constants.DEMO_MODE)) {
+//                Log.d(Constants.TAG, "MessageService:starting msgservice in demo mode");
+//                setDemoMode(true);
+//                startDemoClientNotif();
+//                LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
+//                LocalBroadcastManager.getInstance(this).registerReceiver(mNotifLocalReceiver, new IntentFilter(Constants.NOTIF_COMM));
+//                LocalBroadcastManager.getInstance(this).registerReceiver(mSnoozeAlarmLocalReceiver, new IntentFilter(Constants.SNOOZE_ALARM_INTENT_FILTER));
+//                return i;
+//            }
+//        }
+//        Log.d(Constants.TAG, "MessageService: onStartCommand");
+//        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mSymptomsLocalReceiver, new IntentFilter(Constants.SYMPTOMS_INTENT_FILTER));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mNotifLocalReceiver, new IntentFilter(Constants.NOTIF_COMM));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mSnoozeAlarmLocalReceiver, new IntentFilter(Constants.SNOOZE_ALARM_INTENT_FILTER));
+//        startClientNotif();
+
+
+
+        if(intent.getAction().equals(Constants.ACTION_FIRST_RUN)) {
+            Log.d(Constants.TAG, "MessageService: onStartCommand first run");
+            mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mSymptomsLocalReceiver, new IntentFilter(Constants.SYMPTOMS_INTENT_FILTER));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mNotifLocalReceiver, new IntentFilter(Constants.NOTIF_COMM));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mSnoozeAlarmLocalReceiver, new IntentFilter(Constants.SNOOZE_ALARM_INTENT_FILTER));
+            showSurveyNotif();
+            showSetupNotif();
         }
-        Log.d(Constants.TAG, "MessageService: onStartCommand");
-        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mSettingsLocalReceiver, new IntentFilter(Constants.SETTING_INTENT_FILTER));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mSymptomsLocalReceiver, new IntentFilter(Constants.SYMPTOMS_INTENT_FILTER));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mNotifLocalReceiver, new IntentFilter(Constants.NOTIF_COMM));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mSnoozeAlarmLocalReceiver, new IntentFilter(Constants.SNOOZE_ALARM_INTENT_FILTER));
-        startClientNotif();
+        else if (intent.getAction().equals(Constants.ACTION_SETUP_WEAR)) {
+            Log.d(Constants.TAG, "MessageService: onStartCommand setup wear");
+        }
         return i;
     }
 
 
-    private void startClientNotif() {
-        Intent dashIntent = new Intent(this, UPMC.class);
-        dashIntent.setAction(new Random().nextInt(50) + "_action");
-        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-        messageServiceNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                .setContentTitle("UPMC Dash")
-                .setContentText(Constants.COMPLETE_SURVEY)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(dashPendingIntent);
-        startForeground(1, messageServiceNotifBuilder.build());
+    private void showSurveyNotif() {
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(Constants.NOTIFICATION_CHANNEL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription("UPMC Dash notification channel");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            notificationChannel.enableVibration(true);
+            notificationManager.createNotificationChannel(notificationChannel);
+            Notification.Builder notificationBuilder = new Notification.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
+            Intent dashIntent = new Intent(this, UPMC.class);
+            dashIntent.setAction(Constants.ACTION_SURVEY);
+            PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
+            notificationBuilder.setAutoCancel(false)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash")
+                    .setContentText(Constants.COMPLETE_SURVEY)
+                    .setContentIntent(dashPendingIntent);
+
+            startForeground(1, notificationBuilder.build());
+
+        } else {
+            Intent dashIntent = new Intent(this, UPMC.class);
+            dashIntent.setAction(Constants.ACTION_SURVEY);
+            PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
+            notificationBuilder.setAutoCancel(false)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash")
+                    .setContentText(Constants.COMPLETE_SURVEY)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setContentInfo("info")
+                    .setContentIntent(dashPendingIntent);
+
+            startForeground(1,notificationBuilder.build());
+        }
+
+    }
+
+
+
+    private void showSetupNotif() {
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder notificationBuilder = new Notification.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
+            Intent dashIntent = new Intent(this, MessageService.class);
+            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
+            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
+            notificationBuilder.setAutoCancel(false)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash")
+                    .setContentText(Constants.SETUP_WEAR)
+                    .setOngoing(true)
+                    .setContentIntent(dashPendingIntent);
+
+            notificationManager.notify(2, notificationBuilder.build());
+
+        } else {
+            Intent dashIntent = new Intent(this, MessageService.class);
+            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
+            PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
+            notificationBuilder.setAutoCancel(false)
+                    .setOngoing(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash")
+                    .setContentText(Constants.SETUP_WEAR)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setContentInfo("info")
+                    .setContentIntent(dashPendingIntent);
+
+            notificationManager.notify(2, notificationBuilder.build());
+        }
+
     }
 
     @Override
