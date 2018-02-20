@@ -39,6 +39,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal" />
 
+            <ProgressBar
+                android:id="@+id/join_study"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible" />
+
             <Button
                 android:id="@+id/save_button"
                 android:layout_width="match_parent"
