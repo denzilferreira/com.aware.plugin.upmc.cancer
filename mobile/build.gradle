@@ -86,8 +86,8 @@ configurations.all {
 
 dependencies {
     //AWARE is now self-contained. No more leftover dependencies!
-    api "com.github.denzilferreira:aware-client:$aware_libs"
-    api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
+    api "com.github.denzilferreira:aware-client:development-SNAPSHOT"
+    api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT"
     api "com.google.android.gms:play-services-wearable:$google_libs"
     api "com.android.support:design:$support_libs"
 

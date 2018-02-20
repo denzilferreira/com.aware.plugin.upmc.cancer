@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,7 +25,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -69,19 +67,16 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("DASH", "UPMC:onDestroy");
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mNotifBroadcastReceiver);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
-        Intent aware = new Intent(this, Aware.class);
-        startService(aware);
-
-
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -141,13 +136,17 @@ public class UPMC extends AppCompatActivity {
     private TimePicker morning_timer;
     private TimePicker night_timer;
 
+    private ProgressBar progressBar;
+
     private void loadSchedule(final boolean firstRun) {
         setContentView(R.layout.settings_upmc_dash);
+
+        progressBar = findViewById(R.id.progress_bar_schedule);
+
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final Button saveSchedule = findViewById(R.id.save_button);
-
 
         morning_timer = findViewById(R.id.morning_start_time);
         night_timer = findViewById(R.id.night_sleep_time);
@@ -157,8 +156,7 @@ public class UPMC extends AppCompatActivity {
 
             saveSchedule.setText("Join Study");
 
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Aware.ACTION_JOINED_STUDY);
+            IntentFilter filter = new IntentFilter(Aware.ACTION_JOINED_STUDY);
             registerReceiver(joinedObserver, filter);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -181,8 +179,9 @@ public class UPMC extends AppCompatActivity {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onClick(View v) {
-                    final ProgressBar progressBar = findViewById(R.id.progress_bar_schedule);
+
                     progressBar.setVisibility(View.VISIBLE);
+
                     saveSchedule.setEnabled(false);
                     saveSchedule.setText("Saving Schedule....");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -192,7 +191,9 @@ public class UPMC extends AppCompatActivity {
                     setTimeInitilaized(true);
 
                     if (!Aware.isStudy(getApplicationContext())) {
-                        new AsyncJoin().execute();
+                        //UPMC Dash
+                        //Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+                        Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
                     }
                 }
             });
@@ -229,10 +230,11 @@ public class UPMC extends AppCompatActivity {
                     isWatchAround = false;
                     LocalBroadcastManager.getInstance(context).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
                     LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTING_INTENT_FILTER).putExtra(Constants.SETTINGS_EXTRA_KEY, Constants.VICINITY_CHECK));
-                    final ProgressBar progressBar = findViewById(R.id.progress_bar_schedule);
+
                     progressBar.setVisibility(View.VISIBLE);
                     saveSchedule.setEnabled(false);
                     saveSchedule.setText("Saving Schedule....");
+
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -273,10 +275,6 @@ public class UPMC extends AppCompatActivity {
                                             else
                                                 writeTimePref(morning_timer.getCurrentHour(), morning_timer.getCurrentMinute(), night_timer.getCurrentHour(), night_timer.getCurrentMinute());
                                         }
-
-                                        if (!Aware.isStudy(getApplicationContext())) {
-                                            new AsyncJoin().execute();
-                                        }
                                     }
                                     LocalBroadcastManager.getInstance(context).unregisterReceiver(vicinityCheckBroadcastReceiver);
 
@@ -286,7 +284,6 @@ public class UPMC extends AppCompatActivity {
                     }, 7000);
                 }
             });
-
         }
     }
 
@@ -340,18 +337,11 @@ public class UPMC extends AppCompatActivity {
                 Applications.isAccessibilityServiceActive(getApplicationContext());
                 Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
 
-                Intent applySchedule = new Intent(getApplicationContext(), Plugin.class);
-                applySchedule.putExtra("schedule", true);
-
-
-                startService(applySchedule);
-
                 unregisterReceiver(joinedObserver);
 
                 Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
                 Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-
 
                 Intent messageService = new Intent(getApplicationContext(), MessageService.class);
                 messageService.setAction(Constants.ACTION_FIRST_RUN);
@@ -360,39 +350,11 @@ public class UPMC extends AppCompatActivity {
                 else
                     startService(messageService);
 
-
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        final ProgressBar progressBar = findViewById(R.id.progress_bar_schedule);
-                        progressBar.setVisibility(View.GONE);
-                        finish();
-                    }
-                }, 10000);
-
-
-
-
-
-
-
+                finish();
             }
         }
 
 
-    }
-
-
-
-    private class AsyncJoin extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            //UPMC Dash
-            //Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
-            Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
-            return null;
-        }
     }
 
     @Override
@@ -454,15 +416,7 @@ public class UPMC extends AppCompatActivity {
 
             //check if watch is around
 
-
-
             setContentView(R.layout.activity_upmc_loading);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            }, 10000);
 
         }
     }
