@@ -540,8 +540,7 @@ public class UPMC extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please wait...", Toast.LENGTH_SHORT).show();
 
                     //UPMC Rhythms
-                    //Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/82/yLxV9leTNGK3");
-                    Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1664/kgyZh9rEWWOx");
+                    Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/82/yLxV9leTNGK3");
                 }
             }
         });
