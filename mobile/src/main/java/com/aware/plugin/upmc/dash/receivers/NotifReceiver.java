@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.util.Locale;
+import com.aware.plugin.upmc.dash.utils.Constants;
 
 /**
  * Created by RaghuTeja on 9/5/17.

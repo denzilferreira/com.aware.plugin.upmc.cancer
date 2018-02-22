@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.services;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -7,6 +7,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+
+import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.activities.UPMC;
 
 /**
  * Created by denzil on 17/09/15.

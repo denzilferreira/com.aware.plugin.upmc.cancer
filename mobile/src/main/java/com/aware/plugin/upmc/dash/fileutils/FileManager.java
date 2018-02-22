@@ -1,24 +1,20 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.fileutils;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.AssetManager;
 import android.os.Environment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

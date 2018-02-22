@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.activities;
 
 import android.Manifest;
 import android.accounts.Account;
@@ -13,6 +13,8 @@ import android.os.Bundle;
 
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
+import com.aware.plugin.upmc.dash.settings.Settings;
+import com.aware.plugin.upmc.dash.services.Survey;
 import com.aware.utils.Aware_Plugin;
 import com.aware.utils.Scheduler;
 

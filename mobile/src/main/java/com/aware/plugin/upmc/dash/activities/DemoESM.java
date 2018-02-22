@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.activities;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.aware.plugin.upmc.dash.R;
 
 public class DemoESM extends AppCompatActivity {
 

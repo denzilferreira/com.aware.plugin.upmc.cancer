@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.utils;
 
 /**
  * Created by RaghuTeja on 6/22/17.
@@ -52,12 +52,7 @@ public final class Constants {
     public static final String BLUETOOTH_COMM_KEY = "bluetooth_comm_key";
 
 
-    // notification messages
-    public static final String NOTIFTEXT_SYNC_FAILED = "Sync Failed: Cannot display alerts from watch";
-    public static final String NOTIFTEXT_SYNC_SUCCESS = "Synced with watch";
-    public static final String NOTIFTEXT_SYNC_FAILED_BLUETOOTH = "Sync Failed : Switch on Bluetooth";
-    public static final String NOTIFTEXT_IN_PROGRESS = "Watch is logging your activity..";
-    public static final String NOTIFTEXT_TRY_CONNECT = "Scanning for watch...";
+
 
 
     //Broadcasts from UPMC Settings Panel
@@ -131,8 +126,20 @@ public final class Constants {
     public static final String ACTION_FIRST_RUN = "first_run";
 
 
-    // Wear setup
-    public static final String SETUP_WEAR = "Tap to setup wear";
+    // Wear setup notif
+    public static final String SETUP_WEAR = "Tap to setup watch";
+    public static final String SETUP_ONGOING = "Scanning for watch...";
+    public static final String CONNECTED_WEAR = "Connected: Watch is logging your activity.. ";
+    public static final String FAILED_WEAR = "Disconnected: Tap to reconnect";
+    public static final String FAILED_WEAR_BLUETOOTH = "Disconnected: Switch on Bluetooth";
+
+
+//    // notification messages
+//    public static final String NOTIFTEXT_SYNC_FAILED = "Sync Failed: Tap to =";
+//    public static final String NOTIFTEXT_SYNC_SUCCESS = "Synced with watch";
+//    public static final String NOTIFTEXT_SYNC_FAILED_BLUETOOTH = "Sync Failed : Switch on Bluetooth";
+//    public static final String NOTIFTEXT_IN_PROGRESS = "Watch is logging your activity..";
+//    public static final String NOTIFTEXT_TRY_CONNECT = "Scanning for watch...";
 
     //msg_comm
     public static final String DEMO_MODE = "demomodemsgservice";
@@ -147,6 +154,16 @@ public final class Constants {
 
     //Notification Channel ID
     public static final String NOTIFICATION_CHANNEL_ID = "upmc_dash";
+
+
+
+    // Loading Activity Stuff
+
+    public static final String LOADING_ACTIVITY_INTENT_FILTER = "LOADING_ACTIVITY_INTENT_FILTER";
+    public static final String MESSAGE_EXTRA_KEY = "MESSAGE_EXTRA_KEY";
+    public static final String LOADING_ACTIVITY_CONNECTED_MESSAGE = "Your watch is  synced! You will receive alerts.";
+    public static final String LOADING_ACTIVITY_FAILED_MESSAGE = "Setup failed! Please try again by tapping the setup notification later.";
+
 
 
 

@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.aware.plugin.upmc.dash.Provider;
+import com.aware.plugin.upmc.dash.activities.Provider;
 import com.aware.syncadapters.AwareSyncAdapter;
 
 /**

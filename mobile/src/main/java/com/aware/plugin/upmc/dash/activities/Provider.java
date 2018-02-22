@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.activities;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -97,7 +97,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_motivation");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.motivation";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.motivation";
-        static final String RATIONALE = "motivation_rationale";
+        public static final String RATIONALE = "motivation_rationale";
     }
 
 

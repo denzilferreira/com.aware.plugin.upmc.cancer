@@ -84,6 +84,8 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+
+
 dependencies {
     //AWARE is now self-contained. No more leftover dependencies!
     api "com.github.denzilferreira:aware-client:development-SNAPSHOT"
@@ -91,5 +93,7 @@ dependencies {
     api "com.google.android.gms:play-services-wearable:$google_libs"
     api "com.android.support:design:$support_libs"
 
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     wearApp project(':wear')
 }

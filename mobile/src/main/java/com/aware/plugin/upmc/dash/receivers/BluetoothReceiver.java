@@ -1,13 +1,12 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.receivers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-import com.aware.Bluetooth;
+import com.aware.plugin.upmc.dash.utils.Constants;
 
 /**
  * Created by RaghuTeja on 8/6/17.

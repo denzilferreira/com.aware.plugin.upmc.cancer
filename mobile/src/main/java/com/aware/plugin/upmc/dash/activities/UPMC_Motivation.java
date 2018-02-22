@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.activities;
 
 import android.content.ContentValues;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
+import com.aware.plugin.upmc.dash.R;
 import com.aware.utils.Scheduler;
 
 import org.json.JSONException;

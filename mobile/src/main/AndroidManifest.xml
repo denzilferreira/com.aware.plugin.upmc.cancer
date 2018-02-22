@@ -23,7 +23,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
     <permission
@@ -32,7 +31,6 @@
         android:icon="@drawable/ic_launcher_settings"
         android:label="Read AWARE&apos;s Context data"
         android:protectionLevel="normal" />
-
     <permission
         android:name="com.aware.WRITE_CONTEXT_DATA"
         android:description="@string/write_permission"
@@ -45,13 +43,12 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name="com.aware.plugin.upmc.dash.UPMC"
+            android:name=".activities.UPMC"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -62,29 +59,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.aware.plugin.upmc.dash.Settings"
+            android:name=".settings.Settings"
             android:exported="true"
             android:label="UPMC Settings" />
-
         <activity
-            android:name="com.aware.plugin.upmc.dash.UPMC_Motivation"
+            android:name=".activities.UPMC_Motivation"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <service
-            android:name="com.aware.plugin.upmc.dash.Plugin"
+            android:name=".activities.Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Cancer" />
-
         <service
-            android:name="com.aware.plugin.upmc.dash.Survey"
+            android:name=".services.Survey"
             android:exported="true"
             android:label="UPMC Survey" />
-
         <service
             android:name="com.aware.Applications"
             android:enabled="true"
@@ -93,6 +86,7 @@
             tools:replace="android:enabled">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
+
                 <category android:name="android.accessibilityservice.category.FEEDBACK_GENERIC" />
             </intent-filter>
 
@@ -100,9 +94,8 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/aware_accessibility_config" />
         </service>
-
         <service
-            android:name="com.aware.plugin.upmc.dash.MessageService"
+            android:name=".services.MessageService"
             android:exported="false">
 
             <!-- <intent-filter> -->
@@ -116,24 +109,22 @@
         </service>
 
         <receiver
-            android:name="com.aware.plugin.upmc.dash.BluetoothReceiver"
+            android:name=".receivers.BluetoothReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
             </intent-filter>
         </receiver>
-
         <receiver
-            android:name="com.aware.plugin.upmc.dash.BootReceiver"
+            android:name=".receivers.BootReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-
         <receiver
-            android:name="com.aware.plugin.upmc.dash.NotifReceiver"
+            android:name=".receivers.NotifReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="SNOOZE_ACTION" />
@@ -145,7 +136,7 @@
         </receiver>
 
         <provider
-            android:name="com.aware.plugin.upmc.dash.Provider"
+            android:name=".activities.Provider"
             android:authorities="${applicationId}.provider.survey"
             android:exported="true"
             android:label="@string/plugin_upmc_dash"
@@ -153,35 +144,39 @@
             android:syncable="true"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name="com.aware.plugin.upmc.dash.Plugin$SurveyListener">
+        <receiver android:name=".activities.Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
-
-        <receiver android:name="com.aware.plugin.upmc.dash.AlarmReceiver" />
+        <receiver android:name=".receivers.AlarmReceiver" />
 
         <activity
-            android:name=".InabilityResponseForm"
+            android:name=".activities.InabilityResponseForm"
             android:label="@string/title_activity_inability_response_form"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.aware.plugin.upmc.dash.DemoESM"
+            android:name=".activities.DemoESM"
             android:label="@string/title_activity_demo_esm"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name="com.aware.plugin.upmc.dash.syncadapters.UPMC_Sync"
+            android:name=".syncadapters.UPMC_Sync"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
+
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_upmc" />
         </service>
+
+        <activity android:name=".activities.SetupLoadingActvity"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert">
+            </activity>
     </application>
 
 </manifest>

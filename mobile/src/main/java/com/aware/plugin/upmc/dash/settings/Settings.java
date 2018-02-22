@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 import com.aware.Aware;
+import com.aware.plugin.upmc.dash.R;
 
 /**
  * Created by denzil on 13/04/15.
