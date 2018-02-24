@@ -109,6 +109,31 @@ public final class Constants {
 
 
 
+    //Notification Channel
+    public static final String SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID = "upmc_dash_sensor_service";
+    public static final String MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID = "upmc_dash_message_service";
+
+    //Notification IDs
+    public static int MESSAGE_SERVICE_NOTIFICATION_ID = 20;
+    public static int SENSOR_SERVICE_NOTIFICATION_ID = 40;
+
+
+    //MessageService onStartCommand Actions
+    public static final String ACTION_SETUP_WEAR = "setup_wear";
+    public static final String ACTION_FIRST_RUN = "first_run";
+    public static final String ACTION_REBOOT_RUN = "action_reboot_run";
+
+
+    //notifstuff
+    public static final String SETUP_WEAR = "Tap to setup watch";
+
+
+
+
+
+
+
+
 
 
 

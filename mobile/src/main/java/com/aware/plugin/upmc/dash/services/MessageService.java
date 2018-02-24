@@ -1019,20 +1019,20 @@ public class MessageService extends WearableListenerService implements
 
     }
 
-
-    public void notifyUser(String notifContent) {
-//        if(!isDemoMode()) {
-//            messageServiceNotifBuilder.setContentText(notifContent);
-//            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//            mNotificationManager.notify(1, messageServiceNotifBuilder.build());
-//        }
-//        else {
-//            messageServiceNotifBuilder.setContentText(notifContent);
-//            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//            mNotificationManager.notify(11, messageServiceNotifBuilder.build());
-//        }
-
-    }
+//
+//    public void notifyUser(String notifContent) {
+////        if(!isDemoMode()) {
+////            messageServiceNotifBuilder.setContentText(notifContent);
+////            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+////            mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+////        }
+////        else {
+////            messageServiceNotifBuilder.setContentText(notifContent);
+////            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+////            mNotificationManager.notify(11, messageServiceNotifBuilder.build());
+////        }
+//
+//    }
 
     @Override
     public void onSyncSuccess() {

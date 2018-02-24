@@ -2,6 +2,7 @@ package com.aware.plugin.upmc.dash;
 
 import android.app.ActivityManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -10,8 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -59,11 +62,12 @@ public class MessageService extends WearableListenerService implements
     int[] nightTime = {-1, -1};
     boolean isSyncedWithPhone;
     private GoogleApiClient mGoogleApiClient;
-    private Notification.Builder messageServiceNotifBuilder;
     private String NODE_ID;
     private boolean timeInvalid = false;
     private String STATUS_WEAR;
     boolean isNodeSaved = false;
+    private Notification.Builder setupNotifBuilder;
+    private NotificationCompat.Builder setupNotifCompatBuilder;
 
     public boolean isNodeSaved() {
         return isNodeSaved;
@@ -113,8 +117,6 @@ public class MessageService extends WearableListenerService implements
             }
         }
     };
-
-
 
 
     private BroadcastReceiver mSensorLocalReceiver = new BroadcastReceiver() {
@@ -213,23 +215,56 @@ public class MessageService extends WearableListenerService implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        int i = super.onStartCommand(intent, flags, startId);
         Log.d(Constants.TAG, "MessageService:onStartCommand");
-        startClientNotif();
-        if (isTimeInitialized()&& isSympInitialized()) {
-            if (!isMyServiceRunning(SensorService.class)) {
-                startService(new Intent(this, SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()));
-                Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
-                setWearStatus(Constants.STATUS_LOGGING);
-                setUpNodeIdentities();
+        if(intent.getAction().equals(Constants.ACTION_FIRST_RUN)) {
+            Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
+            showSetupNotif();
+//            setUpNodeIdentities();
+            if (isTimeInitialized()&& isSympInitialized()) {
+                if (!isMyServiceRunning(SensorService.class)) {
+                    Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
+                    Intent sensorService = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage());
+                    sensorService.setAction(Constants.ACTION_FIRST_RUN);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        startForegroundService(sensorService);
+                    else
+                        startService(sensorService);
+                    setWearStatus(Constants.STATUS_LOGGING);
+                }
+            } else {
+                Log.d(Constants.TAG, "onStartCommand:need time initialization");
+                setWearStatus(Constants.STATUS_INIT);
             }
-        } else {
-            Log.d(Constants.TAG, "onStartCommand:Need TimeInitialization , Requesting Phone:");
-            setWearStatus(Constants.STATUS_INIT);
+            LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
         }
+        else if(intent.getAction().equals(Constants.ACTION_SETUP_WEAR))  {
+            Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
-        return START_NOT_STICKY;
+        }
+        else if(intent.getAction().equals(Constants.ACTION_REBOOT_RUN)) {
+            Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
+            setUpNodeIdentities();
+            if (isTimeInitialized()&& isSympInitialized()) {
+                if (!isMyServiceRunning(SensorService.class)) {
+                    Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
+                    Intent sensorService = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage());
+                    sensorService.setAction(Constants.ACTION_FIRST_RUN);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        startForegroundService(sensorService);
+                    else
+                        startService(sensorService);
+                    setWearStatus(Constants.STATUS_LOGGING);
+                }
+            } else {
+                Log.d(Constants.TAG, "onStartCommand:Need TimeInitialization , Requesting Phone:");
+                setWearStatus(Constants.STATUS_INIT);
+            }
+            LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
+        }
+        return i;
     }
 
     private void setUpNodeIdentities() {
@@ -265,17 +300,64 @@ public class MessageService extends WearableListenerService implements
         }, 3000);
     }
 
-    private void startClientNotif() {
+//    private void startClientNotif() {
+//
+//        Intent dashIntent = new Intent(this, MainActivity.class);
+//        dashIntent.setAction(new Random().nextInt(50) + "_action");
+//        messageServiceNotifBuilder = new Notification.Builder(getApplicationContext())
+//                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+//                .setContentTitle("UPMC Dash")
+//                .setContentText(Constants.NOTIFTEXT_SYNC_FAILED)
+//                .setPriority(Notification.PRIORITY_HIGH);
+//        startForeground(1, messageServiceNotifBuilder.build());
+//    }
+    private void showSetupNotif() {
 
-        Intent dashIntent = new Intent(this, MainActivity.class);
-        dashIntent.setAction(new Random().nextInt(50) + "_action");
-        messageServiceNotifBuilder = new Notification.Builder(getApplicationContext())
-                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                .setContentTitle("UPMC Dash")
-                .setContentText(Constants.NOTIFTEXT_SYNC_FAILED)
-                .setPriority(Notification.PRIORITY_HIGH);
-        startForeground(1, messageServiceNotifBuilder.build());
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(Constants.MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID, "MESSAGE_SERVICE", NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription("UPMC Dash notification channel");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setVibrationPattern(new long[]{0, 800, 100, 800, 100, 800, 100, 800, 100, 800});
+            notificationChannel.enableVibration(true);
+            notificationManager.createNotificationChannel(notificationChannel);
+            setupNotifBuilder = new Notification.Builder(this, Constants.MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID);
+            Intent dashIntent = new Intent(this, MessageService.class);
+            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
+            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
+            setupNotifBuilder.setAutoCancel(false)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash")
+                    .setContentText(Constants.SETUP_WEAR)
+                    .setOngoing(true)
+                    .setContentIntent(dashPendingIntent);
+
+            startForeground(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
+
+        } else {
+            Intent dashIntent = new Intent(this, MessageService.class);
+            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
+            PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
+            setupNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID);
+            setupNotifCompatBuilder.setAutoCancel(false)
+                    .setOngoing(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash")
+                    .setContentText(Constants.SETUP_WEAR)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setContentInfo("info")
+                    .setContentIntent(dashPendingIntent);
+
+            startForeground(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
+        }
     }
+
+
+
+
 
     public void writeTimePref(int morn_hour, int morn_minute, int night_hour, int night_minute) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -353,7 +435,7 @@ public class MessageService extends WearableListenerService implements
                 Constants.CAPABILITY_PHONE_APP);
         Uri uri = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
         Wearable.MessageApi.addListener(mGoogleApiClient, this, uri, MessageApi.FILTER_PREFIX);
-        setUpNodeIdentities();
+//        setUpNodeIdentities();
     }
 
     @Override
@@ -421,7 +503,7 @@ public class MessageService extends WearableListenerService implements
                 else if(message.contains(Constants.DEMO_NOTIF)) {
                     Log.d(Constants.TAG, "MessageService: Demo mode starting on watch");
                     LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
-                    startDemoNotif();
+//                    startDemoNotif();
                 }
                 else if(message.contains(Constants.OK_ACTION)) {
                     Log.d(Constants.TAG, "MessageService: feedback starts");
@@ -432,28 +514,28 @@ public class MessageService extends WearableListenerService implements
     }
 
 
-    public void startDemoNotif() {
-        final NotificationManager notifMnager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        messageServiceNotifBuilder = new Notification.Builder(getApplicationContext())
-                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                .setContentTitle("UPMC Dash Activity Monitor (DEMO)")
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setContentText("Ready for a quick walk ?")
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setPriority(Notification.PRIORITY_MAX)
-                .setDefaults(Notification.DEFAULT_ALL);
-        notifMnager.notify(444, messageServiceNotifBuilder.build());
-        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
-        vibrator.vibrate(pattern,0);
-        Handler handler2 = new Handler();
-        handler2.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                vibrator.cancel();
-            }
-        }, 3000);
-    }
+//    public void startDemoNotif() {
+//        final NotificationManager notifMnager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        messageServiceNotifBuilder = new Notification.Builder(getApplicationContext())
+//                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+//                .setContentTitle("UPMC Dash Activity Monitor (DEMO)")
+//                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+//                .setContentText("Ready for a quick walk ?")
+//                .setVisibility(Notification.VISIBILITY_PUBLIC)
+//                .setPriority(Notification.PRIORITY_MAX)
+//                .setDefaults(Notification.DEFAULT_ALL);
+//        notifMnager.notify(444, messageServiceNotifBuilder.build());
+//        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+//        long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+//        vibrator.vibrate(pattern,0);
+//        Handler handler2 = new Handler();
+//        handler2.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                vibrator.cancel();
+//            }
+//        }, 3000);
+//    }
 
     private String buildInitMessage() {
         StringBuilder messageBuilder = new StringBuilder();
@@ -542,9 +624,17 @@ public class MessageService extends WearableListenerService implements
     }
 
     private void notifyUser(String notifContent) {
-        messageServiceNotifBuilder.setContentText(notifContent);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, messageServiceNotifBuilder.build());
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            assert setupNotifBuilder!=null;
+            setupNotifBuilder.setContentText(notifContent);
+            mNotificationManager.notify(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
+        }
+        else {
+            assert setupNotifBuilder!=null;
+            setupNotifCompatBuilder.setContentText(notifContent);
+            mNotificationManager.cancel(Constants.MESSAGE_SERVICE_NOTIFICATION_ID);
+            mNotificationManager.notify(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifCompatBuilder.build());
+        }
     }
-
 }

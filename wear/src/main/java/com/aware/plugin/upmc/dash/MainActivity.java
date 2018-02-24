@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
@@ -27,7 +28,6 @@ public class MainActivity extends WearableActivity{
     private TextView mTextView;
     private TextView mClockView;
     private static final String LC_DEBUG = "DASH";
-    private Intent msgServiceIntent;
 
 
     @Override
@@ -39,12 +39,21 @@ public class MainActivity extends WearableActivity{
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mTextView = (TextView) findViewById(R.id.text);
         mClockView = (TextView) findViewById(R.id.clock);
-        msgServiceIntent = new Intent(this, MessageService.class);
         Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
-        if(!isMyServiceRunning(MessageService.class))
-            startService(msgServiceIntent);
-       // Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
-        finish();
+        if(!isMyServiceRunning(MessageService.class)) {
+            Intent messageService = new Intent(this, MessageService.class);
+            messageService.setAction(Constants.ACTION_FIRST_RUN);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(messageService);
+                Log.d(Constants.TAG, "MainActivity: starting foreground message service");
+
+            }
+            else {
+                startService(messageService);
+                Log.d(Constants.TAG, "MainActivity: starting message service");
+
+            }
+        }
     }
 
 

@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 /**
@@ -13,9 +14,13 @@ import android.util.Log;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(Constants.TAG,"BootReceived");
+        Log.d(Constants.TAG,"BootReceiver: onReceive: BootReceived");
         if(!isMyServiceRunning(MessageService.class, context)) {
-            context.startService(new Intent(context, MessageService.class));
+            Intent messageService = new Intent(context, MessageService.class).setAction(Constants.ACTION_REBOOT_RUN);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                context.startForegroundService(messageService);
+            else
+                context.startService(messageService);
         }
 
     }
