@@ -128,6 +128,7 @@ public final class Constants {
     public static final String ACTION_APPRAISAL = "action_appraisal_ok";
     public static final String ACTION_INACTIVITY = "action_inactivity_responses";
     public static final String ACTION_VICINITY = "action_vicinity";
+    public static final String ACTION_SETTINGS_CHANGED = "action_settings_changed";
 
 
 
