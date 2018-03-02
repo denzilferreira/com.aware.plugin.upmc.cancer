@@ -395,7 +395,7 @@ public class UPMC extends AppCompatActivity {
                             showSymptomSurvey();
                         }
                     }
-                }, 3000);
+                }, 10000);
             }
         }
     }

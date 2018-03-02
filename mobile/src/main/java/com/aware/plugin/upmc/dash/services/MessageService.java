@@ -481,6 +481,7 @@ public class MessageService extends WearableListenerService implements
             case Constants.ACTION_VICINITY:
                 Log.d(Constants.TAG, "MessageService: onStartCommand: vicinity");
                 checkSetup();
+                break;
             default:
                 return i;
         }
@@ -517,25 +518,29 @@ public class MessageService extends WearableListenerService implements
 
 
     public void checkSetup() {
-        isWearServiceRunning(getNODE_ID());
-        if(isNodeSaved()) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
+        setUpNodeIdentities();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(isNodeSaved()) {
                     if(isWearConnected()) {
+                        Log.d(Constants.TAG, "onStartCommand:Setup Complete");
+                        notifySetup(Constants.CONNECTED_WEAR);
                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_IN_RANGE));
                     }
                     else {
+                        Log.d(Constants.TAG, "onStartCommand: setupFailed");
+                        notifySetup(Constants.FAILED_WEAR);
                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
                     }
                 }
-            }, 5000);
-        }
-        else {
-          LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
-
-
-        }
+                else {
+                    Log.d(Constants.TAG, "onStartCommand:setupFailed");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
+                    notifySetup(Constants.FAILED_WEAR);
+                }
+            }
+        }, 5000);
 
     }
 
