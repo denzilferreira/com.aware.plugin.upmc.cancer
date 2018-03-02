@@ -123,17 +123,6 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".receivers.NotifReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="SNOOZE_ACTION" />
-                <action android:name="OK_ACTION" />
-                <action android:name="NO_ACTION" />
-                <action android:name="RETRY_ACTION" />
-                <action android:name="OK_ACTION_GJ" />
-            </intent-filter>
-        </receiver>
 
         <provider
             android:name=".activities.Provider"
@@ -150,12 +139,8 @@
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.AlarmReceiver" />
+        <receiver android:name=".receivers.SnoozeReceiver" />
 
-        <activity
-            android:name=".activities.InabilityResponseForm"
-            android:label="@string/title_activity_inability_response_form"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.DemoESM"
             android:label="@string/title_activity_demo_esm"
@@ -173,10 +158,14 @@
                 android:resource="@xml/sync_upmc" />
         </service>
 
-        <activity android:name=".activities.SetupLoadingActvity"
+        <activity
+            android:name=".activities.SetupLoadingActvity"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.Dialog.Alert">
-            </activity>
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"/>
+        <activity
+            android:name=".activities.NotificationResponseActivity"
+            android:label="@string/title_activity_notification_response"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"/>
     </application>
 
 </manifest>

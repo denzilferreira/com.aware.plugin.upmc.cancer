@@ -94,7 +94,6 @@ public final class Constants {
     // Ok Action
     public static final String OK_ACTION = "OK_ACTION";
 
-    public static final String OK_ACTION_GJ = "OK_ACTION_GJ";
 
 
     //No Action
@@ -122,8 +121,13 @@ public final class Constants {
     //complete survey
 
     public static final String COMPLETE_SURVEY = "Tap to begin your survey";
+
+    //MessageService ACTIONS
     public static final String ACTION_SURVEY = "action_survey";
     public static final String ACTION_FIRST_RUN = "first_run";
+    public static final String ACTION_APPRAISAL = "action_appraisal_ok";
+    public static final String ACTION_INACTIVITY = "action_inactivity_responses";
+
 
 
     // Wear setup notif
@@ -132,6 +136,12 @@ public final class Constants {
     public static final String CONNECTED_WEAR = "Connected: Watch is logging your activity.. ";
     public static final String FAILED_WEAR = "Disconnected: Tap to reconnect";
     public static final String FAILED_WEAR_BLUETOOTH = "Disconnected: Switch on Bluetooth";
+
+
+    //Wear monitor notif
+
+    public static final String NOTIF_APPRAISAL = "Great Job! You have been active";
+    public static final String NOTIF_INACTIVITY =  "Ready for a quick walk?";
 
 
 //    // notification messages

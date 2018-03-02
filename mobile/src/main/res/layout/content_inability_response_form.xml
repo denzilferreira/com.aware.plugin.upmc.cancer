@@ -33,10 +33,17 @@
 
     <EditText
         android:id="@+id/reason_field"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="Please enter reason here"
         />
+
+    <Button
+        android:id="@+id/inability_submit"
+        android:text="SUBMIT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 
 </LinearLayout>

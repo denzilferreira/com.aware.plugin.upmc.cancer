@@ -241,6 +241,7 @@ public class MessageService extends WearableListenerService implements
         }
         else if(intent.getAction().equals(Constants.ACTION_SETUP_WEAR))  {
             Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
+            sendMessageToPhone(Constants.ACK);
 
         }
         else if(intent.getAction().equals(Constants.ACTION_REBOOT_RUN)) {

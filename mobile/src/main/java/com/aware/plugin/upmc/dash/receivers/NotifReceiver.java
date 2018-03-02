@@ -17,7 +17,7 @@ public class NotifReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction()!=null) {
             Log.d(Constants.TAG, "NotifRecevier: Received: " + intent.getAction());
-            LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.NOTIF_COMM).putExtra(Constants.NOTIF_KEY, intent.getAction()));
+            LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.NOTIF_COMM).setAction(intent.getAction()));
         }
 
     }
