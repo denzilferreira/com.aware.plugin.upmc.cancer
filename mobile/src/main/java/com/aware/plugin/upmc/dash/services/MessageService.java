@@ -106,55 +106,6 @@ public class MessageService extends WearableListenerService implements
 //                    Log.d(Constants.TAG, "MessageService: mSettingsLocalReceiver");
 //                    timeResetWear();
 //                }
-//                else if(intent.getStringExtra(Constants.SETTINGS_EXTRA_KEY).equals(Constants.VICINITY_CHECK)) {
-//                    Log.d(Constants.TAG, "MessageService: vicinity check");
-//                    isWearServiceRunning(getNODE_ID());
-//                    if(isDemoMode()) {
-//                        final Handler handler = new Handler();
-//                        //do something here
-//                        handler.postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (isWearConnected()) {
-//                                    Log.d(Constants.TAG, "MessageService:: Wear replied with ACK");
-//                                    if(isDemoMode()) {
-//                                        Handler handler = new Handler();
-//                                        handler.postDelayed(new Runnable() {
-//                                            @Override
-//                                            public void run() {
-//                                                sendMessageToWear(Constants.DEMO_NOTIF);
-//                                                Log.d(Constants.TAG, "MessageService:Sending Demo Notif");
-//                                            }
-//                                        }, 16000);
-//                                    }
-//
-//
-//                                } else {
-//                                    Log.d(Constants.TAG, "MessageService:: Wear gave no ACK response");
-//                                    //notifyUserSyncFailed(Constants.FAILED_WEAR);
-//                                }
-//                            }
-//                        }, 5000);
-//                    }
-//                    Handler handler = new Handler();
-//                    final Context mContext = context;
-//                    handler.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if(isWearConnected()) {
-//                                LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_IN_RANGE));
-//                                Log.d(Constants.TAG, "MessageService: vicinity check pass");
-//                            }
-//                            else {
-//                                LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
-//                                Log.d(Constants.TAG, "MessageService: vicinity check fail");
-//                            }
-//                        }
-//                    }, 10000);
-//                }
-//                else if(intent.getStringExtra(Constants.SETTINGS_EXTRA_KEY).equals(Constants.KILL_DEMO)) {
-//                    Log.d(Constants.TAG, "MessageService:EndingDemo");
-//                }
 //            }
         }
     };
@@ -189,7 +140,6 @@ public class MessageService extends WearableListenerService implements
         else
             return true;
     }
-
 
     private BroadcastReceiver mSymptomsLocalReceiver = new BroadcastReceiver() {
         @Override
@@ -368,11 +318,13 @@ public class MessageService extends WearableListenerService implements
             if (!isNodeSaved()) {
                 setNODE_ID(messageEvent.getSourceNodeId());
             }
+            if (!isWearConnected()) {
+                setWearConnected(true);
+                notifySetup(Constants.CONNECTED_WEAR);
+            }
+
             if (message.equals(Constants.ACK)) {
-                if (!isWearConnected()) {
-                    setWearConnected(true);
-                    notifySetup(Constants.CONNECTED_WEAR);
-                }
+                // do nothing
             } else {
                 sendMessageToWear(Constants.ACK);
                 if (message.equals(Constants.STATUS_LOGGING)) {
@@ -515,30 +467,7 @@ public class MessageService extends WearableListenerService implements
             case Constants.ACTION_SETUP_WEAR:
                 Log.d(Constants.TAG, "MessageService: onStartCommand setup wear");
                 startActivity(new Intent(this, SetupLoadingActvity.class));
-                setUpNodeIdentities();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(isNodeSaved()) {
-                            if(isWearConnected()) {
-                                Log.d(Constants.TAG, "onStartCommand:Setup Complete");
-                                notifySetup(Constants.CONNECTED_WEAR);
-                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.CONNECTED_WEAR));
-                            }
-                            else {
-                                Log.d(Constants.TAG, "onStartCommand: setupFailed");
-                                notifySetup(Constants.FAILED_WEAR);
-                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.FAILED_WEAR));
-                            }
-                        }
-                        else {
-                            Log.d(Constants.TAG, "onStartCommand:setupFailed");
-                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.FAILED_WEAR));
-                            notifySetup(Constants.FAILED_WEAR);
-
-                        }
-                    }
-                }, 5000);
+                initiateSetup();
                 notifyUserWithInactivity();
                 break;
             case Constants.ACTION_APPRAISAL:
@@ -549,11 +478,69 @@ public class MessageService extends WearableListenerService implements
                 Log.d(Constants.TAG, "MessageService: onStartCommand : inactivity");
                 startActivity(new Intent(this, NotificationResponseActivity.class));
                 break;
+            case Constants.ACTION_VICINITY:
+                Log.d(Constants.TAG, "MessageService: onStartCommand: vicinity");
+                checkSetup();
             default:
                 return i;
         }
         return i;
     }
+
+
+    public void initiateSetup() {
+        setUpNodeIdentities();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(isNodeSaved()) {
+                    if(isWearConnected()) {
+                        Log.d(Constants.TAG, "onStartCommand:Setup Complete");
+                        notifySetup(Constants.CONNECTED_WEAR);
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.CONNECTED_WEAR));
+                    }
+                    else {
+                        Log.d(Constants.TAG, "onStartCommand: setupFailed");
+                        notifySetup(Constants.FAILED_WEAR);
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.FAILED_WEAR));
+                    }
+                }
+                else {
+                    Log.d(Constants.TAG, "onStartCommand:setupFailed");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.FAILED_WEAR));
+                    notifySetup(Constants.FAILED_WEAR);
+                }
+            }
+        }, 5000);
+
+    }
+
+
+    public void checkSetup() {
+        isWearServiceRunning(getNODE_ID());
+        if(isNodeSaved()) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(isWearConnected()) {
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_IN_RANGE));
+                    }
+                    else {
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
+                    }
+                }
+            }, 5000);
+        }
+        else {
+          LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
+
+
+        }
+
+    }
+
+
+
 
 
     private void showSurveyNotif() {
@@ -743,9 +730,14 @@ public class MessageService extends WearableListenerService implements
             public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
                 if (!sendMessageResult.getStatus().isSuccess()) {
                     Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed" + message);
+                    setWearConnected(false);
                     notifySetup(Constants.FAILED_WEAR);
                 } else {
                     Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent" + message);
+                    if(!isWearConnected()) {
+                        notifySetup(Constants.CONNECTED_WEAR);
+                    }
+                    setWearConnected(true);
                 }
             }
         });
