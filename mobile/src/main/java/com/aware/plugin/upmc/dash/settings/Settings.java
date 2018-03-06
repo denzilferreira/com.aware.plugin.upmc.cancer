@@ -31,11 +31,11 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
      */
     public static final String PLUGIN_UPMC_CANCER_PROMPT_INTERVAL = "plugin_upmc_cancer_prompt_interval";
 
-    public static final String PLUGIN_UPMC_CANCER_MORNING_HOUR = "-1";
-    public static final String PLUGIN_UPMC_CANCER_MORNING_MINUTE = "-1";
-    public static final String PLUGIN_UPMC_CANCER_NIGHT_HOUR = "-1";
-    public static final String PLUGIN_UPMC_CANCER_NIGHT_MINUTE = "-1";
-    public static final String PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY =  "-1";
+    public static final String PLUGIN_UPMC_CANCER_MORNING_HOUR = "plugin_upmc_cancer_morning_hour";
+    public static final String PLUGIN_UPMC_CANCER_MORNING_MINUTE = "plugin_upmc_cancer_morning_minute";
+    public static final String PLUGIN_UPMC_CANCER_NIGHT_HOUR = "plugin_upmc_cancer_night_hour";
+    public static final String PLUGIN_UPMC_CANCER_NIGHT_MINUTE = "plugin_upmc_cancer_night_minute";
+    public static final String PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY =  "plugin_upmc_cancer_symptom_severity";
 
     private CheckBoxPreference status;
     private EditTextPreference max_prompts, min_interval_prompts;

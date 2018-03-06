@@ -241,9 +241,9 @@ public class MessageService extends WearableListenerService implements
                     sendMessageToWear(Constants.ACK);
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:TimeInit");
                     notifySetup(Constants.CONNECTED_WEAR);
-                    if(isWearInitializable()){
-                        initializeWear();
-                    }
+//                    if(isWearInitializable()){
+//                        initializeWear();
+//                    }
                     break;
                 case Constants.NOTIF_INACTIVITY:
                     sendMessageToWear(Constants.ACK);
@@ -364,6 +364,7 @@ public class MessageService extends WearableListenerService implements
         initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
         initBuilder.append(" ");
         initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY));
+        Log.d(Constants.TAG, "MessageService:initializeWear: " + initBuilder.toString());
         sendMessageToWear(initBuilder.toString());
     }
 
@@ -371,7 +372,11 @@ public class MessageService extends WearableListenerService implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         final int i = super.onStartCommand(intent, flags, startId);
         Log.d(Constants.TAG, "MessageService: onStartCommand");
-        String intentAction = intent.getAction();
+        String intentAction = null;
+        if(intent!=null)
+            intentAction = intent.getAction();
+        if(intentAction ==null)
+            return i;
         switch (intentAction) {
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "MessageService: onStartCommand first run");
@@ -386,7 +391,7 @@ public class MessageService extends WearableListenerService implements
                 Log.d(Constants.TAG, "MessageService: onStartCommand setup wear");
                 startActivity(new Intent(this, SetupLoadingActvity.class));
                 initiateSetup();
-                notifyUserWithInactivity();
+                //notifyUserWithInactivity();
                 break;
             case Constants.ACTION_APPRAISAL:
                 Log.d(Constants.TAG, "MessageService: onStartCommand appraisal");

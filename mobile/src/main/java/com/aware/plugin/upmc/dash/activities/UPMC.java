@@ -278,8 +278,10 @@ public class UPMC extends AppCompatActivity {
             Aware.setSetting(this, Aware_Preferences.STATUS_ESM, true);
             //Aware.startESM(this);
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
+                // When app is run for the first time
                 loadSchedule(true);
             } else {
+                // When the app is opened later
                 if (isMyServiceRunning(MessageService.class)) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(new Intent(this, MessageService.class).setAction(Constants.ACTION_VICINITY));
@@ -289,7 +291,8 @@ public class UPMC extends AppCompatActivity {
                 }
 
                 LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
-//                // check if watch is around
+
+                //                // check if watch is around
                 setContentView(R.layout.activity_upmc_loading);
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -642,7 +645,7 @@ public class UPMC extends AppCompatActivity {
             public void onClick(View v) {
                 answer_questions.setEnabled(false);
                 answer_questions.setText("Saving answers..");
-                Log.d(Constants.TAG, "Trig::Questionnaire");
+                Log.d(Constants.TAG, "UPMC:Questionnaire");
                 progressBar.setVisibility(View.VISIBLE);
                 ContentValues answer = new ContentValues();
                 answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));

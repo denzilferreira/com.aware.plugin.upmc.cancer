@@ -9,13 +9,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -40,6 +44,13 @@ public class MainActivity extends WearableActivity{
         mTextView = (TextView) findViewById(R.id.text);
         mClockView = (TextView) findViewById(R.id.clock);
         Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
+        String[] REQUIRED_PERMISSIONS = new String[]{
+        Manifest.permission.BODY_SENSORS,
+        Manifest.permission.RECEIVE_BOOT_COMPLETED,
+        Manifest.permission.BLUETOOTH,
+        Manifest.permission.VIBRATE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        requestPermissions(REQUIRED_PERMISSIONS, 1);
         if(!isMyServiceRunning(MessageService.class)) {
             Intent messageService = new Intent(this, MessageService.class);
             messageService.setAction(Constants.ACTION_FIRST_RUN);
@@ -56,7 +67,27 @@ public class MainActivity extends WearableActivity{
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
 
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.2
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(MainActivity.this, "Permission denied. Cannot continue", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
