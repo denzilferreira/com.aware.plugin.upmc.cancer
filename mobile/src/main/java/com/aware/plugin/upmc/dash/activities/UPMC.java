@@ -48,6 +48,7 @@ import java.util.List;
 
 public class UPMC extends AppCompatActivity {
     public boolean isWatchAround = false;
+    public boolean WEARLESS_DEBUG = true;
     public BroadcastReceiver vicinityCheckBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -292,21 +293,24 @@ public class UPMC extends AppCompatActivity {
 
                 LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
 
-                //                // check if watch is around
-                setContentView(R.layout.activity_upmc_loading);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(vicinityCheckBroadcastReceiver);
-                        if(!isWatchAround()) {
-                            Toast.makeText(getApplicationContext(), "Wear is not in range. Please reinitiate setup", Toast.LENGTH_SHORT).show();
-                            finish();
+                // check if watch is around. If you do not have a Android Wear device and you'd like debug, set WIRELESS_DEBUG to true
+                if (WEARLESS_DEBUG) {
+                    showSymptomSurvey();
+                } else {
+                    setContentView(R.layout.activity_upmc_loading);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(vicinityCheckBroadcastReceiver);
+                            if (!isWatchAround()) {
+                                Toast.makeText(getApplicationContext(), "Wear is not in range. Please reinitiate setup", Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                showSymptomSurvey();
+                            }
                         }
-                        else  {
-                            showSymptomSurvey();
-                        }
-                    }
-                }, 10000);
+                    }, 10000);
+                }
             }
         }
     }
