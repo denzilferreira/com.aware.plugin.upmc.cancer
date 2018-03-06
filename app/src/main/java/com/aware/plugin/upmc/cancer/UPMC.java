@@ -554,45 +554,45 @@ public class UPMC extends AppCompatActivity {
 
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
 
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
+                //Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
 
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
 
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NOTIFICATIONS, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_APPLICATIONS, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_NOTIFICATIONS, true);
 
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
 
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.device_usage.Settings.STATUS_PLUGIN_DEVICE_USAGE, true);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.device_usage.Settings.STATUS_PLUGIN_DEVICE_USAGE, true);
 
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.STATUS_GOOGLE_FUSED_LOCATION, true);
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.MAX_FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.ACCURACY_GOOGLE_FUSED_LOCATION, 102);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.STATUS_GOOGLE_FUSED_LOCATION, true);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.MAX_FREQUENCY_GOOGLE_FUSED_LOCATION, 300);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.ACCURACY_GOOGLE_FUSED_LOCATION, 102);
                 Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.FALLBACK_LOCATION_TIMEOUT, 20);
                 Aware.setSetting(getApplicationContext(), com.aware.plugin.google.fused_location.Settings.LOCATION_SENSITIVITY, 5);
 
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
 
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_CALLS, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_MESSAGES, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_CALLS, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_MESSAGES, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
 
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, false);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, false);
 
-                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
-                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.device_usage");
-                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.fused_location");
-                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
-                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
+//                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+//                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.device_usage");
+//                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.fused_location");
+//                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.studentlife.audio_final");
+//                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.fitbit");
 
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour());
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute());
