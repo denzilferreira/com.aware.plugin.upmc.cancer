@@ -140,6 +140,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.SnoozeReceiver" />
+        <receiver android:name=".receivers.ContextBroadcaster"/>
 
         <activity
             android:name=".activities.DemoESM"

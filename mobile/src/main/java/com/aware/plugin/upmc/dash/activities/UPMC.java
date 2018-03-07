@@ -676,12 +676,8 @@ public class UPMC extends AppCompatActivity {
                 final Context context = getApplicationContext();
                 Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
                 sendActionToService(Constants.SETTINGS_CHANGED);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        finish();
-                    }
-                }, 10000);
+                Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
+                finish();
             }
         });
     }
