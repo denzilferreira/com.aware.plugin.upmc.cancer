@@ -84,9 +84,6 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-
-
-
 dependencies {
     //AWARE is now self-contained. No more leftover dependencies!
     api "com.github.denzilferreira:aware-client:development-SNAPSHOT"

@@ -16,6 +16,7 @@ import com.aware.syncadapters.AwareSyncAdapter;
 public class UPMC_Sync extends Service {
     private AwareSyncAdapter sSyncAdapter = null;
     private static final Object sSyncAdapterLock = new Object();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -32,12 +33,11 @@ public class UPMC_Sync extends Service {
                 );
             }
         }
-
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return sSyncAdapter.getSyncAdapterBinder();
     }
 }

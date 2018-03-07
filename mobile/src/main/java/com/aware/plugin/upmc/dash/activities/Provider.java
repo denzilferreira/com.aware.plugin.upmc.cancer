@@ -18,24 +18,9 @@ import com.aware.utils.DatabaseHelper;
 
 import java.util.HashMap;
 
-/**
- * Created by denzil on 25/11/
- * <p>
- * <p>
- * CREATE TABLE `upmc_dash`.`upmc_dash_stepcount` (
- * `_id` INT(11) NOT NULL AUTO_INCREMENT,
- * `timestamp` DOUBLE NULL DEFAULT '0',
- * `device_id` VARCHAR(45) NULL DEFAULT '',
- * `stepcount` INT NULL DEFAULT NULL,
- * `alarmtype` INT NULL DEFAULT NULL,
- * PRIMARY KEY (`_id`));
- */
 public class Provider extends ContentProvider {
-
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-
     public static final int DATABASE_VERSION = 10; //increase this if you make changes to the database structure, i.e., rename columns, etc.
-
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
@@ -62,9 +47,6 @@ public class Provider extends ContentProvider {
     }
 
     public static final class Symptom_Data implements AWAREColumns {
-        private Symptom_Data() {
-        }
-
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash";
@@ -91,20 +73,14 @@ public class Provider extends ContentProvider {
     }
 
     public static final class Motivational_Data implements AWAREColumns {
-        private Motivational_Data() {
-        }
-
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_motivation");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.motivation";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.motivation";
-        public static final String RATIONALE = "motivation_rationale";
+        static final String RATIONALE = "motivation_rationale";
     }
 
 
     public static final class Stepcount_Data implements AWAREColumns {
-        private Stepcount_Data() {
-        }
-
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_stepcount");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";

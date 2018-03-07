@@ -34,6 +34,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
 import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
@@ -42,6 +43,7 @@ import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.ui.PermissionsHandler;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -171,8 +173,8 @@ public class UPMC extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
                     if (!Aware.isStudy(getApplicationContext())) {
                         //UPMC Dash
-                        //Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
-                        Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
+                        Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+                        //Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
                     }
                 }
             });
@@ -782,7 +784,7 @@ public class UPMC extends AppCompatActivity {
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, false);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true);
@@ -804,6 +806,7 @@ public class UPMC extends AppCompatActivity {
                 //Ask accessibility to be activated
                 Applications.isAccessibilityServiceActive(getApplicationContext());
                 Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
+
                 unregisterReceiver(joinedObserver);
                 Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();

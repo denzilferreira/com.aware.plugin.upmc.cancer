@@ -71,9 +71,10 @@
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <service
-            android:name=".activities.Plugin"
+            android:name="com.aware.plugin.upmc.dash.activities.Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Cancer" />
+
         <service
             android:name=".services.Survey"
             android:exported="true"
@@ -125,7 +126,7 @@
         </receiver>
 
         <provider
-            android:name=".activities.Provider"
+            android:name="com.aware.plugin.upmc.dash.activities.Provider"
             android:authorities="${applicationId}.provider.survey"
             android:exported="true"
             android:label="@string/plugin_upmc_dash"
@@ -133,14 +134,19 @@
             android:syncable="true"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name=".activities.Plugin$SurveyListener">
+        <receiver android:name="com.aware.plugin.upmc.dash.activities.Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.SnoozeReceiver" />
-        <receiver android:name=".receivers.ContextBroadcaster"/>
+
+        <receiver android:name=".activities.Plugin$SyncReceiver">
+            <intent-filter>
+                <action android:name="ACTION_AWARE_SYNC_DATA" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".activities.DemoESM"
@@ -148,12 +154,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".syncadapters.UPMC_Sync"
+            android:name="com.aware.plugin.upmc.dash.syncadapters.UPMC_Sync"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_upmc" />
@@ -162,11 +167,11 @@
         <activity
             android:name=".activities.SetupLoadingActvity"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.Dialog.Alert"/>
+            android:theme="@style/Theme.AppCompat.Dialog.Alert" />
         <activity
             android:name=".activities.NotificationResponseActivity"
             android:label="@string/title_activity_notification_response"
-            android:theme="@style/Theme.AppCompat.Dialog.Alert"/>
+            android:theme="@style/Theme.AppCompat.Dialog.Alert" />
     </application>
 
 </manifest>

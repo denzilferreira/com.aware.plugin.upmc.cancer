@@ -13,8 +13,8 @@ import android.os.Bundle;
 
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
-import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.services.Survey;
+import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.utils.Aware_Plugin;
 import com.aware.utils.Scheduler;
 
@@ -31,7 +31,8 @@ public class Plugin extends Aware_Plugin {
     public void onCreate() {
         super.onCreate();
 
-        AUTHORITY = Provider.getAuthority(this);
+        AUTHORITY = Provider.getAuthority(getApplicationContext());
+
         TAG = "UPMC Cancer";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
@@ -123,10 +124,10 @@ public class Plugin extends Aware_Plugin {
                 e.printStackTrace();
             }
 
-            if (Aware.isStudy(this)) {
+            if (Aware.isStudy(getApplicationContext())) {
                 Account aware_account = Aware.getAWAREAccount(getApplicationContext());
                 String authority = Provider.getAuthority(getApplicationContext());
-                long frequency = Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
+                long frequency = Long.parseLong(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
 
                 ContentResolver.setIsSyncable(aware_account, authority, 1);
                 ContentResolver.setSyncAutomatically(aware_account, authority, true);
@@ -141,6 +142,18 @@ public class Plugin extends Aware_Plugin {
         }
 
         return START_STICKY;
+    }
+
+    public static class SyncReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Aware.ACTION_AWARE_SYNC_DATA)) {
+                Bundle sync = new Bundle();
+                sync.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                sync.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                ContentResolver.requestSync(Aware.getAWAREAccount(context), Provider.getAuthority(context), sync);
+            }
+        }
     }
 
     public static Float symptomAvg(Context c) {
@@ -255,8 +268,8 @@ public class Plugin extends Aware_Plugin {
         super.onDestroy();
 
         ContentResolver.removePeriodicSync(
-                Aware.getAWAREAccount(this),
-                Provider.getAuthority(this),
+                Aware.getAWAREAccount(getApplicationContext()),
+                Provider.getAuthority(getApplicationContext()),
                 Bundle.EMPTY
         );
 
