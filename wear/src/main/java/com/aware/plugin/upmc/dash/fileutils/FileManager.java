@@ -1,18 +1,14 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.fileutils;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.wearable.Asset;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;

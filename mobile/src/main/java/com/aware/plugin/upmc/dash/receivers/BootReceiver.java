@@ -18,7 +18,7 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(Constants.TAG,"BootReceived");
         if(!isMyServiceRunning(MessageService.class, context)) {
-            context.startService(new Intent(context, MessageService.class));
+            context.startService(new Intent(context, MessageService.class).setAction(Constants.ACTION_REBOOT));
         }
 
     }

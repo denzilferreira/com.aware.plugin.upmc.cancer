@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.utils;
 
 /**
  * Created by RaghuTeja on 6/23/17.
@@ -74,11 +74,15 @@ public final class Constants {
 
 
     // notification messages
-    public static final String NOTIFTEXT_SYNC_FAILED = "Sync Failed: Cannot display alerts on phone";
-    public static final String NOTIFTEXT_SYNC_SUCCESS = "Synced: Phone will display alerts";
-    public static final String NOTIFTEXT_SYNC_FAILED_BLUETOOTH = "Sync Failed : Switch on Bluetooth";
-    public static final String NOTIFTEXT_SENDING_MESSAGE = "Sending message...";
-    public static final String NOTIFTEXT_TRY_CONNECT = "Syncing with phone...";
+    public static final String FAILED_PHONE = "(Disconnected)\nPhone cannot display alerts";
+    public static final String CONNECTED_PHONE = "(Connected)\nPhone will display alerts";
+    public static final String FAILED_PHONE_BLUETOOTH = "Disconnected : Switch on Bluetooth";
+    public static final String NOTIFTEXT_TRY_CONNECT = "Scanning for phone...";
+
+
+    // Sensor Service Notification
+    public static final String SS_MONITORING = "(Session Running)\n until night time";
+    public static final String SS_NOT_MONITORING = "(Session Paused)\n until morning time";
 
 
     //sensors
@@ -121,7 +125,7 @@ public final class Constants {
     //MessageService onStartCommand Actions
     public static final String ACTION_SETUP_WEAR = "setup_wear";
     public static final String ACTION_FIRST_RUN = "first_run";
-    public static final String ACTION_REBOOT_RUN = "action_reboot_run";
+    public static final String ACTION_REBOOT = "action_reboot_run";
 
 
     //notifstuff

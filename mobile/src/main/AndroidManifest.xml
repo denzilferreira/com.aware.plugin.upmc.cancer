@@ -71,10 +71,9 @@
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <service
-            android:name="com.aware.plugin.upmc.dash.activities.Plugin"
+            android:name=".activities.Plugin"
             android:exported="true"
             android:label="AWARE: UPMC Cancer" />
-
         <service
             android:name=".services.Survey"
             android:exported="true"
@@ -126,7 +125,7 @@
         </receiver>
 
         <provider
-            android:name="com.aware.plugin.upmc.dash.activities.Provider"
+            android:name=".activities.Provider"
             android:authorities="${applicationId}.provider.survey"
             android:exported="true"
             android:label="@string/plugin_upmc_dash"
@@ -134,14 +133,13 @@
             android:syncable="true"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name="com.aware.plugin.upmc.dash.activities.Plugin$SurveyListener">
+        <receiver android:name=".activities.Plugin$SurveyListener">
             <intent-filter>
                 <action android:name="ACTION_CANCER_SURVEY" />
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.SnoozeReceiver" />
-
         <receiver android:name=".activities.Plugin$SyncReceiver">
             <intent-filter>
                 <action android:name="ACTION_AWARE_SYNC_DATA" />
@@ -154,11 +152,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name="com.aware.plugin.upmc.dash.syncadapters.UPMC_Sync"
+            android:name=".syncadapters.UPMC_Sync"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
+
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_upmc" />

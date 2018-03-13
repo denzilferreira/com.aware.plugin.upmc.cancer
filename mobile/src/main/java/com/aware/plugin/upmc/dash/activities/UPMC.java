@@ -34,7 +34,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
 import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
@@ -224,7 +223,7 @@ public class UPMC extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
                     Log.d(Constants.TAG, "UPMC: Sending Settings Changed Broadcast");
-                    sendActionToService(Constants.SETTINGS_CHANGED);
+                    sendActionToService(Constants.ACTION_SETTINGS_CHANGED);
                 }
             });
         }
@@ -284,21 +283,20 @@ public class UPMC extends AppCompatActivity {
                 // When app is run for the first time
                 loadSchedule(true);
             } else {
-                // When the app is opened later
-                if (isMyServiceRunning(MessageService.class)) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        startForegroundService(new Intent(this, MessageService.class).setAction(Constants.ACTION_VICINITY));
-                    } else {
-                        startService(new Intent(this, MessageService.class).setAction(Constants.ACTION_VICINITY));
-                    }
-                }
-
-                LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
 
                 // check if watch is around. If you do not have a Android Wear device and you'd like debug, set WIRELESS_DEBUG to true
                 if (WEARLESS_DEBUG) {
                     showSymptomSurvey();
                 } else {
+                    // When the app is opened later
+                    if (isMyServiceRunning(MessageService.class)) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(new Intent(this, MessageService.class).setAction(Constants.ACTION_VICINITY));
+                        } else {
+                            startService(new Intent(this, MessageService.class).setAction(Constants.ACTION_VICINITY));
+                        }
+                    }
+                    LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
                     setContentView(R.layout.activity_upmc_loading);
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -677,7 +675,7 @@ public class UPMC extends AppCompatActivity {
                 int severity = checkSymptoms();
                 final Context context = getApplicationContext();
                 Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
-                sendActionToService(Constants.SETTINGS_CHANGED);
+                sendActionToService(Constants.ACTION_SETTINGS_CHANGED);
                 Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -784,7 +782,7 @@ public class UPMC extends AppCompatActivity {
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, false);
+                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true);

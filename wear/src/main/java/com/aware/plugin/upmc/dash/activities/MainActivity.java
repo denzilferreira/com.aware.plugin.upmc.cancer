@@ -1,8 +1,7 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.activities;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
@@ -18,8 +16,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.services.MessageService;
+import com.aware.plugin.upmc.dash.R;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -40,9 +41,9 @@ public class MainActivity extends WearableActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
-        mContainerView = (BoxInsetLayout) findViewById(R.id.container);
-        mTextView = (TextView) findViewById(R.id.text);
-        mClockView = (TextView) findViewById(R.id.clock);
+        mContainerView =  findViewById(R.id.container);
+        mTextView =  findViewById(R.id.text);
+        mClockView =  findViewById(R.id.clock);
         Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
         String[] REQUIRED_PERMISSIONS = new String[]{
         Manifest.permission.BODY_SENSORS,
@@ -74,6 +75,7 @@ public class MainActivity extends WearableActivity{
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    finish();
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.2

@@ -59,7 +59,6 @@ public final class Constants {
     public static final String SETTINGS_EXTRA_KEY = "settings comm";
     public static final String SETTING_INTENT_FILTER = "settings intent filter";
     public static final String VICINITY_CHECK = "vcheck";
-    public static final String SETTINGS_CHANGED = "settings panel changed";
 
 
 
@@ -84,7 +83,7 @@ public final class Constants {
 
     // Snooze Action
 
-    public static final String SNOOZE_ACTION = "SNOOZE_ACTION";
+    public static final String ACTION_NOTIF_SNOOZE = "SNOOZE_ACTION";
     public static final String ALARM_COMM = "AlarmComm";
     public static final String SNOOZE_ALARM_INTENT_FILTER = "snooze alarm intent filter";
     public static final String SNOOZE_ALARM_EXTRA_KEY = "snooze alarm extra key";
@@ -92,12 +91,12 @@ public final class Constants {
 
 
     // Ok Action
-    public static final String OK_ACTION = "OK_ACTION";
+    public static final String ACTION_NOTIF_OK = "OK_ACTION";
 
 
 
     //No Action
-    public static final String NO_ACTION = "NO_ACTION";
+    public static final String ACTION_NOTIF_NO = "NO_ACTION";
 
     //Retry Action
     public static final String RETRY_ACTION = "RETRY_ACTION";
@@ -107,6 +106,12 @@ public final class Constants {
 
     //MessageService Actions
     public static final String ACTION_SETUP_WEAR = "setup_wear";
+
+
+
+    //
+
+    public static final String ACTION_SNOOZE = "action_snooze";
 
 
 
@@ -129,12 +134,12 @@ public final class Constants {
     public static final String ACTION_INACTIVITY = "action_inactivity_responses";
     public static final String ACTION_VICINITY = "action_vicinity";
     public static final String ACTION_SETTINGS_CHANGED = "action_settings_changed";
+    public static final String ACTION_REBOOT = "action_reboot";
 
 
 
     // Wear setup notif
     public static final String SETUP_WEAR = "Tap to setup watch";
-    public static final String SETUP_ONGOING = "Scanning for watch...";
     public static final String CONNECTED_WEAR = "Connected: Watch is logging your activity.. ";
     public static final String FAILED_WEAR = "Disconnected: Tap to reconnect";
     public static final String FAILED_WEAR_BLUETOOTH = "Disconnected: Switch on Bluetooth";

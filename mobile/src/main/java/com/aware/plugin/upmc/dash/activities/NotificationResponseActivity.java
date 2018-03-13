@@ -3,6 +3,7 @@ package com.aware.plugin.upmc.dash.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +22,7 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.utils.Constants;
 
 public class NotificationResponseActivity extends AppCompatActivity {
@@ -44,22 +46,22 @@ public class NotificationResponseActivity extends AppCompatActivity {
         switch(view.getId()) {
             case R.id.radio_ok:
                 if (checked)
-                    action = Constants.OK_ACTION;
+                    action = Constants.ACTION_NOTIF_OK;
                     break;
             case R.id.radio_snooze:
                 if (checked)
-                    action = Constants.SNOOZE_ACTION;
+                    action = Constants.ACTION_NOTIF_SNOOZE;
                     break;
             case R.id.radio_no:
                 if (checked)
-                    action = Constants.NO_ACTION;
+                    action = Constants.ACTION_NOTIF_SNOOZE;
                     break;
         }
     }
     public void submitResponse(View view) {
         Log.d(Constants.TAG, "NotificationResponseActivity");
         if(action.length()!=0) {
-            if(action.equals(Constants.NO_ACTION)) {
+            if(action.equals(Constants.ACTION_NOTIF_NO)) {
                 setContentView(R.layout.content_inability_response_form);
                 editText = findViewById(R.id.reason_field);
                 submitButton = findViewById(R.id.inability_submit);
@@ -95,13 +97,16 @@ public class NotificationResponseActivity extends AppCompatActivity {
                 });
             }
             else {
-                LocalBroadcastManager.getInstance(view.getContext()).sendBroadcast(new Intent(Constants.NOTIF_COMM).putExtra(Constants.NOTIF_KEY, action));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(new Intent(this, MessageService.class).setAction(action));
+                } else {
+                    startService(new Intent(this, MessageService.class).setAction(action));
+                }
                 Toast.makeText(view.getContext(), "Thanks!", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
     }
-
 
     public boolean isOtherChecked() {
         return isOtherChecked;

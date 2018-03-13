@@ -98,35 +98,76 @@ public class MessageService extends WearableListenerService implements
         }
     };
 
-    private BroadcastReceiver mSnoozeAlarmLocalReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra(Constants.SNOOZE_ALARM_EXTRA_KEY)) {
-                notifyUserWithInactivity();
-            }
-        }
-    };
 
-    private BroadcastReceiver mNotifLocalReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra(Constants.NOTIF_KEY)) {
-                Log.d(Constants.TAG, "MessageService: NotifLocalReceiver:Received :  " + intent.getStringExtra(Constants.NOTIF_KEY));
-                String action = intent.getStringExtra(Constants.NOTIF_KEY);
-                switch (action) {
-                    case Constants.SNOOZE_ACTION:
-                        snoozeInactivityNotif();
-                        break;
-                    case Constants.OK_ACTION:
-                        dismissInactivtyNotif();
-                        break;
-                    case Constants.NO_ACTION:
-                        dismissInactivtyNotif();
-                        break;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        final int i = super.onStartCommand(intent, flags, startId);
+        Log.d(Constants.TAG, "MessageService: onStartCommand");
+        String intentAction = null;
+        if(intent!=null)
+            intentAction = intent.getAction();
+        if(intentAction ==null)
+            return i;
+        switch (intentAction) {
+            case Constants.ACTION_FIRST_RUN:
+                Log.d(Constants.TAG, "MessageService: onStartCommand first run");
+                mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
+                showSurveyNotif();
+                showSetupNotif();
+                break;
+            case Constants.ACTION_SETUP_WEAR:
+                Log.d(Constants.TAG, "MessageService: onStartCommand setup wear");
+                startActivity(new Intent(this, SetupLoadingActvity.class));
+                initiateSetup();
+                notifyUserWithInactivity();
+                break;
+            case Constants.ACTION_APPRAISAL:
+                Log.d(Constants.TAG, "MessageService: onStartCommand appraisal");
+                dismissAppraisal();
+                break;
+            case Constants.ACTION_INACTIVITY:
+                Log.d(Constants.TAG, "MessageService: onStartCommand : inactivity");
+                startActivity(new Intent(this, NotificationResponseActivity.class));
+                break;
+            case Constants.ACTION_VICINITY:
+                Log.d(Constants.TAG, "MessageService: onStartCommand: vicinity");
+                checkSetup();
+                break;
+            case Constants.ACTION_SETTINGS_CHANGED:
+                Log.d(Constants.TAG, "MessageService:onStartCommand: settings changed");
+                if(isWearInitializable()) {
+                    initializeWear();
                 }
-            }
+                else {
+                    Log.d(Constants.TAG, "MessageService: not enough information to start logging");
+                }
+                break;
+            case Constants.ACTION_NOTIF_SNOOZE:
+                Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_SNOOZE");
+                snoozeInactivityNotif();
+                break;
+            case Constants.ACTION_NOTIF_OK:
+                dismissInactivtyNotif();
+                Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_OK");
+                break;
+            case Constants.ACTION_NOTIF_NO:
+                Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_NO");
+                dismissInactivtyNotif();
+                break;
+            case Constants.ACTION_SNOOZE:
+                Log.d(Constants.TAG, "MessageService:ACTION_SNOOZE");
+                notifyUserWithInactivity();
+                break;
+            case Constants.ACTION_REBOOT:
+                Log.d(Constants.TAG, "MessageService:ACTION_REBOOT");
+                // do some reboot stuff here.
+            default:
+                return i;
         }
-    };
+        return i;
+    }
 
     public void dismissAppraisal() {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -139,11 +180,15 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void snoozeInactivityNotif() {
-        Intent snoozeInt = new Intent(this, SnoozeReceiver.class);
-        snoozeInt.putExtra(Constants.ALARM_COMM,Constants.SNOOZE_ALARM_EXTRA);
+        Intent snoozeInt = new Intent(this, MessageService.class).setAction(Constants.ACTION_SNOOZE);
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        PendingIntent snoozePendInt = PendingIntent.getBroadcast(this, 56, snoozeInt, 0);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 15*60*1000, snoozePendInt);
+        PendingIntent snoozePendInt;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+             snoozePendInt = PendingIntent.getForegroundService(this, 56, snoozeInt, 0);
+        } else {
+             snoozePendInt = PendingIntent.getService(this, 56, snoozeInt, 0);
+        }
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 1*60*1000, snoozePendInt);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(3);
     }
@@ -168,8 +213,6 @@ public class MessageService extends WearableListenerService implements
             mGoogleApiClient.disconnect();
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifLocalReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSnoozeAlarmLocalReceiver);
         stopSelf();
     }
 
@@ -310,7 +353,8 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void notifyUserWithInactivity() {
-        final Intent dashIntent = new Intent(this, MessageService.class).setAction(Constants.ACTION_INACTIVITY);
+        final Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
+        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
         wl.acquire(6000);
@@ -324,7 +368,6 @@ public class MessageService extends WearableListenerService implements
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(true);
             mNotificationManager.createNotificationChannel(notificationChannel);
-            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
             setupNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
@@ -335,9 +378,6 @@ public class MessageService extends WearableListenerService implements
                     .setContentIntent(dashPendingIntent);
         }
         else  {
-
-            PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
-
             monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Monitor")
@@ -368,57 +408,6 @@ public class MessageService extends WearableListenerService implements
         sendMessageToWear(initBuilder.toString());
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        final int i = super.onStartCommand(intent, flags, startId);
-        Log.d(Constants.TAG, "MessageService: onStartCommand");
-        String intentAction = null;
-        if(intent!=null)
-            intentAction = intent.getAction();
-        if(intentAction ==null)
-            return i;
-        switch (intentAction) {
-            case Constants.ACTION_FIRST_RUN:
-                Log.d(Constants.TAG, "MessageService: onStartCommand first run");
-                mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
-                LocalBroadcastManager.getInstance(this).registerReceiver(mNotifLocalReceiver, new IntentFilter(Constants.NOTIF_COMM));
-                LocalBroadcastManager.getInstance(this).registerReceiver(mSnoozeAlarmLocalReceiver, new IntentFilter(Constants.SNOOZE_ALARM_INTENT_FILTER));
-                showSurveyNotif();
-                showSetupNotif();
-                break;
-            case Constants.ACTION_SETUP_WEAR:
-                Log.d(Constants.TAG, "MessageService: onStartCommand setup wear");
-                startActivity(new Intent(this, SetupLoadingActvity.class));
-                initiateSetup();
-                //notifyUserWithInactivity();
-                break;
-            case Constants.ACTION_APPRAISAL:
-                Log.d(Constants.TAG, "MessageService: onStartCommand appraisal");
-                dismissAppraisal();
-                break;
-            case Constants.ACTION_INACTIVITY:
-                Log.d(Constants.TAG, "MessageService: onStartCommand : inactivity");
-                startActivity(new Intent(this, NotificationResponseActivity.class));
-                break;
-            case Constants.ACTION_VICINITY:
-                Log.d(Constants.TAG, "MessageService: onStartCommand: vicinity");
-                checkSetup();
-                break;
-            case Constants.SETTINGS_CHANGED:
-                Log.d(Constants.TAG, "MessageService:onStartCommand: settings changed");
-                if(isWearInitializable()) {
-                    initializeWear();
-                }
-                else {
-                    Log.d(Constants.TAG, "MessageService: not enough information to start logging");
-                }
-                break;
-            default:
-                return i;
-        }
-        return i;
-    }
 
     public void initiateSetup() {
         setUpNodeIdentities();

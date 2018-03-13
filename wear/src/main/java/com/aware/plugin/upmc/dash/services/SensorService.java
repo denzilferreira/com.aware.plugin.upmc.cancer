@@ -1,4 +1,4 @@
-package com.aware.plugin.upmc.dash;
+package com.aware.plugin.upmc.dash.services;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -24,6 +24,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.fileutils.FileManager;
+import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.activities.MainActivity;
+import com.aware.plugin.upmc.dash.receivers.AlarmReceiver;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -226,10 +232,12 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(Constants.TAG, "SensorService:onStartCommand:");
         int[] config = parseConfig(intent);
         storeConfig(config);
         final int type = config[4];
         myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        showMonitorNotif();
         LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
         LocalBroadcastManager.getInstance(this).registerReceiver(resetLocalBroadcastReceiver, new IntentFilter(Constants.RESET_BROADCAST_INTENT_FILTER));
         LocalBroadcastManager.getInstance(this).registerReceiver(feedbackLocalBroadcastReceiver, new IntentFilter(Constants.FEEDBACK_BROADCAST_INTENT_FILTER));
@@ -366,7 +374,6 @@ public class SensorService extends Service implements SensorEventListener {
         sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
         assert sensorManager != null;
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        showMonitorNotif();
         try {
             FileManager.createFile();
             Log.d(Constants.TAG, "SensorService:FileCreated!");
@@ -376,6 +383,7 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     private void showMonitorNotif() {
+        final String contentText = isTimeToNotify()? Constants.SS_MONITORING:Constants.SS_NOT_MONITORING;
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID, "SENSOR_SEVICE", NotificationManager.IMPORTANCE_HIGH);
@@ -386,33 +394,23 @@ public class SensorService extends Service implements SensorEventListener {
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
             sensorNotifBuilder = new Notification.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
-            Intent dashIntent = new Intent(this, MessageService.class);
-            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
-            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
             sensorNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Wear Monitor")
-                    .setContentText("Waiting for Survey")
-                    .setOngoing(true)
-                    .setContentIntent(dashPendingIntent);
-
+                    .setContentTitle("Dash Monitor")
+                    .setContentText(contentText)
+                    .setOngoing(true);
             startForeground(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifBuilder.build());
 
         } else {
-            Intent dashIntent = new Intent(this, MessageService.class);
-            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
-            PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
-            sensorNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
             sensorNotifCompatBuilder.setAutoCancel(false)
                     .setOngoing(true)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash")
-                    .setContentText("Waiting for Survey")
+                    .setContentTitle("Dash Monitor")
+                    .setContentText(contentText)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setContentInfo("info")
-                    .setContentIntent(dashPendingIntent);
+                    .setContentInfo("info");
             startForeground(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifCompatBuilder.build());
         }
     }
@@ -420,35 +418,29 @@ public class SensorService extends Service implements SensorEventListener {
 
     private void notifyMonitoring() {
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        final String contentText = isTimeToNotify()? Constants.SS_MONITORING:Constants.SS_NOT_MONITORING;
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sensorNotifBuilder = new Notification.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
-            Intent dashIntent = new Intent(this, MessageService.class);
-            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
-            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
             sensorNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Wear Monitor")
-                    .setContentText("Waiting for Survey")
-                    .setOngoing(true)
-                    .setContentIntent(dashPendingIntent);
+                    .setContentText(contentText)
+                    .setOngoing(true);
 
             mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifBuilder.build());
 
         } else {
-            Intent dashIntent = new Intent(this, MessageService.class);
-            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
-            PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
             sensorNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
             sensorNotifCompatBuilder.setAutoCancel(false)
                     .setOngoing(true)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash")
-                    .setContentText("Waiting for Survey")
+                    .setContentText(contentText)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setContentInfo("info")
-                    .setContentIntent(dashPendingIntent);
+                    .setContentInfo("info");
             mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifCompatBuilder.build());
         }
     }
