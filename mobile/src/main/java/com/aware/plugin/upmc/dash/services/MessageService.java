@@ -65,7 +65,6 @@ public class MessageService extends WearableListenerService implements
 
     public boolean wearConnected = false;
     private GoogleApiClient mGoogleApiClient;
-    private NotificationCompat.Builder monitorNotifCompatBuilder;
     private Notification.Builder setupNotifBuilder;
     private NotificationCompat.Builder setupNotifCompatBuilder;
     private AlarmManager mAlarmManager;
@@ -116,12 +115,12 @@ public class MessageService extends WearableListenerService implements
                 LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
                 showSurveyNotif();
                 showSetupNotif();
+                createInterventionNotifChannel();
                 break;
             case Constants.ACTION_SETUP_WEAR:
                 Log.d(Constants.TAG, "MessageService: onStartCommand setup wear");
                 startActivity(new Intent(this, SetupLoadingActvity.class));
                 initiateSetup();
-                notifyUserWithInactivity();
                 break;
             case Constants.ACTION_APPRAISAL:
                 Log.d(Constants.TAG, "MessageService: onStartCommand appraisal");
@@ -169,14 +168,26 @@ public class MessageService extends WearableListenerService implements
         return i;
     }
 
+    public void createInterventionNotifChannel() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(Constants.INTERVENTION_NOTIF_CHNL_ID, Constants.INTERVENTION_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription(Constants.INTERVENTION_NOTIF_CHNL_DESC);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.enableVibration(false);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
     public void dismissAppraisal() {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(3);
+        mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
 
     public void dismissInactivtyNotif() {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(3);
+        mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
 
     public void snoozeInactivityNotif() {
@@ -190,7 +201,7 @@ public class MessageService extends WearableListenerService implements
         }
         mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 1*60*1000, snoozePendInt);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(3);
+        mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
 
     public boolean isNodeSaved() {
@@ -212,6 +223,7 @@ public class MessageService extends WearableListenerService implements
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
         stopSelf();
     }
@@ -288,7 +300,7 @@ public class MessageService extends WearableListenerService implements
 //                        initializeWear();
 //                    }
                     break;
-                case Constants.NOTIF_INACTIVITY:
+                case Constants.NOTIFY_INACTIVITY:
                     sendMessageToWear(Constants.ACK);
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:InactiveUser");
                     notifyUserWithInactivity();
@@ -313,7 +325,7 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void notifyUserWithAppraisal() {
-        final Intent dashIntent = new Intent(this, MessageService.class).setAction(Constants.ACTION_APPRAISAL);
+        Intent dashIntent = new Intent(this, MessageService.class).setAction(Constants.ACTION_APPRAISAL);
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
         wl.acquire(6000);
@@ -321,14 +333,9 @@ public class MessageService extends WearableListenerService implements
         vibrator.vibrate(3000);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(Constants.NOTIFICATION_CHANNEL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.setDescription("UPMC Dash notification channel");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.enableVibration(true);
-            mNotificationManager.createNotificationChannel(notificationChannel);
+            Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
             PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
-            setupNotifBuilder.setAutoCancel(false)
+            monitorNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Monitor")
@@ -336,10 +343,12 @@ public class MessageService extends WearableListenerService implements
                     .setGroup("Prompt")
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent);
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
+
         }
         else  {
             PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
-            monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.NOTIFICATION_CHANNEL_ID)
+            NotificationCompat.Builder monitorCompatNotifBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Monitor")
                     .setContentText(Constants.NOTIF_APPRAISAL)
@@ -348,12 +357,12 @@ public class MessageService extends WearableListenerService implements
                     .setGroup("Prompt")
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setPriority(NotificationCompat.PRIORITY_MAX);
-            mNotificationManager.notify(3, monitorNotifCompatBuilder.build());
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorCompatNotifBuilder.build());
         }
     }
 
     public void notifyUserWithInactivity() {
-        final Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
+        Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
         PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
@@ -362,13 +371,8 @@ public class MessageService extends WearableListenerService implements
         vibrator.vibrate(3000);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(Constants.NOTIFICATION_CHANNEL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.setDescription("UPMC Dash notification channel");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.enableVibration(true);
-            mNotificationManager.createNotificationChannel(notificationChannel);
-            setupNotifBuilder.setAutoCancel(false)
+            Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+            monitorNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Monitor")
@@ -376,9 +380,10 @@ public class MessageService extends WearableListenerService implements
                     .setGroup("Prompt")
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent);
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
         }
         else  {
-            monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.NOTIFICATION_CHANNEL_ID)
+             NotificationCompat.Builder  monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Monitor")
                     .setContentText(Constants.NOTIF_INACTIVITY)
@@ -387,7 +392,7 @@ public class MessageService extends WearableListenerService implements
                     .setGroup("Prompt")
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setPriority(NotificationCompat.PRIORITY_MAX);
-            mNotificationManager.notify(3, monitorNotifCompatBuilder.build());
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
         }
     }
 
@@ -466,14 +471,13 @@ public class MessageService extends WearableListenerService implements
         dashIntent.setAction(Constants.ACTION_SURVEY);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(Constants.NOTIFICATION_CHANNEL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.setDescription("UPMC Dash notification channel");
+            NotificationChannel notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription("UPMC Dash Survey Notification");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
-            Notification.Builder notificationBuilder = new Notification.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
-
+            Notification.Builder notificationBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             notificationBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
@@ -482,11 +486,11 @@ public class MessageService extends WearableListenerService implements
                     .setGroup("Survey")
                     .setContentText(Constants.COMPLETE_SURVEY)
                     .setContentIntent(dashPendingIntent);
-            startForeground(1, notificationBuilder.build());
+            startForeground(Constants.SURVEY_NOTIF_ID, notificationBuilder.build());
 
         } else {
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
             notificationBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
@@ -494,12 +498,10 @@ public class MessageService extends WearableListenerService implements
                     .setContentText(Constants.COMPLETE_SURVEY)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setGroup("Survey")
-                    .setContentInfo("info")
+                    .setContentInfo("Survey Notification")
                     .setContentIntent(dashPendingIntent);
-
-            startForeground(1,notificationBuilder.build());
+            startForeground(Constants.SURVEY_NOTIF_ID,notificationBuilder.build());
         }
-
     }
 
     private void showSetupNotif() {
@@ -507,7 +509,7 @@ public class MessageService extends WearableListenerService implements
         dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupNotifBuilder = new Notification.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
+            setupNotifBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID); // using the survey notification ID, as it doesn't matter
             PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
             setupNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
@@ -518,10 +520,10 @@ public class MessageService extends WearableListenerService implements
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent);
 
-            notificationManager.notify(2, setupNotifBuilder.build());
+            notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifBuilder.build());
         } else {
             PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
-            setupNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID);
+            setupNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
             setupNotifCompatBuilder.setAutoCancel(false)
                     .setOngoing(true)
                     .setGroup("Setup")
@@ -532,25 +534,25 @@ public class MessageService extends WearableListenerService implements
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentInfo("info")
                     .setContentIntent(dashPendingIntent);
-            notificationManager.notify(2, setupNotifCompatBuilder.build());
+            notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifCompatBuilder.build());
         }
     }
 
     public void notifySetup(String contentText) {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupNotifBuilder.setContentText(contentText);
-            notificationManager.notify(2, setupNotifBuilder.build());
-        }
-        else {
-            setupNotifCompatBuilder.setContentText(contentText);
-            notificationManager.notify(2, setupNotifCompatBuilder.build());
-        }
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
         wl.acquire(6000);
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(500);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setupNotifBuilder.setContentText(contentText);
+            notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifBuilder.build());
+        }
+        else {
+            setupNotifCompatBuilder.setContentText(contentText);
+            notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifCompatBuilder.build());
+        }
     }
 
 

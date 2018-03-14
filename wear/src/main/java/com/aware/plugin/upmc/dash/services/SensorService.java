@@ -19,6 +19,7 @@ import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -53,8 +54,9 @@ public class SensorService extends Service implements SensorEventListener {
         }
     };
     boolean FIRST_TIME = true;
-    boolean DEBUG_MODE = false;
+    boolean DEBUG_MODE = true;
     int[] config;
+    private boolean wasPrevTimePointTimeToNotify = false;
     private int alarmType;
     private SensorManager sensorManager;
     private Sensor stepSensor;
@@ -67,8 +69,8 @@ public class SensorService extends Service implements SensorEventListener {
     private boolean feedbackEnabled = false;
     private int MINUTE_STEP_COUNT = 0;
     private long timepoint;
-    private Notification.Builder sensorNotifBuilder;
-    private NotificationCompat.Builder sensorNotifCompatBuilder;
+    private Notification.Builder sessionStatusNotifBuilder;
+    private NotificationCompat.Builder sessionStatusCompatNotifBuilder;
     public BroadcastReceiver resetLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -237,7 +239,8 @@ public class SensorService extends Service implements SensorEventListener {
         storeConfig(config);
         final int type = config[4];
         myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        showMonitorNotif();
+        showSessionStatus();
+        createInterventionNotifChannel();
         LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
         LocalBroadcastManager.getInstance(this).registerReceiver(resetLocalBroadcastReceiver, new IntentFilter(Constants.RESET_BROADCAST_INTENT_FILTER));
         LocalBroadcastManager.getInstance(this).registerReceiver(feedbackLocalBroadcastReceiver, new IntentFilter(Constants.FEEDBACK_BROADCAST_INTENT_FILTER));
@@ -253,6 +256,16 @@ public class SensorService extends Service implements SensorEventListener {
             }
         }, 5000);
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    public void createInterventionNotifChannel() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(Constants.INTERVENTION_NOTIF_CHNL_ID, Constants.INTERVENTION_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription(Constants.INTERVENTION_NOTIF_CHNL_DESC);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
     }
 
     public void startAlarmOfType(int type) {
@@ -361,7 +374,6 @@ public class SensorService extends Service implements SensorEventListener {
                 }
             }
         }
-
         Log.d(Constants.TAG,"isTimeToNotify: False - Exit");
         return false;
 
@@ -382,28 +394,25 @@ public class SensorService extends Service implements SensorEventListener {
         }
     }
 
-    private void showMonitorNotif() {
+    private void showSessionStatus() {
         final String contentText = isTimeToNotify()? Constants.SS_MONITORING:Constants.SS_NOT_MONITORING;
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID, "SENSOR_SEVICE", NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.setDescription("UPMC Dash notification channel");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.setVibrationPattern(new long[]{0, 800, 100, 800, 100, 800, 100, 800, 100, 800});
-            notificationChannel.enableVibration(true);
+            NotificationChannel notificationChannel = new NotificationChannel(Constants.SESSION_STATUS_CHNL_ID, Constants.SESSION_STATUS_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setDescription("session notification channel");
             notificationManager.createNotificationChannel(notificationChannel);
-            sensorNotifBuilder = new Notification.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
-            sensorNotifBuilder.setAutoCancel(false)
+            sessionStatusNotifBuilder = new Notification.Builder(this, Constants.SESSION_STATUS_CHNL_ID);
+            sessionStatusNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("Dash Monitor")
                     .setContentText(contentText)
                     .setOngoing(true);
-            startForeground(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifBuilder.build());
+            startForeground(Constants.SESSION_STATUS_NOTIF_ID, sessionStatusNotifBuilder.build());
 
         } else {
-            sensorNotifCompatBuilder.setAutoCancel(false)
+            sessionStatusCompatNotifBuilder = new NotificationCompat.Builder(this, Constants.SESSION_STATUS_CHNL_ID);
+            sessionStatusCompatNotifBuilder.setAutoCancel(false)
                     .setOngoing(true)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
@@ -411,37 +420,21 @@ public class SensorService extends Service implements SensorEventListener {
                     .setContentText(contentText)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentInfo("info");
-            startForeground(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifCompatBuilder.build());
+            startForeground(Constants.SESSION_STATUS_NOTIF_ID, sessionStatusCompatNotifBuilder.build());
         }
     }
 
 
-    private void notifyMonitoring() {
+    private void notifySessionStatus(boolean isTimeToNotify) {
+        final String contentText = isTimeToNotify? Constants.SS_MONITORING:Constants.SS_NOT_MONITORING;
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        final String contentText = isTimeToNotify()? Constants.SS_MONITORING:Constants.SS_NOT_MONITORING;
-
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            sensorNotifBuilder = new Notification.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
-            sensorNotifBuilder.setAutoCancel(false)
-                    .setWhen(System.currentTimeMillis())
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Wear Monitor")
-                    .setContentText(contentText)
-                    .setOngoing(true);
-
-            mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifBuilder.build());
+            sessionStatusNotifBuilder.setContentText(contentText);
+            mNotificationManager.notify(Constants.SESSION_STATUS_NOTIF_ID, sessionStatusNotifBuilder.build());
 
         } else {
-            sensorNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
-            sensorNotifCompatBuilder.setAutoCancel(false)
-                    .setOngoing(true)
-                    .setWhen(System.currentTimeMillis())
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash")
-                    .setContentText(contentText)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setContentInfo("info");
-            mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifCompatBuilder.build());
+            sessionStatusCompatNotifBuilder.setContentText(contentText);
+            mNotificationManager.notify(Constants.SESSION_STATUS_NOTIF_ID, sessionStatusCompatNotifBuilder.build());
         }
     }
 
@@ -457,81 +450,74 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
 
-
    public void  notifyInactive(int sc_count) {
+       LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
+       wakeUpAndVibrate(6000, 3000);
        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-           sensorNotifBuilder = new Notification.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
-           Intent dashIntent = new Intent(this, MessageService.class);
-           dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
-           PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
-           sensorNotifBuilder.setAutoCancel(false)
+           Notification.Builder interventionNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+           interventionNotifBuilder.setAutoCancel(false)
                    .setWhen(System.currentTimeMillis())
                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                   .setContentTitle("UPMC Dash Activity Monitor")
-                   .setContentText("Ready for a quick walk ? #" + sc_count)
+                   .setContentTitle("Dash Monitor")
+                   .setContentText("Ready for a short walk ? #" + sc_count)
                    .setOngoing(true)
-                   .setContentIntent(dashPendingIntent);
-
-           mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifBuilder.build());
+                   .setGroup("intervention");
+           mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifBuilder.build());
        }
        else {
-
-           sensorNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID)
+           NotificationCompat.Builder interventionNotifCompatBuilder = new NotificationCompat.Builder(this, "sensor_service_intervention")
                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                   .setContentTitle("UPMC Dash Activity Monitor")
+                   .setContentTitle("Dash Monitor")
                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                   .setContentText("Ready for a quick walk ? #" + sc_count)
+                   .setContentText("Ready for a short walk ? #" + sc_count)
                    .setVisibility(Notification.VISIBILITY_PUBLIC)
                    .setPriority(Notification.PRIORITY_MAX)
                    .setDefaults(Notification.DEFAULT_ALL);
-
            assert mNotificationManager != null;
-           mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifCompatBuilder.build());
-
-           final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-           LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
-           long[] pattern = {0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
-           assert vibrator != null;
-           vibrator.vibrate(pattern, 0);
-           Handler handler2 = new Handler();
-           handler2.postDelayed(new Runnable() {
-               @Override
-               public void run() {
-                   vibrator.cancel();
-               }
-           }, 3000);
+           mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifCompatBuilder.build());
        }
-       Handler handler3 = new Handler();
-       handler3.postDelayed(new Runnable() {
+   }
+
+
+   public void wakeUpAndVibrate(int duration_awake, int duration_vibrate) {
+       PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+       PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+       wl.acquire(duration_awake);
+       final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+       long[] pattern = {0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+       assert vibrator != null;
+       vibrator.vibrate(pattern, 0);
+       Handler handler2 = new Handler();
+       handler2.postDelayed(new Runnable() {
            @Override
            public void run() {
-               notifyMonitoring();
+               vibrator.cancel();
            }
-       }, 15000);
+       }, duration_vibrate);
+
+
    }
 
     public void notifyFeedback(int sc_count) {
+        wakeUpAndVibrate(6000, 3000);
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            sensorNotifBuilder = new Notification.Builder(this, Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID);
-            Intent dashIntent = new Intent(this, MessageService.class);
-            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
-            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
-            sensorNotifBuilder.setAutoCancel(false)
+            Notification.Builder interventionNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+            interventionNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Activity Monitor")
+                    .setContentTitle("Dash Monitor")
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setContentText("Great Job! You are active " + sc_count)
                     .setOngoing(true)
-                    .setContentIntent(dashPendingIntent);
-            mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifBuilder.build());
+                    .setGroup("intervention");
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifBuilder.build());
         }
         else {
-            sensorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(),  Constants.SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID)
+            NotificationCompat.Builder interventionNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), "sensor_service_intervention" )
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Activity Monitor")
+                    .setContentTitle("Dash Monitor")
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setContentText("Great Job! You are active " + sc_count)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
@@ -539,31 +525,8 @@ public class SensorService extends Service implements SensorEventListener {
                     .setDefaults(Notification.DEFAULT_ALL);
 
             assert mNotificationManager != null;
-            mNotificationManager.notify(Constants.SENSOR_SERVICE_NOTIFICATION_ID, sensorNotifCompatBuilder.build());
-            final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_GREAT_JOB));
-            long[] pattern = { 0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
-            assert vibrator != null;
-            vibrator.vibrate(pattern, 0);
-            Handler handler2 = new Handler();
-            handler2.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    vibrator.cancel();
-                }
-            }, 3000);
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifCompatBuilder.build());
         }
-
-
-
-        Handler handler3 = new Handler();
-        handler3.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                notifyMonitoring();
-            }
-        }, 15000);
-
     }
     //to debug change 'minutes' to 'seconds'
     public boolean isEndOfInterval() {
@@ -617,7 +580,11 @@ public class SensorService extends Service implements SensorEventListener {
                     initializeMinuteStepCount(count);
                     Log.d(Constants.TAG, "SensorService (min_steps taken)" + getMINUTE_STEP_COUNT());
                     startMinuteAlarm();
-                    if(isTimeToNotify()) {
+                    boolean isTimeToNotify = isTimeToNotify();
+                    if(isTimeToNotify!=wasPrevTimePointTimeToNotify())
+                        notifySessionStatus(isTimeToNotify);
+                    setWasPrevTimePointTimeToNotify(isTimeToNotify);
+                    if(isTimeToNotify) {
                         Log.d(Constants.TAG, "SensorService:isTimeToNotify(), writing to file...");
                         try {
                             FileManager.writeToFile(getMINUTE_STEP_COUNT(), 2);
@@ -687,5 +654,13 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void setFirstRun(boolean FIRST_TIME) {
         this.FIRST_TIME = FIRST_TIME;
+    }
+
+    public boolean wasPrevTimePointTimeToNotify() {
+        return wasPrevTimePointTimeToNotify;
+    }
+
+    public void setWasPrevTimePointTimeToNotify(boolean wasPrevTimePointTimeToNotify) {
+        this.wasPrevTimePointTimeToNotify = wasPrevTimePointTimeToNotify;
     }
 }

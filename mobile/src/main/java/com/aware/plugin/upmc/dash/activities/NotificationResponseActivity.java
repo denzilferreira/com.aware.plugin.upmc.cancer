@@ -41,6 +41,7 @@ public class NotificationResponseActivity extends AppCompatActivity {
     }
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
+        Log.d(Constants.TAG, "NotificationResponseActivity:onRadioButtonClicked " + view.getId());
         boolean checked = ((RadioButton) view).isChecked();
         // Check which radio button was clicked
         switch(view.getId()) {
@@ -54,12 +55,12 @@ public class NotificationResponseActivity extends AppCompatActivity {
                     break;
             case R.id.radio_no:
                 if (checked)
-                    action = Constants.ACTION_NOTIF_SNOOZE;
+                    action = Constants.ACTION_NOTIF_NO;
                     break;
         }
     }
     public void submitResponse(View view) {
-        Log.d(Constants.TAG, "NotificationResponseActivity");
+        Log.d(Constants.TAG, "NotificationResponseActivity:submitResponse");
         if(action.length()!=0) {
             if(action.equals(Constants.ACTION_NOTIF_NO)) {
                 setContentView(R.layout.content_inability_response_form);

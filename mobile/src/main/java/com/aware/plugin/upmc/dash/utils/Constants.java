@@ -16,36 +16,26 @@ public final class Constants {
     //local broadcast receivers/ MessageService stuff
     // intent filters for Broadcast Receivers
 
-    public static final String NOTIFICATION_RECEIVER_INTENT_FILTER = "upmc_notification_receiver";
     public static final String NOTIFICATION_MESSAGE_INTENT_FILTER = "upmc_notif_intent_filter";
 
 
     // Messages to wear
-    public static final String GET_STATUS_WEAR = "get_wear_status";
     public static final String IS_WEAR_RUNNING = "is wear running";
-    public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
-    public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
     public static final String INIT_TS = "morningtimestamp&symptoms"; // Morning timestamp plus
-    public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
-    public static final String SYMP_RESET = "symptomschanged";
-    public static final String DEMO_NOTIF = "demonotif";
 
     //replies from wear
 
     public static final String COMM_KEY_UPMC = "message_upmc";  // key in putExtra
-    public static final String COMM_KEY_NOTIF = "message_notif";  // key in putExtra
-    public static final String COMM_KEY_MSGSERVICE = "message_msgservice";  // key in putExtra
 
     //messages from wear
     public static final String NOTIFY_INACTIVITY = "user is inactive";
     public static final String NOTIFY_GREAT_JOB = "user is active";
 
 
-    // states
+    // states from wear
     public static final String STATUS_INIT = "init"; // need to be time initiated
     public static final String STATUS_LOGGING = "logging"; // currently logging
-    public static final String STATUS_DISCONNECTED = "disconnected"; // currently disconnected
 
     //Bluetooth Communication
     public static final String BLUETOOTH_COMM = "bluetooth_comm";
@@ -55,29 +45,6 @@ public final class Constants {
 
 
 
-    //Broadcasts from UPMC Settings Panel
-    public static final String SETTINGS_EXTRA_KEY = "settings comm";
-    public static final String SETTING_INTENT_FILTER = "settings intent filter";
-    public static final String VICINITY_CHECK = "vcheck";
-
-
-
-    public static final String MORNING_HOUR = "morning hour key";
-    public static final String MORNING_MINUTE = "morning minute key";
-    public static final String NIGHT_HOUR = "night hour key";
-    public static final String NIGHT_MINUTE = "night minute key";
-
-    //Symptoms
-    public static final int SYMPTOMS_0 = 0;
-    public static final int SYMPTOMS_1 = 1;
-    public static final String SYMPTOMS_INTENT_FILTER = "symptoms filter";
-    public static final String SYMPTOMS_KEY = "symptoms keys";
-    public static final String SYMPTOMS_PREFS = "symptoms prefs";
-
-
-    //NotifReceiver
-    public static final String NOTIF_COMM = "notif_comm";
-    public static final String NOTIF_KEY = "notif_key";
 
 
 
@@ -98,8 +65,6 @@ public final class Constants {
     //No Action
     public static final String ACTION_NOTIF_NO = "NO_ACTION";
 
-    //Retry Action
-    public static final String RETRY_ACTION = "RETRY_ACTION";
 
 
 
@@ -117,7 +82,6 @@ public final class Constants {
 
     //vicinity check
     public static final String VICINITY_CHECK_INTENT_FILTER = "vcheckfilter";
-    public static final String VICINITY_INTENT_FILTER = "vicinity intent filter";
     public static final String VICINITY_RESULT_KEY = "vicinity result key";
     public static final int WEAR_IN_RANGE = 1;
     public static final int WEAR_NOT_IN_RANGE = 0;
@@ -150,27 +114,27 @@ public final class Constants {
     public static final String NOTIF_APPRAISAL = "Great Job! You have been active";
     public static final String NOTIF_INACTIVITY =  "Ready for a quick walk?";
 
+    /**
+     *
+     *   Notification Channels & Ids
+     *
+     */
+    // channel IDs
+    public static final String SURVEY_NOTIF_CHNL_ID = "survey_notification";
 
-//    // notification messages
-//    public static final String NOTIFTEXT_SYNC_FAILED = "Sync Failed: Tap to =";
-//    public static final String NOTIFTEXT_SYNC_SUCCESS = "Synced with watch";
-//    public static final String NOTIFTEXT_SYNC_FAILED_BLUETOOTH = "Sync Failed : Switch on Bluetooth";
-//    public static final String NOTIFTEXT_IN_PROGRESS = "Watch is logging your activity..";
-//    public static final String NOTIFTEXT_TRY_CONNECT = "Scanning for watch...";
-
-    //msg_comm
-    public static final String DEMO_MODE = "demomodemsgservice";
-
-
-    // Kill demo
-    public static final String KILL_DEMO = "killdemo";
+    public static final String INTERVENTION_NOTIF_CHNL_ID = "intervention_notification";
+    public static final String INTERVENTION_NOTIF_CHNL_NAME = "UPMC Dash intervention notification";
+    public static final String INTERVENTION_NOTIF_CHNL_DESC = "UPMC Dash intervention notification";
 
 
+    // Notification IDs
+    public static final int SURVEY_NOTIF_ID = 1;
+    public static final int SETUP_NOTIF_ID = 2;
+    public static final int INTERVENTION_NOTIF_ID = 3;
 
 
 
-    //Notification Channel ID
-    public static final String NOTIFICATION_CHANNEL_ID = "upmc_dash";
+
 
 
 

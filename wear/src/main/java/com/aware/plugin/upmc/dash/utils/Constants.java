@@ -113,13 +113,10 @@ public final class Constants {
 
 
 
-    //Notification Channel
-    public static final String SENSOR_SERVICE_NOTIFICATION_CHANNEL_ID = "upmc_dash_sensor_service";
     public static final String MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID = "upmc_dash_message_service";
 
     //Notification IDs
     public static int MESSAGE_SERVICE_NOTIFICATION_ID = 20;
-    public static int SENSOR_SERVICE_NOTIFICATION_ID = 40;
 
 
     //MessageService onStartCommand Actions
@@ -130,6 +127,35 @@ public final class Constants {
 
     //notifstuff
     public static final String SETUP_WEAR = "Tap to setup watch";
+
+
+    /**
+     * Notification Channel IDs, IDs, Names, Descriptions
+     *
+     */
+
+
+    //Channel IDs
+    public static final String SESSION_STATUS_CHNL_ID = "session_status";
+    public static final String INTERVENTION_NOTIF_CHNL_ID = "intervention_notification_wear";
+
+
+    // Channel Names
+    public static final String SESSION_STATUS_CHNL_NAME = "UPMC Dash Session Status";
+    public static final String INTERVENTION_NOTIF_CHNL_NAME = "UPMC Dash Wear intervention notification";
+
+    //Channel Desc
+    public static final String INTERVENTION_NOTIF_CHNL_DESC = "UPMC Dash Wear intervention notification";
+
+
+
+    // Notif IDs
+    public static int SESSION_STATUS_NOTIF_ID = 40;
+    public static int INTERVENTION_NOTIF_ID = 50;
+
+
+
+
 
 
 
