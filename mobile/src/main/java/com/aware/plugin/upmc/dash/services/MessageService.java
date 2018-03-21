@@ -109,6 +109,7 @@ public class MessageService extends WearableListenerService implements
         if(intentAction ==null)
             return i;
         switch (intentAction) {
+            case Constants.ACTION_REBOOT:
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "MessageService: onStartCommand first run");
                 mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -124,7 +125,7 @@ public class MessageService extends WearableListenerService implements
                 break;
             case Constants.ACTION_APPRAISAL:
                 Log.d(Constants.TAG, "MessageService: onStartCommand appraisal");
-                dismissAppraisal();
+                dismissIntervention();
                 break;
             case Constants.ACTION_INACTIVITY:
                 Log.d(Constants.TAG, "MessageService: onStartCommand : inactivity");
@@ -148,19 +149,17 @@ public class MessageService extends WearableListenerService implements
                 snoozeInactivityNotif();
                 break;
             case Constants.ACTION_NOTIF_OK:
-                dismissInactivtyNotif();
+                dismissIntervention();
                 Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_OK");
                 break;
             case Constants.ACTION_NOTIF_NO:
                 Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_NO");
-                dismissInactivtyNotif();
+                dismissIntervention();
                 break;
             case Constants.ACTION_SNOOZE:
                 Log.d(Constants.TAG, "MessageService:ACTION_SNOOZE");
                 notifyUserWithInactivity();
                 break;
-            case Constants.ACTION_REBOOT:
-                Log.d(Constants.TAG, "MessageService:ACTION_REBOOT");
                 // do some reboot stuff here.
             default:
                 return i;
@@ -180,12 +179,8 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
-    public void dismissAppraisal() {
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
-    }
 
-    public void dismissInactivtyNotif() {
+    public void dismissIntervention() {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
@@ -309,6 +304,24 @@ public class MessageService extends WearableListenerService implements
                     sendMessageToWear(Constants.ACK);
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:GreatJobUser");
                     notifyUserWithAppraisal();
+                    break;
+
+                case Constants.ACTION_NOTIF_OK:
+                    sendMessageToWear(Constants.ACK);
+                    dismissIntervention();
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:ACTION_NOTIF_OK");
+                    break;
+
+                case Constants.ACTION_NOTIF_NO:
+                    sendMessageToWear(Constants.ACK);
+                    dismissIntervention();
+                    Log.d(Constants.TAG,"MessageService:onMessageReceived:ACTION_NOTIF_NO");
+                    break;
+
+                case Constants.ACTION_NOTIF_SNOOZE:
+                    sendMessageToWear(Constants.ACK);
+                    snoozeInactivityNotif();
+                    Log.d(Constants.TAG,"MessageService:onMessageReceived:ACTION_NOTIF_SNOOZE");
                     break;
             }
         }

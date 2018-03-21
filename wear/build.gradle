@@ -21,9 +21,12 @@ android {
 }
 
 
+
+
 dependencies {
     implementation "com.google.android.gms:play-services-wearable:$google_libs"
     implementation 'com.google.android.support:wearable:2.2.0'
     implementation 'com.android.support:wear:27.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compileOnly 'com.google.android.wearable:wearable:2.2.0'
 }

@@ -50,7 +50,6 @@ public final class Constants {
 
     // Snooze Action
 
-    public static final String ACTION_NOTIF_SNOOZE = "SNOOZE_ACTION";
     public static final String ALARM_COMM = "AlarmComm";
     public static final String SNOOZE_ALARM_INTENT_FILTER = "snooze alarm intent filter";
     public static final String SNOOZE_ALARM_EXTRA_KEY = "snooze alarm extra key";
@@ -58,6 +57,8 @@ public final class Constants {
 
 
     // Ok Action
+    public static final String ACTION_NOTIF_SNOOZE = "SNOOZE_ACTION";
+
     public static final String ACTION_NOTIF_OK = "OK_ACTION";
 
 

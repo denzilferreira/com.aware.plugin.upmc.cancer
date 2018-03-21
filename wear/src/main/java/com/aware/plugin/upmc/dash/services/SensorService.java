@@ -10,7 +10,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -26,11 +25,11 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.aware.plugin.upmc.dash.activities.NotificationResponse;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.fileutils.FileManager;
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.activities.MainActivity;
-import com.aware.plugin.upmc.dash.receivers.AlarmReceiver;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -234,27 +233,63 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(Constants.TAG, "SensorService:onStartCommand:");
-        int[] config = parseConfig(intent);
-        storeConfig(config);
-        final int type = config[4];
-        myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        showSessionStatus();
-        createInterventionNotifChannel();
-        LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
-        LocalBroadcastManager.getInstance(this).registerReceiver(resetLocalBroadcastReceiver, new IntentFilter(Constants.RESET_BROADCAST_INTENT_FILTER));
-        LocalBroadcastManager.getInstance(this).registerReceiver(feedbackLocalBroadcastReceiver, new IntentFilter(Constants.FEEDBACK_BROADCAST_INTENT_FILTER));
-        Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + type);
-        setFirstRun(true);
-        registerSensorListener();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startAlarmOfType(type);
-                startMinuteAlarm();
 
-            }
-        }, 5000);
+        String action = intent.getAction();
+        switch (action) {
+            case Constants.ACTION_FIRST_RUN:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                int[] config = parseConfig(intent);
+                storeConfig(config);
+                final int type = config[4];
+                myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                showSessionStatus();
+                createInterventionNotifChannel();
+                LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
+                LocalBroadcastManager.getInstance(this).registerReceiver(resetLocalBroadcastReceiver, new IntentFilter(Constants.RESET_BROADCAST_INTENT_FILTER));
+                LocalBroadcastManager.getInstance(this).registerReceiver(feedbackLocalBroadcastReceiver, new IntentFilter(Constants.FEEDBACK_BROADCAST_INTENT_FILTER));
+                Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + type);
+                setFirstRun(true);
+                registerSensorListener();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAlarmOfType(type);
+                        startMinuteAlarm();
+
+                    }
+                }, 5000);
+                break;
+            case Constants.ACTION_MINUTE_ALARM:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                setALARM_MINUTE_FLAG(true);
+                registerSensorListener();
+                break;
+
+            case Constants.ACTION_NOTIF_OK:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                sendMessageServiceAction(Constants.ACTION_NOTIF_OK);
+                dismissIntervention();
+                break;
+
+            case Constants.ACTION_NOTIF_NO:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                sendMessageServiceAction(Constants.ACTION_NOTIF_NO);
+                dismissIntervention();
+                break;
+
+
+            case Constants.ACTION_NOTIF_SNOOZE:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                sendMessageServiceAction(Constants.ACTION_NOTIF_SNOOZE);
+                dismissIntervention();
+                break;
+
+
+            case Constants.ACTION_FEEDBACK_ALARM:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" + action);
+                break;
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -279,31 +314,53 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     public void startMinuteAlarm() {
-        Intent alarmIntent_min = new Intent(this, AlarmReceiver.class);
-        alarmIntent_min.putExtra(Constants.ALARM_COMM, 2);
+        Intent alarmIntent_min = new Intent(this, SensorService.class).setAction(Constants.ACTION_MINUTE_ALARM);
         int interval = 60 * 1000;
-        alarmPendingIntent_min = PendingIntent.getBroadcast(this, 668, alarmIntent_min, 0);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            alarmPendingIntent_min = PendingIntent.getForegroundService(this, 668, alarmIntent_min, 0);
+
+        }
+        else {
+            alarmPendingIntent_min = PendingIntent.getService(this, 668, alarmIntent_min, 0);
+
+        }
         Intent alarmInfoIntent = new Intent(this, MainActivity.class);
         PendingIntent alarmInfoPendingIntent = PendingIntent.getActivity(this, 777,alarmInfoIntent,0);
         myAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(System.currentTimeMillis()+interval, alarmInfoPendingIntent),alarmPendingIntent_min );
     }
 
     public void cancelMinuteAlarm() {
-        Intent alarmIntent_min = new Intent(this, AlarmReceiver.class);
-        alarmIntent_min.putExtra(Constants.ALARM_COMM, 2);
-        alarmPendingIntent_min = PendingIntent.getBroadcast(this, 668, alarmIntent_min, 0);
+        Intent alarmIntent_min = new Intent(this, SensorService.class).setAction(Constants.ACTION_MINUTE_ALARM);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            alarmPendingIntent_min = PendingIntent.getForegroundService(this, 668, alarmIntent_min, 0);
+
+        }
+        else {
+            alarmPendingIntent_min = PendingIntent.getService(this, 668, alarmIntent_min, 0);
+
+        }
         myAlarmManager.cancel(alarmPendingIntent_min);
         setALARM_MINUTE_FLAG(false);
     }
 
     public void startFeedbackAlarm() {
-        Intent alarmIntent_feedback = new Intent(this, AlarmReceiver.class);
-        alarmIntent_feedback.putExtra(Constants.ALARM_COMM, 3);
+        Log.d(Constants.TAG, "StartFeedbackAlarmCalled");
+        Intent alarmIntent_feedback = new Intent(this, SensorService.class).setAction(Constants.ACTION_FEEDBACK_ALARM);
         int interval = 15 * 60 * 1000;
+
         if(DEBUG_MODE){
             interval = 60 * 1000;
+            return;
         }
-        alarmPendingIntent_feedback = PendingIntent.getBroadcast(this, 1212, alarmIntent_feedback, 0);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            alarmPendingIntent_feedback = PendingIntent.getForegroundService(this, 1212, alarmIntent_feedback, 0);
+
+        }
+        else {
+            alarmPendingIntent_feedback = PendingIntent.getService(this, 1212, alarmIntent_feedback, 0);
+
+        }
         myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, alarmPendingIntent_feedback);
         Intent alarmInfoIntent = new Intent(this, MainActivity.class);
         PendingIntent alarmInfoPendingIntent = PendingIntent.getActivity(this, 1212,alarmInfoIntent,0);
@@ -441,6 +498,7 @@ public class SensorService extends Service implements SensorEventListener {
     public void notifyUserIfThreshold(int sc_count) {
         if(isTimeToNotify()) {
             if (sc_count < 50) {
+                sendMessageServiceAction(Constants.ACTION_NOTIFY_INACTIVITY);
                 notifyInactive(sc_count);
             }
             else {
@@ -451,9 +509,10 @@ public class SensorService extends Service implements SensorEventListener {
 
 
    public void  notifyInactive(int sc_count) {
-       LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.NOTIFY_INACTIVITY));
        wakeUpAndVibrate(6000, 3000);
        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+       Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_ALL);
+       PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
            Notification.Builder interventionNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
            interventionNotifBuilder.setAutoCancel(false)
@@ -462,6 +521,7 @@ public class SensorService extends Service implements SensorEventListener {
                    .setContentTitle("Dash Monitor")
                    .setContentText("Ready for a short walk ? #" + sc_count)
                    .setOngoing(true)
+                   .setContentIntent(contentPI)
                    .setGroup("intervention");
            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifBuilder.build());
        }
@@ -472,6 +532,7 @@ public class SensorService extends Service implements SensorEventListener {
                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                    .setContentText("Ready for a short walk ? #" + sc_count)
                    .setVisibility(Notification.VISIBILITY_PUBLIC)
+                   .setContentIntent(contentPI)
                    .setPriority(Notification.PRIORITY_MAX)
                    .setDefaults(Notification.DEFAULT_ALL);
            assert mNotificationManager != null;
@@ -501,6 +562,8 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void notifyFeedback(int sc_count) {
         wakeUpAndVibrate(6000, 3000);
+        Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_ALL);
+        PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder interventionNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
@@ -511,6 +574,7 @@ public class SensorService extends Service implements SensorEventListener {
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setContentText("Great Job! You are active " + sc_count)
                     .setOngoing(true)
+                    .setContentIntent(contentPI)
                     .setGroup("intervention");
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifBuilder.build());
         }
@@ -522,12 +586,19 @@ public class SensorService extends Service implements SensorEventListener {
                     .setContentText("Great Job! You are active " + sc_count)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setPriority(Notification.PRIORITY_MAX)
+                    .setContentIntent(contentPI)
                     .setDefaults(Notification.DEFAULT_ALL);
 
             assert mNotificationManager != null;
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifCompatBuilder.build());
         }
     }
+
+    public void dismissIntervention() {
+        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
+    }
+
     //to debug change 'minutes' to 'seconds'
     public boolean isEndOfInterval() {
         long timeDiff = System.currentTimeMillis() - getTimepoint();
@@ -557,6 +628,16 @@ public class SensorService extends Service implements SensorEventListener {
 
     }
 
+    public void sendMessageServiceAction(String action) {
+        Intent intent = new Intent(getApplicationContext(), MessageService.class).setAction(action);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        }
+        else {
+            startService(intent);
+        }
+    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         Log.d(Constants.TAG, "SensorService : onSensorChanged");
@@ -573,7 +654,7 @@ public class SensorService extends Service implements SensorEventListener {
             }
              else if(ALARM_MINUTE_FLAG) {
                     Log.d(Constants.TAG, "SensorService: Peeking step count" + peekStepCount(count));
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.SENSOR_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.SENSOR_ALARM));
+                    sendMessageServiceAction(Constants.ACTION_SYNC_DATA);
                     Log.d(Constants.TAG, "SensorService: alarm minute flag");
                     unregisterSensorListener();
                     calculateMinuteStepCount(count);
@@ -591,8 +672,9 @@ public class SensorService extends Service implements SensorEventListener {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        if(isFeedbackEnabled() && peekStepCount(count)>=15) {
+                        if(isFeedbackEnabled() && peekStepCount(count)>=10) {
                             Log.d(Constants.TAG, "SensorService: feedback successful: " + peekStepCount(count));
+                            sendMessageServiceAction(Constants.ACTION_NOTIFY_GREAT_JOB);
                             notifyFeedback(peekStepCount(count));
                             setFeedbackEnabled(false);
                         }

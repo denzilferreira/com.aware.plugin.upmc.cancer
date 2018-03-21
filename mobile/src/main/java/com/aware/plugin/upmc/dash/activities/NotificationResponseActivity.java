@@ -60,8 +60,8 @@ public class NotificationResponseActivity extends AppCompatActivity {
         }
     }
     public void submitResponse(View view) {
-        Log.d(Constants.TAG, "NotificationResponseActivity:submitResponse");
-        if(action.length()!=0) {
+
+
             if(action.equals(Constants.ACTION_NOTIF_NO)) {
                 setContentView(R.layout.content_inability_response_form);
                 editText = findViewById(R.id.reason_field);
@@ -92,19 +92,28 @@ public class NotificationResponseActivity extends AppCompatActivity {
                             Toast.makeText(view.getContext(), "Please specify a reason for other", Toast.LENGTH_SHORT).show();
                         }
                         else {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                startForegroundService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                            } else {
+                                startService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                            }
                             finish();
                         }
                     }
                 });
             }
+
             else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(new Intent(this, MessageService.class).setAction(action));
-                } else {
-                    startService(new Intent(this, MessageService.class).setAction(action));
-                }
-                Toast.makeText(view.getContext(), "Thanks!", Toast.LENGTH_SHORT).show();
-                finish();
+                if(action.length()!=0) {
+                    Log.d(Constants.TAG, "NotificationResponseActivity:submitResponse " + action);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(new Intent(this, MessageService.class).setAction(action));
+                    } else {
+                        startService(new Intent(this, MessageService.class).setAction(action));
+                    }
+
+                    finish();
+
             }
         }
     }

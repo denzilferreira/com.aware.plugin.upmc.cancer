@@ -123,6 +123,23 @@ public final class Constants {
     public static final String ACTION_SETUP_WEAR = "setup_wear";
     public static final String ACTION_FIRST_RUN = "first_run";
     public static final String ACTION_REBOOT = "action_reboot_run";
+    public static final String ACTION_NOTIFY_INACTIVITY = "action_notify_user";
+    public static final String ACTION_SYNC_DATA = "action_sync_data";
+    public static final String ACTION_NOTIFY_GREAT_JOB = "action_notify_great_job";
+
+
+
+    //SensorService actions
+
+    public static final String ACTION_MINUTE_ALARM = "action_minute_alarm";
+    public static final String ACTION_FEEDBACK_ALARM = "action_feedback_alarm";
+    public static final String ACTION_NOTIF_SNOOZE = "SNOOZE_ACTION";
+    public static final String ACTION_NOTIF_OK = "OK_ACTION";
+    public static final String ACTION_NOTIF_NO = "NO_ACTION";
+
+
+    //NotificationResponse actions
+    public static final String ACTION_SHOW_ALL = "actopm_show_all";
 
 
     //notifstuff

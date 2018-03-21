@@ -113,43 +113,6 @@ public class MessageService extends WearableListenerService implements
     };
 
 
-    private BroadcastReceiver mSensorLocalReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra(Constants.SENSOR_EXTRA_KEY)) {
-                String message = intent.getStringExtra(Constants.SENSOR_EXTRA_KEY);
-                Log.d(Constants.TAG, "Sending the file over to the phone");
-                if(message.equals(Constants.SENSOR_ALARM)) {
-                    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
-                    try {
-                        Asset logAsset = FileManager.createAssetFromLogFile();
-                        Log.d(Constants.TAG, "MessageService:onDataChanged: " + logAsset.getData().length);
-                        putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
-                    com.google.android.gms.common.api.PendingResult<DataApi.DataItemResult> pendingResult =
-                            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest.setUrgent());
-                    pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                        @Override
-                        public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
-                            if(dataItemResult.getStatus().isSuccess()) {
-                                Log.d(Constants.TAG, "File sent successfully");
-                            }
-                        }
-                    });
-
-                }
-                else if(message.equals(Constants.NOTIFY_INACTIVITY)) {
-                    sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
-                }
-                else if(message.equals(Constants.NOTIFY_GREAT_JOB)) {
-                    sendMessageToPhone(Constants.NOTIFY_GREAT_JOB);
-                }
-            }
-        }
-    };
 
     public boolean isSyncedWithPhone() {
         return isSyncedWithPhone;
@@ -185,7 +148,6 @@ public class MessageService extends WearableListenerService implements
             mGoogleApiClient.disconnect();
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSensorLocalReceiver);
         stopForeground(true);
         stopSelf();
     }
@@ -211,13 +173,13 @@ public class MessageService extends WearableListenerService implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         int i = super.onStartCommand(intent, flags, startId);
         Log.d(Constants.TAG, "MessageService:onStartCommand");
-        String action;
-        if(intent!=null)
-             action = intent.getAction();
-        else
-            return i;
-        if(action==null)
-            return i;
+        String action = intent.getAction();
+//        if(intent!=null)
+//             action = intent.getAction();
+//        else
+//            return i;
+//        if(action==null)
+//            return i;
         switch (action) {
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
@@ -238,7 +200,6 @@ public class MessageService extends WearableListenerService implements
                     setWearStatus(Constants.STATUS_INIT);
                 }
                 LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
-                LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
                 break;
             case Constants.ACTION_REBOOT:
                 Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
@@ -259,18 +220,67 @@ public class MessageService extends WearableListenerService implements
                     setWearStatus(Constants.STATUS_INIT);
                 }
                 LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
-                LocalBroadcastManager.getInstance(this).registerReceiver(mSensorLocalReceiver, new IntentFilter(Constants.SENSOR_INTENT_FILTER));
                 break;
             case Constants.ACTION_SETUP_WEAR:
                 Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
                 setUpNodeIdentities();
                 break;
+
+            case Constants.ACTION_SYNC_DATA:
+                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
+                syncDataWithPhone();
+                break;
+
+            case Constants.ACTION_NOTIFY_INACTIVITY:
+                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
+                sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
+                break;
+
+            case Constants.ACTION_NOTIFY_GREAT_JOB:
+                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
+                sendMessageToPhone(Constants.NOTIFY_GREAT_JOB);
+                break;
+
+
+            case Constants.ACTION_NOTIF_NO:
+            case Constants.ACTION_NOTIF_OK:
+            case Constants.ACTION_NOTIF_SNOOZE:
+                sendMessageToPhone(action);
+                break;
+
             default:
                 return i;
 
         }
 
         return i;
+    }
+
+
+    public void syncDataWithPhone() {
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
+        try {
+            Asset logAsset = FileManager.createAssetFromLogFile();
+            Log.d(Constants.TAG, "MessageService:onDataChanged: " + logAsset.getData().length);
+            putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+        com.google.android.gms.common.api.PendingResult<DataApi.DataItemResult> pendingResult =
+                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest.setUrgent());
+        pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+            @Override
+            public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
+                if(dataItemResult.getStatus().isSuccess()) {
+                    Log.d(Constants.TAG, "syncDataWithPhone: success");
+                }
+                else {
+
+                    Log.d(Constants.TAG, "syncDataWithPhone: failed " + dataItemResult.getStatus().getStatusMessage());
+                }
+            }
+        });
     }
 
     private void setUpNodeIdentities() {
@@ -349,8 +359,6 @@ public class MessageService extends WearableListenerService implements
             startForeground(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
         }
     }
-
-
 
 
 
@@ -587,7 +595,6 @@ public class MessageService extends WearableListenerService implements
         }
         else {
             setupNotifCompatBuilder.setContentText(notifContent);
-            mNotificationManager.cancel(Constants.MESSAGE_SERVICE_NOTIFICATION_ID);
             mNotificationManager.notify(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifCompatBuilder.build());
         }
     }

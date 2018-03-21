@@ -224,6 +224,7 @@ public class UPMC extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
                     Log.d(Constants.TAG, "UPMC: Sending Settings Changed Broadcast");
                     sendActionToService(Constants.ACTION_SETTINGS_CHANGED);
+                    finish();
                 }
             });
         }
