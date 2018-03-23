@@ -44,7 +44,7 @@ public class SensorService extends Service implements SensorEventListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.hasExtra(Constants.SENSOR_EXTRA_KEY)) {
-                if(intent.getStringExtra(Constants.SENSOR_EXTRA_KEY).equals(Constants.OK_ACTION)) {
+                if(intent.getStringExtra(Constants.SENSOR_EXTRA_KEY).equals(Constants.ACTION_NOTIF_OK)) {
                     Log.d(Constants.TAG, "SensorService:feedbackLocalBroadcastReceiver:okaction");
                     //setFeedbackEnabled(true);
                     //startFeedbackAlarm();
@@ -284,13 +284,11 @@ public class SensorService extends Service implements SensorEventListener {
                 snoozeInactivityNotif();
                 break;
 
-            case Constants.ACTION_FEEDBACK_ALARM:
-                Log.d(Constants.TAG, "SensorService:onStartCommand:" + action);
-                break;
 
-            case Constants.ACTION_SNOOZE:
+            case Constants.ACTION_SNOOZE_ALARM:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:" + action);
                 notifyInactive(0, false);
+                sendMessageServiceAction(action);
                 break;
 
         }
@@ -301,7 +299,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void snoozeInactivityNotif() {
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent snoozeInt = new Intent(this, SensorService.class).setAction(Constants.ACTION_SNOOZE);
+        Intent snoozeInt = new Intent(this, SensorService.class).setAction(Constants.ACTION_SNOOZE_ALARM);
         PendingIntent snoozePendInt;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             snoozePendInt = PendingIntent.getForegroundService(this, 56, snoozeInt, 0);
@@ -532,7 +530,7 @@ public class SensorService extends Service implements SensorEventListener {
        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
        Intent contentIntent = contentIntent = new Intent(this, NotificationResponse.class);
        if(showSnooze)
-           contentIntent.setAction(Constants.ACTION_SHOW_ALL);
+           contentIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
        PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
            Notification.Builder interventionNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
@@ -583,7 +581,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void notifyFeedback(int sc_count) {
         wakeUpAndVibrate(6000, 3000);
-        Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_ALL);
+        Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_SNOOZE);
         PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

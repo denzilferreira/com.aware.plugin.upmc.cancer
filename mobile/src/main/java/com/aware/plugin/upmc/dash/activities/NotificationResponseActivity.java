@@ -38,6 +38,12 @@ public class NotificationResponseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_response);
 
+        if(getIntent().getAction()!=null) {
+            if (getIntent().getAction().equals(Constants.ACTION_SHOW_SNOOZE)) {
+                findViewById(R.id.radio_snooze).setVisibility(View.VISIBLE);
+            }
+        }
+
     }
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?

@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.hardware.Sensor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -258,9 +259,16 @@ public class MessageService extends WearableListenerService implements
                 break;
 
 
+            case Constants.ACTION_SNOOZE_ALARM:
+                Log.d(Constants.TAG, "MessageService:onStartCommand " + intent.getAction());
+                sendMessageToPhone(Constants.NOTIFY_INACTIVITY_SNOOZED);
+                break;
+
+
             case Constants.ACTION_NOTIF_NO:
             case Constants.ACTION_NOTIF_OK:
             case Constants.ACTION_NOTIF_SNOOZE:
+
                 sendMessageToPhone(action);
                 break;
 
@@ -460,8 +468,8 @@ public class MessageService extends WearableListenerService implements
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         super.onMessageReceived(messageEvent);
-        Log.d(Constants.TAG, "MessageService:onMessageReceived");
-        Log.d(Constants.TAG, "MessageService: onMessageReceived: buildPath" + messageEvent.getPath());
+       // Log.d(Constants.TAG, "MessageService:onMessageReceived");
+       // Log.d(Constants.TAG, "MessageService: onMessageReceived: buildPath" + messageEvent.getPath());
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("wear").path("/upmc-dash").build();
         if (messageEvent.getPath().equals(uriBuilder.toString())) {
@@ -472,15 +480,15 @@ public class MessageService extends WearableListenerService implements
                 setNODE_ID(messageEvent.getSourceNodeId());
                 setNodeSaved(true);
             }
-            if (message.equals(Constants.ACK)) {
-                if(!isSyncedWithPhone()) {
-                    notifySetup(Constants.CONNECTED_PHONE);
-                    setSyncedWithPhone(true);
-                }
-            }
-            else {
-                sendMessageToPhone(Constants.ACK);
-                if (message.contains(Constants.INIT_TS)) {
+
+            switch (message) {
+                case Constants.ACK:
+                    if(!isSyncedWithPhone()) {
+                        notifySetup(Constants.CONNECTED_PHONE);
+                        setSyncedWithPhone(true);
+                    }
+                    break;
+                case Constants.INIT_TS:
                     String[] arr = message.split("\\s+");
                     int morn_hour = Integer.parseInt(arr[1]);
                     int morn_minute = Integer.parseInt(arr[2]);
@@ -498,19 +506,65 @@ public class MessageService extends WearableListenerService implements
                     else
                         startService(sensorService);
                     sendStateToPhone();
-                }
-                else if(message.contains(Constants.IS_WEAR_RUNNING)) {
+                    break;
+
+                case Constants.IS_WEAR_RUNNING:
                     if(!isSyncedWithPhone()) {
                         setSyncedWithPhone(true);
                         notifySetup(Constants.CONNECTED_PHONE);
                     }
                     sendStateToPhone();
-                }
-                else if(message.contains(Constants.OK_ACTION)) {
-                    Log.d(Constants.TAG, "MessageService: feedback starts");
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.FEEDBACK_BROADCAST_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.OK_ACTION));
-                }
+                    break;
+
+                case Constants.ACTION_NOTIF_OK:
+                case Constants.ACTION_NOTIF_NO:
+                case Constants.ACTION_NOTIF_SNOOZE:
+                    sendActionToSensorService(message);
+                    break;
             }
+
+
+
+
+//            if (message.equals(Constants.ACK)) {
+//                if(!isSyncedWithPhone()) {
+//                    notifySetup(Constants.CONNECTED_PHONE);
+//                    setSyncedWithPhone(true);
+//                }
+//            }
+//            else {
+//                sendMessageToPhone(Constants.ACK);
+//                if (message.contains(Constants.INIT_TS)) {
+//                    String[] arr = message.split("\\s+");
+//                    int morn_hour = Integer.parseInt(arr[1]);
+//                    int morn_minute = Integer.parseInt(arr[2]);
+//                    int night_hour = Integer.parseInt(arr[3]);
+//                    int nigh_minute = Integer.parseInt(arr[4]);
+//                    int type = Integer.parseInt(arr[5]);
+//                    writeTimePref(morn_hour, morn_minute, night_hour, nigh_minute);
+//                    writeSymptomPref(type);
+//                    Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + morn_hour + " " + morn_minute + " " + night_hour  + " " + nigh_minute + " " + type);
+//                    setWearStatus(Constants.STATUS_LOGGING);
+//                    Intent sensorService = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage());
+//                    sensorService.setAction(Constants.ACTION_FIRST_RUN);
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//                        startForegroundService(sensorService);
+//                    else
+//                        startService(sensorService);
+//                    sendStateToPhone();
+//                }
+//                else if(message.contains(Constants.IS_WEAR_RUNNING)) {
+//                    if(!isSyncedWithPhone()) {
+//                        setSyncedWithPhone(true);
+//                        notifySetup(Constants.CONNECTED_PHONE);
+//                    }
+//                    sendStateToPhone();
+//                }
+//                else if(message.contains(Constants.ACTION_NOTIF_OK)) {
+//                    Log.d(Constants.TAG, "MessageService: feedback starts");
+//                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.FEEDBACK_BROADCAST_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.OK_ACTION));
+//                }
+//            }
         }
     }
 
@@ -601,6 +655,17 @@ public class MessageService extends WearableListenerService implements
             }
         });
 
+    }
+
+
+    public void sendActionToSensorService(String action) {
+        Intent intent = new Intent(getApplicationContext(), SensorService.class).setAction(action);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        }
+        else {
+            startService(intent);
+        }
     }
 
     private void notifySetup(String notifContent) {

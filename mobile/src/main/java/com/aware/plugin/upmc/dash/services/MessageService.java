@@ -95,7 +95,6 @@ public class MessageService extends WearableListenerService implements
                                 checkSetup();
                             }
                         }, 10000);
-
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
@@ -152,24 +151,18 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "MessageService: not enough information to start logging");
                 }
                 break;
+
+            case Constants.ACTION_SNOOZE_ALARM:
+                Log.d(Constants.TAG, "MessageService:"  + intentAction);
+                notifyUserWithInactivity(false);
+                break;
             case Constants.ACTION_NOTIF_SNOOZE:
-                Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_SNOOZE");
-                // check vicinity
-                snoozeInactivityNotif();
-                break;
             case Constants.ACTION_NOTIF_OK:
-                dismissIntervention();
-                Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_OK");
-                break;
             case Constants.ACTION_NOTIF_NO:
-                Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_NO");
+                sendMessageToWear(intentAction);
+                Log.d(Constants.TAG, "MessageService:" + intentAction);
                 dismissIntervention();
                 break;
-            case Constants.ACTION_SNOOZE:
-                Log.d(Constants.TAG, "MessageService:ACTION_SNOOZE");
-                notifyUserWithInactivity();
-                break;
-                // do some reboot stuff here.
             default:
                 return i;
         }
@@ -194,19 +187,7 @@ public class MessageService extends WearableListenerService implements
         mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
 
-    public void snoozeInactivityNotif() {
-        Intent snoozeInt = new Intent(this, MessageService.class).setAction(Constants.ACTION_SNOOZE);
-        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        PendingIntent snoozePendInt;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-             snoozePendInt = PendingIntent.getForegroundService(this, 56, snoozeInt, 0);
-        } else {
-             snoozePendInt = PendingIntent.getService(this, 56, snoozeInt, 0);
-        }
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 1*60*1000, snoozePendInt);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
-    }
+
 
     public boolean isNodeSaved() {
         return isNodeSaved;
@@ -307,7 +288,7 @@ public class MessageService extends WearableListenerService implements
                 case Constants.NOTIFY_INACTIVITY:
                     sendMessageToWear(Constants.ACK);
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:InactiveUser");
-                    notifyUserWithInactivity();
+                    notifyUserWithInactivity(true);
                     break;
                 case Constants.NOTIFY_GREAT_JOB:
                     sendMessageToWear(Constants.ACK);
@@ -316,21 +297,15 @@ public class MessageService extends WearableListenerService implements
                     break;
 
                 case Constants.ACTION_NOTIF_OK:
-                    sendMessageToWear(Constants.ACK);
-                    dismissIntervention();
-                    Log.d(Constants.TAG, "MessageService:onMessageReceived:ACTION_NOTIF_OK");
-                    break;
-
                 case Constants.ACTION_NOTIF_NO:
-                    sendMessageToWear(Constants.ACK);
-                    dismissIntervention();
-                    Log.d(Constants.TAG,"MessageService:onMessageReceived:ACTION_NOTIF_NO");
-                    break;
-
                 case Constants.ACTION_NOTIF_SNOOZE:
                     sendMessageToWear(Constants.ACK);
-                    snoozeInactivityNotif();
-                    Log.d(Constants.TAG,"MessageService:onMessageReceived:ACTION_NOTIF_SNOOZE");
+                    dismissIntervention();
+                    Log.d(Constants.TAG,"MessageService:onMessageReceived " + message);
+                    break;
+
+                case Constants.NOTIFY_INACTIVITY_SNOOZED:
+                    notifyUserWithInactivity(false);
                     break;
             }
         }
@@ -383,8 +358,10 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
-    public void notifyUserWithInactivity() {
+    public void notifyUserWithInactivity(boolean snoozeOption) {
         Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
+        if(snoozeOption)
+            dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
         PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");

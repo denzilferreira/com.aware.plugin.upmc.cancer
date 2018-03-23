@@ -19,6 +19,7 @@
             android:text="NO"
             android:onClick="onRadioButtonClicked"/>
         <RadioButton android:id="@+id/radio_snooze"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SNOOZE"

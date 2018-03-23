@@ -28,7 +28,6 @@ public final class Constants {
     public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
     public static final String ACK = "device acknowledges";
     public static final String DEMO_NOTIF = "demonotif";
-    public static final String OK_ACTION = "OK_ACTION";
 
 
 
@@ -36,6 +35,10 @@ public final class Constants {
 
     // messages to phone
     public static final String LOW_ACTIVITY = "step count below threshold";
+
+
+    public static final String NOTIFY_INACTIVITY_SNOOZED = "user is inactive after snooze";
+
 
 
 
@@ -136,11 +139,11 @@ public final class Constants {
     public static final String ACTION_NOTIF_SNOOZE = "SNOOZE_ACTION";
     public static final String ACTION_NOTIF_OK = "OK_ACTION";
     public static final String ACTION_NOTIF_NO = "NO_ACTION";
-    public static final String ACTION_SNOOZE = "SNOOZE_ALARM";
+    public static final String ACTION_SNOOZE_ALARM = "ACTION_SNOOZE_ALARM";
 
 
     //NotificationResponse actions
-    public static final String ACTION_SHOW_ALL = "actopm_show_all";
+    public static final String ACTION_SHOW_SNOOZE = "actopm_show_all";
 
 
     //notifstuff

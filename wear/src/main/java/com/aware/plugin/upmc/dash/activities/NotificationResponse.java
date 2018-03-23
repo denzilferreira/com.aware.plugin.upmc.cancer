@@ -23,7 +23,7 @@ public class NotificationResponse extends WearableActivity {
         mTextView =  findViewById(R.id.text);
         setAmbientEnabled();
         if(getIntent().getAction()!=null) {
-            if (getIntent().getAction().equals(Constants.ACTION_SHOW_ALL)) {
+            if (getIntent().getAction().equals(Constants.ACTION_SHOW_SNOOZE)) {
                 findViewById(R.id.snooze_response).setVisibility(View.VISIBLE);
             }
         }

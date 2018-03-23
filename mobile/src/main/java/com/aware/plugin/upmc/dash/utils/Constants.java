@@ -30,6 +30,8 @@ public final class Constants {
 
     //messages from wear
     public static final String NOTIFY_INACTIVITY = "user is inactive";
+    public static final String NOTIFY_INACTIVITY_SNOOZED = "user is inactive after snooze";
+
     public static final String NOTIFY_GREAT_JOB = "user is active";
 
 
@@ -43,6 +45,8 @@ public final class Constants {
 
 
 
+
+    public static final String ACTION_SHOW_SNOOZE = "action_show_snooze";
 
 
 
@@ -77,7 +81,7 @@ public final class Constants {
 
     //
 
-    public static final String ACTION_SNOOZE = "action_snooze";
+    public static final String ACTION_SNOOZE_ALARM = "ACTION_SNOOZE_ALARM";
 
 
 
