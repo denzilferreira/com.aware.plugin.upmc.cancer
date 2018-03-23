@@ -81,8 +81,8 @@ public final class Constants {
 
 
     // Sensor Service Notification
-    public static final String SS_MONITORING = "(Session Running)\n until night time";
-    public static final String SS_NOT_MONITORING = "(Session Paused)\n until morning time";
+    public static final String SS_MONITORING = "(Running)\n until night time";
+    public static final String SS_NOT_MONITORING = "(Paused)\n until morning time";
 
 
     //sensors
@@ -136,6 +136,7 @@ public final class Constants {
     public static final String ACTION_NOTIF_SNOOZE = "SNOOZE_ACTION";
     public static final String ACTION_NOTIF_OK = "OK_ACTION";
     public static final String ACTION_NOTIF_NO = "NO_ACTION";
+    public static final String ACTION_SNOOZE = "SNOOZE_ALARM";
 
 
     //NotificationResponse actions

@@ -281,16 +281,35 @@ public class SensorService extends Service implements SensorEventListener {
             case Constants.ACTION_NOTIF_SNOOZE:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
                 sendMessageServiceAction(Constants.ACTION_NOTIF_SNOOZE);
-                dismissIntervention();
+                snoozeInactivityNotif();
                 break;
-
 
             case Constants.ACTION_FEEDBACK_ALARM:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:" + action);
                 break;
+
+            case Constants.ACTION_SNOOZE:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" + action);
+                notifyInactive(0, false);
+                break;
+
         }
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+
+    public void snoozeInactivityNotif() {
+        AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent snoozeInt = new Intent(this, SensorService.class).setAction(Constants.ACTION_SNOOZE);
+        PendingIntent snoozePendInt;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            snoozePendInt = PendingIntent.getForegroundService(this, 56, snoozeInt, 0);
+        } else {
+            snoozePendInt = PendingIntent.getService(this, 56, snoozeInt, 0);
+        }
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + 1*60*1000, snoozePendInt);
+        dismissIntervention();
     }
 
     public void createInterventionNotifChannel() {
@@ -499,7 +518,7 @@ public class SensorService extends Service implements SensorEventListener {
         if(isTimeToNotify()) {
             if (sc_count < 50) {
                 sendMessageServiceAction(Constants.ACTION_NOTIFY_INACTIVITY);
-                notifyInactive(sc_count);
+                notifyInactive(sc_count, true);
             }
             else {
                 Log.d(Constants.TAG, "SensorService: good job! lol");
@@ -508,10 +527,12 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
 
-   public void  notifyInactive(int sc_count) {
+   public void  notifyInactive(int sc_count, boolean showSnooze) {
        wakeUpAndVibrate(6000, 3000);
        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-       Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_ALL);
+       Intent contentIntent = contentIntent = new Intent(this, NotificationResponse.class);
+       if(showSnooze)
+           contentIntent.setAction(Constants.ACTION_SHOW_ALL);
        PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
            Notification.Builder interventionNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);

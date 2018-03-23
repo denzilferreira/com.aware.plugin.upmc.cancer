@@ -50,6 +50,7 @@ import java.util.List;
 public class UPMC extends AppCompatActivity {
     public boolean isWatchAround = false;
     public boolean WEARLESS_DEBUG = true;
+    public boolean STUDYLESS_DEBUG = true;
     public BroadcastReceiver vicinityCheckBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -170,11 +171,23 @@ public class UPMC extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, ""+ morningMinute);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
-                    if (!Aware.isStudy(getApplicationContext())) {
-                        //UPMC Dash
-                        Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
-                        //Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
+                    if(!STUDYLESS_DEBUG) {
+                        if (!Aware.isStudy(getApplicationContext())) {
+                            //UPMC Dash
+                             Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+                            //Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
+                        }
                     }
+                    else {
+                        sendActionToService(Constants.ACTION_FIRST_RUN);
+
+                    }
+
+
+                    // alarm
+
+                    finish();
+
                 }
             });
         } else {

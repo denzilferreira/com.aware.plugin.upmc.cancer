@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aware.Aware;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
@@ -80,14 +81,21 @@ public class MessageService extends WearableListenerService implements
                     case BluetoothAdapter.STATE_OFF:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
                         notifySetup(Constants.FAILED_WEAR_BLUETOOTH);
+                        if(!enableBluetooth())
+                            Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
-                        notifySetup(Constants.FAILED_WEAR_BLUETOOTH);
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
-                        setUpNodeIdentities();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                checkSetup();
+                            }
+                        }, 10000);
+
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
@@ -146,6 +154,7 @@ public class MessageService extends WearableListenerService implements
                 break;
             case Constants.ACTION_NOTIF_SNOOZE:
                 Log.d(Constants.TAG, "MessageService:ACTION_NOTIF_SNOOZE");
+                // check vicinity
                 snoozeInactivityNotif();
                 break;
             case Constants.ACTION_NOTIF_OK:
@@ -477,6 +486,15 @@ public class MessageService extends WearableListenerService implements
                 }
             }
         }, 5000);
+    }
+
+
+    public boolean enableBluetooth() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        boolean isEnabled = bluetoothAdapter.isEnabled();
+        if(!isEnabled)
+            return bluetoothAdapter.enable();
+        return true;
     }
 
     private void showSurveyNotif() {

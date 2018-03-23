@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.fileutils.FileManager;
@@ -95,6 +96,8 @@ public class MessageService extends WearableListenerService implements
                                     Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
                                     setSyncedWithPhone(false);
                                     notifySetup(Constants.FAILED_PHONE_BLUETOOTH);
+                                    if(!enableBluetooth())
+                                        Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
                                     break;
                                 case BluetoothAdapter.STATE_TURNING_OFF:
                                     Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
@@ -102,7 +105,12 @@ public class MessageService extends WearableListenerService implements
                                     break;
                                 case BluetoothAdapter.STATE_ON:
                                     Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
-                                    //setUpNodeIdentities();
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            setUpNodeIdentities();
+                                        }
+                                    }, 10000);
                                     break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
@@ -111,6 +119,14 @@ public class MessageService extends WearableListenerService implements
             }
         }
     };
+
+    public boolean enableBluetooth() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        boolean isEnabled = bluetoothAdapter.isEnabled();
+        if(!isEnabled)
+            return bluetoothAdapter.enable();
+        return true;
+    }
 
 
 
