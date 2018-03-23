@@ -20,9 +20,9 @@ public final class Constants {
 
 
     // Messages to wear
-    public static final String IS_WEAR_RUNNING = "is wear running";
-    public static final String INIT_TS = "morningtimestamp&symptoms"; // Morning timestamp plus
-    public static final String ACK = "device acknowledges";
+    public static final String IS_WEAR_RUNNING = "is_wear_running";
+    public static final String INIT_TS = "init_time_and_symptoms"; // Morning timestamp plus
+    public static final String ACK = "device_acknowledges";
 
     //replies from wear
 
@@ -149,6 +149,12 @@ public final class Constants {
     public static final String MESSAGE_EXTRA_KEY = "MESSAGE_EXTRA_KEY";
     public static final String LOADING_ACTIVITY_CONNECTED_MESSAGE = "Your watch is  synced! You will receive alerts.";
     public static final String LOADING_ACTIVITY_FAILED_MESSAGE = "Setup failed! Please try again by tapping the setup notification later.";
+
+
+
+    public static int INTERVENTION_TIMEOUT = 15000;
+    public static int DURATION_AWAKE = 15000;
+    public static int DURATION_VIBRATE = 3000;
 
 
 

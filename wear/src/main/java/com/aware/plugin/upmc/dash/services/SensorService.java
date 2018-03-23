@@ -526,7 +526,7 @@ public class SensorService extends Service implements SensorEventListener {
 
 
    public void  notifyInactive(int sc_count, boolean showSnooze) {
-       wakeUpAndVibrate(6000, 3000);
+       wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
        final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
        Intent contentIntent = contentIntent = new Intent(this, NotificationResponse.class);
        if(showSnooze)
@@ -560,7 +560,7 @@ public class SensorService extends Service implements SensorEventListener {
    }
 
 
-   public void wakeUpAndVibrate(int duration_awake, int duration_vibrate) {
+   public void wakeUpAndVibrate(int duration_awake, int duration_vibrate, int timeout) {
        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
        wl.acquire(duration_awake);
@@ -575,12 +575,16 @@ public class SensorService extends Service implements SensorEventListener {
                vibrator.cancel();
            }
        }, duration_vibrate);
-
-
+       new Handler().postDelayed(new Runnable() {
+           @Override
+           public void run() {
+               dismissIntervention();
+           }
+       }, timeout);
    }
 
     public void notifyFeedback(int sc_count) {
-        wakeUpAndVibrate(6000, 3000);
+        wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
         Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_SNOOZE);
         PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -20,14 +20,10 @@ public final class Constants {
 
 
     // Messages from phone
-    public static final String GET_STATUS_WEAR = "get_wear_status";
-    public static final String IS_WEAR_RUNNING = "is wear running";
-    public static final String STOP_SC = "stop_step_count";    // STOP STEP COUNT COMMAND
-    public static final String KILL_DASH = "killeverything"; //KILL COMMANDS
-    public static final String INIT_TS = "morningtimestamp&symptoms"; // Morning timestamp plus
-    public static final String TIME_RESET = "resetconfig"; // Morning timestamp plus
-    public static final String ACK = "device acknowledges";
-    public static final String DEMO_NOTIF = "demonotif";
+    public static final String IS_WEAR_RUNNING = "is_wear_running";
+    public static final String INIT_TS = "init_time_and_symptoms"; // Morning timestamp plus
+    public static final String ACK = "device_acknowledges";
+
 
 
 
@@ -173,6 +169,13 @@ public final class Constants {
     // Notif IDs
     public static int SESSION_STATUS_NOTIF_ID = 40;
     public static int INTERVENTION_NOTIF_ID = 50;
+
+
+    // intervention timeout
+
+    public static int INTERVENTION_TIMEOUT = 15000;
+    public static int DURATION_AWAKE = 15000;
+    public static int DURATION_VIBRATE = 3000;
 
 
 

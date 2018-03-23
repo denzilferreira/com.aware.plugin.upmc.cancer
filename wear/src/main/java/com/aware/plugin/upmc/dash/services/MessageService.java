@@ -480,8 +480,7 @@ public class MessageService extends WearableListenerService implements
                 setNODE_ID(messageEvent.getSourceNodeId());
                 setNodeSaved(true);
             }
-
-            switch (message) {
+            switch (message.split("\\s+")[0]) {
                 case Constants.ACK:
                     if(!isSyncedWithPhone()) {
                         notifySetup(Constants.CONNECTED_PHONE);

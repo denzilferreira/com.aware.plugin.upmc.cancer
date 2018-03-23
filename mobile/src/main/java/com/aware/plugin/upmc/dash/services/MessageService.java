@@ -105,6 +105,30 @@ public class MessageService extends WearableListenerService implements
     };
 
 
+    public void wakeUpAndVibrate(int duration_awake, int duration_vibrate, int timeout) {
+        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+        wl.acquire(duration_awake);
+        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        long[] pattern = {0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
+        assert vibrator != null;
+        vibrator.vibrate(pattern, 0);
+        Handler handler2 = new Handler();
+        handler2.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                vibrator.cancel();
+            }
+        }, duration_vibrate);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dismissIntervention();
+            }
+        }, timeout);
+    }
+
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -322,12 +346,8 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void notifyUserWithAppraisal() {
+        wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
         Intent dashIntent = new Intent(this, MessageService.class).setAction(Constants.ACTION_APPRAISAL);
-        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
-        wl.acquire(6000);
-        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(3000);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
@@ -359,15 +379,11 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void notifyUserWithInactivity(boolean snoozeOption) {
+        wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
         Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
         if(snoozeOption)
             dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
         PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
-        wl.acquire(6000);
-        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(3000);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);

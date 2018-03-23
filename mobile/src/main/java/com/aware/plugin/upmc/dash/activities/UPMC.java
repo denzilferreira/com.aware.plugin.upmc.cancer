@@ -179,13 +179,10 @@ public class UPMC extends AppCompatActivity {
                         }
                     }
                     else {
-                        sendActionToService(Constants.ACTION_FIRST_RUN);
-
+                        sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
                     }
 
-
                     // alarm
-
                     finish();
 
                 }
@@ -236,7 +233,7 @@ public class UPMC extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
                     Log.d(Constants.TAG, "UPMC: Sending Settings Changed Broadcast");
-                    sendActionToService(Constants.ACTION_SETTINGS_CHANGED);
+                    sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
                     finish();
                 }
             });
@@ -298,18 +295,15 @@ public class UPMC extends AppCompatActivity {
                 loadSchedule(true);
             } else {
 
+                if(!isMyServiceRunning(MessageService.class)) {
+                    sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                }
                 // check if watch is around. If you do not have a Android Wear device and you'd like debug, set WIRELESS_DEBUG to true
                 if (WEARLESS_DEBUG) {
                     showSymptomSurvey();
                 } else {
                     // When the app is opened later
-                    if (isMyServiceRunning(MessageService.class)) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            startForegroundService(new Intent(this, MessageService.class).setAction(Constants.ACTION_VICINITY));
-                        } else {
-                            startService(new Intent(this, MessageService.class).setAction(Constants.ACTION_VICINITY));
-                        }
-                    }
+                    sendMessageServiceAction(Constants.ACTION_VICINITY);
                     LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
                     setContentView(R.layout.activity_upmc_loading);
                     new Handler().postDelayed(new Runnable() {
@@ -326,6 +320,16 @@ public class UPMC extends AppCompatActivity {
                     }, 10000);
                 }
             }
+        }
+    }
+
+
+    public void sendMessageServiceAction(String action) {
+        Intent intent = new Intent(this, MessageService.class).setAction(action);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
         }
     }
 
@@ -689,7 +693,7 @@ public class UPMC extends AppCompatActivity {
                 int severity = checkSymptoms();
                 final Context context = getApplicationContext();
                 Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
-                sendActionToService(Constants.ACTION_SETTINGS_CHANGED);
+                sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
                 Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -697,14 +701,6 @@ public class UPMC extends AppCompatActivity {
     }
 
 
-    public void sendActionToService(String action) {
-        final Context context = getApplicationContext();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(new Intent(context, MessageService.class).setAction(action));
-        } else {
-            startService(new Intent(context, MessageService.class).setAction(action));
-        }
-    }
 
     //Handles ? as scores. Can't use ? in SQLite
     private String parseAnswer(String rating) {
@@ -823,7 +819,7 @@ public class UPMC extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
                 Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-                sendActionToService(Constants.ACTION_FIRST_RUN);
+                sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
                 finish();
             }
         }
