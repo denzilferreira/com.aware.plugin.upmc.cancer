@@ -47,6 +47,18 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+
+        <activity
+            android:name=".activities.DemoMode"
+            android:label="@string/title_activity_demo_mode"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".activities.UPMC"
             android:exported="true"
@@ -94,6 +106,11 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/aware_accessibility_config" />
         </service>
+
+
+        <service
+            android:name=".services.DemoMessageService"
+            android:exported="false"/>
         <service
             android:name=".services.MessageService"
             android:exported="false">
@@ -171,6 +188,7 @@
             android:name=".activities.NotificationResponseActivity"
             android:label="@string/title_activity_notification_response"
             android:theme="@style/Theme.AppCompat.Dialog.Alert" />
+
     </application>
 
 </manifest>

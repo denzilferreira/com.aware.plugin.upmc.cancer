@@ -23,6 +23,7 @@ android {
 
 
 
+
 dependencies {
     implementation "com.google.android.gms:play-services-wearable:$google_libs"
     implementation 'com.google.android.support:wearable:2.2.0'

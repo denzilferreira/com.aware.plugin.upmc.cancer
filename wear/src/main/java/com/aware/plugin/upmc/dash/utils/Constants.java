@@ -1,5 +1,7 @@
 package com.aware.plugin.upmc.dash.utils;
 
+import android.net.Uri;
+
 /**
  * Created by RaghuTeja on 6/23/17.
  */
@@ -171,11 +173,21 @@ public final class Constants {
     public static int INTERVENTION_NOTIF_ID = 50;
 
 
+
+    // Demo mode Notification IDs
+    public static final int DEMO_NOTIF_ID = 100;
+    public static final String DEMO_NOTIF_CHNL_ID = "wear_demo_notification";
+    public static final String DEMO_MODE = "Demo Mode";
+
+
     // intervention timeout
 
     public static int INTERVENTION_TIMEOUT = 15000;
     public static int DURATION_AWAKE = 15000;
     public static int DURATION_VIBRATE = 3000;
+
+    public static Uri MESSAGE_URI = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
+
 
 
 
