@@ -291,6 +291,10 @@ public class SensorService extends Service implements SensorEventListener {
                 sendMessageServiceAction(action);
                 break;
 
+
+
+
+
         }
 
         return super.onStartCommand(intent, flags, startId);

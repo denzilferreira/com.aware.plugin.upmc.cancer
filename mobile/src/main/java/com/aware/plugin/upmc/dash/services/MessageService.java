@@ -183,7 +183,7 @@ public class MessageService extends WearableListenerService implements
             case Constants.ACTION_NOTIF_SNOOZE:
             case Constants.ACTION_NOTIF_OK:
             case Constants.ACTION_NOTIF_NO:
-                sendMessageToWear(intentAction);
+                sendMessageToWear(intentAction + "_PHONE");
                 Log.d(Constants.TAG, "MessageService:" + intentAction);
                 dismissIntervention();
                 break;
@@ -319,9 +319,9 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:GreatJobUser");
                     notifyUserWithAppraisal();
                     break;
-
-                case Constants.ACTION_NOTIF_OK:
                 case Constants.ACTION_NOTIF_NO:
+                    showInabilityResponseDialog();
+                case Constants.ACTION_NOTIF_OK:
                 case Constants.ACTION_NOTIF_SNOOZE:
                     sendMessageToWear(Constants.ACK);
                     dismissIntervention();
@@ -335,6 +335,12 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
+
+    public void showInabilityResponseDialog() {
+        Intent intent = new Intent(this, NotificationResponseActivity.class).setAction(Constants.ACTION_SHOW_INABILITY);
+        startActivity(intent);
+    }
+
     public boolean isWearInitializable() {
         final Context context = getApplicationContext();
         boolean morning_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) != -1;
@@ -344,6 +350,8 @@ public class MessageService extends WearableListenerService implements
         boolean severity = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY)) != -1;
         return(morning_hour && morning_minute & night_hour && night_minute && severity);
     }
+
+
 
     public void notifyUserWithAppraisal() {
         wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
@@ -398,7 +406,7 @@ public class MessageService extends WearableListenerService implements
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
         }
         else  {
-             NotificationCompat.Builder  monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
+            NotificationCompat.Builder  monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Monitor")
                     .setContentText(Constants.NOTIF_INACTIVITY)

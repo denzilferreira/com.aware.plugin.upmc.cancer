@@ -17,5 +17,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_notification_response">NotificationResponseActivity</string>
     <string name="title_activity_demo_mode">DemoMode</string>
+    <string name="title_activity_inability_response">InabilityResponseActivity</string>
 
 </resources>

@@ -10,25 +10,25 @@
         android:id="@+id/busy_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onCheckBoxClocked"
+        android:onClick="onCheckBoxClicked"
         android:text="Busy"/>
     <CheckBox
         android:id="@+id/pain_heckbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onCheckBoxClocked"
+        android:onClick="onCheckBoxClicked"
         android:text="Pain"/>
     <CheckBox
         android:id="@+id/nausea_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onCheckBoxClocked"
+        android:onClick="onCheckBoxClicked"
         android:text="Nausea"/>
     <CheckBox
         android:id="@+id/other_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onCheckBoxClocked"
+        android:onClick="onCheckBoxClicked"
         android:text="Other"/>
 
     <EditText

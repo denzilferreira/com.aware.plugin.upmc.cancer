@@ -285,7 +285,7 @@ public class MessageService extends WearableListenerService implements
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
         try {
             Asset logAsset = FileManager.createAssetFromLogFile();
-            Log.d(Constants.TAG, "MessageService:onDataChanged: " + logAsset.getData().length);
+            Log.d(Constants.TAG, "MessageService:onDataChanged: ");
             putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
         } catch (IOException e) {
             e.printStackTrace();

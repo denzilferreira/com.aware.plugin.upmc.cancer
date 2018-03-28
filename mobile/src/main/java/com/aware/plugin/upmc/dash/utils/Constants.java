@@ -15,6 +15,11 @@ public final class Constants {
 
     public static final String TAG = "CANCER";
     public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";
+    public static final String CAPABILITY_DEMO_WEAR_APP = "upmcdash_demo_wearapp";
+
+    public static final String CAPABILITY_DEMO_PHONE_APP = "upmcdash_demo_phoneapp";
+
+
     //local broadcast receivers/ MessageService stuff
     // intent filters for Broadcast Receivers
 
@@ -49,6 +54,9 @@ public final class Constants {
 
 
     public static final String ACTION_SHOW_SNOOZE = "action_show_snooze";
+
+
+    public static final String ACTION_SHOW_INABILITY = "action_show_inability";
 
 
 

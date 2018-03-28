@@ -158,6 +158,11 @@ public final class Constants {
     public static final String SESSION_STATUS_CHNL_ID = "session_status";
     public static final String INTERVENTION_NOTIF_CHNL_ID = "intervention_notification_wear";
 
+    public static final String CAPABILITY_DEMO_WEAR_APP = "upmcdash_demo_wearapp";
+    public static final String CAPABILITY_DEMO_PHONE_APP = "upmcdash_demo_phoneapp";
+
+
+
 
     // Channel Names
     public static final String SESSION_STATUS_CHNL_NAME = "UPMC Dash Session Status";

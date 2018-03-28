@@ -27,12 +27,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -56,6 +54,12 @@ public class DemoMessageService extends WearableListenerService implements Messa
     private DataClient dataClient;
     private String wearNodeID;
     int count = 0;
+
+    public void setWearAround(boolean wearAround) {
+        isWearAround = wearAround;
+    }
+
+    private boolean isWearAround = false;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Constants.TAG, "onStartCommand");
@@ -72,8 +76,9 @@ public class DemoMessageService extends WearableListenerService implements Messa
         capabilityClient = Wearable.getCapabilityClient(this, options);
         dataClient = Wearable.getDataClient(this, options);
         messageClient.addListener(this, Constants.MESSAGE_URI, MessageClient.FILTER_PREFIX);
-        capabilityClient.addListener(this, Constants.CAPABILITY_WEAR_APP);
+        capabilityClient.addListener(this, Constants.CAPABILITY_DEMO_WEAR_APP);
         dataClient.addListener(this);
+        capabilityClient.addLocalCapability(Constants.CAPABILITY_DEMO_PHONE_APP);
         setUpNodeIdentities();
         final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
@@ -92,8 +97,6 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     private void sendMessageToWear(final String message) {
         Log.d(Constants.TAG, "MessageService:sendMessageToWear " + message);
-
-
         messageClient.sendMessage(getWearNodeID(), Constants.MESSAGE_URI.toString(), message.getBytes()).
                 addOnSuccessListener(new OnSuccessListener<Integer>() {
             @Override
@@ -113,39 +116,28 @@ public class DemoMessageService extends WearableListenerService implements Messa
         .addOnCompleteListener(new OnCompleteListener<Integer>() {
             @Override
             public void onComplete(@NonNull Task<Integer> task) {
-                Log.d(Constants.TAG, "sendmessage:oncomplete");
+                Log.d(Constants.TAG, "sendmessage:oncomplete, waiting for ACK from wear...");
 
             }
         });
 
+        setWearAround(false);
 
-//        PendingResult<MessageApi.SendMessageResult> pendingResult =
-//                Wearable.MessageApi.sendMessage(
-//                        mGoogleApiClient,
-//                        getNODE_ID(),
-//                        uriBuilder.toString(),
-//                        message.getBytes());
-//
-//        pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-//            @Override
-//            public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-//                if (!sendMessageResult.getStatus().isSuccess()) {
-//                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message failed" + message);
-//                    setWearConnected(false);
-//                    notifySetup(Constants.FAILED_WEAR);
-//                } else {
-//                    Log.d(Constants.TAG, "MessageService:sendMessageToWear:message sent" + message);
-//                    if(!isWearConnected()) {
-//                        notifySetup(Constants.CONNECTED_WEAR);
-//                    }
-//                    setWearConnected(true);
-//                }
-//            }
-//        });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                if(isWearAround())
+                    Log.d(Constants.TAG, "sendMessageToWear: ACK received, wear is around");
+                else
+                    Log.d(Constants.TAG, "sendMessageToWear: ACK not received wear is not around");
+            }
+        }, 5000);
+
     }
 
     private void setUpNodeIdentities() {
-        capabilityClient.getCapability(Constants.CAPABILITY_WEAR_APP, CapabilityClient.FILTER_REACHABLE).addOnCompleteListener(new OnCompleteListener<CapabilityInfo>() {
+        capabilityClient.getCapability(Constants.CAPABILITY_DEMO_WEAR_APP, CapabilityClient.FILTER_REACHABLE).addOnCompleteListener(new OnCompleteListener<CapabilityInfo>() {
             @Override
             public void onComplete(@NonNull Task<CapabilityInfo> task) {
                 Log.d(Constants.TAG, "onComplete");
@@ -175,22 +167,7 @@ public class DemoMessageService extends WearableListenerService implements Messa
                 }
             }
         });
-//        Wearable.CapabilityApi.getCapability(mGoogleApiClient, Constants.CAPABILITY_WEAR_APP, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
-//            @Override
-//            public void onResult(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
-//                CapabilityInfo info = getCapabilityResult.getCapability();
-//                Set<Node> nodes = info.getNodes();
-//                String NODE_ID;
-//                if (nodes.size() == 1) {
-//                    for (Node node : nodes) {
-//                        NODE_ID = node.getId();
-//                        Log.d(Constants.TAG, "MessageService:setUpNodeIdentities: " + NODE_ID);
-//                        setNODE_ID(NODE_ID);
-//                        isWearServiceRunning(getNODE_ID());
-//                    }
-//                }
-//            }
-//        });
+
     }
 
     @Override
@@ -199,6 +176,7 @@ public class DemoMessageService extends WearableListenerService implements Messa
         super.onDestroy();
         messageClient.removeListener(this);
         capabilityClient.removeListener(this);
+        capabilityClient.removeLocalCapability(Constants.CAPABILITY_DEMO_PHONE_APP);
         dataClient.removeListener(this);
     }
 
@@ -209,6 +187,7 @@ public class DemoMessageService extends WearableListenerService implements Messa
         byte[] input = messageEvent.getData();
         String message = new String(input);
         Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
+        setWearAround(true);
 
     }
 
@@ -224,6 +203,7 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     @Override
     public void onConnectedNodes(List<Node> list) {
+        Log.d(Constants.TAG, "onConnectedNodes: ");
         super.onConnectedNodes(list);
     }
 
@@ -273,5 +253,9 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     public void setWearNodeID(String wearNodeID) {
         this.wearNodeID = wearNodeID;
+    }
+
+    public boolean isWearAround() {
+        return isWearAround;
     }
 }

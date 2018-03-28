@@ -37,10 +37,12 @@ public class NotificationResponseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_response);
-
         if(getIntent().getAction()!=null) {
             if (getIntent().getAction().equals(Constants.ACTION_SHOW_SNOOZE)) {
                 findViewById(R.id.radio_snooze).setVisibility(View.VISIBLE);
+            }
+            if (getIntent().getAction().equals(Constants.ACTION_SHOW_INABILITY)) {
+                showInabilityResponseDialog();
             }
         }
 
@@ -69,44 +71,7 @@ public class NotificationResponseActivity extends AppCompatActivity {
 
 
             if(action.equals(Constants.ACTION_NOTIF_NO)) {
-                setContentView(R.layout.content_inability_response_form);
-                editText = findViewById(R.id.reason_field);
-                submitButton = findViewById(R.id.inability_submit);
-                submitButton.setEnabled(false);
-                editText.setVisibility(View.INVISIBLE);
-                editText.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable editable) {
-                        submitButton.setEnabled(true);
-                    }
-                });
-
-                submitButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if(editText.getText().length() == 0 && isOtherChecked()) {
-                            Toast.makeText(view.getContext(), "Please specify a reason for other", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                startForegroundService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
-                            } else {
-                                startService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
-                            }
-                            finish();
-                        }
-                    }
-                });
+             showInabilityResponseDialog();
             }
 
             else {
@@ -117,11 +82,54 @@ public class NotificationResponseActivity extends AppCompatActivity {
                     } else {
                         startService(new Intent(this, MessageService.class).setAction(action));
                     }
-
                     finish();
-
             }
         }
+    }
+
+
+    public void showInabilityResponseDialog() {
+        setContentView(R.layout.content_inability_response_form);
+        editText = findViewById(R.id.reason_field);
+        submitButton = findViewById(R.id.inability_submit);
+        submitButton.setEnabled(false);
+        editText.setVisibility(View.INVISIBLE);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                submitButton.setEnabled(true);
+            }
+        });
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(editText.getText().length() == 0 && isOtherChecked()) {
+                    Toast.makeText(view.getContext(), "Please specify a reason for other", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                    } else {
+                        startService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                    }
+                    finish();
+                }
+            }
+        });
+
+
+
     }
 
     public boolean isOtherChecked() {
@@ -136,7 +144,7 @@ public class NotificationResponseActivity extends AppCompatActivity {
             editText.setVisibility(View.GONE);
     }
 
-    public void onCheckBoxClocked(View view) {
+    public void onCheckBoxClicked(View view) {
         boolean checked = ((CheckBox) view).isChecked();
         if(checked)
             checkCount++;

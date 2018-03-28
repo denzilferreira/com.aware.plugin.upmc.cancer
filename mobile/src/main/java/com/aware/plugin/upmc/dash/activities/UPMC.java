@@ -132,7 +132,8 @@ public class UPMC extends AppCompatActivity {
         if (firstRun) {
             saveSchedule.setText("Join Study");
             IntentFilter filter = new IntentFilter(Aware.ACTION_JOINED_STUDY);
-            registerReceiver(joinedObserver, filter);
+            if(!STUDYLESS_DEBUG)
+                registerReceiver(joinedObserver, filter);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 morning_timer.setHour(9);
                 morning_timer.setMinute(0);
