@@ -518,7 +518,7 @@ public class MessageService extends WearableListenerService implements
                 case Constants.ACTION_NOTIF_OK:
                 case Constants.ACTION_NOTIF_NO:
                 case Constants.ACTION_NOTIF_SNOOZE:
-                    sendActionToSensorService(message);
+                    sendActionToSensorService(message + "_PHONE");
                     break;
             }
 

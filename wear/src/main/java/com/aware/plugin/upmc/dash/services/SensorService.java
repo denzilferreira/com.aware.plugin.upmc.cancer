@@ -292,7 +292,24 @@ public class SensorService extends Service implements SensorEventListener {
                 break;
 
 
+            case Constants.ACTION_NOTIF_OK_PHONE:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                dismissIntervention();
+                break;
 
+            case Constants.ACTION_NOTIF_NO_PHONE:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                dismissIntervention();
+                break;
+
+
+            case Constants.ACTION_NOTIF_SNOOZE_PHONE:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
+                snoozeInactivityNotif();
+                break;
+
+            default:
+                Log.d(Constants.TAG, "SensorService:onStartCommand:UndefinedAction " + action);
 
 
         }

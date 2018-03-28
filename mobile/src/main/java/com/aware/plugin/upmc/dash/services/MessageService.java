@@ -183,7 +183,7 @@ public class MessageService extends WearableListenerService implements
             case Constants.ACTION_NOTIF_SNOOZE:
             case Constants.ACTION_NOTIF_OK:
             case Constants.ACTION_NOTIF_NO:
-                sendMessageToWear(intentAction + "_PHONE");
+                sendMessageToWear(intentAction);
                 Log.d(Constants.TAG, "MessageService:" + intentAction);
                 dismissIntervention();
                 break;

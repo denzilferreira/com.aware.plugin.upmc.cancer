@@ -140,6 +140,11 @@ public final class Constants {
     public static final String ACTION_SNOOZE_ALARM = "ACTION_SNOOZE_ALARM";
 
 
+    public static final String ACTION_NOTIF_SNOOZE_PHONE = "SNOOZE_ACTION_PHONE";
+    public static final String ACTION_NOTIF_OK_PHONE = "OK_ACTION_PHONE";
+    public static final String ACTION_NOTIF_NO_PHONE = "NO_ACTION_PHONE";
+
+
     //NotificationResponse actions
     public static final String ACTION_SHOW_SNOOZE = "actopm_show_all";
 
