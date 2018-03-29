@@ -5,14 +5,17 @@
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-feature android:name="android.hardware.sensor.stepcounter" />
     <uses-feature android:name="android.hardware.sensor.stepdetector" />
-
     <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -48,14 +51,6 @@
             </intent-filter>
         </activity>
 
-
-        <receiver
-            android:name=".receivers.BluetoothReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
 
         <service
         android:name=".services.MessageService"

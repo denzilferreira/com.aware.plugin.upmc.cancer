@@ -256,6 +256,7 @@ public class UPMC extends AppCompatActivity {
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.CHANGE_WIFI_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
         REQUIRED_PERMISSIONS.add(Manifest.permission.WAKE_LOCK);
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);

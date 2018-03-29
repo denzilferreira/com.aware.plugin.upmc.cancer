@@ -48,8 +48,13 @@ public class MainActivity extends WearableActivity{
         String[] REQUIRED_PERMISSIONS = new String[]{
         Manifest.permission.BODY_SENSORS,
         Manifest.permission.RECEIVE_BOOT_COMPLETED,
+        Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.BLUETOOTH,
         Manifest.permission.VIBRATE,
+        Manifest.permission.ACCESS_NETWORK_STATE,
+        Manifest.permission.CHANGE_NETWORK_STATE,
+        Manifest.permission.ACCESS_WIFI_STATE,
+        Manifest.permission.CHANGE_WIFI_STATE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE};
         requestPermissions(REQUIRED_PERMISSIONS, 1);
         if(!isMyServiceRunning(MessageService.class)) {

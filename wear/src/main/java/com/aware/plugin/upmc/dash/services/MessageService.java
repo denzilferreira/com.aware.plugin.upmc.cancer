@@ -12,8 +12,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.hardware.Sensor;
+import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -70,63 +71,69 @@ public class MessageService extends WearableListenerService implements
         return isNodeSaved;
     }
 
-                public void writeSymptomPref(int type) {
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt(Constants.SYMPTOMS_PREFS, type);
-                    editor.apply();
+    public void writeSymptomPref(int type) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(Constants.SYMPTOMS_PREFS, type);
+        editor.apply();
+    }
+
+    public int readSymptomsPref() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int type = sharedPref.getInt(Constants.SYMPTOMS_PREFS, -1);
+        Log.d(Constants.TAG, "MessageService:readSymptomsPref: " + type);
+        return type;
+    }
+
+    public void setNodeSaved(boolean nodeSaved) {
+        isNodeSaved = nodeSaved;
+    }
+    private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+            switch (state) {
+                case BluetoothAdapter.STATE_OFF:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
+                    setSyncedWithPhone(false);
+                    notifySetup(Constants.FAILED_PHONE_BLUETOOTH);
+                    if(!enableBluetoothIfOff())
+                        Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
+                    break;
+                case BluetoothAdapter.STATE_TURNING_OFF:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
+                    setSyncedWithPhone(false);
+                    break;
+                case BluetoothAdapter.STATE_ON:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            setUpNodeIdentities();
+                        }
+                    }, 10000);
+                    break;
+                case BluetoothAdapter.STATE_TURNING_ON:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
+                    break;
                 }
 
-                public int readSymptomsPref() {
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    int type = sharedPref.getInt(Constants.SYMPTOMS_PREFS, -1);
-                    Log.d(Constants.TAG, "MessageService:readSymptomsPref: " + type);
-                    return type;
-                }
-
-                public void setNodeSaved(boolean nodeSaved) {
-                    isNodeSaved = nodeSaved;
-                }
-                private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        if (intent.hasExtra(Constants.BLUETOOTH_COMM_KEY)) {
-                            int state = intent.getIntExtra(Constants.BLUETOOTH_COMM_KEY, BluetoothAdapter.ERROR);
-                            switch (state) {
-                                case BluetoothAdapter.STATE_OFF:
-                                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
-                                    setSyncedWithPhone(false);
-                                    notifySetup(Constants.FAILED_PHONE_BLUETOOTH);
-                                    if(!enableBluetooth())
-                                        Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
-                                    break;
-                                case BluetoothAdapter.STATE_TURNING_OFF:
-                                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
-                                    setSyncedWithPhone(false);
-                                    break;
-                                case BluetoothAdapter.STATE_ON:
-                                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            setUpNodeIdentities();
-                                        }
-                                    }, 10000);
-                                    break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
-                        break;
-                }
-            }
         }
     };
 
-    public boolean enableBluetooth() {
+    public boolean enableBluetoothIfOff() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         boolean isEnabled = bluetoothAdapter.isEnabled();
         if(!isEnabled)
             return bluetoothAdapter.enable();
         return true;
+    }
+
+
+    public void registerBluetoothReceiver() {
+        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(mBluetootLocalReceiver, filter);
     }
 
 
@@ -158,13 +165,14 @@ public class MessageService extends WearableListenerService implements
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mBluetootLocalReceiver);
+        unregisterReceiver(mConnectivityReceiver);
         Log.d(Constants.TAG, "MessageService: onDestroy");
         Wearable.CapabilityApi.removeCapabilityListener(mGoogleApiClient, this, Constants.CAPABILITY_PHONE_APP);
         Wearable.MessageApi.removeListener(mGoogleApiClient, this);
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBluetootLocalReceiver);
         stopForeground(true);
         stopSelf();
     }
@@ -186,6 +194,54 @@ public class MessageService extends WearableListenerService implements
         super.onConnectedNodes(list);
     }
 
+
+    public void enableWifiIfOff() {
+        WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        if(!wifiManager.isWifiEnabled())
+            wifiManager.setWifiEnabled(true);
+    }
+
+
+
+
+
+    private BroadcastReceiver mConnectivityReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int state = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
+            enableWifiIfOff();
+            Log.d(Constants.TAG,  "Caught intent ");
+            switch (state) {
+                case ConnectivityManager.TYPE_BLUETOOTH:
+                    Log.d(Constants.TAG, "mConnectivityReceiver: Blue");
+                    break;
+                case ConnectivityManager.TYPE_WIFI:
+                    Log.d(Constants.TAG, "mConnectivityReceiver: Wifi");
+                    break;
+                case ConnectivityManager.TYPE_ETHERNET:
+                    Log.d(Constants.TAG, "mConnectivityReceiver: ether");
+                    break;
+
+                case ConnectivityManager.TYPE_MOBILE:
+                    Log.d(Constants.TAG, "mConnectivityReceiver: mob");
+                    break;
+
+            }
+
+        }
+    };
+
+
+
+    public void registerConnectivityReceiver() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mConnectivityReceiver, filter);
+    }
+
+
+
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int i = super.onStartCommand(intent, flags, startId);
@@ -198,45 +254,24 @@ public class MessageService extends WearableListenerService implements
 //        if(action==null)
 //            return i;
         switch (action) {
+            case Constants.ACTION_REBOOT:
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
                 showSetupNotif();
+                enableBluetoothIfOff();
+                enableWifiIfOff();
+                registerConnectivityReceiver();
+                registerBluetoothReceiver();
                 if (isTimeInitialized()&& isSympInitialized()) {
                     if (!isMyServiceRunning(SensorService.class)) {
                         Log.d(Constants.TAG, "MessageService:onStartCommand:TimeInitialization done, Starting SensorService: ");
-                        Intent sensorService = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage());
-                        sensorService.setAction(Constants.ACTION_FIRST_RUN);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            startForegroundService(sensorService);
-                        else
-                            startService(sensorService);
+                        sendSensorServiceAction(Constants.ACTION_FIRST_RUN);
                         setWearStatus(Constants.STATUS_LOGGING);
                     }
                 }
                 else {
                     setWearStatus(Constants.STATUS_INIT);
                 }
-                LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
-                break;
-            case Constants.ACTION_REBOOT:
-                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
-                showSetupNotif();
-                if (isTimeInitialized()&& isSympInitialized()) {
-                    if (!isMyServiceRunning(SensorService.class)) {
-                        Log.d(Constants.TAG, "onStartCommand:TimeInitialization done, Starting SensorService: ");
-                        Intent sensorService = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage());
-                        sensorService.setAction(Constants.ACTION_FIRST_RUN);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            startForegroundService(sensorService);
-                        else
-                            startService(sensorService);
-                        setWearStatus(Constants.STATUS_LOGGING);
-                    }
-                }
-                else {
-                    setWearStatus(Constants.STATUS_INIT);
-                }
-                LocalBroadcastManager.getInstance(this).registerReceiver(mBluetootLocalReceiver, new IntentFilter(Constants.BLUETOOTH_COMM));
                 break;
             case Constants.ACTION_SETUP_WEAR:
                 Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
@@ -518,7 +553,7 @@ public class MessageService extends WearableListenerService implements
                 case Constants.ACTION_NOTIF_OK:
                 case Constants.ACTION_NOTIF_NO:
                 case Constants.ACTION_NOTIF_SNOOZE:
-                    sendActionToSensorService(message + "_PHONE");
+                    sendSensorServiceAction(message + "_PHONE");
                     break;
             }
 
@@ -657,7 +692,7 @@ public class MessageService extends WearableListenerService implements
     }
 
 
-    public void sendActionToSensorService(String action) {
+    public void sendSensorServiceAction(String action) {
         Intent intent = new Intent(getApplicationContext(), SensorService.class).setAction(action);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);

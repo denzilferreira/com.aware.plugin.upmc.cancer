@@ -10,6 +10,8 @@
         android:name="android.hardware.sensor.stepdetector"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -19,11 +21,12 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
 
     <permission
         android:name="com.aware.READ_CONTEXT_DATA"
@@ -110,24 +113,8 @@
         <service
             android:name=".services.MessageService"
             android:exported="false">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" /> -->
-            <!-- <data android:scheme="wear" android:host="*"/> -->
-            <!-- </intent-filter> -->
-            <!-- <intent-filter> -->
-            <!-- <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" /> -->
-            <!-- <data android:scheme="wear" android:host="*" android:pathPrefix="/upmc-dash"/> -->
-            <!-- </intent-filter> -->
         </service>
 
-        <receiver
-            android:name=".receivers.BluetoothReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
         <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true">
@@ -152,7 +139,6 @@
                 <action android:name="ACTION_CANCER_EMOTION" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.SnoozeReceiver" />
         <receiver android:name=".activities.Plugin$SyncReceiver">
             <intent-filter>
                 <action android:name="ACTION_AWARE_SYNC_DATA" />
