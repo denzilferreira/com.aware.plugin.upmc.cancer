@@ -9,10 +9,8 @@ android {
         applicationId "com.aware.plugin.upmc.cancer"
         minSdkVersion minimum_sdk
         targetSdkVersion target_sdk
-        versionCode 47
-        versionName "5.7"
-
-        //multiDexEnabled true
+        versionCode 48
+        versionName "5.8"
 
         //AWARE core sensors provider authority overrides
         resValue "string", "provider_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer"
@@ -96,21 +94,20 @@ configurations.all {
 }
 
 dependencies {
-    //implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //implementation 'com.android.support:multidex:1.0.3'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api 'com.github.denzilferreira:aware-client:development-SNAPSHOT'
-    api 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:development-SNAPSHOT'
-    api 'com.github.denzilferreira:com.aware.plugin.device_usage:development-SNAPSHOT'
-    api 'com.github.denzilferreira:com.aware.plugin.google.fused_location:development-SNAPSHOT'
-    api 'com.github.denzilferreira:com.aware.plugin.fitbit:development-SNAPSHOT'
-    api 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:development-SNAPSHOT'
+    api 'com.github.denzilferreira:aware-client:master-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.google.activity_recognition:master-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.device_usage:master-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.google.fused_location:master-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.fitbit:master-SNAPSHOT'
+    api 'com.github.denzilferreira:com.aware.plugin.studentlife.audio_final:master-SNAPSHOT'
 
     implementation('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
         transitive = true
     }
 
-    implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.google.firebase:firebase-core:12.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

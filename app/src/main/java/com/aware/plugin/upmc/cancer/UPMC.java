@@ -34,6 +34,9 @@ import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.ui.PermissionsHandler;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -82,6 +85,18 @@ public class UPMC extends AppCompatActivity {
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
                 loadSchedule();
                 return;
+            }
+
+            if (Aware.isStudy(this)) {
+                try {
+                    JSONObject installedVersion = new JSONObject();
+                    installedVersion.put("package_installed", getPackageName());
+                    installedVersion.put("version_name", BuildConfig.VERSION_NAME);
+                    installedVersion.put("version_code", BuildConfig.VERSION_CODE);
+                    Aware.debug(getApplicationContext(), installedVersion.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             Calendar cal = Calendar.getInstance();
