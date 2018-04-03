@@ -19,6 +19,10 @@ public final class Constants {
     public static final String COMM_KEY_NOTIF = "message";  // key in putExtra
 
 
+    public static final String PREFERENCES_DEFAULT_PHONE_NODEID = "pref_default_phone_nodeid";
+    public static final String PREFERENCES_KEY_PHONE_NODEID = "pref_key_phone_nodeid";
+
+
 
 
     // Messages from phone

@@ -19,6 +19,9 @@ public final class Constants {
 
     public static final String CAPABILITY_DEMO_PHONE_APP = "upmcdash_demo_phoneapp";
 
+    public static final String PREFERENCES_KEY_WEAR_NODEID = "pref_key_wear_nodeid";
+    public static final String PREFERENCES_DEFAULT_WEAR_NODEID = "pref_default_wear_nodeid";
+
 
     //local broadcast receivers/ MessageService stuff
     // intent filters for Broadcast Receivers

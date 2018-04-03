@@ -10,18 +10,30 @@
     tools:context="com.aware.plugin.upmc.dash.activities.DemoMode"
     tools:deviceIds="wear">
 
-    <FrameLayout
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/inner_frame_layout_padding"
-        app:boxedEdges="all">
+        android:orientation="vertical"
+        tools:context="com.aware.plugin.upmc.dash.activities.DemoMode">
 
-        <TextView
-            android:id="@+id/text"
+
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/hello_world" />
+            android:text="test1"
+            android:onClick="testButton1"/>
 
-    </FrameLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="test2"
+            android:onClick="testButton2"/>
+
+
+
+    </LinearLayout>
+
 </android.support.wear.widget.BoxInsetLayout>
 

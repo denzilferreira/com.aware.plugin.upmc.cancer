@@ -7,19 +7,23 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.utils.InvalidPhoneNodeException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -61,11 +65,26 @@ public class DemoMessageService extends WearableListenerService implements Messa
     private boolean isPhoneAround;
 
 
-    private String phoneNodeID;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Constants.TAG, "onStartCommand");
-        showDemoNotif();
+        if(intent!=null) {
+            String action = intent.getAction();
+            if(action!=null) {
+                switch (action) {
+                    case Constants.ACTION_FIRST_RUN:
+                        showDemoNotif();
+                        break;
+                    case Constants.ACTION_SETUP_WEAR:
+                        scanPhoneNode();
+                        break;
+                    case Constants.ACTION_NOTIF_OK:
+                        sendMessageToPhone("test");
+                        break;
+                }
+
+            }
+        }
         return super.onStartCommand(intent, flags, startId);
 
     }
@@ -81,9 +100,11 @@ public class DemoMessageService extends WearableListenerService implements Messa
         capabilityClient.addListener(this, Constants.CAPABILITY_DEMO_PHONE_APP);
         capabilityClient.addLocalCapability(Constants.CAPABILITY_DEMO_WEAR_APP);
         dataClient.addListener(this);
-        setUpNodeIdentities();
         super.onCreate();
     }
+
+
+
 
     @Override
     public void onDestroy() {
@@ -96,18 +117,15 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     }
 
-
-
-
-
-
-    private void setUpNodeIdentities() {
+    private void scanPhoneNode() {
+        if(!isPhoneNodeSaved())
+            return;
         capabilityClient.getCapability(Constants.CAPABILITY_DEMO_PHONE_APP, CapabilityClient.FILTER_REACHABLE).addOnCompleteListener(new OnCompleteListener<CapabilityInfo>() {
             @Override
             public void onComplete(@NonNull Task<CapabilityInfo> task) {
                 Log.d(Constants.TAG, "onComplete");
             }
-        })
+            })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -117,19 +135,76 @@ public class DemoMessageService extends WearableListenerService implements Messa
                 .addOnSuccessListener(new OnSuccessListener<CapabilityInfo>() {
                     @Override
                     public void onSuccess(CapabilityInfo capabilityInfo) {
-                        Log.d(Constants.TAG,  "onSuccess");
+                        Log.d(Constants.TAG, "onSuccess");
                         Set<Node> nodes = capabilityInfo.getNodes();
-                        String NODE_ID;
-                        if(nodes.size()==1){
-                            for(Node node : nodes) {
-                                NODE_ID = node.getId();
-                                Log.d(Constants.TAG, "MessageService:setUpNodeIdentities: " + NODE_ID);
-                                setPhoneNodeID(NODE_ID);
-                            }
+                        if (isPhoneNodeIdPresent(nodes)) {
+                            Log.d(Constants.TAG, "scanPhoneNode: connected");
                         }
                         else {
-                            Log.d(Constants.TAG, "No nodes found or too many nodes " + nodes.size());
+                            Log.d(Constants.TAG, "scanPhoneNode: disconnected");
                         }
+                    }
+                });
+    }
+
+    public boolean isPhoneNodeIdPresent(Set<Node> nodes) {
+        if (nodes.size() == 0) {
+            Log.d(Constants.TAG, "isPhoneNodeIdPresent: no connected nodes");
+            return false;
+        }
+        for (Node node : nodes) {
+            if (node.getId().equals(readPhoneNodeId()))
+                return true;
+        }
+        Log.d(Constants.TAG, "isPhoneNodeIdPresent: no nodes with wear nodeID");
+        return false;
+    }
+
+
+    public String getPhoneNodeID() throws InvalidPhoneNodeException {
+        String phoneNodeId = readPhoneNodeId();
+        if (phoneNodeId.equals(Constants.PREFERENCES_DEFAULT_PHONE_NODEID)) {
+            throw new InvalidPhoneNodeException(Constants.PREFERENCES_DEFAULT_PHONE_NODEID);
+        } else {
+            return phoneNodeId;
+        }
+    }
+
+
+    public String readPhoneNodeId() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String nodeId = sharedPref.getString(Constants.PREFERENCES_KEY_PHONE_NODEID, Constants.PREFERENCES_DEFAULT_PHONE_NODEID);
+        if (nodeId.equals(Constants.PREFERENCES_DEFAULT_PHONE_NODEID))
+            Log.d(Constants.TAG, "MessageService:readWearNodeId: " + nodeId);
+        return nodeId;
+    }
+
+
+
+
+    private void sendAckToPhone() {
+        final String nodeID = readPhoneNodeId();
+        messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(),Constants.ACK.getBytes()).
+                addOnSuccessListener(new OnSuccessListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        Log.d(Constants.TAG, "sendAckToPhone:oNsuccess " + integer);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Constants.TAG, "sendAckToPhone:onFailure");
+
+
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<Integer>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Integer> task) {
+                        Log.d(Constants.TAG, "sendAckToPhone:onComplete, sent ACK to phone...");
+
                     }
                 });
 
@@ -137,13 +212,16 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
 
 
-    private void sendMessageToPhone(final String message) {
-        Log.d(Constants.TAG, "MessageService:sendMessageToWear " + message);
-        messageClient.sendMessage(getPhoneNodeID(), Constants.MESSAGE_URI.toString(), message.getBytes()).
+    private void sendMessageToPhone(String message) {
+        Log.d(Constants.TAG, "MessageService:sendMessageToPhone " + message);
+        if(!isPhoneNodeSaved())
+            return;
+        final String nodeID = readPhoneNodeId();
+        messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(), message.getBytes()).
                 addOnSuccessListener(new OnSuccessListener<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {
-                        Log.d(Constants.TAG, "sendmessage:onsuccess " + integer);
+                        Log.d(Constants.TAG, "sendMessageToPhone:sendmessage:onsuccess " + integer);
 
                     }
                 })
@@ -158,23 +236,24 @@ public class DemoMessageService extends WearableListenerService implements Messa
                 .addOnCompleteListener(new OnCompleteListener<Integer>() {
                     @Override
                     public void onComplete(@NonNull Task<Integer> task) {
-                        Log.d(Constants.TAG, "sendmessage:oncomplete, waiting for ACK from wear...");
+                        Log.d(Constants.TAG, "sendmessage:oncomplete, waiting for ACK from phone...");
 
                     }
                 });
 
-//        setWearAround(false);
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                if(isWearAround())
-//                    Log.d(Constants.TAG, "sendMessageToWear: ACK received, wear is around");
-//                else
-//                    Log.d(Constants.TAG, "sendMessageToWear: ACK not received wear is not around");
-//            }
-//        }, 5000);
+        setPhoneAround(false);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isPhoneAround())
+                    Log.d(Constants.TAG, "sendMessageToPhone: ACK received, phone is around");
+                else
+                    Log.d(Constants.TAG, "sendMessageToPhone: ACK not received phone is not around");
+            }
+        }, 5000);
+
+
 
     }
 
@@ -185,8 +264,26 @@ public class DemoMessageService extends WearableListenerService implements Messa
         byte[] input = messageEvent.getData();
         String message = new String(input);
         Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message );
+        setPhoneAround(true);
+        switch (message) {
+            case Constants.ACTION_SETUP_WEAR:
+                String phoneNodeID = messageEvent.getSourceNodeId();
+                writePhoneNodeId(phoneNodeID);
+                sendAckToPhone();
+                break;
+            case "test":
+                sendAckToPhone();
+                stopSelf();
+                break;
+        }
+    }
 
-
+    public void writePhoneNodeId(String nodeId) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(Constants.PREFERENCES_KEY_PHONE_NODEID, nodeId);
+        editor.apply();
+        Log.d(Constants.TAG, "MessageService:writePhoneNodeId: " + nodeId);
     }
 
     @Override
@@ -196,7 +293,16 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     @Override
     public void onCapabilityChanged(@NonNull CapabilityInfo capabilityInfo) {
+        Log.d(Constants.TAG, "onCapabilityChanged)");
+        if(isPhoneNodeSaved()) {
+            if (isPhoneNodeIdPresent(capabilityInfo.getNodes())) {
+                Log.d(Constants.TAG, "onCapabilityChanged: phone is connected");
+            }
+        }
+    }
 
+    public boolean isPhoneNodeSaved() {
+        return !(Constants.PREFERENCES_DEFAULT_PHONE_NODEID.equals(readPhoneNodeId()));
     }
 
     @Override
@@ -238,11 +344,5 @@ public class DemoMessageService extends WearableListenerService implements Messa
         }
     }
 
-    public String getPhoneNodeID() {
-        return phoneNodeID;
-    }
-    public void setPhoneNodeID(String phoneNodeID) {
-        this.phoneNodeID = phoneNodeID;
-    }
 
 }
