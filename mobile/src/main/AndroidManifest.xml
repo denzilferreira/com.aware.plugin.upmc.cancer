@@ -51,17 +51,6 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".activities.DemoMode"
-            android:label="@string/title_activity_demo_mode"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity
             android:name=".activities.UPMC"
             android:exported="true"
             android:label="@string/app_name"
@@ -73,6 +62,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <activity
+            android:name=".activities.DemoMode"
+            android:label="@string/title_activity_demo_mode"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
 
         <activity
             android:name=".settings.Settings"

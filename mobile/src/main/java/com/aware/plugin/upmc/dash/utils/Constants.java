@@ -16,6 +16,7 @@ public final class Constants {
     public static final String TAG = "CANCER";
     public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";
     public static final String CAPABILITY_DEMO_WEAR_APP = "upmcdash_demo_wearapp";
+    public static final String CAPABILITY_PHONE_APP= "upmcdash_phoneapp";
 
     public static final String CAPABILITY_DEMO_PHONE_APP = "upmcdash_demo_phoneapp";
 
@@ -129,7 +130,8 @@ public final class Constants {
     // Wear setup notif
     public static final String SETUP_WEAR = "Tap to setup watch";
     public static final String CONNECTED_WEAR = "Connected: Watch is logging your activity.. ";
-    public static final String FAILED_WEAR = "Disconnected: Tap to reconnect";
+    public static final String FAILED_WEAR = "Disconnected: Watch is not in range";
+    public static final String FAILED_WEAR_DISCOVERY = "Setup Failed: Cannot find your LG watch";
     public static final String FAILED_WEAR_BLUETOOTH = "Disconnected: Switch on Bluetooth";
 
 
@@ -173,7 +175,7 @@ public final class Constants {
     public static final String LOADING_ACTIVITY_INTENT_FILTER = "LOADING_ACTIVITY_INTENT_FILTER";
     public static final String MESSAGE_EXTRA_KEY = "MESSAGE_EXTRA_KEY";
     public static final String LOADING_ACTIVITY_CONNECTED_MESSAGE = "Your watch is  synced! You will receive alerts.";
-    public static final String LOADING_ACTIVITY_FAILED_MESSAGE = "Setup failed! Please try again by tapping the setup notification later.";
+    public static final String LOADING_ACTIVITY_FAILED_MESSAGE = "Setup Complete! However, your watch is not reachable";
 
 
 

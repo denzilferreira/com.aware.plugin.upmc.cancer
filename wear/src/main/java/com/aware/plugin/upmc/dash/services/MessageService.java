@@ -550,6 +550,11 @@ public class MessageService extends WearableListenerService implements
                     sendStateToPhone();
                     break;
 
+
+                case Constants.ACTION_SETUP_WEAR:
+                    sendMessageToPhone(Constants.ACK);
+                    break;
+
                 case Constants.ACTION_NOTIF_OK:
                 case Constants.ACTION_NOTIF_NO:
                 case Constants.ACTION_NOTIF_SNOOZE:

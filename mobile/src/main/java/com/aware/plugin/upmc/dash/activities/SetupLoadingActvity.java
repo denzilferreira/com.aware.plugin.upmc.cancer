@@ -28,13 +28,17 @@ public class SetupLoadingActvity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 textView.setVisibility(View.VISIBLE);
                 button.setText("Okay!");
-                if(intent.getStringExtra(Constants.MESSAGE_EXTRA_KEY).equals(Constants.CONNECTED_WEAR)) {
-                    textView.setText(Constants.LOADING_ACTIVITY_CONNECTED_MESSAGE);
-                }
-                else {
-
-                    textView.setText(Constants.LOADING_ACTIVITY_FAILED_MESSAGE);
-
+                String action = intent.getStringExtra(Constants.MESSAGE_EXTRA_KEY);
+                switch (action) {
+                    case Constants.CONNECTED_WEAR:
+                        textView.setText(Constants.LOADING_ACTIVITY_CONNECTED_MESSAGE);
+                        break;
+                    case Constants.FAILED_WEAR:
+                        textView.setText(Constants.LOADING_ACTIVITY_FAILED_MESSAGE);
+                        break;
+                    case Constants.FAILED_WEAR_DISCOVERY:
+                        textView.setText(Constants.FAILED_WEAR_DISCOVERY);
+                        break;
                 }
             }
         }
