@@ -40,7 +40,24 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by RaghuTeja on 3/23/18.
+ *  Created by RaghuTeja on 3/23/18.
+ *  A demo WearableListenerService, featuring the new Wearable API
+ *  Definitions:
+ *  Please refer to official documentation : https://developers.google.com/android/reference/com/google/android/gms/wearable/Wearable
+ *  Node - A device in the network representing either a phone or a wearable
+ *  Node Name: "LG WATCH STYLE", or "GOOGLE PIXEL XL"
+ *  Unique NodeID: a string of letters and integers
+ *  Note: You can search for other nodes, and use these APIs, only if they are linked to your Google Account. You can link wearables devices to your phone
+ *  by setting them up using the WearOS app from PlayStore.
+ *  Clients - APIs which help you find other connected wearable devices, sync data and / or messages
+ *  1) MessageClient -  Sending messages b/w Phone and Wear (< 100KB)
+ *  2) DataClient - To sync b/w Phone and Wear (data can be anything)
+ *  3) CapabilityClient - To find and manage connected nodes holding a given Capability
+ *
+ *  Capabilities are assigned per-app basis using the capability client.
+ * g
+ *
+ *
  */
 
 public class DemoMessageService extends WearableListenerService implements MessageClient.OnMessageReceivedListener,
@@ -53,6 +70,20 @@ public class DemoMessageService extends WearableListenerService implements Messa
     private CapabilityClient capabilityClient;
     private DataClient dataClient;
     private boolean isWearAround = false;
+
+
+    /**
+     *
+     *  ACTION_FIRST_RUN: run it for the first time
+     *      Checking if I have saved a NodeID.
+     *
+     *
+     *
+     * @param intent
+     * @param flags
+     * @param startId
+     * @return
+     */
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -80,10 +111,18 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
             }
         }
-
         return super.onStartCommand(intent, flags, startId);
 
     }
+
+
+    /**
+     *
+     * Initialize all clients (Message, Capability, Data) here.
+     *
+     * addLocalCapability to assign a capability to your own app on the device that's its being run on
+     *
+     */
 
     @Override
     public void onCreate() {
@@ -100,6 +139,15 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     }
 
+    /**
+     * Using Android's SharedPreferences API to save a nodeID with user-defined key
+     * PREFERENCES_KEY_WEAR_NODEID
+     *
+     *
+     * @param nodeId
+     */
+
+
     public void writeWearNodeId(String nodeId) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -107,6 +155,14 @@ public class DemoMessageService extends WearableListenerService implements Messa
         editor.apply();
         Log.d(Constants.TAG, "MessageService:writeWearNodeId: " + nodeId);
     }
+
+    /**
+     * Using Android's shared preferences API to read a Node ID if it is saved.
+     * If there no saved node for the given key, returns the default user-defined NODE_ID
+     * PREFERENCES_DEFAULT_WEAR_NODEID
+     *
+     * @return
+     */
 
     public String readWearNodeId() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -116,7 +172,16 @@ public class DemoMessageService extends WearableListenerService implements Messa
         return nodeId;
     }
 
+    /**
+     * Uses the MessageClient to send messages to wear with the given NODE_ID at the given MESSAGE_URI
+     *
+     * Using the Handler to check if ACK is received from wear 5000, to determine if is connected or not.
+     *
+     * @param message
+     */
+
     private void sendMessageToWear(final String message) {
+        setWearAround(false);
         Log.d(Constants.TAG, "MessageService:sendMessageToWear " + message);
         if(!isWearNodeSaved())
             return;
@@ -145,7 +210,6 @@ public class DemoMessageService extends WearableListenerService implements Messa
                     }
                 });
 
-        setWearAround(false);
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -157,8 +221,20 @@ public class DemoMessageService extends WearableListenerService implements Messa
                     Log.d(Constants.TAG, "sendMessageToWear: ACK not received wear is not around");
             }
         }, 5000);
-
     }
+
+
+    /**
+     * Uses the capability client to scan for nearby connected wear devices with the given capability.
+     * Once the given criteria matches, it saves the node ID using writeWearNodeId.
+     *
+     * getCapability is an asynchronous task -> it goes to a separate thread.
+     * onSuccess - gives you the result
+     *
+     * FILTER REACHABLE - Reachable via Bluetooth or Network (WiFi or LTE or Ethernet)
+     *
+     *
+     */
 
     private void saveConnectedWearNode() {
         capabilityClient.getCapability(Constants.CAPABILITY_DEMO_WEAR_APP, CapabilityClient.FILTER_REACHABLE).addOnCompleteListener(new OnCompleteListener<CapabilityInfo>() {
@@ -178,7 +254,7 @@ public class DemoMessageService extends WearableListenerService implements Messa
                     public void onSuccess(CapabilityInfo capabilityInfo) {
                         Log.d(Constants.TAG, "onSuccess");
                         Set<Node> nodes = capabilityInfo.getNodes();
-                        Node wearNode = getConnectedWearNode(nodes);
+                        Node wearNode = getConnectedWearNode(nodes); // just getting the LG watch.
                         if (wearNode == null) {
                             Log.d(Constants.TAG, "saveConnectedWearNode: no wear nodes found");
                         } else {
@@ -232,6 +308,14 @@ public class DemoMessageService extends WearableListenerService implements Messa
         capabilityClient.removeLocalCapability(Constants.CAPABILITY_DEMO_PHONE_APP);
         dataClient.removeListener(this);
     }
+
+
+    /**
+     * Callback when a message is received from the wear node.
+     *
+     *
+     * @param messageEvent
+     */
 
     @Override
     public void onMessageReceived(@NonNull MessageEvent messageEvent) {
@@ -295,12 +379,20 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     }
 
+    /**
+     * Check if a wear node is saved in the local Preferences.
+     *
+     * @return
+     */
     public boolean isWearNodeSaved() {
         return !(Constants.PREFERENCES_DEFAULT_WEAR_NODEID.equals(readWearNodeId()));
     }
 
+
+
     public boolean isWearNodeIdPresent(Set<Node> nodes) {
         if (nodes.size() == 0) {
+            Log.d(Constants.TAG, "isWearNodeIdPresent: no connected nodes");
             Log.d(Constants.TAG, "isWearNodeIdPresent: no connected nodes");
             return false;
         }
@@ -311,6 +403,16 @@ public class DemoMessageService extends WearableListenerService implements Messa
         Log.d(Constants.TAG, "isWearNodeIdPresent: no nodes with wear nodeID");
         return false;
     }
+
+
+    /**
+     *
+     * Looks for nodes with given node name. In this case it is
+     * "lg watch"
+     *
+     * @param nodes
+     * @return
+     */
 
     public Node getConnectedWearNode(Set<Node> nodes) {
         if (nodes.size() == 0) {
