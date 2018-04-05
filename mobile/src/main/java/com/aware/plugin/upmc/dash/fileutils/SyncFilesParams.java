@@ -4,19 +4,21 @@ import android.content.Context;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataClient;
 
 /**
  * Created by RaghuTeja on 10/26/17.
  */
 
 public class SyncFilesParams {
-    GoogleApiClient client;
-    Asset asset;
+    private Asset asset;
+    private Context context;
+    private DataClient dataClient;
 
-    public  SyncFilesParams(GoogleApiClient client, Asset asset, Context context) {
+    public  SyncFilesParams(Context context, Asset asset, DataClient dataClient) {
         setAsset(asset);
-        setClient(client);
         setContext(context);
+        setDataClient(dataClient);
     }
 
     public Context getContext() {
@@ -27,25 +29,19 @@ public class SyncFilesParams {
         this.context = context;
     }
 
-    Context context;
-
-
-    public GoogleApiClient getClient() {
-        return client;
-    }
-
-    public void setClient(GoogleApiClient client) {
-        this.client = client;
-    }
-
     public Asset getAsset() {
         return asset;
     }
-
     public void setAsset(Asset asset) {
         this.asset = asset;
     }
 
 
+    public DataClient getDataClient() {
+        return dataClient;
+    }
 
+    public void setDataClient(DataClient dataClient) {
+        this.dataClient = dataClient;
+    }
 }

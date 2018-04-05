@@ -24,21 +24,28 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.fileutils.FileManager;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -265,29 +272,32 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void syncDataWithPhone() {
-//        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
-//        try {
-//            Asset logAsset = FileManager.createAssetFromLogFile();
-//            Log.d(Constants.TAG, "MessageService:onDataChanged: ");
-//            putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
-//        com.google.android.gms.common.api.PendingResult<DataApi.DataItemResult> pendingResult =
-//                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest.setUrgent());
-//        pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-//            @Override
-//            public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
-//                if(dataItemResult.getStatus().isSuccess()) {
-//                    Log.d(Constants.TAG, "syncDataWithPhone: success");
-//                }
-//                else {
-//
-//                    Log.d(Constants.TAG, "syncDataWithPhone: failed " + dataItemResult.getStatus().getStatusMessage());
-//                }
-//            }
-//        });
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
+        try {
+            Asset logAsset = FileManager.createAssetFromLogFile();
+            Log.d(Constants.TAG, "MessageService:onDataChanged: ");
+            putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+        dataClient.putDataItem(putDataRequest.setUrgent()).addOnSuccessListener(new OnSuccessListener<DataItem>() {
+            @Override
+            public void onSuccess(DataItem dataItem) {
+                    Log.d(Constants.TAG, "syncDataWithPhone: onSuccess " );
+            }
+            })
+                .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(Constants.TAG, "syncDataWithPhone: onFailure " );
+            }
+        }).addOnCompleteListener(new OnCompleteListener<DataItem>() {
+            @Override
+            public void onComplete(@NonNull Task<DataItem> task) {
+                Log.d(Constants.TAG, "syncDataWithPhone: onComplete " );
+            }
+        });
     }
 
     public boolean isPhoneNodeSaved() {

@@ -2,12 +2,16 @@ package com.aware.plugin.upmc.dash.fileutils;
 
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.BufferedInputStream;
@@ -84,30 +88,17 @@ public class FileManager {
     }
 
 
-    public static InputStream loadLogFileFromAsset(Asset asset, GoogleApiClient googleApiClient) throws IOException {
+    public static Task<DataClient.GetFdForAssetResponse> loadLogFileFromAsset(Asset asset, DataClient dataClient) throws IOException {
         Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset entered ");
         if(asset == null)
             throw new IllegalArgumentException("Asset must be non-null");
-        Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset w1 ");
-        if(!googleApiClient.isConnected()) {
-            final ConnectionResult result =
-                    googleApiClient.blockingConnect(5000, TimeUnit.MILLISECONDS);
-            Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset w2 ");
-            if(!result.isSuccess())
-                return null;
-        }
-        Log.d(Constants.TAG,"FileManager: loadLogFileFromAsset 23 ");
-        InputStream assetInputStream = Wearable.DataApi.getFdForAsset(googleApiClient, asset).await().getInputStream();
-        if(assetInputStream == null) {
-            Log.d(Constants.TAG, "Requested an unknown Asset");
-        }
-        Log.d(Constants.TAG,"FileManager: " + assetInputStream.available());
-        return assetInputStream;
+        return dataClient.getFdForAsset(asset);
     }
 
 
 
     public static void saveAssetAsTextFile(InputStream assetInputStream, Context context) throws IOException {
+        Log.d(Constants.TAG, "saveAssetAsTextFile: Writing file with size: " + String.valueOf(assetInputStream.available()));
         createFile();
         File file = new File(STORAGE_FOLDER+STORAGE_FILE + EXTENSION);
         OutputStream outputStream = new FileOutputStream(file);

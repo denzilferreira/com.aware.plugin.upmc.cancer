@@ -2,9 +2,15 @@ package com.aware.plugin.upmc.dash.fileutils;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataClient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,18 +28,28 @@ public class SyncFilesTask extends AsyncTask<SyncFilesParams, Integer, Long> {
     @Override
     protected Long doInBackground(SyncFilesParams... paramList) {
         SyncFilesParams params = paramList[0];
-        GoogleApiClient googleApiClient = params.getClient();
+        DataClient dataClient = params.getDataClient();
         Asset asset = params.getAsset();
-        Context context = params.getContext();
-        InputStream inputStream = null;
+        final Context context = params.getContext();
         try {
-            inputStream = FileManager.loadLogFileFromAsset(asset, googleApiClient);
-            FileManager.saveAssetAsTextFile(inputStream, context);
-
+            FileManager.loadLogFileFromAsset(asset, dataClient).addOnCompleteListener(new OnCompleteListener<DataClient.GetFdForAssetResponse>() {
+                @Override
+                public void onComplete(@NonNull Task<DataClient.GetFdForAssetResponse> task) {
+                    InputStream assetInputStream =  task.getResult().getInputStream();
+                    if(assetInputStream == null) {
+                        Log.d(Constants.TAG, "Requested an unknown Asset");
+                    }
+                    try {
+                        FileManager.saveAssetAsTextFile(assetInputStream, context);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    delegate.onSyncSuccess();
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
-        delegate.onSyncSuccess();
         return (long) 0;
     }
 

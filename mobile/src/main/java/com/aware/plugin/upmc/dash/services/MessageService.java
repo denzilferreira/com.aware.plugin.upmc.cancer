@@ -31,16 +31,22 @@ import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
 import com.aware.plugin.upmc.dash.activities.SetupLoadingActvity;
 import com.aware.plugin.upmc.dash.activities.UPMC;
+import com.aware.plugin.upmc.dash.fileutils.SyncFilesParams;
+import com.aware.plugin.upmc.dash.fileutils.SyncFilesResponse;
+import com.aware.plugin.upmc.dash.fileutils.SyncFilesTask;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.DataClient;
+import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -57,7 +63,8 @@ import java.util.Set;
 public class MessageService extends WearableListenerService implements
         MessageClient.OnMessageReceivedListener,
         CapabilityClient.OnCapabilityChangedListener,
-        DataClient.OnDataChangedListener {
+        DataClient.OnDataChangedListener,
+        SyncFilesResponse{
 
     private MessageClient messageClient;
     private CapabilityClient capabilityClient;
@@ -599,16 +606,18 @@ public class MessageService extends WearableListenerService implements
     @Override
     public void onDataChanged(@NonNull DataEventBuffer dataEventBuffer) {
         Log.d(Constants.TAG, "MessageService:onDataChanged:received");
-//        for(DataEvent event : dataEventBuffer) {
-//            if (event.getType() == DataEvent.TYPE_CHANGED &&
-//                    event.getDataItem().getUri().getPath().equals("/upmc-dash")) {
-//                DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-//                final Asset logfileAsset = dataMapItem.getDataMap().getAsset("logfile");
-//                Log.d(Constants.TAG, "MessageService:onDataChanged: received logfileasset");
-//                SyncFilesTask syncFilesTask = new SyncFilesTask(MessageService.this);
-//                //syncFilesTask.execute(new SyncFilesParams(mGoogleApiClient,logfileAsset, getApplicationContext()));
-//            }
-//        }
+        for(DataEvent event : dataEventBuffer) {
+            Log.d(Constants.TAG, "test1");
+            if (event.getType() == DataEvent.TYPE_CHANGED &&
+                    event.getDataItem().getUri().getPath().equals("/upmc-dash")) {
+                Log.d(Constants.TAG, "test2");
+                DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                final Asset logfileAsset = dataMapItem.getDataMap().getAsset("logfile");
+                Log.d(Constants.TAG, "MessageService:onDataChanged: received logfileasset");
+                SyncFilesTask syncFilesTask = new SyncFilesTask(MessageService.this);
+                syncFilesTask.execute(new SyncFilesParams(MessageService.this, logfileAsset, dataClient));
+            }
+        }
         super.onDataChanged(dataEventBuffer);
     }
 
@@ -797,4 +806,13 @@ public class MessageService extends WearableListenerService implements
     }
 
 
+    @Override
+    public void onSyncSuccess() {
+        Log.d(Constants.TAG, "MessageService:onSyncSuccess");
+    }
+
+    @Override
+    public void onSyncFailed() {
+        Log.d(Constants.TAG, "MessageService:onSyncFailed");
+    }
 }
