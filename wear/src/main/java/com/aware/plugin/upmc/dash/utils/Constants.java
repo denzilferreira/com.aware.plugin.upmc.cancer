@@ -12,7 +12,7 @@ public final class Constants {
     public static final String TAG = "CANCER";
     public static final int UPMC_DASH_PHONE_DISCONNECTED = 1;
     public static final String CAPABILITY_PHONE_APP = "upmcdash_phoneapp";
-    public static final String NODE_ID = "upmcdash_wearapp";
+    public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";
 
     public static final String ALARM_COMM = "AlarmComm";
     public static final String START_SC = "start_step_count";  // START STEP COUNT COMMAND
@@ -59,8 +59,9 @@ public final class Constants {
 
 
     //states
-    public static final String STATUS_INIT = "init";
-    public static final String STATUS_LOGGING = "logging"; // currently logging
+    public static final String STATE_INIT = "STATE_INIT";
+    public static final String STATE_LOGGING = "STATE_LOGGING"; // currently logging
+    public static final String STATE_INACTIVE = "STATE_INACTIVE"; //  currently paused
 
 
 
@@ -126,6 +127,7 @@ public final class Constants {
 
     //MessageService onStartCommand Actions
     public static final String ACTION_SETUP_WEAR = "setup_wear";
+    public static final String ACTION_SCAN_PHONE = "ACTION_SCAN_PHONE";
     public static final String ACTION_FIRST_RUN = "first_run";
     public static final String ACTION_REBOOT = "action_reboot_run";
     public static final String ACTION_NOTIFY_INACTIVITY = "action_notify_user";
@@ -154,7 +156,7 @@ public final class Constants {
 
 
     //notifstuff
-    public static final String SETUP_WEAR = "Tap to setup watch";
+    public static final String SETUP_WEAR = "(HELLO!)\nUse your phone to begin setup";
 
 
     /**

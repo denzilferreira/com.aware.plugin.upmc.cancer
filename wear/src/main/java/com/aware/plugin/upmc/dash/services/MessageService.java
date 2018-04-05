@@ -13,39 +13,32 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.aware.plugin.upmc.dash.utils.Constants;
-import com.aware.plugin.upmc.dash.fileutils.FileManager;
 import com.aware.plugin.upmc.dash.R;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.CapabilityApi;
+import com.aware.plugin.upmc.dash.utils.Constants;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
-import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -54,21 +47,134 @@ import java.util.Set;
  */
 
 public class MessageService extends WearableListenerService implements
-        GoogleApiClient.ConnectionCallbacks, DataApi.DataListener {
+        MessageClient.OnMessageReceivedListener,
+        CapabilityClient.OnCapabilityChangedListener,
+        DataClient.OnDataChangedListener {
 
     int[] morningTime = {-1, -1};
     int[] nightTime = {-1, -1};
-    boolean isSyncedWithPhone;
-    private GoogleApiClient mGoogleApiClient;
-    private String NODE_ID;
     private boolean timeInvalid = false;
-    private String STATUS_WEAR;
-    boolean isNodeSaved = false;
+    private String STATE_WEAR;
     private Notification.Builder setupNotifBuilder;
     private NotificationCompat.Builder setupNotifCompatBuilder;
+    private MessageClient messageClient;
+    private CapabilityClient capabilityClient;
+    private DataClient dataClient;
+    private String prevNotif = "Tap to setup your watch";
+    private boolean isPhoneAround;
+    private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
 
-    public boolean isNodeSaved() {
-        return isNodeSaved;
+            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+            switch (state) {
+                case BluetoothAdapter.STATE_OFF:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
+                    setPhoneAround(false);
+                    notifySetup(Constants.FAILED_PHONE_BLUETOOTH);
+                    if (!enableBluetoothIfOff())
+                        Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
+                    break;
+                case BluetoothAdapter.STATE_TURNING_OFF:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
+                    setPhoneAround(false);
+                    break;
+                case BluetoothAdapter.STATE_ON:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            scanPhoneNode();
+                        }
+                    }, 10000);
+                    break;
+                case BluetoothAdapter.STATE_TURNING_ON:
+                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
+                    break;
+            }
+
+        }
+    };
+    private BroadcastReceiver mConnectivityReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //int state = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
+            enableWifiIfOff();
+        }
+    };
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int i = super.onStartCommand(intent, flags, startId);
+        Log.d(Constants.TAG, "MessageService:onStartCommand");
+        String action = intent.getAction();
+        switch (action) {
+            case Constants.ACTION_REBOOT:
+            case Constants.ACTION_FIRST_RUN:
+                Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_FIRST_RUN ");
+                showSetupNotif();
+                enableBluetoothIfOff();
+                enableWifiIfOff();
+                registerConnectivityReceiver();
+                registerBluetoothReceiver();
+                checkAndStartSession();
+                break;
+            case Constants.ACTION_SCAN_PHONE:
+                Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_SCAN_PHONE");
+                scanPhoneNode();
+                break;
+            case Constants.ACTION_SYNC_DATA:
+                Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_SYNC_DATA");
+                syncDataWithPhone();
+                break;
+            case Constants.ACTION_NOTIFY_INACTIVITY:
+                Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_NOTIFY_INACTIVITY");
+                sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
+                break;
+            case Constants.ACTION_NOTIFY_GREAT_JOB:
+                Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_NOTIFY_GREAT_JOB");
+                sendMessageToPhone(Constants.NOTIFY_GREAT_JOB);
+                break;
+            case Constants.ACTION_SNOOZE_ALARM:
+                Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_SNOOZE_ALARM");
+                sendMessageToPhone(Constants.NOTIFY_INACTIVITY_SNOOZED);
+                break;
+            case Constants.ACTION_NOTIF_NO:
+            case Constants.ACTION_NOTIF_OK:
+            case Constants.ACTION_NOTIF_SNOOZE:
+                Log.d(Constants.TAG, "MessageService:onStartCommand " + action);
+                sendMessageToPhone(action);
+                break;
+            default:
+                return i;
+        }
+        return i;
+    }
+
+    public void checkAndStartSession() {
+        if (isPhoneNodeSaved() && isTimeInitialized() && isSympInitialized()) {
+            if (!isMyServiceRunning(SensorService.class)) {
+                Log.d(Constants.TAG, "checkAndStartSession:TimeInitialization done, Starting SensorService: ");
+                Intent intent = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()).setAction(Constants.ACTION_FIRST_RUN);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(intent);
+                } else {
+                    startService(intent);
+                }
+                setWearState(Constants.STATE_LOGGING);
+            }
+        } else {
+            Log.d(Constants.TAG, "checkAndStartSession:TimeInitialization failed, back to INIT: ");
+            setWearState(Constants.STATE_INIT);
+        }
+    }
+
+    public boolean isPhoneAround() {
+        return isPhoneAround;
+    }
+
+    public void setPhoneAround(boolean phoneAround) {
+        isPhoneAround = phoneAround;
     }
 
     public void writeSymptomPref(int type) {
@@ -85,81 +191,31 @@ public class MessageService extends WearableListenerService implements
         return type;
     }
 
-    public void setNodeSaved(boolean nodeSaved) {
-        isNodeSaved = nodeSaved;
+    public void writePhoneNodeId(String nodeId) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(Constants.PREFERENCES_KEY_PHONE_NODEID, nodeId);
+        editor.apply();
+        Log.d(Constants.TAG, "MessageService:writePhoneNodeId: " + nodeId);
     }
-    private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
-            switch (state) {
-                case BluetoothAdapter.STATE_OFF:
-                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOff");
-                    setSyncedWithPhone(false);
-                    notifySetup(Constants.FAILED_PHONE_BLUETOOTH);
-                    if(!enableBluetoothIfOff())
-                        Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
-                    break;
-                case BluetoothAdapter.STATE_TURNING_OFF:
-                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOff");
-                    setSyncedWithPhone(false);
-                    break;
-                case BluetoothAdapter.STATE_ON:
-                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateOn");
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            setUpNodeIdentities();
-                        }
-                    }, 10000);
-                    break;
-                case BluetoothAdapter.STATE_TURNING_ON:
-                    Log.d(Constants.TAG, "MessageService:BluetoothReceiver:StateTurningOn");
-                    break;
-                }
-
-        }
-    };
 
     public boolean enableBluetoothIfOff() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         boolean isEnabled = bluetoothAdapter.isEnabled();
-        if(!isEnabled)
-            return bluetoothAdapter.enable();
-        return true;
+        return isEnabled || bluetoothAdapter.enable();
     }
-
 
     public void registerBluetoothReceiver() {
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mBluetootLocalReceiver, filter);
     }
 
-
-
-    public boolean isSyncedWithPhone() {
-        return isSyncedWithPhone;
+    public String getWearState() {
+        return STATE_WEAR;
     }
 
-    public void setSyncedWithPhone(boolean syncedWithPhone) {
-        isSyncedWithPhone = syncedWithPhone;
-    }
-
-    public String getWearStatus() {
-        return STATUS_WEAR;
-    }
-
-    public void setWearStatus(String STATUS_WEAR) {
-        this.STATUS_WEAR = STATUS_WEAR;
-    }
-
-    public String getNODE_ID() {
-        return NODE_ID;
-    }
-
-    public void setNODE_ID(String NODE_ID) {
-        this.NODE_ID = NODE_ID;
+    public void setWearState(String STATUS_WEAR) {
+        this.STATE_WEAR = STATUS_WEAR;
     }
 
     @Override
@@ -168,11 +224,10 @@ public class MessageService extends WearableListenerService implements
         unregisterReceiver(mBluetootLocalReceiver);
         unregisterReceiver(mConnectivityReceiver);
         Log.d(Constants.TAG, "MessageService: onDestroy");
-        Wearable.CapabilityApi.removeCapabilityListener(mGoogleApiClient, this, Constants.CAPABILITY_PHONE_APP);
-        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+        messageClient.removeListener(this);
+        capabilityClient.removeListener(this);
+        dataClient.removeListener(this);
+        capabilityClient.removeLocalCapability(Constants.CAPABILITY_DEMO_WEAR_APP);
         stopForeground(true);
         stopSelf();
     }
@@ -181,11 +236,15 @@ public class MessageService extends WearableListenerService implements
     public void onCreate() {
         super.onCreate();
         Log.d(Constants.TAG, "MessageService: onCreate");
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .build();
-        mGoogleApiClient.connect();
+        Wearable.WearableOptions options = new Wearable.WearableOptions.Builder().setLooper(Looper.myLooper()).build();
+        messageClient = Wearable.getMessageClient(this, options);
+        capabilityClient = Wearable.getCapabilityClient(this, options);
+        dataClient = Wearable.getDataClient(this, options);
+        messageClient.addListener(this, Constants.MESSAGE_URI, MessageClient.FILTER_PREFIX);
+        capabilityClient.addListener(this, Constants.CAPABILITY_PHONE_APP);
+        capabilityClient.addLocalCapability(Constants.CAPABILITY_WEAR_APP);
+        dataClient.addListener(this);
+
     }
 
     @Override
@@ -194,191 +253,118 @@ public class MessageService extends WearableListenerService implements
         super.onConnectedNodes(list);
     }
 
-
     public void enableWifiIfOff() {
         WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-        if(!wifiManager.isWifiEnabled())
+        if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
     }
-
-
-
-
-
-    private BroadcastReceiver mConnectivityReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int state = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
-            enableWifiIfOff();
-            Log.d(Constants.TAG,  "Caught intent ");
-            switch (state) {
-                case ConnectivityManager.TYPE_BLUETOOTH:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: Blue");
-                    break;
-                case ConnectivityManager.TYPE_WIFI:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: Wifi");
-                    break;
-                case ConnectivityManager.TYPE_ETHERNET:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: ether");
-                    break;
-
-                case ConnectivityManager.TYPE_MOBILE:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: mob");
-                    break;
-
-            }
-
-        }
-    };
-
-
 
     public void registerConnectivityReceiver() {
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(mConnectivityReceiver, filter);
     }
 
-
-
-
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        int i = super.onStartCommand(intent, flags, startId);
-        Log.d(Constants.TAG, "MessageService:onStartCommand");
-        String action = intent.getAction();
-//        if(intent!=null)
-//             action = intent.getAction();
-//        else
-//            return i;
-//        if(action==null)
-//            return i;
-        switch (action) {
-            case Constants.ACTION_REBOOT:
-            case Constants.ACTION_FIRST_RUN:
-                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
-                showSetupNotif();
-                enableBluetoothIfOff();
-                enableWifiIfOff();
-                registerConnectivityReceiver();
-                registerBluetoothReceiver();
-                if (isTimeInitialized()&& isSympInitialized()) {
-                    if (!isMyServiceRunning(SensorService.class)) {
-                        Log.d(Constants.TAG, "MessageService:onStartCommand:TimeInitialization done, Starting SensorService: ");
-                        sendSensorServiceAction(Constants.ACTION_FIRST_RUN);
-                        setWearStatus(Constants.STATUS_LOGGING);
-                    }
-                }
-                else {
-                    setWearStatus(Constants.STATUS_INIT);
-                }
-                break;
-            case Constants.ACTION_SETUP_WEAR:
-                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
-                setUpNodeIdentities();
-                break;
-
-            case Constants.ACTION_SYNC_DATA:
-                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
-                syncDataWithPhone();
-                break;
-
-            case Constants.ACTION_NOTIFY_INACTIVITY:
-                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
-                sendMessageToPhone(Constants.NOTIFY_INACTIVITY);
-                break;
-
-            case Constants.ACTION_NOTIFY_GREAT_JOB:
-                Log.d(Constants.TAG, "MessageService:onStartCommand " +  intent.getAction());
-                sendMessageToPhone(Constants.NOTIFY_GREAT_JOB);
-                break;
-
-
-            case Constants.ACTION_SNOOZE_ALARM:
-                Log.d(Constants.TAG, "MessageService:onStartCommand " + intent.getAction());
-                sendMessageToPhone(Constants.NOTIFY_INACTIVITY_SNOOZED);
-                break;
-
-
-            case Constants.ACTION_NOTIF_NO:
-            case Constants.ACTION_NOTIF_OK:
-            case Constants.ACTION_NOTIF_SNOOZE:
-
-                sendMessageToPhone(action);
-                break;
-
-            default:
-                return i;
-
-        }
-
-        return i;
-    }
-
-
     public void syncDataWithPhone() {
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
-        try {
-            Asset logAsset = FileManager.createAssetFromLogFile();
-            Log.d(Constants.TAG, "MessageService:onDataChanged: ");
-            putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
-        com.google.android.gms.common.api.PendingResult<DataApi.DataItemResult> pendingResult =
-                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest.setUrgent());
-        pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-            @Override
-            public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
-                if(dataItemResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "syncDataWithPhone: success");
-                }
-                else {
-
-                    Log.d(Constants.TAG, "syncDataWithPhone: failed " + dataItemResult.getStatus().getStatusMessage());
-                }
-            }
-        });
+//        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/upmc-dash");
+//        try {
+//            Asset logAsset = FileManager.createAssetFromLogFile();
+//            Log.d(Constants.TAG, "MessageService:onDataChanged: ");
+//            putDataMapRequest.getDataMap().putAsset("logfile", logAsset);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+//        com.google.android.gms.common.api.PendingResult<DataApi.DataItemResult> pendingResult =
+//                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest.setUrgent());
+//        pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+//            @Override
+//            public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
+//                if(dataItemResult.getStatus().isSuccess()) {
+//                    Log.d(Constants.TAG, "syncDataWithPhone: success");
+//                }
+//                else {
+//
+//                    Log.d(Constants.TAG, "syncDataWithPhone: failed " + dataItemResult.getStatus().getStatusMessage());
+//                }
+//            }
+//        });
     }
 
-    private void setUpNodeIdentities() {
-        notifySetup(Constants.NOTIFTEXT_TRY_CONNECT);
-        Wearable.CapabilityApi.getCapability(mGoogleApiClient, Constants.CAPABILITY_PHONE_APP, CapabilityApi.FILTER_REACHABLE).setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
-            @Override
-            public void onResult(@NonNull CapabilityApi.GetCapabilityResult getCapabilityResult) {
-                CapabilityInfo info = getCapabilityResult.getCapability();
-                Set<Node> nodes = info.getNodes();
-                String NODE_ID;
-                if (nodes.size() == 1) {
-                    for (Node node : nodes) {
-                        NODE_ID = node.getId();
-                        Log.d(Constants.TAG, "MessageService:setUpNodeIdentities: " + NODE_ID);
-                        setNODE_ID(NODE_ID);
-                        sendStateToPhone();
-                    }
-                }
-            }
-        });
+    public boolean isPhoneNodeSaved() {
+        return !(Constants.PREFERENCES_DEFAULT_PHONE_NODEID.equals(readPhoneNodeId()));
+    }
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+    public String readPhoneNodeId() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String nodeId = sharedPref.getString(Constants.PREFERENCES_KEY_PHONE_NODEID, Constants.PREFERENCES_DEFAULT_PHONE_NODEID);
+        if (nodeId.equals(Constants.PREFERENCES_DEFAULT_PHONE_NODEID))
+            Log.d(Constants.TAG, "MessageService:readWearNodeId: " + nodeId);
+        return nodeId;
+    }
+
+    public boolean isPhoneNodeIdPresent(Set<Node> nodes) {
+        if (nodes.size() == 0) {
+            Log.d(Constants.TAG, "isPhoneNodeIdPresent: no connected nodes");
+            return false;
+        }
+        for (Node node : nodes) {
+            if (node.getId().equals(readPhoneNodeId()))
+                return true;
+        }
+        Log.d(Constants.TAG, "isPhoneNodeIdPresent: no nodes with wear nodeID");
+        return false;
+    }
+
+    private void scanPhoneNode() {
+        notifySetup(Constants.NOTIFTEXT_TRY_CONNECT);
+        if (!isPhoneNodeSaved()) {
+            notifySetup(Constants.SETUP_WEAR);
+            return;
+        }
+        capabilityClient.getCapability(Constants.CAPABILITY_PHONE_APP, CapabilityClient.FILTER_REACHABLE).addOnCompleteListener(new OnCompleteListener<CapabilityInfo>() {
+            @Override
+            public void onComplete(@NonNull Task<CapabilityInfo> task) {
+                Log.d(Constants.TAG, "onComplete");
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Constants.TAG, "onFailure");
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<CapabilityInfo>() {
+                    @Override
+                    public void onSuccess(CapabilityInfo capabilityInfo) {
+                        Log.d(Constants.TAG, "onSuccess");
+                        Set<Node> nodes = capabilityInfo.getNodes();
+                        if (isPhoneNodeIdPresent(nodes)) {
+                            Log.d(Constants.TAG, "scanPhoneNode: connected");
+                            setPhoneAround(true);
+                        } else {
+                            Log.d(Constants.TAG, "scanPhoneNode: disconnected");
+                            setPhoneAround(false);
+                        }
+                    }
+                });
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(!isSyncedWithPhone()) {
+                if (isPhoneAround()) {
+                    notifySetup(Constants.CONNECTED_PHONE);
+                } else {
                     notifySetup(Constants.FAILED_PHONE);
                 }
-                else {
-                    notifySetup(Constants.CONNECTED_PHONE);
-                }
             }
-        }, 3000);
+        }, 5000);
     }
 
     private void showSetupNotif() {
-
+        final String contentText = isPhoneNodeSaved() ? Constants.FAILED_PHONE : Constants.SETUP_WEAR;
+        Intent dashIntent = new Intent(this, MessageService.class);
+        dashIntent.setAction(Constants.ACTION_SCAN_PHONE);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(Constants.MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID, "MESSAGE_SERVICE", NotificationManager.IMPORTANCE_MIN);
             notificationChannel.setDescription("UPMC Dash notification channel");
             notificationChannel.enableLights(true);
@@ -387,22 +373,18 @@ public class MessageService extends WearableListenerService implements
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
             setupNotifBuilder = new Notification.Builder(this, Constants.MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID);
-            Intent dashIntent = new Intent(this, MessageService.class);
-            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
+
             PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
             setupNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("Dash Setup")
-                    .setContentText(Constants.SETUP_WEAR)
+                    .setContentText(contentText)
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent);
-
             startForeground(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
 
         } else {
-            Intent dashIntent = new Intent(this, MessageService.class);
-            dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
             PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
             setupNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.MESSAGE_SERVICE_NOTIFICATION_CHANNEL_ID);
             setupNotifCompatBuilder.setAutoCancel(false)
@@ -410,16 +392,13 @@ public class MessageService extends WearableListenerService implements
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("Dash Setup")
-                    .setContentText(Constants.SETUP_WEAR)
+                    .setContentText(contentText)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentInfo("info")
                     .setContentIntent(dashPendingIntent);
-
             startForeground(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
         }
     }
-
-
 
     public void writeTimePref(int morn_hour, int morn_minute, int night_hour, int night_minute) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -429,7 +408,7 @@ public class MessageService extends WearableListenerService implements
         editor.putInt(Constants.NIGHT_HOUR, night_hour);
         editor.putInt(Constants.NIGHT_MINUTE, night_minute);
         editor.apply();
-        storeTime(morn_hour, morn_minute,night_hour, night_minute);
+        storeTime(morn_hour, morn_minute, night_hour, night_minute);
     }
 
     public void readTimePref() {
@@ -439,7 +418,7 @@ public class MessageService extends WearableListenerService implements
         int night_hour = sharedPref.getInt(Constants.NIGHT_HOUR, -1);
         int night_minute = sharedPref.getInt(Constants.NIGHT_MINUTE, -1);
         Log.d(Constants.TAG, "MessageService:readTimePref:" + morn_hour + " " + morn_minute);
-        storeTime(morn_hour, morn_minute,night_hour, night_minute);
+        storeTime(morn_hour, morn_minute, night_hour, night_minute);
     }
 
     private void storeTime(int morn_hour, int morn_minute, int night_hour, int night_minute) {
@@ -460,7 +439,7 @@ public class MessageService extends WearableListenerService implements
 
     public boolean isTimeInitialized() {
         readTimePref();
-        if ((this.morningTime[0] == -1)||(this.nightTime[0] == -1)) {
+        if ((this.morningTime[0] == -1) || (this.nightTime[0] == -1)) {
             setTimeInitilaized(false);
         } else {
             setTimeInitilaized(true);
@@ -469,9 +448,7 @@ public class MessageService extends WearableListenerService implements
     }
 
     public boolean isSympInitialized() {
-        if(readSymptomsPref()==-1)
-            return false;
-        return true;
+        return !(readSymptomsPref() == -1);
     }
 
     public void setTimeInitilaized(boolean isinit) {
@@ -479,134 +456,74 @@ public class MessageService extends WearableListenerService implements
     }
 
     @Override
-    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
+    public void onCapabilityChanged(@NonNull CapabilityInfo capabilityInfo) {
         Log.d(Constants.TAG, "MessageService: onCapability");
         super.onCapabilityChanged(capabilityInfo);
-        if (capabilityInfo.getNodes().size() > 0) {
-            Log.d(Constants.TAG, "MessageService: onCapability: Mobile Connected");
-        } else {
-            Log.d(Constants.TAG, "MessageService: onCapability: No Mobile Found");
+        if(isPhoneNodeSaved()) {
+            if (isPhoneNodeIdPresent(capabilityInfo.getNodes())) {
+                Log.d(Constants.TAG, "onCapabilityChanged: phone is connected");
+                notifySetup(Constants.CONNECTED_PHONE);
+            }
+            else {
+                Log.d(Constants.TAG, "onCapabilityChanged: phone is disconnected");
+                notifySetup(Constants.FAILED_PHONE);
+            }
         }
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        Log.d(Constants.TAG, "MessageService: onConnected");
-        Wearable.CapabilityApi.addCapabilityListener(mGoogleApiClient,
-                this,
-                Constants.CAPABILITY_PHONE_APP);
-        Uri uri = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
-        Wearable.MessageApi.addListener(mGoogleApiClient, this, uri, MessageApi.FILTER_PREFIX);
-//        setUpNodeIdentities();
-    }
+
 
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
+    public void onMessageReceived(@NonNull MessageEvent messageEvent) {
         super.onMessageReceived(messageEvent);
-       // Log.d(Constants.TAG, "MessageService:onMessageReceived");
-       // Log.d(Constants.TAG, "MessageService: onMessageReceived: buildPath" + messageEvent.getPath());
-        Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("wear").path("/upmc-dash").build();
-        if (messageEvent.getPath().equals(uriBuilder.toString())) {
-            byte[] input = messageEvent.getData();
-            String message = new String(input);
-            Log.d(Constants.TAG, "MessageService: onMessageReceived: " + message);
-            if(!isNodeSaved()) {
-                setNODE_ID(messageEvent.getSourceNodeId());
-                setNodeSaved(true);
-            }
+        Log.d(Constants.TAG, "MessageService:onMessageReceived");
+        byte[] input = messageEvent.getData();
+        String message = new String(input);
+        if (messageEvent.getPath().equals(Constants.MESSAGE_URI.toString())) {
             switch (message.split("\\s+")[0]) {
                 case Constants.ACK:
-                    if(!isSyncedWithPhone()) {
-                        notifySetup(Constants.CONNECTED_PHONE);
-                        setSyncedWithPhone(true);
-                    }
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:ACK");
                     break;
                 case Constants.INIT_TS:
-                    String[] arr = message.split("\\s+");
-                    int morn_hour = Integer.parseInt(arr[1]);
-                    int morn_minute = Integer.parseInt(arr[2]);
-                    int night_hour = Integer.parseInt(arr[3]);
-                    int nigh_minute = Integer.parseInt(arr[4]);
-                    int type = Integer.parseInt(arr[5]);
-                    writeTimePref(morn_hour, morn_minute, night_hour, nigh_minute);
-                    writeSymptomPref(type);
-                    Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + morn_hour + " " + morn_minute + " " + night_hour  + " " + nigh_minute + " " + type);
-                    setWearStatus(Constants.STATUS_LOGGING);
-                    Intent sensorService = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage());
-                    sensorService.setAction(Constants.ACTION_FIRST_RUN);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        startForegroundService(sensorService);
-                    else
-                        startService(sensorService);
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:INIT_TS");
+                    parseAndStoreInitFromPhone(message);
+                    setWearState(Constants.STATE_LOGGING);
                     sendStateToPhone();
+                    checkAndStartSession();
                     break;
-
                 case Constants.IS_WEAR_RUNNING:
-                    if(!isSyncedWithPhone()) {
-                        setSyncedWithPhone(true);
-                        notifySetup(Constants.CONNECTED_PHONE);
-                    }
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:IS_WEAR_RUNNING");
                     sendStateToPhone();
                     break;
-
-
                 case Constants.ACTION_SETUP_WEAR:
-                    sendMessageToPhone(Constants.ACK);
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:ACTION_SETUP_WEAR");
+                    writePhoneNodeId(messageEvent.getSourceNodeId());
+                    notifySetup(Constants.CONNECTED_PHONE);
+                    sendAckToPhone();
                     break;
-
                 case Constants.ACTION_NOTIF_OK:
                 case Constants.ACTION_NOTIF_NO:
                 case Constants.ACTION_NOTIF_SNOOZE:
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:" + message);
+                    sendAckToPhone();
                     sendSensorServiceAction(message + "_PHONE");
                     break;
             }
 
-
-
-
-//            if (message.equals(Constants.ACK)) {
-//                if(!isSyncedWithPhone()) {
-//                    notifySetup(Constants.CONNECTED_PHONE);
-//                    setSyncedWithPhone(true);
-//                }
-//            }
-//            else {
-//                sendMessageToPhone(Constants.ACK);
-//                if (message.contains(Constants.INIT_TS)) {
-//                    String[] arr = message.split("\\s+");
-//                    int morn_hour = Integer.parseInt(arr[1]);
-//                    int morn_minute = Integer.parseInt(arr[2]);
-//                    int night_hour = Integer.parseInt(arr[3]);
-//                    int nigh_minute = Integer.parseInt(arr[4]);
-//                    int type = Integer.parseInt(arr[5]);
-//                    writeTimePref(morn_hour, morn_minute, night_hour, nigh_minute);
-//                    writeSymptomPref(type);
-//                    Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + morn_hour + " " + morn_minute + " " + night_hour  + " " + nigh_minute + " " + type);
-//                    setWearStatus(Constants.STATUS_LOGGING);
-//                    Intent sensorService = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage());
-//                    sensorService.setAction(Constants.ACTION_FIRST_RUN);
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-//                        startForegroundService(sensorService);
-//                    else
-//                        startService(sensorService);
-//                    sendStateToPhone();
-//                }
-//                else if(message.contains(Constants.IS_WEAR_RUNNING)) {
-//                    if(!isSyncedWithPhone()) {
-//                        setSyncedWithPhone(true);
-//                        notifySetup(Constants.CONNECTED_PHONE);
-//                    }
-//                    sendStateToPhone();
-//                }
-//                else if(message.contains(Constants.ACTION_NOTIF_OK)) {
-//                    Log.d(Constants.TAG, "MessageService: feedback starts");
-//                    LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.FEEDBACK_BROADCAST_INTENT_FILTER).putExtra(Constants.SENSOR_EXTRA_KEY, Constants.OK_ACTION));
-//                }
-//            }
         }
     }
 
+    public void parseAndStoreInitFromPhone(String message) {
+        String[] arr = message.split("\\s+");
+        int morn_hour = Integer.parseInt(arr[1]);
+        int morn_minute = Integer.parseInt(arr[2]);
+        int night_hour = Integer.parseInt(arr[3]);
+        int nigh_minute = Integer.parseInt(arr[4]);
+        int type = Integer.parseInt(arr[5]);
+        writeTimePref(morn_hour, morn_minute, night_hour, nigh_minute);
+        writeSymptomPref(type);
+        Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + morn_hour + " " + morn_minute + " " + night_hour + " " + nigh_minute + " " + type);
+    }
 
     private String buildInitMessage() {
         StringBuilder messageBuilder = new StringBuilder();
@@ -635,87 +552,135 @@ public class MessageService extends WearableListenerService implements
         return false;
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d(Constants.TAG, "MessageService: onConnectionSuspended");
-    }
+
+    private void sendMessageToPhone(String message) {
+        Log.d(Constants.TAG, "MessageService:sendMessageToPhone " + message);
+        if (!isPhoneNodeSaved())
+            return;
+        final String nodeID = readPhoneNodeId();
+        messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(), message.getBytes()).
+                addOnSuccessListener(new OnSuccessListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        Log.d(Constants.TAG, "sendMessageToPhone:onSuccess " + integer);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Constants.TAG, "sendMessageToPhone:onFailure");
 
 
-    private void sendMessageToPhone(final String message) {
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<Integer>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Integer> task) {
+                        Log.d(Constants.TAG, "sendMessageToPhone:onComplete, waiting for ACK from phone...");
 
-        Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("wear").path("/upmc-dash").build();
-        PendingResult<MessageApi.SendMessageResult> pendingResult =
-                Wearable.MessageApi.sendMessage(
-                        mGoogleApiClient,
-                        getNODE_ID(),
-                        uriBuilder.toString(),
-                        message.getBytes());
+                    }
+                });
 
-        pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+        setPhoneAround(false);
+
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                if (!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message failed: " + message);
-                } else {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message sent : " + message);
-                }
+            public void run() {
+                if (isPhoneAround())
+                    Log.d(Constants.TAG, "sendMessageToPhone: ACK received, phone is around");
+                else
+                    Log.d(Constants.TAG, "sendMessageToPhone: ACK not received, phone is not around");
             }
-        });
+        }, 5000);
 
     }
 
+
+    private void sendStateToPhone() {
+        Log.d(Constants.TAG, "MessageService:sendStateToPhone " + getWearState());
+        if (!isPhoneNodeSaved())
+            return;
+        final String nodeID = readPhoneNodeId();
+        messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(), getWearState().getBytes()).
+                addOnSuccessListener(new OnSuccessListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        Log.d(Constants.TAG, "sendStateToPhone:onSuccess" + integer);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Constants.TAG, "sendStateToPhone:onFailure");
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<Integer>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Integer> task) {
+                        Log.d(Constants.TAG, "sendStateToPhone:onComplete");
+                    }
+                });
+    }
+
+    private void sendAckToPhone() {
+        Log.d(Constants.TAG, "MessageService:sendAckToPhone ");
+        if (!isPhoneNodeSaved())
+            return;
+        final String nodeID = readPhoneNodeId();
+        messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(), Constants.ACK.getBytes()).
+                addOnSuccessListener(new OnSuccessListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        Log.d(Constants.TAG, "sendAckToPhone:onSuccess" + integer);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(Constants.TAG, "sendAckToPhone:onFailure");
+
+
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<Integer>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Integer> task) {
+                        Log.d(Constants.TAG, "sendAckToPhone:onComplete");
+
+                    }
+                });
+    }
+
     @Override
-    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+    public void onDataChanged(@NonNull DataEventBuffer dataEventBuffer) {
         super.onDataChanged(dataEventBuffer);
     }
 
-    private void sendStateToPhone() {
-        final String message = getWearStatus();
-        if(message==null)
-            setWearStatus(Constants.STATUS_INIT);
-        Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("wear").path("/upmc-dash").build();
-        PendingResult<MessageApi.SendMessageResult> pendingResult =
-                Wearable.MessageApi.sendMessage(
-                        mGoogleApiClient,
-                        getNODE_ID(),
-                        uriBuilder.toString(),
-                        message.getBytes());
-
-        pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-            @Override
-            public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                if (!sendMessageResult.getStatus().isSuccess()) {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message failed: " + message);
-                } else {
-                    Log.d(Constants.TAG, "MessageService:sendMessageToPhone:message sent : " + message);
-                }
-            }
-        });
-
-    }
-
-
     public void sendSensorServiceAction(String action) {
         Intent intent = new Intent(getApplicationContext(), SensorService.class).setAction(action);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
-        }
-        else {
+        } else {
             startService(intent);
         }
     }
 
-    private void notifySetup(String notifContent) {
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupNotifBuilder.setContentText(notifContent);
-            mNotificationManager.notify(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
+    private void notifySetup(String contentText) {
+        boolean canNotify = !this.prevNotif.equals(contentText);
+        if(canNotify) {
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setupNotifBuilder.setContentText(contentText);
+                mNotificationManager.notify(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
+            } else {
+                setupNotifCompatBuilder.setContentText(contentText);
+                mNotificationManager.notify(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifCompatBuilder.build());
+            }
+            this.prevNotif = contentText;
+
         }
-        else {
-            setupNotifCompatBuilder.setContentText(notifContent);
-            mNotificationManager.notify(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifCompatBuilder.build());
-        }
+
     }
 }

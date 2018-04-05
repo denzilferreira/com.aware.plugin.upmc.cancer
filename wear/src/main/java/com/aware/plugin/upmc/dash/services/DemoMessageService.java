@@ -253,8 +253,6 @@ public class DemoMessageService extends WearableListenerService implements Messa
             }
         }, 5000);
 
-
-
     }
 
 

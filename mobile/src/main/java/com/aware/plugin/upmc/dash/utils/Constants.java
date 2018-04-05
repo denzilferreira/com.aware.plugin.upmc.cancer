@@ -46,9 +46,10 @@ public final class Constants {
     public static final String NOTIFY_GREAT_JOB = "user is active";
 
 
-    // states from wear
-    public static final String STATUS_INIT = "init"; // need to be time initiated
-    public static final String STATUS_LOGGING = "logging"; // currently logging
+    //states
+    public static final String STATE_INIT = "STATE_INIT";
+    public static final String STATE_LOGGING = "STATE_LOGGING"; // currently logging
+    public static final String STATE_INACTIVE = "STATE_INACTIVE"; //  currently paused
 
     //Bluetooth Communication
     public static final String BLUETOOTH_COMM = "bluetooth_comm";
@@ -129,9 +130,9 @@ public final class Constants {
 
     // Wear setup notif
     public static final String SETUP_WEAR = "Tap to setup watch";
-    public static final String CONNECTED_WEAR = "Connected: Watch is logging your activity.. ";
+    public static final String CONNECTED_WEAR = "Connected: Watch is monitoring your activity..";
     public static final String FAILED_WEAR = "Disconnected: Watch is not in range";
-    public static final String FAILED_WEAR_DISCOVERY = "Setup Failed: Cannot find your LG watch";
+    public static final String FAILED_WEAR_DISCOVERY = "Setup Failed: Tap to retry";
     public static final String FAILED_WEAR_BLUETOOTH = "Disconnected: Switch on Bluetooth";
 
 

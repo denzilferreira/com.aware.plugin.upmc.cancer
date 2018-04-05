@@ -1,6 +1,5 @@
 package com.aware.plugin.upmc.dash.services;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -14,50 +13,34 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.aware.Aware;
+import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
 import com.aware.plugin.upmc.dash.activities.SetupLoadingActvity;
-import com.aware.plugin.upmc.dash.utils.Constants;
-import com.aware.plugin.upmc.dash.R;
-import com.aware.plugin.upmc.dash.settings.Settings;
-import com.aware.plugin.upmc.dash.fileutils.SyncFilesParams;
-import com.aware.plugin.upmc.dash.fileutils.SyncFilesResponse;
-import com.aware.plugin.upmc.dash.fileutils.SyncFilesTask;
 import com.aware.plugin.upmc.dash.activities.UPMC;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
+import com.aware.plugin.upmc.dash.settings.Settings;
+import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
-import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataClient;
-import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -75,10 +58,12 @@ public class MessageService extends WearableListenerService implements
         MessageClient.OnMessageReceivedListener,
         CapabilityClient.OnCapabilityChangedListener,
         DataClient.OnDataChangedListener {
+
     private MessageClient messageClient;
     private CapabilityClient capabilityClient;
     private DataClient dataClient;
     private boolean isWearAround = false;
+    private String prevNotif = "Tap to setup your watch";
     private Notification.Builder setupNotifBuilder;
     private NotificationCompat.Builder setupNotifCompatBuilder;
     private int count = 0;
@@ -90,7 +75,7 @@ public class MessageService extends WearableListenerService implements
                 case BluetoothAdapter.STATE_OFF:
                     Log.d(Constants.TAG, "MessageService:BluetoothReceiver:STATE_OFF");
                     notifySetup(Constants.FAILED_WEAR_BLUETOOTH);
-                    if(!enableBluetoothIfOff())
+                    if (!enableBluetoothIfOff())
                         Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
                     break;
                 case BluetoothAdapter.STATE_TURNING_OFF:
@@ -115,25 +100,25 @@ public class MessageService extends WearableListenerService implements
     private BroadcastReceiver mConnectivityReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int state = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
+//            int state = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
             enableWifiIfOff();
-            Log.d(Constants.TAG,  "Caught intent ");
-            switch (state) {
-                case ConnectivityManager.TYPE_BLUETOOTH:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_BLUETOOTH");
-                    break;
-                case ConnectivityManager.TYPE_WIFI:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_WIFI");
-                    break;
-                case ConnectivityManager.TYPE_ETHERNET:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_ETHERNET");
-                    break;
-
-                case ConnectivityManager.TYPE_MOBILE:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_MOBILE");
-                    break;
-
-            }
+//            Log.d(Constants.TAG, "Caught intent ");
+//            switch (state) {
+//                case ConnectivityManager.TYPE_BLUETOOTH:
+//                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_BLUETOOTH");
+//                    break;
+//                case ConnectivityManager.TYPE_WIFI:
+//                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_WIFI");
+//                    break;
+//                case ConnectivityManager.TYPE_ETHERNET:
+//                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_ETHERNET");
+//                    break;
+//
+//                case ConnectivityManager.TYPE_MOBILE:
+//                    Log.d(Constants.TAG, "mConnectivityReceiver: TYPE_MOBILE");
+//                    break;
+//
+//            }
 
         }
     };
@@ -143,9 +128,9 @@ public class MessageService extends WearableListenerService implements
         final int i = super.onStartCommand(intent, flags, startId);
         Log.d(Constants.TAG, "MessageService: onStartCommand");
         String intentAction = null;
-        if(intent!=null)
+        if (intent != null)
             intentAction = intent.getAction();
-        if(intentAction ==null)
+        if (intentAction == null)
             return i;
         switch (intentAction) {
             case Constants.ACTION_FIRST_RUN:
@@ -167,10 +152,8 @@ public class MessageService extends WearableListenerService implements
                 showSurveyNotif();
                 showSetupNotif();
                 createInterventionNotifChannel();
-                if(isWearNodeSaved())
+                if (isWearNodeSaved())
                     scanWear();
-                else
-                    initiateWearSetup();
             case Constants.ACTION_SETUP_WEAR:
                 Log.d(Constants.TAG, "MessageService: onStartCommand : ACTION_SETUP_WEAR");
                 startActivity(new Intent(this, SetupLoadingActvity.class));
@@ -190,16 +173,15 @@ public class MessageService extends WearableListenerService implements
                 break;
             case Constants.ACTION_SETTINGS_CHANGED:
                 Log.d(Constants.TAG, "MessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
-                if(isWearInitializable()) {
+                if (isWearInitializable()) {
                     initializeWear();
-                }
-                else {
+                } else {
                     Log.d(Constants.TAG, "MessageService: not enough information to start logging");
                 }
                 break;
             case Constants.ACTION_SNOOZE_ALARM:
                 Log.d(Constants.TAG, "MessageService:onStartCommand : ACTION_SNOOZE_ALARM");
-                Log.d(Constants.TAG, "MessageService:"  + intentAction);
+                Log.d(Constants.TAG, "MessageService:" + intentAction);
                 notifyUserWithInactivity(false);
                 break;
             case Constants.ACTION_NOTIF_SNOOZE:
@@ -215,8 +197,6 @@ public class MessageService extends WearableListenerService implements
         return i;
     }
 
-
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -229,11 +209,7 @@ public class MessageService extends WearableListenerService implements
         dataClient.addListener(this);
         capabilityClient.addLocalCapability(Constants.CAPABILITY_PHONE_APP);
         Log.d(Constants.TAG, "MessageService: onCreate");
-
     }
-
-
-
 
     public void wakeUpAndVibrate(int duration_awake, int duration_vibrate, int timeout) {
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
@@ -268,9 +244,8 @@ public class MessageService extends WearableListenerService implements
         registerReceiver(mConnectivityReceiver, filter);
     }
 
-
     public void createInterventionNotifChannel() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(Constants.INTERVENTION_NOTIF_CHNL_ID, Constants.INTERVENTION_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
             notificationChannel.setDescription(Constants.INTERVENTION_NOTIF_CHNL_DESC);
             notificationChannel.enableLights(true);
@@ -281,20 +256,16 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
-
     public void dismissIntervention() {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
 
-
-
     public void enableWifiIfOff() {
         WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-        if(!wifiManager.isWifiEnabled())
+        if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
     }
-
 
     private void saveConnectedWearNode() {
         setWearAround(false);
@@ -327,7 +298,6 @@ public class MessageService extends WearableListenerService implements
                 });
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -339,13 +309,11 @@ public class MessageService extends WearableListenerService implements
         capabilityClient.removeListener(this);
         capabilityClient.removeLocalCapability(Constants.CAPABILITY_PHONE_APP);
         dataClient.removeListener(this);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         stopSelf();
     }
 
-
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
+    public void onMessageReceived(@NonNull MessageEvent messageEvent) {
         super.onMessageReceived(messageEvent);
         byte[] input = messageEvent.getData();
         String message = new String(input);
@@ -357,13 +325,11 @@ public class MessageService extends WearableListenerService implements
                 case Constants.ACK:
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:ACK");
                     break;
-                case Constants.STATUS_LOGGING:
+                case Constants.STATE_LOGGING:
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:STATUS_LOGGING");
-                    sendAckToWear();
                     notifySetup(Constants.CONNECTED_WEAR);
                     break;
-                case Constants.STATUS_INIT:
-                    sendAckToWear();
+                case Constants.STATE_INIT:
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:STATUS_INIT");
                     notifySetup(Constants.CONNECTED_WEAR);
                     break;
@@ -383,7 +349,7 @@ public class MessageService extends WearableListenerService implements
                 case Constants.ACTION_NOTIF_SNOOZE:
                     sendAckToWear();
                     dismissIntervention();
-                    Log.d(Constants.TAG,"MessageService:onMessageReceived " + message);
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived " + message);
                     break;
                 case Constants.NOTIFY_INACTIVITY_SNOOZED:
                     sendAckToWear();
@@ -392,7 +358,6 @@ public class MessageService extends WearableListenerService implements
             }
         }
     }
-
 
     public void showInabilityResponseDialog() {
         Intent intent = new Intent(this, NotificationResponseActivity.class).setAction(Constants.ACTION_SHOW_INABILITY);
@@ -406,16 +371,14 @@ public class MessageService extends WearableListenerService implements
         boolean night_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)) != -1;
         boolean night_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)) != -1;
         boolean severity = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY)) != -1;
-        return(morning_hour && morning_minute & night_hour && night_minute && severity);
+        return (morning_hour && morning_minute & night_hour && night_minute && severity);
     }
-
-
 
     public void notifyUserWithAppraisal() {
         wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
         Intent dashIntent = new Intent(this, MessageService.class).setAction(Constants.ACTION_APPRAISAL);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
             PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
             monitorNotifBuilder.setAutoCancel(false)
@@ -428,8 +391,7 @@ public class MessageService extends WearableListenerService implements
                     .setContentIntent(dashPendingIntent);
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
 
-        }
-        else  {
+        } else {
             PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
             NotificationCompat.Builder monitorCompatNotifBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
@@ -447,11 +409,11 @@ public class MessageService extends WearableListenerService implements
     public void notifyUserWithInactivity(boolean snoozeOption) {
         wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
         Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
-        if(snoozeOption)
+        if (snoozeOption)
             dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
         PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
             monitorNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
@@ -462,9 +424,8 @@ public class MessageService extends WearableListenerService implements
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent);
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
-        }
-        else  {
-            NotificationCompat.Builder  monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
+        } else {
+            NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("UPMC Dash Monitor")
                     .setContentText(Constants.NOTIF_INACTIVITY)
@@ -494,25 +455,22 @@ public class MessageService extends WearableListenerService implements
         sendMessageToWear(initBuilder.toString());
     }
 
-
     public void initiateWearSetup() {
         saveConnectedWearNode();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(isWearNodeSaved()) {
-                    if(isWearAround()) {
+                if (isWearNodeSaved()) {
+                    if (isWearAround()) {
                         Log.d(Constants.TAG, "initiateWearSetup:Setup Complete");
                         notifySetup(Constants.CONNECTED_WEAR);
                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.CONNECTED_WEAR));
-                    }
-                    else {
+                    } else {
                         Log.d(Constants.TAG, "initiateWearSetup: setupPartial");
                         notifySetup(Constants.FAILED_WEAR);
                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.FAILED_WEAR));
                     }
-                }
-                else {
+                } else {
                     Log.d(Constants.TAG, "initiateWearSetup:setupFailed");
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.LOADING_ACTIVITY_INTENT_FILTER).putExtra(Constants.MESSAGE_EXTRA_KEY, Constants.FAILED_WEAR_DISCOVERY));
                     notifySetup(Constants.FAILED_WEAR_DISCOVERY);
@@ -521,19 +479,17 @@ public class MessageService extends WearableListenerService implements
         }, 5000);
     }
 
-
     public void scanWear() {
         Log.d(Constants.TAG, "MessageService:scanWear");
         isWearServiceRunning();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(isWearAround()) {
+                if (isWearAround()) {
                     Log.d(Constants.TAG, "MessageService:scanWear");
                     notifySetup(Constants.CONNECTED_WEAR);
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_IN_RANGE));
-                }
-                else {
+                } else {
                     notifySetup(Constants.FAILED_WEAR);
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.VICINITY_CHECK_INTENT_FILTER).putExtra(Constants.VICINITY_RESULT_KEY, Constants.WEAR_NOT_IN_RANGE));
 
@@ -545,16 +501,14 @@ public class MessageService extends WearableListenerService implements
     public boolean enableBluetoothIfOff() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         boolean isEnabled = bluetoothAdapter.isEnabled();
-        if(!isEnabled)
-            return bluetoothAdapter.enable();
-        return true;
+        return isEnabled || bluetoothAdapter.enable();
     }
 
     private void showSurveyNotif() {
         final Intent dashIntent = new Intent(this, UPMC.class);
         dashIntent.setAction(Constants.ACTION_SURVEY);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
             notificationChannel.setDescription("UPMC Dash Survey Notification");
             notificationChannel.enableLights(true);
@@ -584,16 +538,16 @@ public class MessageService extends WearableListenerService implements
                     .setGroup("Survey")
                     .setContentInfo("Survey Notification")
                     .setContentIntent(dashPendingIntent);
-            startForeground(Constants.SURVEY_NOTIF_ID,notificationBuilder.build());
+            startForeground(Constants.SURVEY_NOTIF_ID, notificationBuilder.build());
         }
     }
 
     private void showSetupNotif() {
-        final String contentText = isWearNodeSaved()? Constants.FAILED_WEAR:Constants.SETUP_WEAR;
+        final String contentText = isWearNodeSaved() ? Constants.FAILED_WEAR : Constants.SETUP_WEAR;
         final Intent dashIntent = new Intent(this, MessageService.class);
         dashIntent.setAction(Constants.ACTION_SETUP_WEAR);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setupNotifBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID); // using the survey notification ID, as it doesn't matter
             PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
             setupNotifBuilder.setAutoCancel(false)
@@ -623,25 +577,27 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void notifySetup(String contentText) {
-        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
-        wl.acquire(6000);
-        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(500);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupNotifBuilder.setContentText(contentText);
-            notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifBuilder.build());
-        }
-        else {
-            setupNotifCompatBuilder.setContentText(contentText);
-            notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifCompatBuilder.build());
+        boolean canNotify = !this.prevNotif.equals(contentText);
+        if(canNotify) {
+            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+            wl.acquire(6000);
+            final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            vibrator.vibrate(500);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setupNotifBuilder.setContentText(contentText);
+                notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifBuilder.build());
+            } else {
+                setupNotifCompatBuilder.setContentText(contentText);
+                notificationManager.notify(Constants.SETUP_NOTIF_ID, setupNotifCompatBuilder.build());
+            }
+            this.prevNotif = contentText;
         }
     }
 
-
     @Override
-    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+    public void onDataChanged(@NonNull DataEventBuffer dataEventBuffer) {
         Log.d(Constants.TAG, "MessageService:onDataChanged:received");
 //        for(DataEvent event : dataEventBuffer) {
 //            if (event.getType() == DataEvent.TYPE_CHANGED &&
@@ -674,13 +630,17 @@ public class MessageService extends WearableListenerService implements
         super.onPeerDisconnected(node);
     }
 
-
     @Override
-    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
+    public void onCapabilityChanged(@NonNull CapabilityInfo capabilityInfo) {
         Log.d(Constants.TAG, "onCapabilityChanged)");
-        if(isWearNodeSaved()) {
+        if (isWearNodeSaved()) {
             if (isWearNodeIdPresent(capabilityInfo.getNodes())) {
                 Log.d(Constants.TAG, "onCapabilityChanged: wear is connected");
+                notifySetup(Constants.CONNECTED_WEAR);
+            }
+            else {
+                Log.d(Constants.TAG, "onCapabilityChanged: wear is disconnected");
+                notifySetup(Constants.FAILED_WEAR);
             }
         }
     }
@@ -702,7 +662,7 @@ public class MessageService extends WearableListenerService implements
 
     private void sendMessageToWear(final String message) {
         Log.d(Constants.TAG, "MessageService:sendMessageToWear " + message);
-        if(!isWearNodeSaved())
+        if (!isWearNodeSaved())
             return;
         final String nodeID = readWearNodeId();
         messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(), message.getBytes()).
@@ -710,39 +670,32 @@ public class MessageService extends WearableListenerService implements
                     @Override
                     public void onSuccess(Integer integer) {
                         Log.d(Constants.TAG, "sendMessageToWear:onSuccess " + integer);
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(Constants.TAG, "sendMessageToWear:onFailure");
-
-
                     }
                 })
                 .addOnCompleteListener(new OnCompleteListener<Integer>() {
                     @Override
                     public void onComplete(@NonNull Task<Integer> task) {
                         Log.d(Constants.TAG, "sendMessageToWear:onComplete, waiting for ACK from wear...");
-
                     }
                 });
-
         setWearAround(false);
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
 
                 if (isWearAround()) {
                     Log.d(Constants.TAG, "sendMessageToWear: ACK received, wear is around");
-                    if(!isWearAround()) {
+                    if (!isWearAround()) {
                         notifySetup(Constants.CONNECTED_WEAR);
                     }
                     setWearAround(true);
-                }
-                else {
+                } else {
                     Log.d(Constants.TAG, "sendMessageToWear: ACK not received wear is not around");
                     setWearAround(false);
                     notifySetup(Constants.FAILED_WEAR);
@@ -751,32 +704,27 @@ public class MessageService extends WearableListenerService implements
         }, 5000);
     }
 
-
     private void sendAckToWear() {
-        if(!isWearNodeSaved())
+        if (!isWearNodeSaved())
             return;
         final String nodeID = readWearNodeId();
-        messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(),Constants.ACK.getBytes()).
+        messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(), Constants.ACK.getBytes()).
                 addOnSuccessListener(new OnSuccessListener<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {
                         Log.d(Constants.TAG, "sendAckToWear:onSuccess " + integer);
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(Constants.TAG, "sendAckToWear:onFailure");
-
-
                     }
                 })
                 .addOnCompleteListener(new OnCompleteListener<Integer>() {
                     @Override
                     public void onComplete(@NonNull Task<Integer> task) {
                         Log.d(Constants.TAG, "sendAckToWear:onComplete, sent ACK to wear");
-
                     }
                 });
     }
@@ -797,7 +745,6 @@ public class MessageService extends WearableListenerService implements
         return null;
     }
 
-
     public void writeWearNodeId(String nodeId) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -817,7 +764,7 @@ public class MessageService extends WearableListenerService implements
     private void isWearServiceRunning() {
         setWearAround(false);
         Log.d(Constants.TAG, "MessageService:isWearServiceRunning");
-        if(!isWearNodeSaved())
+        if (!isWearNodeSaved())
             return;
         final String nodeID = readWearNodeId();
         messageClient.sendMessage(nodeID, Constants.MESSAGE_URI.toString(), Constants.IS_WEAR_RUNNING.getBytes()).
@@ -848,4 +795,6 @@ public class MessageService extends WearableListenerService implements
     public void setWearAround(boolean wearAround) {
         isWearAround = wearAround;
     }
+
+
 }

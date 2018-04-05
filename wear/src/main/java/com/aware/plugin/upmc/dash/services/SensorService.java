@@ -156,6 +156,8 @@ public class SensorService extends Service implements SensorEventListener {
 
     }
 
+
+
     public int peekStepCount(int count) {
         if(count == INIT_STEP_COUNT) {
             return 0;
@@ -233,7 +235,6 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         String action = intent.getAction();
         switch (action) {
             case Constants.ACTION_FIRST_RUN:
@@ -301,7 +302,6 @@ public class SensorService extends Service implements SensorEventListener {
                 Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
                 dismissIntervention();
                 break;
-
 
             case Constants.ACTION_NOTIF_SNOOZE_PHONE:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
