@@ -180,7 +180,7 @@ public final class Constants {
 
 
 
-    public static int INTERVENTION_TIMEOUT = 15000;
+    public static int INTERVENTION_TIMEOUT = 5 * 60 * 1000;
     public static int DURATION_AWAKE = 15000;
     public static int DURATION_VIBRATE = 3000;
 

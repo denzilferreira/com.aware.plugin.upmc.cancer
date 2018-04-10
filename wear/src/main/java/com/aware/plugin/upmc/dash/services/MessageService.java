@@ -489,10 +489,12 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageService:onMessageReceived");
         byte[] input = messageEvent.getData();
         String message = new String(input);
+        setPhoneAround(true);
         if (messageEvent.getPath().equals(Constants.MESSAGE_URI.toString())) {
             switch (message.split("\\s+")[0]) {
                 case Constants.ACK:
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:ACK");
+                    setPhoneAround(true);
                     break;
                 case Constants.INIT_TS:
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:INIT_TS");

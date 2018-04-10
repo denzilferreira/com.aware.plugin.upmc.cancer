@@ -48,23 +48,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class UPMC extends AppCompatActivity {
-    public boolean isWatchAround = false;
-    public boolean WEARLESS_DEBUG = true;
     public boolean STUDYLESS_DEBUG = true;
-    public BroadcastReceiver vicinityCheckBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(Constants.TAG, "UPMC:: vicinitycheck received from MessageService: " + intent.getIntExtra(Constants.VICINITY_RESULT_KEY, -1));
-            if (intent.hasExtra(Constants.VICINITY_RESULT_KEY)) {
-                if ((intent.getIntExtra(Constants.VICINITY_RESULT_KEY, -1) == Constants.WEAR_VICINITY_CHECK_FAILED)
-                        || (intent.getIntExtra(Constants.VICINITY_RESULT_KEY, -1) == Constants.WEAR_NOT_IN_RANGE)) {
-                    setWatchAround(false);
-                } else if (intent.getIntExtra(Constants.VICINITY_RESULT_KEY, -1) == Constants.WEAR_IN_RANGE) {
-                    setWatchAround(true);
-                }
-            }
-        }
-    };
     private boolean permissions_ok = true;
     private List<Integer> ratingList;
     private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
@@ -81,13 +65,7 @@ public class UPMC extends AppCompatActivity {
     private ProgressBar progressBar;
     private JoinedStudy joinedObserver = new JoinedStudy();
 
-    public boolean isWatchAround() {
-        return isWatchAround;
-    }
 
-    public void setWatchAround(boolean watchAround) {
-        isWatchAround = watchAround;
-    }
 
     @Override
     protected void onDestroy() {
@@ -229,12 +207,19 @@ public class UPMC extends AppCompatActivity {
                         nightHour = night_timer.getCurrentHour();
                         nightMinute = night_timer.getCurrentMinute();
                     }
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, ""+ morningHour);
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, ""+ morningMinute);
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
-                    Log.d(Constants.TAG, "UPMC: Sending Settings Changed Broadcast");
-                    sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                    final Context context = getApplicationContext();
+                    boolean morning_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) != morningHour;
+                    boolean morning_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)) != morningMinute;
+                    boolean night_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)) != nightHour;
+                    boolean night_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)) != nightMinute;
+                    if(morning_hour || morning_minute || night_hour || night_minute) {
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, ""+ morningHour);
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, ""+ morningMinute);
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
+                        Log.d(Constants.TAG, "UPMC:schedule Changed");
+                        sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                    }
                     finish();
                 }
             });
@@ -296,31 +281,10 @@ public class UPMC extends AppCompatActivity {
                 // When app is run for the first time
                 loadSchedule(true);
             } else {
-
                 if(!isMyServiceRunning(MessageService.class)) {
-                    sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                    sendMessageServiceAction(Constants.ACTION_REBOOT);
                 }
-                // check if watch is around. If you do not have a Android Wear device and you'd like debug, set WIRELESS_DEBUG to true
-                if (WEARLESS_DEBUG) {
-                    showSymptomSurvey();
-                } else {
-                    // When the app is opened later
-                    sendMessageServiceAction(Constants.ACTION_VICINITY);
-                    LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(vicinityCheckBroadcastReceiver, new IntentFilter(Constants.VICINITY_CHECK_INTENT_FILTER));
-                    setContentView(R.layout.activity_upmc_loading);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(vicinityCheckBroadcastReceiver);
-                            if (!isWatchAround()) {
-                                Toast.makeText(getApplicationContext(), "Wear is not in range. Please reinitiate setup", Toast.LENGTH_SHORT).show();
-                                finish();
-                            } else {
-                                showSymptomSurvey();
-                            }
-                        }
-                    }, 10000);
-                }
+                showSymptomSurvey();
             }
         }
     }
@@ -694,13 +658,27 @@ public class UPMC extends AppCompatActivity {
                 getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
                 int severity = checkSymptoms();
                 final Context context = getApplicationContext();
-                Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
-                sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                String oldSeverity = Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY);
+                if(oldSeverity.length()!=0) {
+                    if(Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY))!=severity) {
+                        Log.d(Constants.TAG, "UPMC:severity changed");
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
+                        sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                    }
+                }
+                else {
+                    Log.d(Constants.TAG, "UPMC:severity first entry");
+                    Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
+                    sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                }
                 Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
                 finish();
             }
         });
     }
+
+
+
 
 
 

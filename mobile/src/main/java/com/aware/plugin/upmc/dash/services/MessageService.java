@@ -218,7 +218,7 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageService: onCreate");
     }
 
-    public void wakeUpAndVibrate(int duration_awake, int duration_vibrate, int timeout) {
+    public void wakeUpAndVibrate(int duration_awake, int duration_vibrate) {
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
         wl.acquire(duration_awake);
@@ -233,12 +233,6 @@ public class MessageService extends WearableListenerService implements
                 vibrator.cancel();
             }
         }, duration_vibrate);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dismissIntervention();
-            }
-        }, timeout);
     }
 
     public void registerBluetoothReceiver() {
@@ -378,11 +372,11 @@ public class MessageService extends WearableListenerService implements
         boolean night_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)) != -1;
         boolean night_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)) != -1;
         boolean severity = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY)) != -1;
-        return (morning_hour && morning_minute & night_hour && night_minute && severity);
+        return (morning_hour && morning_minute && night_hour && night_minute && severity);
     }
 
     public void notifyUserWithAppraisal() {
-        wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
+        wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         Intent dashIntent = new Intent(this, MessageService.class).setAction(Constants.ACTION_APPRAISAL);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -394,6 +388,7 @@ public class MessageService extends WearableListenerService implements
                     .setContentTitle("UPMC Dash Monitor")
                     .setContentText(Constants.NOTIF_APPRAISAL)
                     .setGroup("Prompt")
+                    .setTimeoutAfter(Constants.INTERVENTION_TIMEOUT)
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent);
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
@@ -407,6 +402,7 @@ public class MessageService extends WearableListenerService implements
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent)
                     .setGroup("Prompt")
+                    .setTimeoutAfter(Constants.INTERVENTION_TIMEOUT)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setPriority(NotificationCompat.PRIORITY_MAX);
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorCompatNotifBuilder.build());
@@ -414,7 +410,7 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void notifyUserWithInactivity(boolean snoozeOption) {
-        wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE, Constants.INTERVENTION_TIMEOUT);
+        wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
         if (snoozeOption)
             dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
@@ -428,6 +424,7 @@ public class MessageService extends WearableListenerService implements
                     .setContentTitle("UPMC Dash Monitor")
                     .setContentText(Constants.NOTIF_INACTIVITY)
                     .setGroup("Prompt")
+                    .setTimeoutAfter(Constants.INTERVENTION_TIMEOUT)
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent);
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
@@ -440,6 +437,7 @@ public class MessageService extends WearableListenerService implements
                     .setContentIntent(dashPendingIntent)
                     .setGroup("Prompt")
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setTimeoutAfter(Constants.INTERVENTION_TIMEOUT)
                     .setPriority(NotificationCompat.PRIORITY_MAX);
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
         }
