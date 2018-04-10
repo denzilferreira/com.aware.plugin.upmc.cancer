@@ -669,7 +669,7 @@ public class UPMC extends AppCompatActivity {
                 else {
                     Log.d(Constants.TAG, "UPMC:severity first entry");
                     Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
-                    sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                    sendMessageServiceAction(Constants.ACTION_INIT);
                 }
                 Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
                 finish();
@@ -701,17 +701,17 @@ public class UPMC extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
-
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item.getTitle().toString().equalsIgnoreCase("Sync") && !Aware.isStudy(getApplicationContext())) {
-                item.setVisible(false);
-            }
-            if (item.getTitle().toString().equalsIgnoreCase("settings") && !Aware.isStudy(getApplicationContext())) {
-                item.setVisible(false);
+        if(!STUDYLESS_DEBUG) {
+            for (int i = 0; i < menu.size(); i++) {
+                MenuItem item = menu.getItem(i);
+                if (item.getTitle().toString().equalsIgnoreCase("Sync") && !Aware.isStudy(getApplicationContext())) {
+                    item.setVisible(false);
+                }
+                if (item.getTitle().toString().equalsIgnoreCase("settings") && !Aware.isStudy(getApplicationContext())) {
+                    item.setVisible(false);
+                }
             }
         }
-
         return true;
     }
 

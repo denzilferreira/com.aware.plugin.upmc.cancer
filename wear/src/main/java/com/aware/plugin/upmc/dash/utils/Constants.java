@@ -27,7 +27,6 @@ public final class Constants {
 
     // Messages from phone
     public static final String IS_WEAR_RUNNING = "is_wear_running";
-    public static final String INIT_TS = "init_time_and_symptoms"; // Morning timestamp plus
     public static final String ACK = "device_acknowledges";
 
 
@@ -41,6 +40,10 @@ public final class Constants {
 
     public static final String NOTIFY_INACTIVITY_SNOOZED = "user is inactive after snooze";
 
+
+    public static final String ACTION_SETTINGS_CHANGED = "action_settings_changed";
+
+    public static final String ACTION_INIT = "ACTION_INIT";
 
 
 

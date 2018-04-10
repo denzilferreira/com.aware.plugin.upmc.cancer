@@ -32,7 +32,6 @@ public final class Constants {
 
     // Messages to wear
     public static final String IS_WEAR_RUNNING = "is_wear_running";
-    public static final String INIT_TS = "init_time_and_symptoms"; // Morning timestamp plus
     public static final String ACK = "device_acknowledges";
 
     //replies from wear
@@ -92,9 +91,9 @@ public final class Constants {
     //MessageService Actions
     public static final String ACTION_SETUP_WEAR = "setup_wear";
 
-
-
     //
+
+    public static final String ACTION_INIT = "ACTION_INIT";
 
     public static final String ACTION_SNOOZE_ALARM = "ACTION_SNOOZE_ALARM";
 

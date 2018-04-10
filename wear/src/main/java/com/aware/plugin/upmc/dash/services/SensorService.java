@@ -30,6 +30,7 @@ import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.fileutils.FileManager;
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.activities.MainActivity;
+import com.aware.plugin.upmc.dash.utils.Preferences;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -42,8 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SensorService extends Service implements SensorEventListener {
     boolean FIRST_TIME = true;
-    boolean DEBUG_MODE = false;
-    int[] config;
+    boolean DEBUG_MODE = true;
     private boolean wasPrevTimePointTimeToNotify = false;
     private int alarmType;
     private SensorManager sensorManager;
@@ -60,50 +60,7 @@ public class SensorService extends Service implements SensorEventListener {
     private long timepoint;
     private Notification.Builder sessionStatusNotifBuilder;
     private NotificationCompat.Builder sessionStatusCompatNotifBuilder;
-    public BroadcastReceiver resetLocalBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra(Constants.TIME_RESET_KEY)) {
-                Log.d(Constants.TAG, "SensorService:: resetLocalBroadcastReceiver: time reset " + intent.getStringExtra(Constants.TIME_RESET_KEY));
-            }
-            else if(intent.hasExtra(Constants.SYMP_RESET_KEY)) {
-                Log.d(Constants.TAG, "SensorService:: resetLocalBroadcastReceiver: symp reset " + intent.getIntExtra(Constants.SYMP_RESET_KEY, -1));
-                if(getCurrentAlarmType() != intent.getIntExtra(Constants.SYMP_RESET_KEY, -1)) {
-                    if(intent.getIntExtra(Constants.SYMP_RESET_KEY, -1)==Constants.SYMPTOMS_0) {
-                        startAlarmOfType(Constants.SYMPTOMS_0);
-                        Log.d(Constants.TAG, "SensorService: Changing to 0");
-                    }
-                    else if(intent.getIntExtra(Constants.SYMP_RESET_KEY, -1)==Constants.SYMPTOMS_1) {
-                        startAlarmOfType(Constants.SYMPTOMS_1);
-                        Log.d(Constants.TAG, "SensorService: Changing to 1");
-                    }
-                }
-            }
-
-        }
-    };
     private boolean ALARM_MINUTE_FLAG = false;
-    public BroadcastReceiver alarmLocalBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(Constants.TAG, "alarmLocalBroadcastReceiver: " + intent.getIntExtra(Constants.ALARM_COMM, 0));
-            if (intent.getIntExtra(Constants.ALARM_COMM, -2) == 0) {
-                registerSensorListener();
-
-            } else if (intent.getIntExtra(Constants.ALARM_COMM, -2) == 1) {
-                registerSensorListener();
-
-            }
-            if (intent.getIntExtra(Constants.ALARM_COMM, -2) == 2) {
-                setALARM_MINUTE_FLAG(true);
-                registerSensorListener();
-            }
-            if(intent.getIntExtra(Constants.ALARM_COMM, -2) == 3) {
-                Log.d(Constants.TAG, "SensorManger:Feedback alarm received");
-                // this is void
-            }
-        }
-    };
 
     public int getMINUTE_STEP_COUNT() {
         return MINUTE_STEP_COUNT;
@@ -164,7 +121,6 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
 
-
     public int peakFeedbackStepCount(int count) {
         if(count == INIT_FEEDBACK_STEP_COUNT) {
             return 0;
@@ -197,8 +153,6 @@ public class SensorService extends Service implements SensorEventListener {
         if (sensorManager != null) {
             unregisterSensorListener();
         }
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(alarmLocalBroadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(resetLocalBroadcastReceiver);
         Log.d(Constants.TAG, "SensorService : onDestroy");
         stopForeground(true);
         cancelMinuteAlarm();
@@ -206,39 +160,22 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
 
-    public int[] parseConfig(Intent intent) {
-        if(intent.hasExtra(Constants.SENSOR_START_INTENT_KEY)) {
-            String extra = intent.getStringExtra(Constants.SENSOR_START_INTENT_KEY);
-            Log.d(Constants.TAG, "SensorService:parseConfig " + extra);
-            String[] extraArray = extra.split("\\s+");
-            int[] configArray = new int[5];
-            configArray[0] = Integer.parseInt(extraArray[0]);
-            configArray[1] = Integer.parseInt(extraArray[1]);
-            configArray[2] = Integer.parseInt(extraArray[2]);
-            configArray[3] = Integer.parseInt(extraArray[3]);
-            configArray[4] = Integer.parseInt(extraArray[4]);
-            return configArray;
-        }
-        return null;
+
+    public void warmUpSensor() {
+        final int alarmType = Preferences.getSymptomRating(getApplicationContext());
+        setCurrentAlarmType(alarmType);
+        Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + alarmType);
+        setFirstRun(true);
+        registerSensorListener();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setInterventionAlarm();
+                setMinuteAlarm();
+            }
+        }, 5000);
     }
 
-    public void storeConfig(int[] config) {
-        this.config = config;
-    }
-
-    public int[] getMorningTime() {
-        int[] morn_time = new int[2];
-        morn_time[0] = this.config[0];
-        morn_time[1] = this.config[1];
-        return morn_time;
-    }
-
-    public int[] getNightTime() {
-        int[] night_time = new int[2];
-        night_time[0] = this.config[2];
-        night_time[1] = this.config[3];
-        return night_time;
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -246,25 +183,10 @@ public class SensorService extends Service implements SensorEventListener {
         switch (action) {
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:" +  action);
-                int[] config = parseConfig(intent);
-                storeConfig(config);
-                final int type = config[4];
                 myAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                 showSessionStatus();
                 createInterventionNotifChannel();
-                LocalBroadcastManager.getInstance(this).registerReceiver(alarmLocalBroadcastReceiver, new IntentFilter(Constants.ALARM_LOCAL_RECEIVER_INTENT_FILTER));
-                LocalBroadcastManager.getInstance(this).registerReceiver(resetLocalBroadcastReceiver, new IntentFilter(Constants.RESET_BROADCAST_INTENT_FILTER));
-                Log.d(Constants.TAG, "SensorService:onStartCommand:Starting Alarm of type:" + type);
-                setFirstRun(true);
-                registerSensorListener();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        startAlarmOfType(type);
-                        startMinuteAlarm();
-
-                    }
-                }, 5000);
+                warmUpSensor();
                 break;
             case Constants.ACTION_MINUTE_ALARM:
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_MINUTE_ALARM");
@@ -319,6 +241,7 @@ public class SensorService extends Service implements SensorEventListener {
             case Constants.ACTION_FEEDBACK_ALARM:
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_FEEDBACK_ALARM (ends)");
                 cancelFeedbackAlarm();
+                break;
 
             default:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:UndefinedAction:" + action);
@@ -363,17 +286,21 @@ public class SensorService extends Service implements SensorEventListener {
 
     }
 
-    public void startAlarmOfType(int type) {
+    public void setInterventionAlarm() {
+        int rating = Preferences.getSymptomRating(getApplicationContext());
+        if(rating!=getCurrentAlarmType())
+            Log.d(Constants.TAG, "setInterventionAlarm: detected SR change, using: " + rating);
+        switch (rating) {
+            case Constants.SYMPTOMS_0:
+                setCurrentAlarmType(Constants.ALARM_TYPE_1HR);
+                break;
+            case Constants.SYMPTOMS_1:
+                setCurrentAlarmType(Constants.ALARM_TYPE_2HR);
+        }
         setTimepoint(System.currentTimeMillis());
-        if(type==Constants.SYMPTOMS_0) {
-            setCurrentAlarmType(Constants.SYMPTOMS_0);
-        }
-        else if(type==Constants.SYMPTOMS_1) {
-            setCurrentAlarmType(Constants.SYMPTOMS_1);
-        }
     }
 
-    public void startMinuteAlarm() {
+    public void setMinuteAlarm() {
         Intent alarmIntent_min = new Intent(this, SensorService.class).setAction(Constants.ACTION_MINUTE_ALARM);
         int interval = 60 * 1000;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -443,8 +370,8 @@ public class SensorService extends Service implements SensorEventListener {
 
 
     public boolean isTimeToNotify() {
-        int[] morn_time = getMorningTime();
-        int[] night_time = getNightTime();
+        int[] morn_time = Preferences.getMorningTime(getApplicationContext());
+        int[] night_time = Preferences.getNightTime(getApplicationContext());
         Calendar now = Calendar.getInstance();
         Calendar morningTime = Calendar.getInstance();
         Calendar nightTime = Calendar.getInstance();
@@ -452,11 +379,9 @@ public class SensorService extends Service implements SensorEventListener {
         morningTime.set(Calendar.MINUTE, morn_time[1]);
         nightTime.set(Calendar.HOUR_OF_DAY, night_time[0]);
         nightTime.set(Calendar.MINUTE, night_time[1]);
-
         Log.d(Constants.TAG, "isTimeNotify: Now: " + now.get(Calendar.HOUR_OF_DAY) + " " + now.get(Calendar.MINUTE));
         Log.d(Constants.TAG, "isTimeNotify: Morn: " + morningTime.get(Calendar.HOUR_OF_DAY) + " " + morningTime.get(Calendar.MINUTE));
         Log.d(Constants.TAG, "isTimeNotify: Night: " + nightTime.get(Calendar.HOUR_OF_DAY) + " " + nightTime.get(Calendar.MINUTE));
-
         int now_hour = now.get(Calendar.HOUR_OF_DAY);
         int now_minute = now.get(Calendar.MINUTE);
         int morn_hour = morningTime.get(Calendar.HOUR_OF_DAY);
@@ -695,7 +620,7 @@ public class SensorService extends Service implements SensorEventListener {
                 case Constants.ALARM_TYPE_1HR:
                     return (seconds >= 60);  //here
                 case Constants.ALARM_TYPE_2HR:
-                    return (seconds>=120);  //and here
+                    return (seconds>= 120);  //and here
                 default:
                     return false;
             }
@@ -705,12 +630,11 @@ public class SensorService extends Service implements SensorEventListener {
                 case Constants.ALARM_TYPE_1HR:
                     return (minutes >= 60);
                 case Constants.ALARM_TYPE_2HR:
-                    return (minutes>=120);
+                    return (minutes>= 120);
                 default:
                     return false;
             }
         }
-
     }
 
     public void sendMessageServiceAction(String action) {
@@ -747,7 +671,7 @@ public class SensorService extends Service implements SensorEventListener {
                     calculateMinuteStepCount(count);
                     initializeMinuteStepCount(count);
                     Log.d(Constants.TAG, "SensorService (min_steps taken)" + getMINUTE_STEP_COUNT());
-                    startMinuteAlarm();
+                    setMinuteAlarm();
                     boolean isTimeToNotify = isTimeToNotify();
                     if(isTimeToNotify!=wasPrevTimePointTimeToNotify())
                         notifySessionStatus(isTimeToNotify);
@@ -775,7 +699,7 @@ public class SensorService extends Service implements SensorEventListener {
                                 e.printStackTrace();
                             }
                             notifyUserIfThreshold(getStepCount());
-                            setTimepoint(System.currentTimeMillis());
+                            setInterventionAlarm();
                         } else if(peekStepCount(count) >= 50) {
                             calculateStepCount(count);
                             Log.d(Constants.TAG, "SensorService: reached threshold before interval " + getStepCount());
@@ -785,7 +709,7 @@ public class SensorService extends Service implements SensorEventListener {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            setTimepoint(System.currentTimeMillis());
+                            setInterventionAlarm();
                         }
                     }
 
@@ -793,6 +717,7 @@ public class SensorService extends Service implements SensorEventListener {
              }
         }
     }
+
 
     private void registerSensorListener() {
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);

@@ -22,10 +22,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.fileutils.FileManager;
 import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.utils.Preferences;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,7 +33,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
-import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
@@ -57,10 +56,6 @@ public class MessageService extends WearableListenerService implements
         MessageClient.OnMessageReceivedListener,
         CapabilityClient.OnCapabilityChangedListener,
         DataClient.OnDataChangedListener {
-
-    int[] morningTime = {-1, -1};
-    int[] nightTime = {-1, -1};
-    private boolean timeInvalid = false;
     private String STATE_WEAR;
     private Notification.Builder setupNotifBuilder;
     private NotificationCompat.Builder setupNotifCompatBuilder;
@@ -124,7 +119,13 @@ public class MessageService extends WearableListenerService implements
                 enableWifiIfOff();
                 registerConnectivityReceiver();
                 registerBluetoothReceiver();
-                checkAndStartSession();
+                if(checkAndStartSession()) {
+                    setWearState(Constants.STATE_LOGGING);
+                    sendStateToPhone();
+                }
+                else {
+                    setWearState(Constants.ACTION_INIT);
+                }
                 break;
             case Constants.ACTION_SCAN_PHONE:
                 Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_SCAN_PHONE");
@@ -158,23 +159,19 @@ public class MessageService extends WearableListenerService implements
         return i;
     }
 
-    public void checkAndStartSession() {
-        if (isPhoneNodeSaved() && isTimeInitialized() && isSympInitialized()) {
+    public boolean checkAndStartSession() {
+        if (isPhoneNodeSaved() && Preferences.isTimeAndRatingInitialized(getApplicationContext())) {
             if (!isMyServiceRunning(SensorService.class)) {
                 Log.d(Constants.TAG, "checkAndStartSession:TimeInitialization done, Starting SensorService: ");
-                Intent intent = new Intent(getApplicationContext(), SensorService.class).putExtra(Constants.SENSOR_START_INTENT_KEY, buildInitMessage()).setAction(Constants.ACTION_FIRST_RUN);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(intent);
-                } else {
-                    startService(intent);
-                }
-                setWearState(Constants.STATE_LOGGING);
+                sendSensorServiceAction(Constants.ACTION_FIRST_RUN);
             }
+            return true;
         } else {
-            Log.d(Constants.TAG, "checkAndStartSession:TimeInitialization failed, back to INIT: ");
-            setWearState(Constants.STATE_INIT);
+            Log.d(Constants.TAG, "checkAndStartSession:TimeInitialization failed");
+            return false;
         }
     }
+
 
     public boolean isPhoneAround() {
         return isPhoneAround;
@@ -184,19 +181,6 @@ public class MessageService extends WearableListenerService implements
         isPhoneAround = phoneAround;
     }
 
-    public void writeSymptomPref(int type) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(Constants.SYMPTOMS_PREFS, type);
-        editor.apply();
-    }
-
-    public int readSymptomsPref() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        int type = sharedPref.getInt(Constants.SYMPTOMS_PREFS, -1);
-        Log.d(Constants.TAG, "MessageService:readSymptomsPref: " + type);
-        return type;
-    }
 
     public void writePhoneNodeId(String nodeId) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -410,61 +394,6 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
-    public void writeTimePref(int morn_hour, int morn_minute, int night_hour, int night_minute) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(Constants.MORNING_HOUR, morn_hour);
-        editor.putInt(Constants.MORNING_MINUTE, morn_minute);
-        editor.putInt(Constants.NIGHT_HOUR, night_hour);
-        editor.putInt(Constants.NIGHT_MINUTE, night_minute);
-        editor.apply();
-        storeTime(morn_hour, morn_minute, night_hour, night_minute);
-    }
-
-    public void readTimePref() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        int morn_hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
-        int morn_minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
-        int night_hour = sharedPref.getInt(Constants.NIGHT_HOUR, -1);
-        int night_minute = sharedPref.getInt(Constants.NIGHT_MINUTE, -1);
-        Log.d(Constants.TAG, "MessageService:readTimePref:" + morn_hour + " " + morn_minute);
-        storeTime(morn_hour, morn_minute, night_hour, night_minute);
-    }
-
-    private void storeTime(int morn_hour, int morn_minute, int night_hour, int night_minute) {
-        this.morningTime[0] = morn_hour;
-        this.morningTime[1] = morn_minute;
-        this.nightTime[0] = night_hour;
-        this.nightTime[1] = night_minute;
-
-    }
-
-    public int[] getMorningTime() {
-        return this.morningTime;
-    }
-
-    public int[] getNightTime() {
-        return this.nightTime;
-    }
-
-    public boolean isTimeInitialized() {
-        readTimePref();
-        if ((this.morningTime[0] == -1) || (this.nightTime[0] == -1)) {
-            setTimeInitilaized(false);
-        } else {
-            setTimeInitilaized(true);
-        }
-        return this.timeInvalid;
-    }
-
-    public boolean isSympInitialized() {
-        return !(readSymptomsPref() == -1);
-    }
-
-    public void setTimeInitilaized(boolean isinit) {
-        this.timeInvalid = isinit;
-    }
-
     @Override
     public void onCapabilityChanged(@NonNull CapabilityInfo capabilityInfo) {
         Log.d(Constants.TAG, "MessageService: onCapability");
@@ -496,12 +425,11 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:ACK");
                     setPhoneAround(true);
                     break;
-                case Constants.INIT_TS:
+                case Constants.ACTION_INIT:
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:INIT_TS");
-                    parseAndStoreInitFromPhone(message);
-                    setWearState(Constants.STATE_LOGGING);
-                    sendStateToPhone();
+                    parseAndStorePref(message);
                     checkAndStartSession();
+                    sendStateToPhone();
                     break;
                 case Constants.IS_WEAR_RUNNING:
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:IS_WEAR_RUNNING");
@@ -511,6 +439,11 @@ public class MessageService extends WearableListenerService implements
                     Log.d(Constants.TAG, "MessageService:onMessageReceived:ACTION_SETUP_WEAR");
                     writePhoneNodeId(messageEvent.getSourceNodeId());
                     notifySetup(Constants.CONNECTED_PHONE);
+                    sendAckToPhone();
+                    break;
+                case Constants.ACTION_SETTINGS_CHANGED:
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:ACTION_SETTINGS_CHANGED");
+                    parseAndStorePref(message);
                     sendAckToPhone();
                     break;
                 case Constants.ACTION_NOTIF_OK:
@@ -525,34 +458,19 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
-    public void parseAndStoreInitFromPhone(String message) {
+
+    public void parseAndStorePref(String message) {
         String[] arr = message.split("\\s+");
         int morn_hour = Integer.parseInt(arr[1]);
         int morn_minute = Integer.parseInt(arr[2]);
         int night_hour = Integer.parseInt(arr[3]);
         int nigh_minute = Integer.parseInt(arr[4]);
         int type = Integer.parseInt(arr[5]);
-        writeTimePref(morn_hour, morn_minute, night_hour, nigh_minute);
-        writeSymptomPref(type);
+        Preferences.writeTime(getApplicationContext(), morn_hour, morn_minute, night_hour, nigh_minute);
+        Preferences.writeSymptomRating(getApplicationContext(),type);
         Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + morn_hour + " " + morn_minute + " " + night_hour + " " + nigh_minute + " " + type);
     }
 
-    private String buildInitMessage() {
-        StringBuilder messageBuilder = new StringBuilder();
-        int[] morningTime = getMorningTime();
-        int[] nightTime = getNightTime();
-        int symptom = readSymptomsPref();
-        messageBuilder.append(morningTime[0]);
-        messageBuilder.append(" ");
-        messageBuilder.append(morningTime[1]);
-        messageBuilder.append(" ");
-        messageBuilder.append(nightTime[0]);
-        messageBuilder.append(" ");
-        messageBuilder.append(nightTime[1]);
-        messageBuilder.append(" ");
-        messageBuilder.append(symptom);
-        return messageBuilder.toString();
-    }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);

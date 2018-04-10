@@ -161,6 +161,16 @@ public class MessageService extends WearableListenerService implements
                 createInterventionNotifChannel();
                 if (isWearNodeSaved())
                     scanWear();
+
+            case Constants.ACTION_INIT:
+                Log.d(Constants.TAG, "MessageService: onStartCommand : ACTION_INIT");
+                if(isWearInitializable()) {
+                    initializeWearSettings();
+                }
+                else {
+                    Log.d(Constants.TAG, "MessageService: not enough information to start logging");
+                }
+                break;
             case Constants.ACTION_SETUP_WEAR:
                 Log.d(Constants.TAG, "MessageService: onStartCommand : ACTION_SETUP_WEAR");
                 startActivity(new Intent(this, SetupLoadingActvity.class));
@@ -180,11 +190,7 @@ public class MessageService extends WearableListenerService implements
                 break;
             case Constants.ACTION_SETTINGS_CHANGED:
                 Log.d(Constants.TAG, "MessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
-                if (isWearInitializable()) {
-                    initializeWear();
-                } else {
-                    Log.d(Constants.TAG, "MessageService: not enough information to start logging");
-                }
+                changeWearSettings();
                 break;
             case Constants.ACTION_SNOOZE_ALARM:
                 Log.d(Constants.TAG, "MessageService:onStartCommand : ACTION_SNOOZE_ALARM");
@@ -443,9 +449,27 @@ public class MessageService extends WearableListenerService implements
         }
     }
 
-    public void initializeWear() {
+    public void initializeWearSettings() {
         StringBuilder initBuilder = new StringBuilder();
-        initBuilder.append(Constants.INIT_TS);
+        initBuilder.append(Constants.ACTION_INIT);
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY));
+        Log.d(Constants.TAG, "MessageService:initializeWear: " + initBuilder.toString());
+        sendMessageToWear(initBuilder.toString());
+    }
+
+
+    public void changeWearSettings () {
+        StringBuilder initBuilder = new StringBuilder();
+        initBuilder.append(Constants.ACTION_SETTINGS_CHANGED);
         initBuilder.append(" ");
         initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
         initBuilder.append(" ");
