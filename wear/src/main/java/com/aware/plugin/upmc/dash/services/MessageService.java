@@ -130,6 +130,8 @@ public class MessageService extends WearableListenerService implements
             case Constants.ACTION_SCAN_PHONE:
                 Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_SCAN_PHONE");
                 scanPhoneNode();
+                if(isPhoneAround())
+                    sendMessageToPhone(Constants.ACTION_SYNC_SETTINGS);
                 break;
             case Constants.ACTION_SYNC_DATA:
                 Log.d(Constants.TAG, "MessageService:onStartCommand ACTION_SYNC_DATA");
@@ -152,6 +154,17 @@ public class MessageService extends WearableListenerService implements
             case Constants.ACTION_NOTIF_SNOOZE:
                 Log.d(Constants.TAG, "MessageService:onStartCommand " + action);
                 sendMessageToPhone(action);
+                break;
+            case Constants.ACTION_STOP_SELF:
+                Log.d(Constants.TAG, "MessageService:onStartCommand: ACTION_STOP_SELF");
+                unregisterReceiver(mBluetootLocalReceiver);
+                unregisterReceiver(mConnectivityReceiver);
+                messageClient.removeListener(this);
+                capabilityClient.removeListener(this);
+                dataClient.removeListener(this);
+                capabilityClient.removeLocalCapability(Constants.CAPABILITY_DEMO_WEAR_APP);
+                stopForeground(true);
+                stopSelf();
                 break;
             default:
                 return i;
@@ -453,10 +466,37 @@ public class MessageService extends WearableListenerService implements
                     sendAckToPhone();
                     sendSensorServiceAction(message + "_PHONE");
                     break;
+                case Constants.ACTION_SYNC_SETTINGS:
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:ACTION_SYNC_SETTINGS");
+                    sendAckToPhone();
+                    parseAndStorePrefIfNeeded(message);
+                    break;
             }
 
         }
     }
+
+    public void parseAndStorePrefIfNeeded(String message) {
+        String[] arr = message.split("\\s+");
+        int[] newConfig = new int[5];
+        newConfig[0] = Integer.parseInt(arr[1]);
+        newConfig[1] = Integer.parseInt(arr[2]);
+        newConfig[2] = Integer.parseInt(arr[3]);
+        newConfig[3] = Integer.parseInt(arr[4]);
+        newConfig[4] = Integer.parseInt(arr[5]);
+        int[] oldConfig = Preferences.readIntoArray(getApplicationContext());
+        for (int i =0; i<5; i++) {
+            if(oldConfig[i]!=newConfig[i]) {
+                parseAndStorePref(message);
+                Log.d(Constants.TAG, "MessageReceived:parseAndStorePrefIfNeeded:change detected");
+                return;
+            }
+        }
+        Log.d(Constants.TAG, "MessageReceived:parseAndStorePrefIfNeeded:no change");
+    }
+
+
+
 
 
     public void parseAndStorePref(String message) {
@@ -468,7 +508,7 @@ public class MessageService extends WearableListenerService implements
         int type = Integer.parseInt(arr[5]);
         Preferences.writeTime(getApplicationContext(), morn_hour, morn_minute, night_hour, nigh_minute);
         Preferences.writeSymptomRating(getApplicationContext(),type);
-        Log.d(Constants.TAG, "onMessageReceived:INIT_TS " + morn_hour + " " + morn_minute + " " + night_hour + " " + nigh_minute + " " + type);
+        Log.d(Constants.TAG, "MessageService:parseAndStorePref:" + morn_hour + " " + morn_minute + " " + night_hour + " " + nigh_minute + " " + type);
     }
 
 
@@ -517,10 +557,14 @@ public class MessageService extends WearableListenerService implements
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (isPhoneAround())
+                if (isPhoneAround()) {
                     Log.d(Constants.TAG, "sendMessageToPhone: ACK received, phone is around");
-                else
+                    notifySetup(Constants.CONNECTED_PHONE);
+                }
+                else {
                     Log.d(Constants.TAG, "sendMessageToPhone: ACK not received, phone is not around");
+                    notifySetup(Constants.FAILED_PHONE);
+                }
             }
         }, 5000);
 

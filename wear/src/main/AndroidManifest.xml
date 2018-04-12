@@ -5,6 +5,7 @@
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-feature android:name="android.hardware.sensor.stepcounter" />
     <uses-feature android:name="android.hardware.sensor.stepdetector" />
+
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -14,8 +15,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
 
     <application
         android:allowBackup="true"
@@ -42,8 +44,8 @@
 
 
         <activity
-            android:name=".activities.DemoMode"
-            android:label="@string/title_activity_demo_mode">
+            android:name=".activities.InabilityResponseForm"
+            android:label="@string/title_activity_inability_response_form">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -54,9 +56,21 @@
 
 
 
+
+
+        <activity
+            android:name=".activities.DemoMode"
+            android:label="@string/title_activity_demo_mode">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <service
-        android:name=".services.MessageService"
-        android:exported="false">
+            android:name=".services.MessageService"
+            android:exported="false">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" /> -->
@@ -67,10 +81,9 @@
             <!-- <data android:scheme="wear" android:host="*"/> -->
             <!-- </intent-filter> -->
         </service>
-
         <service
             android:name=".services.DemoMessageService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <receiver
             android:name=".receivers.BootReceiver"
@@ -82,6 +95,13 @@
         </receiver>
 
         <service android:name=".services.SensorService" />
+
+        <receiver android:name=".receivers.ShutdownReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.QUICKBOOT_POWEROFF" />
+            </intent-filter>
+        </receiver>
         <!--
                Set to true if your app is Standalone, that is, it does not require the handheld
                app to run.
@@ -89,9 +109,6 @@
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
-
-
-
 
         <activity
             android:name=".activities.NotificationResponse"

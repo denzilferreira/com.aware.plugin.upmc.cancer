@@ -30,6 +30,10 @@ public final class Constants {
     public static final String ACK = "device_acknowledges";
 
 
+    public static final String ACTION_STOP_SELF = "ACTION_STOP_SELF";
+
+
+
 
 
 
@@ -44,6 +48,9 @@ public final class Constants {
     public static final String ACTION_SETTINGS_CHANGED = "action_settings_changed";
 
     public static final String ACTION_INIT = "ACTION_INIT";
+
+
+    public static final String ACTION_SYNC_SETTINGS = "ACTION_SYNC_SETTINGS";
 
 
 

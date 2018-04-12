@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.aware.plugin.upmc.dash.utils.Constants;
@@ -18,7 +19,13 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(Constants.TAG,"BootReceived");
         if(!isMyServiceRunning(MessageService.class, context)) {
-            context.startService(new Intent(context, MessageService.class).setAction(Constants.ACTION_REBOOT));
+            Intent msgServiceIntent = new Intent(context, MessageService.class).setAction(Constants.ACTION_REBOOT);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(msgServiceIntent);
+            }
+            else {
+                context.startService(msgServiceIntent);
+            }
         }
 
     }

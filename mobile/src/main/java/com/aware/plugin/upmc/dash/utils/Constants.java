@@ -28,6 +28,8 @@ public final class Constants {
     // intent filters for Broadcast Receivers
 
     public static final String NOTIFICATION_MESSAGE_INTENT_FILTER = "upmc_notif_intent_filter";
+    public static final String ACTION_SYNC_SETTINGS = "ACTION_SYNC_SETTINGS";
+
 
 
     // Messages to wear
@@ -61,6 +63,9 @@ public final class Constants {
 
 
     public static final String ACTION_SHOW_INABILITY = "action_show_inability";
+
+
+    public static final String ACTION_STOP_SELF = "ACTION_STOP_SELF";
 
 
 

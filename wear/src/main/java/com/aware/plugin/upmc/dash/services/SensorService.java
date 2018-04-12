@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SensorService extends Service implements SensorEventListener {
     boolean FIRST_TIME = true;
-    boolean DEBUG_MODE = true;
+    boolean DEBUG_MODE = false;
     private boolean wasPrevTimePointTimeToNotify = false;
     private int alarmType;
     private SensorManager sensorManager;
@@ -243,6 +243,17 @@ public class SensorService extends Service implements SensorEventListener {
                 cancelFeedbackAlarm();
                 break;
 
+            case Constants.ACTION_STOP_SELF:
+                Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_STOP_SELF");
+                if (sensorManager != null) {
+                    unregisterSensorListener();
+                }
+                stopForeground(true);
+                cancelMinuteAlarm();
+                stopSelf();
+                break;
+
+
             default:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:UndefinedAction:" + action);
 
@@ -317,17 +328,19 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     public void cancelMinuteAlarm() {
-        Intent alarmIntent_min = new Intent(this, SensorService.class).setAction(Constants.ACTION_MINUTE_ALARM);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            alarmPendingIntent_min = PendingIntent.getForegroundService(this, 668, alarmIntent_min, 0);
+        if(myAlarmManager!=null &&alarmPendingIntent_min!=null) {
+            Intent alarmIntent_min = new Intent(this, SensorService.class).setAction(Constants.ACTION_MINUTE_ALARM);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                alarmPendingIntent_min = PendingIntent.getForegroundService(this, 668, alarmIntent_min, 0);
 
-        }
-        else {
-            alarmPendingIntent_min = PendingIntent.getService(this, 668, alarmIntent_min, 0);
+            }
+            else {
+                alarmPendingIntent_min = PendingIntent.getService(this, 668, alarmIntent_min, 0);
 
+            }
+            myAlarmManager.cancel(alarmPendingIntent_min);
+            setALARM_MINUTE_FLAG(false);
         }
-        myAlarmManager.cancel(alarmPendingIntent_min);
-        setALARM_MINUTE_FLAG(false);
     }
 
     public void startFeedbackAlarm() {

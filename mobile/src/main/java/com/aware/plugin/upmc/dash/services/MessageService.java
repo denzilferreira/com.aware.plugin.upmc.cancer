@@ -161,7 +161,6 @@ public class MessageService extends WearableListenerService implements
                 createInterventionNotifChannel();
                 if (isWearNodeSaved())
                     scanWear();
-
             case Constants.ACTION_INIT:
                 Log.d(Constants.TAG, "MessageService: onStartCommand : ACTION_INIT");
                 if(isWearInitializable()) {
@@ -203,6 +202,16 @@ public class MessageService extends WearableListenerService implements
                 sendMessageToWear(intentAction);
                 Log.d(Constants.TAG, "MessageService:" + intentAction);
                 dismissIntervention();
+                break;
+            case Constants.ACTION_STOP_SELF:
+                Log.d(Constants.TAG, "MessageService:onStartCommand: ACTION_STOP_SELF");
+                stopForeground(true);
+                unregisterReceiver(mBluetootLocalReceiver);
+                unregisterReceiver(mConnectivityReceiver);
+                messageClient.removeListener(this);
+                capabilityClient.removeListener(this);
+                capabilityClient.removeLocalCapability(Constants.CAPABILITY_PHONE_APP);
+                dataClient.removeListener(this);
                 break;
             default:
                 return i;
@@ -362,6 +371,10 @@ public class MessageService extends WearableListenerService implements
                     sendAckToWear();
                     notifyUserWithInactivity(false);
                     break;
+                case Constants.ACTION_SYNC_SETTINGS:
+                    sendAckToWear();
+                    syncWearSettings();
+                    break;
             }
         }
     }
@@ -480,7 +493,25 @@ public class MessageService extends WearableListenerService implements
         initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
         initBuilder.append(" ");
         initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY));
-        Log.d(Constants.TAG, "MessageService:initializeWear: " + initBuilder.toString());
+        Log.d(Constants.TAG, "MessageService:changeWearSettings: " + initBuilder.toString());
+        sendMessageToWear(initBuilder.toString());
+    }
+
+
+    public void syncWearSettings () {
+        StringBuilder initBuilder = new StringBuilder();
+        initBuilder.append(Constants.ACTION_SYNC_SETTINGS);
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        initBuilder.append(" ");
+        initBuilder.append(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY));
+        Log.d(Constants.TAG, "MessageService:syncWearSettings: " + initBuilder.toString());
         sendMessageToWear(initBuilder.toString());
     }
 
@@ -668,6 +699,7 @@ public class MessageService extends WearableListenerService implements
             if (isWearNodeIdPresent(capabilityInfo.getNodes())) {
                 Log.d(Constants.TAG, "onCapabilityChanged: wear is connected");
                 notifySetup(Constants.CONNECTED_WEAR);
+                syncWearSettings();
             }
             else {
                 Log.d(Constants.TAG, "onCapabilityChanged: wear is disconnected");

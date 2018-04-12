@@ -6,18 +6,20 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class Preferences {
-    public static int[] readTime(Context context) {
+    public static int[] readIntoArray(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         int morn_hour = sharedPref.getInt(Constants.MORNING_HOUR, -1);
         int morn_minute = sharedPref.getInt(Constants.MORNING_MINUTE, -1);
         int night_hour = sharedPref.getInt(Constants.NIGHT_HOUR, -1);
         int night_minute = sharedPref.getInt(Constants.NIGHT_MINUTE, -1);
-        int[] timePrefs = new int[4];
+        int rating = sharedPref.getInt(Constants.SYMPTOMS_PREFS, -1);
+        int[] timePrefs = new int[5];
         timePrefs[0] = morn_hour;
         timePrefs[1] = morn_minute;
         timePrefs[2] = night_hour;
         timePrefs[3] = night_minute;
-        Log.d(Constants.TAG, "Preferences:readTimePref:" + morn_hour + " " + morn_minute + " " + night_hour + " " + night_minute);
+        timePrefs[4] = rating;
+        Log.d(Constants.TAG, "Preferences:readTimePref:" + morn_hour + " " + morn_minute + " " + night_hour + " " + night_minute + " " + rating);
         return timePrefs;
     }
 

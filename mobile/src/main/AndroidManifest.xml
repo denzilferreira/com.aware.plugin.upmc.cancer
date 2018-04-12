@@ -25,8 +25,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <permission
         android:name="com.aware.READ_CONTEXT_DATA"
@@ -62,8 +62,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".activities.DemoMode"
             android:label="@string/title_activity_demo_mode"
@@ -74,8 +72,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".settings.Settings"
             android:exported="true"
@@ -116,8 +112,7 @@
             android:exported="false" />
         <service
             android:name=".services.MessageService"
-            android:exported="false">
-        </service>
+            android:exported="false"/>
 
         <receiver
             android:name=".receivers.BootReceiver"
@@ -149,6 +144,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".receivers.ShutdownReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.QUICKBOOT_POWEROFF" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".activities.DemoESM"
             android:label="@string/title_activity_demo_esm"
@@ -174,7 +176,6 @@
             android:name=".activities.NotificationResponseActivity"
             android:label="@string/title_activity_notification_response"
             android:theme="@style/Theme.AppCompat.Dialog.Alert" />
-
     </application>
 
 </manifest>
