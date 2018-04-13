@@ -57,20 +57,6 @@ public class MainActivity extends WearableActivity{
         Manifest.permission.CHANGE_WIFI_STATE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE};
         requestPermissions(REQUIRED_PERMISSIONS, 1);
-        if(!isMyServiceRunning(MessageService.class)) {
-            Intent messageService = new Intent(this, MessageService.class);
-            messageService.setAction(Constants.ACTION_FIRST_RUN);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(messageService);
-                Log.d(Constants.TAG, "MainActivity: starting foreground message service");
-
-            }
-            else {
-                startService(messageService);
-                Log.d(Constants.TAG, "MainActivity: starting message service");
-
-            }
-        }
     }
 
     @Override
@@ -80,6 +66,20 @@ public class MainActivity extends WearableActivity{
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(!isMyServiceRunning(MessageService.class)) {
+                        Intent messageService = new Intent(this, MessageService.class);
+                        messageService.setAction(Constants.ACTION_FIRST_RUN);
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(messageService);
+                            Log.d(Constants.TAG, "MainActivity: starting foreground message service");
+
+                        }
+                        else {
+                            startService(messageService);
+                            Log.d(Constants.TAG, "MainActivity: starting message service");
+
+                        }
+                    }
                     finish();
 
                     // permission was granted, yay! Do the

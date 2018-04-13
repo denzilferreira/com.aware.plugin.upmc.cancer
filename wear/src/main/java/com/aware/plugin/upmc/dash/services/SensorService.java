@@ -252,11 +252,8 @@ public class SensorService extends Service implements SensorEventListener {
                 cancelMinuteAlarm();
                 stopSelf();
                 break;
-
-
             default:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:UndefinedAction:" + action);
-
 
         }
 
@@ -344,6 +341,8 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     public void startFeedbackAlarm() {
+        if(myAlarmManager==null)
+            return;
         if(isFeedbackEnabled())
             cancelFeedbackAlarm();
         Log.d(Constants.TAG, "StartFeedbackAlarmCalled");
@@ -374,7 +373,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void cancelFeedbackAlarm() {
         Log.d(Constants.TAG, "SensorService: cancelFeedbackAlarm called");
-        if(isFeedbackEnabled()) {
+        if(isFeedbackEnabled() && myAlarmManager!=null) {
             myAlarmManager.cancel(alarmPendingIntent_feedback);
             setFeedbackEnabled(false);
         }
@@ -580,7 +579,7 @@ public class SensorService extends Service implements SensorEventListener {
     public void notifyFeedback(int sc_count) {
         wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         cancelFeedbackAlarm();
-        Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_SNOOZE);
+        Intent contentIntent = new Intent(this, NotificationResponse.class);
         PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

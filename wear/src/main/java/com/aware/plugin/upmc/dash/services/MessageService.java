@@ -205,8 +205,13 @@ public class MessageService extends WearableListenerService implements
 
     public boolean enableBluetoothIfOff() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        boolean isEnabled = bluetoothAdapter.isEnabled();
-        return isEnabled || bluetoothAdapter.enable();
+        if(bluetoothAdapter!=null) {
+            boolean isEnabled = bluetoothAdapter.isEnabled();
+            return isEnabled || bluetoothAdapter.enable();
+        }
+        else {
+            return false;
+        }
     }
 
     public void registerBluetoothReceiver() {
@@ -403,7 +408,7 @@ public class MessageService extends WearableListenerService implements
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentInfo("info")
                     .setContentIntent(dashPendingIntent);
-            startForeground(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifBuilder.build());
+            startForeground(Constants.MESSAGE_SERVICE_NOTIFICATION_ID, setupNotifCompatBuilder.build());
         }
     }
 

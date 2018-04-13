@@ -161,6 +161,7 @@ public class MessageService extends WearableListenerService implements
                 createInterventionNotifChannel();
                 if (isWearNodeSaved())
                     scanWear();
+                notifyUserWithInactivity(true);
             case Constants.ACTION_INIT:
                 Log.d(Constants.TAG, "MessageService: onStartCommand : ACTION_INIT");
                 if(isWearInitializable()) {

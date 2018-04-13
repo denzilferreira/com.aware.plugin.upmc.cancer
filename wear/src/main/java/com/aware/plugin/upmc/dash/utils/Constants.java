@@ -208,9 +208,10 @@ public final class Constants {
 
     // intervention timeout
 
-    public static int INTERVENTION_TIMEOUT = 15000;
+    public static int INTERVENTION_TIMEOUT =  5 * 60 * 1000;
     public static int DURATION_AWAKE = 15000;
     public static int DURATION_VIBRATE = 3000;
+    public static final String ACTION_DEBUG_NOIFS = "ACTION_DEBUG_NOIFS";
 
     public static Uri MESSAGE_URI = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
 
