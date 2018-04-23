@@ -48,7 +48,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class UPMC extends AppCompatActivity {
-    public boolean STUDYLESS_DEBUG = true;
+    public boolean STUDYLESS_DEBUG = false;
     private boolean permissions_ok = true;
     private List<Integer> ratingList;
     private BroadcastReceiver mNotifBroadcastReceiver = new BroadcastReceiver() {
@@ -64,6 +64,7 @@ public class UPMC extends AppCompatActivity {
     private TimePicker night_timer;
     private ProgressBar progressBar;
     private JoinedStudy joinedObserver = new JoinedStudy();
+    private boolean isRegistered = false;
 
 
 
@@ -72,6 +73,8 @@ public class UPMC extends AppCompatActivity {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(mNotifBroadcastReceiver);
+        if(isRegistered)
+            unregisterReceiver(joinedObserver);
     }
 
     @Override
@@ -110,8 +113,7 @@ public class UPMC extends AppCompatActivity {
         if (firstRun) {
             saveSchedule.setText("Join Study");
             IntentFilter filter = new IntentFilter(Aware.ACTION_JOINED_STUDY);
-            if(!STUDYLESS_DEBUG)
-                registerReceiver(joinedObserver, filter);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 morning_timer.setHour(9);
                 morning_timer.setMinute(0);
@@ -153,16 +155,17 @@ public class UPMC extends AppCompatActivity {
                     if(!STUDYLESS_DEBUG) {
                         if (!Aware.isStudy(getApplicationContext())) {
                             //UPMC Dash
-                             Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+                            isRegistered = true;
+                            Log.d(Constants.TAG, "Joining Study");
+                            Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
                             //Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
                         }
+                        sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
                     }
                     else {
                         sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
                     }
 
-                    // alarm
-                    finish();
 
                 }
             });
@@ -279,6 +282,11 @@ public class UPMC extends AppCompatActivity {
             //Aware.startESM(this);
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
                 // When app is run for the first time
+                if(!STUDYLESS_DEBUG) {
+                    Log.d(Constants.TAG, "onResume: Registering ACTION_JOINED_STUDY observer");
+                    IntentFilter filter = new IntentFilter(Aware.ACTION_JOINED_STUDY);
+                    registerReceiver(joinedObserver, filter);
+                }
                 loadSchedule(true);
             } else {
                 if(!isMyServiceRunning(MessageService.class)) {
@@ -760,6 +768,7 @@ public class UPMC extends AppCompatActivity {
     private class JoinedStudy extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.TAG, "JoinedStudy:onReceive:");
             if (intent.getAction().equalsIgnoreCase(Aware.ACTION_JOINED_STUDY)) {
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true); //enable logcat debug messages
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
@@ -796,6 +805,7 @@ public class UPMC extends AppCompatActivity {
                 Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
 
                 unregisterReceiver(joinedObserver);
+                isRegistered = false;
                 Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
                 Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));

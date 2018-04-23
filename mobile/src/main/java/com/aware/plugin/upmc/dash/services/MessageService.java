@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -27,8 +28,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.aware.Aware;
+import com.aware.Aware_Preferences;
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
+import com.aware.plugin.upmc.dash.activities.Provider;
 import com.aware.plugin.upmc.dash.activities.SetupLoadingActvity;
 import com.aware.plugin.upmc.dash.activities.UPMC;
 import com.aware.plugin.upmc.dash.fileutils.SyncFilesParams;
@@ -149,6 +152,7 @@ public class MessageService extends WearableListenerService implements
                 showSurveyNotif();
                 showSetupNotif();
                 createInterventionNotifChannel();
+                syncSCWithServer();
                 break;
             case Constants.ACTION_REBOOT:
                 Log.d(Constants.TAG, "MessageService: onStartCommand : ACTION_REBOOT");
@@ -218,6 +222,16 @@ public class MessageService extends WearableListenerService implements
                 return i;
         }
         return i;
+    }
+
+
+    public void syncSCWithServer(){
+        ContentValues step_count = new ContentValues();
+        step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        step_count.put(Provider.Stepcount_Data.TIMESTAMP, System.currentTimeMillis());
+        step_count.put(Provider.Stepcount_Data.STEP_COUNT, 15);
+        step_count.put(Provider.Stepcount_Data.ALARM_TYPE, 0);
+        getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
     }
 
     @Override
@@ -386,7 +400,10 @@ public class MessageService extends WearableListenerService implements
     }
 
     public boolean isWearInitializable() {
+
         final Context context = getApplicationContext();
+        if(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY).length()==0)
+            return false;
         boolean morning_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) != -1;
         boolean morning_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)) != -1;
         boolean night_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)) != -1;

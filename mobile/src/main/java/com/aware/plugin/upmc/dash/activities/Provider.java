@@ -82,10 +82,10 @@ public class Provider extends ContentProvider {
 
     public static final class Stepcount_Data implements AWAREColumns {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_stepcount");
-        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
-        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
-        static final String STEP_COUNT = "stepcount";
-        static final String ALARM_TYPE = "alarmtype";
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
+        public static final String STEP_COUNT = "stepcount";
+        public static final String ALARM_TYPE = "alarmtype";
     }
 
     public static final String[] TABLES_FIELDS = {

@@ -123,6 +123,10 @@
             </intent-filter>
         </receiver>
 
+
+
+
+
         <provider
             android:name=".activities.Provider"
             android:authorities="${applicationId}.provider.survey"

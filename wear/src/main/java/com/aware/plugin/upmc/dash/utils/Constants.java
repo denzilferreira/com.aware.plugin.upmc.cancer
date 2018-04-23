@@ -216,6 +216,9 @@ public final class Constants {
     public static Uri MESSAGE_URI = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
 
 
+    public static String ACTION_SHOW_ONLY_OK = "ACTION_SHOW_ONLY_OK";
+
+
 
 
 

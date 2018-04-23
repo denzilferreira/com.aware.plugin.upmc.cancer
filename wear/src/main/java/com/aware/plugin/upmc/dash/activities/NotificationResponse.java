@@ -26,6 +26,9 @@ public class NotificationResponse extends WearableActivity {
             if (getIntent().getAction().equals(Constants.ACTION_SHOW_SNOOZE)) {
                 findViewById(R.id.snooze_response).setVisibility(View.VISIBLE);
             }
+            else{
+                findViewById(R.id.no_response).setVisibility(View.GONE);
+            }
         }
     }
 

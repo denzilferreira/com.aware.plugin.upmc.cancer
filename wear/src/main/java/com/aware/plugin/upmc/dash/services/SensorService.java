@@ -187,6 +187,8 @@ public class SensorService extends Service implements SensorEventListener {
                 showSessionStatus();
                 createInterventionNotifChannel();
                 warmUpSensor();
+                notifyInactive(50, true);
+                sendMessageServiceAction(Constants.ACTION_NOTIFY_INACTIVITY);
                 break;
             case Constants.ACTION_MINUTE_ALARM:
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_MINUTE_ALARM");
@@ -579,7 +581,7 @@ public class SensorService extends Service implements SensorEventListener {
     public void notifyFeedback(int sc_count) {
         wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         cancelFeedbackAlarm();
-        Intent contentIntent = new Intent(this, NotificationResponse.class);
+        Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_ONLY_OK);
         PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -699,6 +701,11 @@ public class SensorService extends Service implements SensorEventListener {
                             Log.d(Constants.TAG, "SensorService: feedback successful: " + peakFeedbackStepCount(count));
                             sendMessageServiceAction(Constants.ACTION_NOTIFY_GREAT_JOB);
                             notifyFeedback(peakFeedbackStepCount(count));
+                            try {
+                                FileManager.writeToFile(peakFeedbackStepCount(count), 3);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                         else if(isEndOfInterval()) {
                             Log.d(Constants.TAG, "SensorService: End of interval: " + getCurrentAlarmType());

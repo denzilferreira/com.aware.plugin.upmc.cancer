@@ -34,11 +34,11 @@ public class FileManager {
         Log.d(Constants.TAG, "FileManager:createFile");
         PrintWriter writer = new PrintWriter(file);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Time");
+        stringBuilder.append("timestamp");
         stringBuilder.append("\t");
-        stringBuilder.append("Count");
+        stringBuilder.append("step_count");
         stringBuilder.append("\t");
-        stringBuilder.append("alarm");
+        stringBuilder.append("interval_type");
         writer.println(stringBuilder.toString());
         writer.flush();
         writer.close();

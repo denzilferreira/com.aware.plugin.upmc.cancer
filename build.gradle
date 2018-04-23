@@ -7,7 +7,7 @@ project.ext {
     version_code = (System.getenv("aware_revision") as Integer ?: 700)
     version_readable = "4.0." + version_code + "." + (System.getenv("aware_label") as String ?: "selfie")
     compile_sdk = (System.getenv("compile_sdk") as Integer ?: 26)
-    mobile_target_sdk = (System.getenv("mobile_target_sdk") as Integer ?: 27)
+    mobile_target_sdk = (System.getenv("mobile_target_sdk") as Integer ?: 25)
     wear_target_sdk = (System.getenv("wear_target_sdk") as Integer ?: 26)
     mobile_min_sdk = (System.getenv("mobile_min_sdk") as Integer ?: 19) //Android 4.0+
     wear_min_sdk = (System.getenv("wear_min_sdk") as Integer ?: 24)
@@ -27,7 +27,7 @@ buildscript {
 
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:3.1.0"
+        classpath 'com.android.tools.build:gradle:3.1.2'
     }
 }
 

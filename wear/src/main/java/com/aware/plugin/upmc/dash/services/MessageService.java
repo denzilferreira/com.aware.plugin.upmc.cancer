@@ -500,10 +500,6 @@ public class MessageService extends WearableListenerService implements
         Log.d(Constants.TAG, "MessageReceived:parseAndStorePrefIfNeeded:no change");
     }
 
-
-
-
-
     public void parseAndStorePref(String message) {
         String[] arr = message.split("\\s+");
         int morn_hour = Integer.parseInt(arr[1]);
