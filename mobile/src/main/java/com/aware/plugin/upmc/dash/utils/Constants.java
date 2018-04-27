@@ -8,8 +8,11 @@ import android.net.Uri;
 
 public final class Constants {
 
+    public static final String DEVICE_TYPE_FITBIT = "DEVICE_TYPE_FITBIT";
+    public static final String DEVICE_TYPE_ANDROID = "DEVICE_TYPE_ANDROID";
 
-
+    public static final String PREFERENCES_KEY_DEVICE_TYPE = "PREFERENCES_KEY_DEVICE_TYPE";
+    public static final String PREFERENCES_DEFAULT_DEVICE_TYPE = "PREFERENCES_DEFAULT_DEVICE_TYPE";
 
 
 
@@ -137,7 +140,6 @@ public final class Constants {
     public static final String CONNECTED_WEAR = "Connected: Watch is monitoring your activity..";
     public static final String FAILED_WEAR = "Disconnected: Watch is not in range";
     public static final String FAILED_WEAR_DISCOVERY = "Setup Failed: Tap to retry";
-    public static final String FAILED_WEAR_BLUETOOTH = "Disconnected: Switch on Bluetooth";
 
 
     //Wear monitor notif
@@ -189,6 +191,57 @@ public final class Constants {
     public static int DURATION_VIBRATE = 3000;
 
     public static Uri MESSAGE_URI = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
+
+
+
+
+
+    // fitbit stuff
+
+
+
+    //  Database credentials
+    public static final String DB_NAME = "jdbc:mysql://localhost:3306/UPMC";
+    public static final String USER = "root";
+    public static final String PASS = "";
+
+    // Table names
+    public static final String TABLE_PS = "PatientSurvey";
+    public static final String TABLE_TS = "TimeSchedule";
+    public static final String TABLE_PROMPT = "PromptFromWatch";
+    public static final String TABLE_CONN = "Connection";
+    public static final String TABLE_COMMAND = "CommandFromPhone";
+
+    // Messages sent to the watch
+    public static final String CASE1 = "<7";
+    public static final String CASE2 = ">=7";
+    public static final String SNOOZE_COMMAND = "Snooze";
+    public static final String CLOSE_COMMAND = "Close";
+
+    // Messages received from the watch
+    public static final String NOTIFICATION = "Ready?";
+    public static final String NOTIF_NO_SNOOZE = "Ready!";
+    public static final String MINIMESSAGE = "Great job!";
+    public static final String CLOSE_NOTIF = "Close";
+
+    // Package names of apps required on the phone
+    public static final String PACKAGE_KSWEB = "ru.kslabs.ksweb";
+    public static final String PACKAGE_FITBIT = "com.fitbit.FitbitMobile";
+
+    // Fitbit notif
+    public static final String FAILED_WEAR_FITBIT = "Disconnected: Relaunching Fitbit app...";
+    public static final String FAILED_WEAR_BLUETOOTH = "Disconnected: Reconnecting the bluetooth...";
+    public static final String BLUETOOTH_ON = "Bluetooth reconnected.";
+    public static final String CONN_STATUS = "Fitbit watch connection";
+    public static final String CONTENT_TITLE_FITBIT = "UPMC Dash Fitbit";
+
+    //MessageService ACTIONS
+    public static final String ACTION_CHECK_PROMPT = "check_prompt";
+    public static final String ACTION_CHECK_CONN = "check_watch_connection";
+    public static final String ACTION_SURVEY_COMPLETED = "notify_survey_completed";
+
+    // Survey notif
+    public static final String SURVEY_COMPLETED = "Survey already completed. Tap to complete again.";
 
 
 

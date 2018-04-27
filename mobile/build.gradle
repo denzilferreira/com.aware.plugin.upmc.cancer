@@ -95,5 +95,7 @@ dependencies {
     implementation "com.android.support:support-v4:$mobile_support_libs"
     implementation "com.android.support:gridlayout-v7:$mobile_support_libs"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
     wearApp project(':wear')
 }

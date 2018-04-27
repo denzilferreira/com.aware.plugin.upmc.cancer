@@ -3,17 +3,21 @@ package com.aware.plugin.upmc.dash.activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
@@ -43,9 +47,22 @@ import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.ui.PermissionsHandler;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static com.aware.plugin.upmc.dash.utils.Constants.ACTION_CHECK_PROMPT;
+import static com.aware.plugin.upmc.dash.utils.Constants.CASE1;
+import static com.aware.plugin.upmc.dash.utils.Constants.CASE2;
+import static com.aware.plugin.upmc.dash.utils.Constants.DB_NAME;
+import static com.aware.plugin.upmc.dash.utils.Constants.PASS;
+import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PS;
+import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_TS;
+import static com.aware.plugin.upmc.dash.utils.Constants.USER;
 
 public class UPMC extends AppCompatActivity {
     public boolean STUDYLESS_DEBUG = false;
@@ -80,7 +97,6 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
     }
@@ -96,14 +112,27 @@ public class UPMC extends AppCompatActivity {
         return false;
     }
 
+
+    public boolean isWearNodeSaved() {
+        return !(Constants.PREFERENCES_DEFAULT_WEAR_NODEID.equals(readWearNodeId()));
+    }
+
+    public String readWearNodeId() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String nodeId = sharedPref.getString(Constants.PREFERENCES_KEY_WEAR_NODEID, Constants.PREFERENCES_DEFAULT_WEAR_NODEID);
+        if (nodeId.equals(Constants.PREFERENCES_DEFAULT_WEAR_NODEID))
+            Log.d(Constants.TAG, "MessageService:readWearNodeId: " + nodeId);
+        return nodeId;
+    }
+
+
+
+
     private void loadSchedule(final boolean firstRun) {
         setContentView(R.layout.settings_upmc_dash);
-
         progressBar = findViewById(R.id.progress_bar_schedule);
-
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         final Button saveSchedule = findViewById(R.id.save_button);
 
         morning_timer = findViewById(R.id.morning_start_time);
@@ -129,6 +158,8 @@ public class UPMC extends AppCompatActivity {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onClick(View v) {
+                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                        saveTimeSchedule();
                     progressBar.setVisibility(View.VISIBLE);
                     saveSchedule.setEnabled(false);
                     saveSchedule.setText("Saving Schedule....");
@@ -160,12 +191,22 @@ public class UPMC extends AppCompatActivity {
                             Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
                             //Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
                         }
-                        sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                        else {
+                            if(!isMyServiceRunning(MessageService.class)) { // add Fitbit Service
+                                if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                                    sendMessageServiceAction(Constants.ACTION_FIRST_RUN); // replace with Fitbit service
+                                else
+                                    sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                            }
+                        }
+
                     }
                     else {
-                        sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                        if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                            sendMessageServiceAction(Constants.ACTION_FIRST_RUN); // replace with Fitbit service
+                        else
+                            sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
                     }
-
 
                 }
             });
@@ -191,6 +232,8 @@ public class UPMC extends AppCompatActivity {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onClick(View v) {
+                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                        saveTimeSchedule();
                     progressBar.setVisibility(View.VISIBLE);
                     saveSchedule.setEnabled(false);
                     saveSchedule.setText("Saving Schedule....");
@@ -289,12 +332,21 @@ public class UPMC extends AppCompatActivity {
                 }
                 loadSchedule(true);
             } else {
-                if(!isMyServiceRunning(MessageService.class)) {
+                if(!isMyServiceRunning(MessageService.class)) { // add fitbit message service here.
                     sendMessageServiceAction(Constants.ACTION_REBOOT);
                 }
                 showSymptomSurvey();
             }
         }
+    }
+
+    public void startFitbitCheckPromptAlarm() {
+        AlarmManager myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent_min = new Intent(getApplicationContext(), MessageService.class); // send it to Fitbit service
+        alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
+        int interval = 60 * 1000;
+        PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
+        myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPendingIntent_min);
     }
 
 
@@ -639,6 +691,11 @@ public class UPMC extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
+                if(!isWearNodeSaved())
+                {
+                    Toast.makeText(getApplicationContext(), "Please complete setup first!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
                 answer_questions.setEnabled(false);
                 answer_questions.setText("Saving answers..");
                 Log.d(Constants.TAG, "UPMC:Questionnaire");
@@ -700,9 +757,13 @@ public class UPMC extends AppCompatActivity {
     public int checkSymptoms() {
         for (Integer i : ratingList) {
             if (i >= 7) {
-              return 1;
+              if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                  new PostData().execute(TABLE_PS, CASE2);
+                return 1;
             }
         }
+        if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+            new PostData().execute(TABLE_PS, CASE1);
         return 0;
     }
 
@@ -765,6 +826,26 @@ public class UPMC extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    public String getDeviceTypePostfix() {
+        String deviceType = readDeviceType();
+        if(deviceType.equals(Constants.DEVICE_TYPE_ANDROID)) {
+            return "_w";
+        }
+        else {
+            return "_f";
+        }
+    }
+
+
+    public String readDeviceType() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String deviceType = sharedPref.getString(Constants.PREFERENCES_KEY_DEVICE_TYPE, Constants.PREFERENCES_DEFAULT_DEVICE_TYPE);
+        if (deviceType.equals(Constants.PREFERENCES_DEFAULT_DEVICE_TYPE))
+            Log.d(Constants.TAG, "PhoneMainActivity:writeDeviceType: " + deviceType);
+        return deviceType;
+    }
+
     private class JoinedStudy extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -809,11 +890,109 @@ public class UPMC extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
                 Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-                sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
+                    //start fitbit service with first run
+                    startFitbitCheckPromptAlarm();
+
+                }
+                else
+                    sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
+
                 finish();
             }
         }
 
 
+    }
+
+    private String zeroPad(Integer i) {
+        StringBuilder sb = new StringBuilder();
+        if (i < 10) {
+            sb.append(0).append(i);
+            return sb.toString();
+        }
+        return i.toString();
+    }
+
+
+    private void saveTimeSchedule() {
+        // Yiyi's code here....
+        StringBuilder sb = new StringBuilder();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            sb.append(zeroPad(morning_timer.getHour()));
+            sb.append(zeroPad(morning_timer.getMinute()));
+            sb.append(zeroPad(night_timer.getHour()));
+            sb.append(zeroPad(night_timer.getMinute()));
+            Log.d(Constants.TAG, "total time is: " + sb.toString());
+        } else {
+            sb.append(zeroPad(morning_timer.getCurrentHour()));
+            sb.append(zeroPad(morning_timer.getCurrentMinute()));
+            sb.append(zeroPad(night_timer.getCurrentHour()));
+            sb.append(zeroPad(night_timer.getCurrentMinute()));
+        }
+        Log.d(Constants.TAG, "time schedule is: " + sb.toString());
+        new PostData().execute(TABLE_TS, sb.toString());
+    }
+
+
+    private class PostData extends AsyncTask<String, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                conn = DriverManager.getConnection(DB_NAME, USER, PASS);
+                stmt = conn.createStatement();
+//                Log.d("yiyi", "connection built. Trying to insert survey result to db.");
+                StringBuilder sb = new StringBuilder();
+                long unixTime = System.currentTimeMillis();
+                sb.append("INSERT INTO ");
+                sb.append(strings[0]);
+                sb.append(" VALUES (null, ");
+                sb.append(unixTime);
+                sb.append(", '");
+                sb.append(strings[1]);
+                sb.append("')");
+                stmt.executeUpdate(sb.toString());
+                Log.d("yiyi", "Inserted records into the table...");
+
+            } catch (SQLException se) {
+                //Handle errors for JDBC
+                se.printStackTrace();
+            } catch (Exception e) {
+                //Handle errors for Class.forName
+                e.printStackTrace();
+            } finally {
+                //finally block used to close resources
+                try {
+                    if (stmt != null)
+                        conn.close();
+                } catch (SQLException se) {
+                }// do nothing
+                try {
+                    if (conn != null)
+                        conn.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }//end finally try
+            }//end try
+
+
+            return null;
+
+        }
     }
 }

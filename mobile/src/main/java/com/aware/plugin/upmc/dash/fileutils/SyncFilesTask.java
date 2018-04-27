@@ -1,6 +1,7 @@
 package com.aware.plugin.upmc.dash.fileutils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -60,6 +61,7 @@ public class SyncFilesTask extends AsyncTask<SyncFilesParams, Integer, Long> {
 
     @Override
     protected void onPostExecute(Long aLong) {
+        Log.d(Constants.TAG, "SyncFilesTast: syncDone");
         super.onPostExecute(aLong);
     }
 

@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends WearableActivity{
+public class WearMainActivity extends WearableActivity{
 
     private static final SimpleDateFormat AMBIENT_DATE_FORMAT =
             new SimpleDateFormat("HH:mm", Locale.US);
@@ -44,7 +44,7 @@ public class MainActivity extends WearableActivity{
         mContainerView =  findViewById(R.id.container);
         mTextView =  findViewById(R.id.text);
         mClockView =  findViewById(R.id.clock);
-        Log.d(Constants.TAG, "MainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
+        Log.d(Constants.TAG, "WearMainActivity: is MsgServiceRunning: " +  isMyServiceRunning(MessageService.class));
         String[] REQUIRED_PERMISSIONS = new String[]{
         Manifest.permission.BODY_SENSORS,
         Manifest.permission.RECEIVE_BOOT_COMPLETED,
@@ -71,12 +71,12 @@ public class MainActivity extends WearableActivity{
                         messageService.setAction(Constants.ACTION_FIRST_RUN);
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             startForegroundService(messageService);
-                            Log.d(Constants.TAG, "MainActivity: starting foreground message service");
+                            Log.d(Constants.TAG, "WearMainActivity: starting foreground message service");
 
                         }
                         else {
                             startService(messageService);
-                            Log.d(Constants.TAG, "MainActivity: starting message service");
+                            Log.d(Constants.TAG, "WearMainActivity: starting message service");
 
                         }
                     }
@@ -88,7 +88,7 @@ public class MainActivity extends WearableActivity{
 
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    Toast.makeText(MainActivity.this, "Permission denied. Cannot continue", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WearMainActivity.this, "Permission denied. Cannot continue", Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
@@ -104,26 +104,26 @@ public class MainActivity extends WearableActivity{
 
     @Override
     protected void onResume() {
-        Log.d(LC_DEBUG,"MainActivity: onResume");
+        Log.d(LC_DEBUG,"WearMainActivity: onResume");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        Log.d(LC_DEBUG,"MainActivity: onPause");
+        Log.d(LC_DEBUG,"WearMainActivity: onPause");
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        Log.d(LC_DEBUG,"MainActivity: onStop");
+        Log.d(LC_DEBUG,"WearMainActivity: onStop");
         super.onStop();
 
     }
 
     @Override
     protected void onDestroy() {
-        Log.d(LC_DEBUG,"MainActivity: onDestroy");
+        Log.d(LC_DEBUG,"WearMainActivity: onDestroy");
 //        if(isMyServiceRunning(MessageService.class)) {
 //            Intent msgService = new Intent(this,MessageService.class);
 //            stopService(msgService);

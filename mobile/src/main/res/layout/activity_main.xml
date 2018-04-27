@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".activities.PhoneMainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="true"
+        android:textSize="20sp"
+        android:text="Choose your wearable device type"/>
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:id="@+id/radio_group"
+        android:orientation="vertical">
+        <RadioButton android:id="@+id/radio_fitbit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textSize="20sp"
+            android:text="Fitbit Ionic / Versa"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_wear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textAllCaps="true"
+            android:textSize="20sp"
+            android:text="LG Watch Style"
+            android:onClick="onRadioButtonClicked"/>
+    </RadioGroup>
+</LinearLayout>

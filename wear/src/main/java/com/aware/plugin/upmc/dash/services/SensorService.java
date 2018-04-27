@@ -6,10 +6,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,14 +20,13 @@ import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.aware.plugin.upmc.dash.activities.NotificationResponse;
+import com.aware.plugin.upmc.dash.activities.WearMainActivity;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.fileutils.FileManager;
 import com.aware.plugin.upmc.dash.R;
-import com.aware.plugin.upmc.dash.activities.MainActivity;
 import com.aware.plugin.upmc.dash.utils.Preferences;
 
 import java.io.IOException;
@@ -321,7 +318,7 @@ public class SensorService extends Service implements SensorEventListener {
             alarmPendingIntent_min = PendingIntent.getService(this, 668, alarmIntent_min, 0);
 
         }
-        Intent alarmInfoIntent = new Intent(this, MainActivity.class);
+        Intent alarmInfoIntent = new Intent(this, WearMainActivity.class);
         PendingIntent alarmInfoPendingIntent = PendingIntent.getActivity(this, 777,alarmInfoIntent,0);
         myAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(System.currentTimeMillis()+interval, alarmInfoPendingIntent),alarmPendingIntent_min );
     }
@@ -365,7 +362,7 @@ public class SensorService extends Service implements SensorEventListener {
             alarmPendingIntent_feedback = PendingIntent.getService(this, 1212, alarmIntent_feedback, 0);
 
         }
-        Intent alarmInfoIntent = new Intent(this, MainActivity.class);
+        Intent alarmInfoIntent = new Intent(this, WearMainActivity.class);
         PendingIntent alarmInfoPendingIntent = PendingIntent.getActivity(this, 1212,alarmInfoIntent,0);
         myAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(System.currentTimeMillis()+interval, alarmInfoPendingIntent),alarmPendingIntent_feedback );
         setFeedbackEnabled(true);

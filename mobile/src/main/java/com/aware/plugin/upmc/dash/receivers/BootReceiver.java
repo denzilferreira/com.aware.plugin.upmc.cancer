@@ -19,7 +19,7 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(Constants.TAG,"BootReceived");
         if(!isMyServiceRunning(MessageService.class, context)) {
-            Intent msgServiceIntent = new Intent(context, MessageService.class).setAction(Constants.ACTION_REBOOT);
+            Intent msgServiceIntent = new Intent(context, MessageService.class).setAction(Constants.ACTION_REBOOT); // fitbit service
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(msgServiceIntent);
             }
