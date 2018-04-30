@@ -165,7 +165,6 @@ public class MessageService extends WearableListenerService implements
                 createInterventionNotifChannel();
                 if (isWearNodeSaved())
                     scanWear();
-                notifyUserWithInactivity(true);
             case Constants.ACTION_INIT:
                 Log.d(Constants.TAG, "MessageService: onStartCommand : ACTION_INIT");
                 if(isWearInitializable()) {
@@ -196,11 +195,11 @@ public class MessageService extends WearableListenerService implements
                 Log.d(Constants.TAG, "MessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
                 changeWearSettings();
                 break;
-            case Constants.ACTION_SNOOZE_ALARM:
-                Log.d(Constants.TAG, "MessageService:onStartCommand : ACTION_SNOOZE_ALARM");
-                Log.d(Constants.TAG, "MessageService:" + intentAction);
-                notifyUserWithInactivity(false);
-                break;
+//            case Constants.ACTION_SNOOZE_ALARM:
+//                Log.d(Constants.TAG, "MessageService:onStartCommand : ACTION_SNOOZE_ALARM");
+//                Log.d(Constants.TAG, "MessageService:" + intentAction);
+//                notifyUserWithInactivity(false);
+//                break;
             case Constants.ACTION_NOTIF_SNOOZE:
             case Constants.ACTION_NOTIF_OK:
             case Constants.ACTION_NOTIF_NO:
@@ -340,6 +339,8 @@ public class MessageService extends WearableListenerService implements
         capabilityClient.removeListener(this);
         capabilityClient.removeLocalCapability(Constants.CAPABILITY_PHONE_APP);
         dataClient.removeListener(this);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancelAll();
         stopSelf();
     }
 

@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,11 +19,13 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,6 +38,9 @@ public class FileManager {
     public static final String STORAGE_FILE = "/motionlog";
     public static final String EXTENSION = ".txt";
     public static boolean loop = true;
+
+
+    public static final String HTDOCS_STORAGE_FOLDER = Environment.getExternalStorageDirectory()+"/htdocs";
 
     public static void createFile() throws IOException {
         File path = new File(STORAGE_FOLDER);
@@ -112,6 +118,52 @@ public class FileManager {
     }
 
 
+    public static void createHtdocsFolder() throws IOException {
+        File path = new File(HTDOCS_STORAGE_FOLDER);
+        if(path.exists()) {
+            Log.d(Constants.TAG, "createHtdocsFolder: folder exists, deleting stuff ");
+            if(path.isDirectory()) {
+                File[] children = path.listFiles();
+                for (File child : children)
+                    if(child.isFile())
+                        child.delete();
+                path.delete();
+                path.mkdirs();
+            }
+        }
+        else{
+            Log.d(Constants.TAG, "createHtdocsFolder: folder doesn't exist, creating anew " + path.mkdirs());
+
+        }
+
+    }
+
+
+    public static void writeResourcesToHtdocs(Context context) throws IllegalAccessException, IOException {
+        createHtdocsFolder();
+        Log.d(Constants.TAG, "writeResourcesToSdCard: Writing raw resources to sd card");
+        Field[] fields = R.raw.class.getFields();
+        for(Field field: fields) {
+            Log.d(Constants.TAG, "writeResourceToSdCard: field name" + field.getName());
+            int resourceId = field.getInt(field);
+            InputStream in = context.getResources().openRawResource(resourceId);
+            File resourceFile = new File(HTDOCS_STORAGE_FOLDER + "/" + field.getName() + ".php");
+            resourceFile.createNewFile();
+            FileOutputStream out = new FileOutputStream(resourceFile);
+            byte[] buff = new byte[1024];
+            int read = 0;
+            try {
+                while((read = in.read(buff))> 0) {
+                    out.write(buff, 0, read);
+                }
+            }
+            finally {
+                in.close();
+                out.close();
+            }
+        }
+    }
+
 
 
     public static void stressTest() throws IOException {
@@ -120,4 +172,31 @@ public class FileManager {
 //        }
 
     }
+
+
+    public static class DirectoryCleaner {
+        private final File mFile;
+
+        public DirectoryCleaner(File file) {
+            mFile = file;
+        }
+
+        public void clean() {
+            if (null == mFile || !mFile.exists() || !mFile.isDirectory()) return;
+            for (File file : mFile.listFiles()) {
+                delete(file);
+            }
+        }
+
+        private void delete(File file) {
+            if (file.isDirectory()) {
+                for (File child : file.listFiles()) {
+                    delete(child);
+                }
+            }
+            file.delete();
+
+        }
+    }
+
 }

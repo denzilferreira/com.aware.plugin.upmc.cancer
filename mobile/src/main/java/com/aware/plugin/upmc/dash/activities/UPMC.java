@@ -42,6 +42,7 @@ import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.services.FitbitMessageService;
 import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
@@ -264,7 +265,8 @@ public class UPMC extends AppCompatActivity {
                         Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
                         Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
                         Log.d(Constants.TAG, "UPMC:schedule Changed");
-                        sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                        if(readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
+                            sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
                     }
                     finish();
                 }
@@ -290,7 +292,6 @@ public class UPMC extends AppCompatActivity {
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
         REQUIRED_PERMISSIONS.add(Manifest.permission.WAKE_LOCK);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         //these are needed for the sync adapter to work...
         REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_SYNC_SETTINGS);
@@ -332,8 +333,12 @@ public class UPMC extends AppCompatActivity {
                 }
                 loadSchedule(true);
             } else {
-                if(!isMyServiceRunning(MessageService.class)) { // add fitbit message service here.
-                    sendMessageServiceAction(Constants.ACTION_REBOOT);
+                Class service = readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)? FitbitMessageService.class:MessageService.class;
+                if(!isMyServiceRunning(service)) { // add fitbit message service here.
+                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                        sendFitbitMessageServiceAction(Constants.ACTION_REBOOT);
+                    else
+                        sendMessageServiceAction(Constants.ACTION_REBOOT);
                 }
                 showSymptomSurvey();
             }
@@ -342,7 +347,7 @@ public class UPMC extends AppCompatActivity {
 
     public void startFitbitCheckPromptAlarm() {
         AlarmManager myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent alarmIntent_min = new Intent(getApplicationContext(), MessageService.class); // send it to Fitbit service
+        Intent alarmIntent_min = new Intent(getApplicationContext(), FitbitMessageService.class);
         alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
         int interval = 60 * 1000;
         PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
@@ -352,6 +357,17 @@ public class UPMC extends AppCompatActivity {
 
     public void sendMessageServiceAction(String action) {
         Intent intent = new Intent(this, MessageService.class).setAction(action);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
+    }
+
+
+
+    public void sendFitbitMessageServiceAction(String action) {
+        Intent intent = new Intent(this, FitbitMessageService.class).setAction(action);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         } else {
@@ -691,11 +707,14 @@ public class UPMC extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                if(!isWearNodeSaved())
-                {
-                    Toast.makeText(getApplicationContext(), "Please complete setup first!", Toast.LENGTH_SHORT).show();
-                    finish();
+                if(readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID)) {
+                    if(!isWearNodeSaved())
+                    {
+                        Toast.makeText(getApplicationContext(), "Please complete setup first!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
                 }
+
                 answer_questions.setEnabled(false);
                 answer_questions.setText("Saving answers..");
                 Log.d(Constants.TAG, "UPMC:Questionnaire");
@@ -721,20 +740,27 @@ public class UPMC extends AppCompatActivity {
                 answer.put(Provider.Symptom_Data.SCORE_OTHER, parseAnswer(other_rating.getText().toString()));
                 answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
                 getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
-                int severity = checkSymptoms();
-                final Context context = getApplicationContext();
-                String oldSeverity = Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY);
-                if(oldSeverity.length()!=0) {
-                    if(Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY))!=severity) {
-                        Log.d(Constants.TAG, "UPMC:severity changed");
+
+
+                if(readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID)) {
+                    int severity = checkSymptoms();
+                    final Context context = getApplicationContext();
+                    String oldSeverity = Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY);
+                    if(oldSeverity.length()!=0) {
+                        if(Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY))!=severity) {
+                            Log.d(Constants.TAG, "UPMC:severity changed");
+                            Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
+                            sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                        }
+                    }
+                    else {
+                        Log.d(Constants.TAG, "UPMC:severity first entry");
                         Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
-                        sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                        sendMessageServiceAction(Constants.ACTION_INIT);
                     }
                 }
-                else {
-                    Log.d(Constants.TAG, "UPMC:severity first entry");
-                    Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
-                    sendMessageServiceAction(Constants.ACTION_INIT);
+                else if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
+                    checkSymptoms();
                 }
                 Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
                 finish();
@@ -890,10 +916,17 @@ public class UPMC extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
                 Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-                if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
-                    //start fitbit service with first run
-                    startFitbitCheckPromptAlarm();
 
+                if(Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL).length()==0) {
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, "upmc_dash_user");
+
+                }
+                String label = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL);
+                String prefix = getDeviceTypePostfix();
+                Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, label + prefix);
+                if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
+                    sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                    startFitbitCheckPromptAlarm();
                 }
                 else
                     sendMessageServiceAction(Constants.ACTION_FIRST_RUN);

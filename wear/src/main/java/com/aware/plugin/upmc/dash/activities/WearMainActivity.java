@@ -39,7 +39,6 @@ public class WearMainActivity extends WearableActivity{
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(Constants.TAG,"MainActivty:onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         setAmbientEnabled();
         mContainerView =  findViewById(R.id.container);
         mTextView =  findViewById(R.id.text);

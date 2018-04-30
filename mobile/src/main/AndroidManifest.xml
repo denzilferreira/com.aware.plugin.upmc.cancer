@@ -73,6 +73,13 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
+
+
+        <service
+            android:name=".services.FitbitMessageService"
+            android:exported="false"
+             />
+
         <service
             android:name=".activities.Plugin"
             android:exported="true"
