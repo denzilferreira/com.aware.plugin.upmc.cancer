@@ -926,7 +926,7 @@ public class UPMC extends AppCompatActivity {
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, label + prefix);
                 if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
                     sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
-                    startFitbitCheckPromptAlarm();
+//                    startFitbitCheckPromptAlarm();
                 }
                 else
                     sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
@@ -989,14 +989,10 @@ public class UPMC extends AppCompatActivity {
                 Class.forName("com.mysql.jdbc.Driver");
                 conn = DriverManager.getConnection(DB_NAME, USER, PASS);
                 stmt = conn.createStatement();
-//                Log.d("yiyi", "connection built. Trying to insert survey result to db.");
                 StringBuilder sb = new StringBuilder();
-                long unixTime = System.currentTimeMillis();
                 sb.append("INSERT INTO ");
                 sb.append(strings[0]);
-                sb.append(" VALUES (null, ");
-                sb.append(unixTime);
-                sb.append(", '");
+                sb.append(" VALUES (null, '");
                 sb.append(strings[1]);
                 sb.append("')");
                 stmt.executeUpdate(sb.toString());

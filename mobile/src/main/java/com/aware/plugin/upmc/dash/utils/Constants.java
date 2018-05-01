@@ -201,7 +201,10 @@ public final class Constants {
 
 
     //  Database credentials
+    public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    public static final String HOST_URL = "jdbc:mysql://localhost";
     public static final String DB_NAME = "jdbc:mysql://localhost:3306/UPMC";
+    public static final String DB_URL = "jdbc:mysql://localhost/UPMC";
     public static final String USER = "root";
     public static final String PASS = "";
 
@@ -244,6 +247,10 @@ public final class Constants {
     public static final String SURVEY_COMPLETED = "Survey already completed. Tap to complete again.";
 
 
+    public static final String LIGHTTPD_START = "ru.kslabs.ksweb.CMD.LIGHTTPD_START";
+    public static final String LIGHTTPD_ADD_HOST = "ru.kslabs.ksweb.CMD.LIGHTTPD_ADD_HOST";
+    public static final String DATA_KEY = "DATA";
+    public static final String TAG_KEY = "TAG";
 
 
 

@@ -1,6 +1,8 @@
 package com.aware.plugin.upmc.dash.services;
 
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -30,6 +32,7 @@ import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
 import com.aware.plugin.upmc.dash.activities.UPMC;
 import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.utils.KSWEBControl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,14 +41,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import static com.aware.plugin.upmc.dash.utils.Constants.ACTION_CHECK_PROMPT;
 import static com.aware.plugin.upmc.dash.utils.Constants.BLUETOOTH_ON;
 import static com.aware.plugin.upmc.dash.utils.Constants.CLOSE_COMMAND;
 import static com.aware.plugin.upmc.dash.utils.Constants.CLOSE_NOTIF;
 import static com.aware.plugin.upmc.dash.utils.Constants.CONNECTED_WEAR;
 import static com.aware.plugin.upmc.dash.utils.Constants.CONTENT_TITLE_FITBIT;
 import static com.aware.plugin.upmc.dash.utils.Constants.DB_NAME;
+import static com.aware.plugin.upmc.dash.utils.Constants.DB_URL;
 import static com.aware.plugin.upmc.dash.utils.Constants.FAILED_WEAR;
+import static com.aware.plugin.upmc.dash.utils.Constants.HOST_URL;
 import static com.aware.plugin.upmc.dash.utils.Constants.INTERVENTION_TIMEOUT;
+import static com.aware.plugin.upmc.dash.utils.Constants.JDBC_DRIVER;
+import static com.aware.plugin.upmc.dash.utils.Constants.LIGHTTPD_ADD_HOST;
+import static com.aware.plugin.upmc.dash.utils.Constants.LIGHTTPD_START;
 import static com.aware.plugin.upmc.dash.utils.Constants.MINIMESSAGE;
 import static com.aware.plugin.upmc.dash.utils.Constants.NOTIFICATION;
 import static com.aware.plugin.upmc.dash.utils.Constants.NOTIF_NO_SNOOZE;
@@ -57,7 +66,9 @@ import static com.aware.plugin.upmc.dash.utils.Constants.SURVEY_COMPLETED;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_COMMAND;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_CONN;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PROMPT;
+import static com.aware.plugin.upmc.dash.utils.Constants.TAG_KEY;
 import static com.aware.plugin.upmc.dash.utils.Constants.USER;
+import static com.aware.plugin.upmc.dash.utils.KSWEBControl.DATA_KEY;
 
 public class FitbitMessageService extends Service {
 
@@ -181,6 +192,29 @@ public class FitbitMessageService extends Service {
         Log.d(Constants.TAG, "FitbitMessageService: onStartCommand " + intentAction);
         switch (intentAction) {
             case Constants.ACTION_REBOOT:
+                enableBluetoothIfOff();
+                enableWifiIfOff();
+                registerBluetoothReceiver();
+                registerConnectivityReceiver();
+                showSurveyNotif();
+                showFitbitNotif();
+                createInterventionNotifChannel();
+                if (!isAppRunning(PACKAGE_FITBIT)) {
+                    launchApp(PACKAGE_FITBIT);
+                }
+                if (!isAppRunning(PACKAGE_KSWEB)) {
+                    launchApp(PACKAGE_KSWEB);
+                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent upmc = new Intent(getApplicationContext(), UPMC.class);
+                        startActivity(upmc);
+                    }
+                }, 3000);
+                new ResetTable().execute();
+                startFitbitCheckPromptAlarm();
+                break;
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand first run");
                 enableBluetoothIfOff();
@@ -203,7 +237,8 @@ public class FitbitMessageService extends Service {
                         startActivity(upmc);
                     }
                 }, 3000);
-
+                setUpDatabase();
+                startFitbitCheckPromptAlarm();
                 break;
             case Constants.ACTION_CHECK_PROMPT:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand check prompt repeatedly");
@@ -474,6 +509,41 @@ public class FitbitMessageService extends Service {
         }
     }
 
+    private void setUpDatabase() {
+        lighttpdStart(getApplicationContext(), "start_lighttpd");
+        lighttpdAddHost(getApplicationContext(), "add_host", "localhost", "8001", "/storage/emulated/0/ksweb/tools/phpMyAdmin");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new CreateDB().execute();
+                new CreateTables().execute();
+            }
+        }, 1000);
+    }
+
+    public static void lighttpdStart(Context context, String tag) {
+        Intent intent = new Intent();
+        intent.setAction(LIGHTTPD_START);
+        intent.putExtra(TAG_KEY, tag);
+        context.sendBroadcast(intent);
+    }
+
+    public static void lighttpdAddHost(Context context, String tag, String hostname, String port, String rootDir) {
+        Intent intent = new Intent();
+        intent.setAction(LIGHTTPD_ADD_HOST);
+        intent.putExtra(TAG_KEY, tag);
+        intent.putExtra(DATA_KEY, new String[]{hostname, port, rootDir});
+        context.sendBroadcast(intent);
+    }
+    public void startFitbitCheckPromptAlarm() {
+        AlarmManager myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent_min = new Intent(getApplicationContext(), FitbitMessageService.class);
+        alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
+        int interval = 60 * 1000;
+        PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
+        myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPendingIntent_min);
+    }
+
     private class CheckConn extends AsyncTask<String, Void, Void> {
 
 
@@ -660,6 +730,193 @@ public class FitbitMessageService extends Service {
                 }
             }
             return null;
+        }
+    }
+
+    private class CreateDB extends AsyncTask<String, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                Class.forName(JDBC_DRIVER);
+                conn = DriverManager.getConnection(HOST_URL, USER, PASS);
+                stmt = conn.createStatement();
+                String sql;
+                sql = "DROP DATABASE IF EXISTS " + DB_NAME;
+                stmt.executeUpdate(sql);
+                sql = "CREATE DATABASE " + DB_NAME;
+                stmt.executeUpdate(sql);
+                Log.d("yiyi", "Database created successfully...");
+            } catch (SQLException se) {
+                se.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (stmt != null)
+                        stmt.close();
+                } catch (SQLException se2) {
+                }// nothing we can do
+                try {
+                    if (conn != null)
+                        conn.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }
+            }
+            return null;
+
+        }
+    }
+
+    private class CreateTables extends AsyncTask<String, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                Class.forName(JDBC_DRIVER);
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                stmt = conn.createStatement();
+                String sql = "CREATE TABLE Connection " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " status int(11) not NULL, " +
+                        " PRIMARY KEY ( id ))";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE PromptFromWatch " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " message varchar(10) not NULL, " +
+                        " PRIMARY KEY ( id ))";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE CommandFromPhone " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " command varchar(10) not NULL, " +
+                        " PRIMARY KEY ( id ))";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE PatientSurvey " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " result varchar(10) not NULL, " +
+                        " PRIMARY KEY ( id ))";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE SensorData " +
+                        "(unixTime bigint(20) not NULL, " +
+                        " type int(11) not NULL, " +
+                        " data int(11) not NULL)";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE TimeSchedule " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " timeRange varchar(10) not NULL, " +
+                        " PRIMARY KEY ( id ))";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE Notification " +
+                        "(unixTime bigint(20) not NULL, " +
+                        " message varchar(10) not NULL)";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE InterventionResponse " +
+                        "(unixTime bigint(20) not NULL, " +
+                        " response varchar(10) not NULL)";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE ReasonsForNo " +
+                        "(unixTime bigint(20) not NULL, " +
+                        " reasons varchar(10) not NULL)";
+                stmt.executeUpdate(sql);
+                Log.d("yiyi", "Created tables in given database...");
+            } catch (SQLException se) {
+                se.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (stmt != null)
+                        conn.close();
+                } catch (SQLException se) {
+                }
+                try {
+                    if (conn != null)
+                        conn.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }
+            }
+            return null;
+
+        }
+    }
+
+    private class ResetTable extends AsyncTask<String, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                Class.forName(JDBC_DRIVER);
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                stmt = conn.createStatement();
+                String sql;
+                sql = "DROP TABLE IF EXISTS PromptFromWatch";
+                stmt.executeUpdate(sql);
+                sql = "CREATE TABLE PromptFromWatch " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " message varchar(10) not NULL, " +
+                        " PRIMARY KEY ( id ))";
+                stmt.executeUpdate(sql);
+                Log.d("yiyi", "Reset table in given database...");
+            } catch (SQLException se) {
+                se.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (stmt != null)
+                        conn.close();
+                } catch (SQLException se) {
+                }
+                try {
+                    if (conn != null)
+                        conn.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }
+            }
+            return null;
+
         }
     }
 
