@@ -28,9 +28,11 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.aware.Aware;
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
 import com.aware.plugin.upmc.dash.activities.UPMC;
+import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.utils.KSWEBControl;
 
@@ -66,6 +68,7 @@ import static com.aware.plugin.upmc.dash.utils.Constants.SURVEY_COMPLETED;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_COMMAND;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_CONN;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PROMPT;
+import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_TS;
 import static com.aware.plugin.upmc.dash.utils.Constants.TAG_KEY;
 import static com.aware.plugin.upmc.dash.utils.Constants.USER;
 import static com.aware.plugin.upmc.dash.utils.KSWEBControl.DATA_KEY;
@@ -253,6 +256,10 @@ public class FitbitMessageService extends Service {
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand notify survey completed");
                 Log.d("yiyi", "action_survey_completed got called!");
                 notifySurvey(SURVEY_COMPLETED);
+                break;
+            case Constants.ACTION_SETTINGS_CHANGED:
+                Log.d(Constants.TAG, "FibitMessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
+                saveTimeSchedule();
                 break;
             case Constants.ACTION_APPRAISAL:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand appraisal");
@@ -516,7 +523,19 @@ public class FitbitMessageService extends Service {
             @Override
             public void run() {
                 new CreateDB().execute();
-                new CreateTables().execute();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        new CreateTables().execute();
+                    }
+                },1000);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveTimeSchedule();
+                    }
+                },3000);
+
             }
         }, 1000);
     }
@@ -535,6 +554,7 @@ public class FitbitMessageService extends Service {
         intent.putExtra(DATA_KEY, new String[]{hostname, port, rootDir});
         context.sendBroadcast(intent);
     }
+
     public void startFitbitCheckPromptAlarm() {
         AlarmManager myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent_min = new Intent(getApplicationContext(), FitbitMessageService.class);
@@ -542,6 +562,26 @@ public class FitbitMessageService extends Service {
         int interval = 60 * 1000;
         PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
         myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPendingIntent_min);
+    }
+
+    private void saveTimeSchedule() {
+        // Yiyi's code here....
+        StringBuilder sb = new StringBuilder();
+        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR))));
+        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE))));
+        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR))));
+        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE))));
+        Log.d(Constants.TAG, "time schedule is: " + sb.toString());
+        new PostData().execute(TABLE_TS, sb.toString());
+    }
+
+    private String zeroPad(Integer i) {
+        StringBuilder sb = new StringBuilder();
+        if (i < 10) {
+            sb.append(0).append(i);
+            return sb.toString();
+        }
+        return i.toString();
     }
 
     private class CheckConn extends AsyncTask<String, Void, Void> {
@@ -565,7 +605,7 @@ public class FitbitMessageService extends Service {
                 //Register JDBC driver
                 Class.forName("com.mysql.jdbc.Driver");
                 //Open a connection
-                conn = DriverManager.getConnection(DB_NAME, USER, PASS);
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
                 Log.d("yiyi", "Connecting to database to check connection...");
                 StringBuilder sql = new StringBuilder();
@@ -624,7 +664,7 @@ public class FitbitMessageService extends Service {
             Statement stmt = null;
             try {
                 Class.forName("com.mysql.jdbc.Driver");
-                conn = DriverManager.getConnection(DB_NAME, USER, PASS);
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
 //                Log.d("yiyi", "connection built. Trying to insert survey result to db.");
                 StringBuilder sb = new StringBuilder();
@@ -699,7 +739,7 @@ public class FitbitMessageService extends Service {
                 Class.forName("com.mysql.jdbc.Driver");
                 //Open a connection
                 Log.d("yiyi", "Connecting to database to check new prompt...");
-                conn = DriverManager.getConnection(DB_NAME, USER, PASS);
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
                 StringBuilder sql1 = new StringBuilder();
                 sql1.append("SELECT id, message FROM ");

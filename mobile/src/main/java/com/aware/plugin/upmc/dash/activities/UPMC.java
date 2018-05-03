@@ -38,6 +38,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
 import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
@@ -60,6 +61,7 @@ import static com.aware.plugin.upmc.dash.utils.Constants.ACTION_CHECK_PROMPT;
 import static com.aware.plugin.upmc.dash.utils.Constants.CASE1;
 import static com.aware.plugin.upmc.dash.utils.Constants.CASE2;
 import static com.aware.plugin.upmc.dash.utils.Constants.DB_NAME;
+import static com.aware.plugin.upmc.dash.utils.Constants.DB_URL;
 import static com.aware.plugin.upmc.dash.utils.Constants.PASS;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PS;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_TS;
@@ -85,13 +87,12 @@ public class UPMC extends AppCompatActivity {
     private boolean isRegistered = false;
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(mNotifBroadcastReceiver);
-        if(isRegistered)
+        if (isRegistered)
             unregisterReceiver(joinedObserver);
     }
 
@@ -127,8 +128,6 @@ public class UPMC extends AppCompatActivity {
     }
 
 
-
-
     private void loadSchedule(final boolean firstRun) {
         setContentView(R.layout.settings_upmc_dash);
         progressBar = findViewById(R.id.progress_bar_schedule);
@@ -159,8 +158,8 @@ public class UPMC extends AppCompatActivity {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onClick(View v) {
-                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
-                        saveTimeSchedule();
+//                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+//                        saveTimeSchedule();
                     progressBar.setVisibility(View.VISIBLE);
                     saveSchedule.setEnabled(false);
                     saveSchedule.setText("Saving Schedule....");
@@ -168,42 +167,39 @@ public class UPMC extends AppCompatActivity {
                     int morningMinute;
                     int nightHour;
                     int nightMinute;
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         morningHour = morning_timer.getHour();
                         morningMinute = morning_timer.getMinute();
                         nightHour = night_timer.getHour();
                         nightMinute = night_timer.getMinute();
-                    }
-                    else {
+                    } else {
                         morningHour = morning_timer.getCurrentHour();
                         morningMinute = morning_timer.getCurrentMinute();
                         nightHour = night_timer.getCurrentHour();
                         nightMinute = night_timer.getCurrentMinute();
                     }
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, ""+ morningHour);
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, ""+ morningMinute);
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
-                    if(!STUDYLESS_DEBUG) {
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, "" + morningHour);
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, "" + morningMinute);
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, "" + nightHour);
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, "" + nightMinute);
+                    if (!STUDYLESS_DEBUG) {
                         if (!Aware.isStudy(getApplicationContext())) {
                             //UPMC Dash
                             isRegistered = true;
                             Log.d(Constants.TAG, "Joining Study");
                             Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
                             //Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
-                        }
-                        else {
-                            if(!isMyServiceRunning(MessageService.class)) { // add Fitbit Service
-                                if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                        } else {
+                            if (!isMyServiceRunning(MessageService.class)) { // add Fitbit Service
+                                if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
                                     sendMessageServiceAction(Constants.ACTION_FIRST_RUN); // replace with Fitbit service
                                 else
                                     sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
                             }
                         }
 
-                    }
-                    else {
-                        if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                    } else {
+                        if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
                             sendMessageServiceAction(Constants.ACTION_FIRST_RUN); // replace with Fitbit service
                         else
                             sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
@@ -233,8 +229,8 @@ public class UPMC extends AppCompatActivity {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onClick(View v) {
-                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
-                        saveTimeSchedule();
+//                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+//                        saveTimeSchedule();
                     progressBar.setVisibility(View.VISIBLE);
                     saveSchedule.setEnabled(false);
                     saveSchedule.setText("Saving Schedule....");
@@ -242,13 +238,12 @@ public class UPMC extends AppCompatActivity {
                     int morningMinute;
                     int nightHour;
                     int nightMinute;
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         morningHour = morning_timer.getHour();
                         morningMinute = morning_timer.getMinute();
                         nightHour = night_timer.getHour();
                         nightMinute = night_timer.getMinute();
-                    }
-                    else {
+                    } else {
                         morningHour = morning_timer.getCurrentHour();
                         morningMinute = morning_timer.getCurrentMinute();
                         nightHour = night_timer.getCurrentHour();
@@ -259,14 +254,15 @@ public class UPMC extends AppCompatActivity {
                     boolean morning_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE)) != morningMinute;
                     boolean night_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)) != nightHour;
                     boolean night_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)) != nightMinute;
-                    if(morning_hour || morning_minute || night_hour || night_minute) {
-                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, ""+ morningHour);
-                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, ""+ morningMinute);
-                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, ""+ nightHour);
-                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, ""+ nightMinute);
+                    if (morning_hour || morning_minute || night_hour || night_minute) {
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, "" + morningHour);
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, "" + morningMinute);
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, "" + nightHour);
+                        Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, "" + nightMinute);
                         Log.d(Constants.TAG, "UPMC:schedule Changed");
-                        if(readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
+                        if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
                             sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+                        else sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
                     }
                     finish();
                 }
@@ -326,16 +322,16 @@ public class UPMC extends AppCompatActivity {
             //Aware.startESM(this);
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0) {
                 // When app is run for the first time
-                if(!STUDYLESS_DEBUG) {
+                if (!STUDYLESS_DEBUG) {
                     Log.d(Constants.TAG, "onResume: Registering ACTION_JOINED_STUDY observer");
                     IntentFilter filter = new IntentFilter(Aware.ACTION_JOINED_STUDY);
                     registerReceiver(joinedObserver, filter);
                 }
                 loadSchedule(true);
             } else {
-                Class service = readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)? FitbitMessageService.class:MessageService.class;
-                if(!isMyServiceRunning(service)) { // add fitbit message service here.
-                    if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                Class service = readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT) ? FitbitMessageService.class : MessageService.class;
+                if (!isMyServiceRunning(service)) { // add fitbit message service here.
+                    if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
                         sendFitbitMessageServiceAction(Constants.ACTION_REBOOT);
                     else
                         sendMessageServiceAction(Constants.ACTION_REBOOT);
@@ -345,16 +341,6 @@ public class UPMC extends AppCompatActivity {
         }
     }
 
-    public void startFitbitCheckPromptAlarm() {
-        AlarmManager myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent alarmIntent_min = new Intent(getApplicationContext(), FitbitMessageService.class);
-        alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
-        int interval = 60 * 1000;
-        PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
-        myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPendingIntent_min);
-    }
-
-
     public void sendMessageServiceAction(String action) {
         Intent intent = new Intent(this, MessageService.class).setAction(action);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -363,7 +349,6 @@ public class UPMC extends AppCompatActivity {
             startService(intent);
         }
     }
-
 
 
     public void sendFitbitMessageServiceAction(String action) {
@@ -707,9 +692,8 @@ public class UPMC extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                if(readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID)) {
-                    if(!isWearNodeSaved())
-                    {
+                if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID)) {
+                    if (!isWearNodeSaved()) {
                         Toast.makeText(getApplicationContext(), "Please complete setup first!", Toast.LENGTH_SHORT).show();
                         finish();
                     }
@@ -742,24 +726,22 @@ public class UPMC extends AppCompatActivity {
                 getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
 
 
-                if(readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID)) {
+                if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID)) {
                     int severity = checkSymptoms();
                     final Context context = getApplicationContext();
                     String oldSeverity = Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY);
-                    if(oldSeverity.length()!=0) {
-                        if(Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY))!=severity) {
+                    if (oldSeverity.length() != 0) {
+                        if (Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY)) != severity) {
                             Log.d(Constants.TAG, "UPMC:severity changed");
                             Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
                             sendMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
                         }
-                    }
-                    else {
+                    } else {
                         Log.d(Constants.TAG, "UPMC:severity first entry");
                         Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
                         sendMessageServiceAction(Constants.ACTION_INIT);
                     }
-                }
-                else if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
+                } else if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
                     checkSymptoms();
                 }
                 Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
@@ -767,10 +749,6 @@ public class UPMC extends AppCompatActivity {
             }
         });
     }
-
-
-
-
 
 
     //Handles ? as scores. Can't use ? in SQLite
@@ -783,12 +761,12 @@ public class UPMC extends AppCompatActivity {
     public int checkSymptoms() {
         for (Integer i : ratingList) {
             if (i >= 7) {
-              if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
-                  new PostData().execute(TABLE_PS, CASE2);
+                if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+                    new PostData().execute(TABLE_PS, CASE2);
                 return 1;
             }
         }
-        if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
+        if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
             new PostData().execute(TABLE_PS, CASE1);
         return 0;
     }
@@ -796,7 +774,7 @@ public class UPMC extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
-        if(!STUDYLESS_DEBUG) {
+        if (!STUDYLESS_DEBUG) {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
                 if (item.getTitle().toString().equalsIgnoreCase("Sync") && !Aware.isStudy(getApplicationContext())) {
@@ -855,10 +833,9 @@ public class UPMC extends AppCompatActivity {
 
     public String getDeviceTypePostfix() {
         String deviceType = readDeviceType();
-        if(deviceType.equals(Constants.DEVICE_TYPE_ANDROID)) {
+        if (deviceType.equals(Constants.DEVICE_TYPE_ANDROID)) {
             return "_w";
-        }
-        else {
+        } else {
             return "_f";
         }
     }
@@ -917,18 +894,17 @@ public class UPMC extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
                 Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
 
-                if(Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL).length()==0) {
+                if (Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL).length() == 0) {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, "upmc_dash_user");
 
                 }
                 String label = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL);
                 String prefix = getDeviceTypePostfix();
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, label + prefix);
-                if(readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
+                if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
                     sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
 //                    startFitbitCheckPromptAlarm();
-                }
-                else
+                } else
                     sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
 
                 finish();
@@ -936,35 +912,6 @@ public class UPMC extends AppCompatActivity {
         }
 
 
-    }
-
-    private String zeroPad(Integer i) {
-        StringBuilder sb = new StringBuilder();
-        if (i < 10) {
-            sb.append(0).append(i);
-            return sb.toString();
-        }
-        return i.toString();
-    }
-
-
-    private void saveTimeSchedule() {
-        // Yiyi's code here....
-        StringBuilder sb = new StringBuilder();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            sb.append(zeroPad(morning_timer.getHour()));
-            sb.append(zeroPad(morning_timer.getMinute()));
-            sb.append(zeroPad(night_timer.getHour()));
-            sb.append(zeroPad(night_timer.getMinute()));
-            Log.d(Constants.TAG, "total time is: " + sb.toString());
-        } else {
-            sb.append(zeroPad(morning_timer.getCurrentHour()));
-            sb.append(zeroPad(morning_timer.getCurrentMinute()));
-            sb.append(zeroPad(night_timer.getCurrentHour()));
-            sb.append(zeroPad(night_timer.getCurrentMinute()));
-        }
-        Log.d(Constants.TAG, "time schedule is: " + sb.toString());
-        new PostData().execute(TABLE_TS, sb.toString());
     }
 
 
@@ -987,7 +934,7 @@ public class UPMC extends AppCompatActivity {
             Statement stmt = null;
             try {
                 Class.forName("com.mysql.jdbc.Driver");
-                conn = DriverManager.getConnection(DB_NAME, USER, PASS);
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
                 StringBuilder sb = new StringBuilder();
                 sb.append("INSERT INTO ");
