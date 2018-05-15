@@ -908,6 +908,10 @@ public class FitbitMessageService extends Service {
         }
     }
 
+
+    /**
+     * Private class to drop the communication table and recreate it again for reboot issues.
+     */
     private class ResetTable extends AsyncTask<String, Void, Void> {
 
 

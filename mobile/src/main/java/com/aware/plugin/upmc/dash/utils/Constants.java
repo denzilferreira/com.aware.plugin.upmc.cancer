@@ -246,7 +246,7 @@ public final class Constants {
     // Survey notif
     public static final String SURVEY_COMPLETED = "Survey already completed. Tap to complete again.";
 
-
+    // Database and local server setup commands
     public static final String LIGHTTPD_START = "ru.kslabs.ksweb.CMD.LIGHTTPD_START";
     public static final String LIGHTTPD_ADD_HOST = "ru.kslabs.ksweb.CMD.LIGHTTPD_ADD_HOST";
     public static final String DATA_KEY = "DATA";

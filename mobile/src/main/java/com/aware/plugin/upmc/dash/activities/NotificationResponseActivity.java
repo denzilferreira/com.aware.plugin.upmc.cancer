@@ -3,8 +3,10 @@ package com.aware.plugin.upmc.dash.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
@@ -22,6 +24,7 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.services.FitbitMessageService;
 import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.utils.Constants;
 
@@ -37,7 +40,7 @@ public class NotificationResponseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_response);
-        if(getIntent().getAction()!=null) {
+        if (getIntent().getAction() != null) {
             if (getIntent().getAction().equals(Constants.ACTION_SHOW_SNOOZE)) {
                 findViewById(R.id.radio_snooze).setVisibility(View.VISIBLE);
             }
@@ -47,42 +50,46 @@ public class NotificationResponseActivity extends AppCompatActivity {
         }
 
     }
+
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         Log.d(Constants.TAG, "NotificationResponseActivity:onRadioButtonClicked " + view.getId());
         boolean checked = ((RadioButton) view).isChecked();
         // Check which radio button was clicked
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.radio_ok:
                 if (checked)
                     action = Constants.ACTION_NOTIF_OK;
-                    break;
+                break;
             case R.id.radio_snooze:
                 if (checked)
                     action = Constants.ACTION_NOTIF_SNOOZE;
-                    break;
+                break;
             case R.id.radio_no:
                 if (checked)
                     action = Constants.ACTION_NOTIF_NO;
-                    break;
+                break;
         }
     }
+
     public void submitResponse(View view) {
 
 
-            if(action.equals(Constants.ACTION_NOTIF_NO)) {
-             showInabilityResponseDialog();
-            }
-
-            else {
-                if(action.length()!=0) {
-                    Log.d(Constants.TAG, "NotificationResponseActivity:submitResponse " + action);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        startForegroundService(new Intent(this, MessageService.class).setAction(action));
-                    } else {
-                        startService(new Intent(this, MessageService.class).setAction(action));
-                    }
-                    finish();
+        if (action.equals(Constants.ACTION_NOTIF_NO)) {
+            showInabilityResponseDialog();
+        } else {
+            if (action.length() != 0) {
+                Log.d(Constants.TAG, "NotificationResponseActivity:submitResponse " + action);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
+                    startForegroundService(new Intent(this, MessageService.class).setAction(action));
+                    else startForegroundService(new Intent(this, FitbitMessageService.class).setAction(action));
+                } else {
+                    if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
+                    startService(new Intent(this, MessageService.class).setAction(action));
+                    else startService(new Intent(this, FitbitMessageService.class).setAction(action));
+                }
+                finish();
             }
         }
     }
@@ -114,20 +121,25 @@ public class NotificationResponseActivity extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(editText.getText().length() == 0 && isOtherChecked()) {
+                if (editText.getText().length() == 0 && isOtherChecked()) {
                     Toast.makeText(view.getContext(), "Please specify a reason for other", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        startForegroundService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                        if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
+                            startForegroundService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                        else
+                            startForegroundService(new Intent(getApplicationContext(), FitbitMessageService.class).setAction(action));
                     } else {
-                        startService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                        if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
+                            startService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
+                        else
+                            startService(new Intent(getApplicationContext(), FitbitMessageService.class).setAction(action));
+
                     }
                     finish();
                 }
             }
         });
-
 
 
     }
@@ -138,7 +150,7 @@ public class NotificationResponseActivity extends AppCompatActivity {
 
     public void setOtherChecked(boolean otherChecked) {
         isOtherChecked = otherChecked;
-        if(otherChecked)
+        if (otherChecked)
             editText.setVisibility(View.VISIBLE);
         else
             editText.setVisibility(View.GONE);
@@ -146,12 +158,12 @@ public class NotificationResponseActivity extends AppCompatActivity {
 
     public void onCheckBoxClicked(View view) {
         boolean checked = ((CheckBox) view).isChecked();
-        if(checked)
+        if (checked)
             checkCount++;
         else
             checkCount--;
 
-        if(checkCount>0)
+        if (checkCount > 0)
             submitButton.setEnabled(true);
         else
             submitButton.setEnabled(false);
@@ -161,6 +173,14 @@ public class NotificationResponseActivity extends AppCompatActivity {
                 setOtherChecked(checked);
                 break;
         }
+    }
+
+    public String readDeviceType() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String deviceType = sharedPref.getString(Constants.PREFERENCES_KEY_DEVICE_TYPE, Constants.PREFERENCES_DEFAULT_DEVICE_TYPE);
+        if (deviceType.equals(Constants.PREFERENCES_DEFAULT_DEVICE_TYPE))
+            Log.d(Constants.TAG, "PhoneMainActivity:writeDeviceType: " + deviceType);
+        return deviceType;
     }
 
 }
