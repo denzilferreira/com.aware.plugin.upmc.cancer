@@ -927,6 +927,7 @@ public class FitbitMessageService extends Service {
 
         @Override
         protected Void doInBackground(String... strings) {
+            Log.d("yiyi","reset table is called!");
             Connection conn = null;
             Statement stmt = null;
             try {
@@ -934,7 +935,7 @@ public class FitbitMessageService extends Service {
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
                 String sql;
-                sql = "DROP TABLE IF EXISTS PromptFromWatch";
+                sql = "DROP TABLE PromptFromWatch";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE PromptFromWatch " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
