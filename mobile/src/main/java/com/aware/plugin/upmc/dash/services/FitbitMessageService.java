@@ -213,10 +213,11 @@ public class FitbitMessageService extends Service {
                     public void run() {
                         Intent upmc = new Intent(getApplicationContext(), UPMC.class);
                         startActivity(upmc);
+                        new ResetTable().execute();
+                        startFitbitCheckPromptAlarm();
                     }
                 }, 3000);
-                new ResetTable().execute();
-                startFitbitCheckPromptAlarm();
+
                 break;
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand first run");
@@ -238,10 +239,10 @@ public class FitbitMessageService extends Service {
                     public void run() {
                         Intent upmc = new Intent(getApplicationContext(), UPMC.class);
                         startActivity(upmc);
+                        setUpDatabase();
+                        startFitbitCheckPromptAlarm();
                     }
-                }, 3000);
-                setUpDatabase();
-                startFitbitCheckPromptAlarm();
+                }, 5000);
                 break;
             case Constants.ACTION_CHECK_PROMPT:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand check prompt repeatedly");
@@ -528,13 +529,13 @@ public class FitbitMessageService extends Service {
                     public void run() {
                         new CreateTables().execute();
                     }
-                },1000);
+                }, 1000);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         saveTimeSchedule();
                     }
-                },3000);
+                }, 3000);
 
             }
         }, 1000);
@@ -927,16 +928,18 @@ public class FitbitMessageService extends Service {
 
         @Override
         protected Void doInBackground(String... strings) {
-            Log.d("yiyi","reset table is called!");
+            Log.d("yiyi", "reset table is called!");
             Connection conn = null;
             Statement stmt = null;
             try {
                 Class.forName(JDBC_DRIVER);
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                Log.d("yiyi", "Connected database successfully");
                 stmt = conn.createStatement();
                 String sql;
                 sql = "DROP TABLE PromptFromWatch";
                 stmt.executeUpdate(sql);
+                Log.d("yiyi", "Table deleted!!!");
                 sql = "CREATE TABLE PromptFromWatch " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
                         " message varchar(10) not NULL, " +
