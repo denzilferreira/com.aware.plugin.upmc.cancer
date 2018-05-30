@@ -144,8 +144,8 @@ public final class Constants {
 
     //Wear monitor notif
 
-    public static final String NOTIF_APPRAISAL = "Great Job! You have been active";
-    public static final String NOTIF_INACTIVITY =  "Ready for a quick walk?";
+    public static final String NOTIF_APPRAISAL = "Great job being active!";
+    public static final String NOTIF_INACTIVITY =  "Ready for a short walk?";
 
     /**
      *

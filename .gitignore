@@ -6,3 +6,4 @@ wear/wear.iml
 
 local.properties mobile/ wear/
 local.properties mobile/mobile.iml wear/wear.iml
+local.properties

@@ -206,6 +206,10 @@ public final class Constants {
     public static final String DEMO_MODE = "Demo Mode";
 
 
+    public static final String NOTIF_APPRAISAL = "Great job being active!";
+    public static final String NOTIF_INACTIVITY =  "Ready for a short walk?";
+
+
     // intervention timeout
 
     public static int INTERVENTION_TIMEOUT =  5 * 60 * 1000;
@@ -217,6 +221,8 @@ public final class Constants {
 
 
     public static String ACTION_SHOW_ONLY_OK = "ACTION_SHOW_ONLY_OK";
+
+    public static final String ACTION_FEEDBACK_OK = "ACTION_FEEDBACK_OK";
 
 
 

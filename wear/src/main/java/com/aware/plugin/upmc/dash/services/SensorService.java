@@ -58,7 +58,7 @@ public class SensorService extends Service implements SensorEventListener {
     private Notification.Builder sessionStatusNotifBuilder;
     private NotificationCompat.Builder sessionStatusCompatNotifBuilder;
     private boolean ALARM_MINUTE_FLAG = false;
-
+    private boolean snoozeActive = false;
     public int getMINUTE_STEP_COUNT() {
         return MINUTE_STEP_COUNT;
     }
@@ -184,8 +184,6 @@ public class SensorService extends Service implements SensorEventListener {
                 showSessionStatus();
                 createInterventionNotifChannel();
                 warmUpSensor();
-                notifyInactive(50, true);
-                sendMessageServiceAction(Constants.ACTION_NOTIFY_INACTIVITY);
                 break;
             case Constants.ACTION_MINUTE_ALARM:
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_MINUTE_ALARM");
@@ -219,8 +217,8 @@ public class SensorService extends Service implements SensorEventListener {
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_SNOOZE_ALARM");
                 notifyInactive(0, false);
                 sendMessageServiceAction(action);
+                setSnoozeActive(false);
                 break;
-
 
             case Constants.ACTION_NOTIF_OK_PHONE:
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_NOTIF_OK_PHONE");
@@ -242,6 +240,11 @@ public class SensorService extends Service implements SensorEventListener {
                 cancelFeedbackAlarm();
                 break;
 
+            case Constants.ACTION_FEEDBACK_OK:
+                Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_FEEDBACK_OK");
+                dismissIntervention();
+                break;
+
             case Constants.ACTION_STOP_SELF:
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_STOP_SELF");
                 if (sensorManager != null) {
@@ -253,7 +256,6 @@ public class SensorService extends Service implements SensorEventListener {
                 break;
             default:
                 Log.d(Constants.TAG, "SensorService:onStartCommand:UndefinedAction:" + action);
-
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -281,6 +283,22 @@ public class SensorService extends Service implements SensorEventListener {
             interval = 15*60*1000;
         mAlarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis() + interval, snoozePendInt);
         dismissIntervention();
+        setSnoozeActive(true);
+    }
+
+    public void cancelSnoozeInactivityNotif() {
+        if(!isSnoozeActive())
+            return;
+        AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent snoozeInt = new Intent(this, SensorService.class).setAction(Constants.ACTION_SNOOZE_ALARM);
+        PendingIntent snoozePendInt;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            snoozePendInt = PendingIntent.getForegroundService(this, 56, snoozeInt, 0);
+        } else {
+            snoozePendInt = PendingIntent.getService(this, 56, snoozeInt, 0);
+        }
+        mAlarmManager.cancel(snoozePendInt);
+        Log.d(Constants.TAG, "SensorService: cancelling snooze");
     }
 
     public void createInterventionNotifChannel() {
@@ -531,7 +549,7 @@ public class SensorService extends Service implements SensorEventListener {
                    .setWhen(System.currentTimeMillis())
                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                    .setContentTitle("Dash Monitor")
-                   .setContentText("Ready for a short walk ? #" + sc_count)
+                   .setContentText(Constants.NOTIF_INACTIVITY + " #" + sc_count)
                    .setOngoing(true)
                    .setContentIntent(contentPI)
                    .setTimeoutAfter(Constants.INTERVENTION_TIMEOUT)
@@ -543,7 +561,7 @@ public class SensorService extends Service implements SensorEventListener {
                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                    .setContentTitle("Dash Monitor")
                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                   .setContentText("Ready for a short walk ? #" + sc_count)
+                   .setContentText(Constants.NOTIF_INACTIVITY + " #" + sc_count)
                    .setVisibility(Notification.VISIBILITY_PUBLIC)
                    .setContentIntent(contentPI)
                    .setPriority(Notification.PRIORITY_MAX)
@@ -578,17 +596,17 @@ public class SensorService extends Service implements SensorEventListener {
     public void notifyFeedback(int sc_count) {
         wakeUpAndVibrate(Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         cancelFeedbackAlarm();
-        Intent contentIntent = new Intent(this, NotificationResponse.class).setAction(Constants.ACTION_SHOW_ONLY_OK);
-        PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
+        Intent contentIntent = new Intent(this, SensorService.class).setAction(Constants.ACTION_FEEDBACK_OK);
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PendingIntent contentPI = PendingIntent.getForegroundService(this, 0, contentIntent, 0);
             Notification.Builder interventionNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
             interventionNotifBuilder.setAutoCancel(true)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("Dash Monitor")
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
-                    .setContentText("Great Job! You are active " + sc_count)
+                    .setContentText(Constants.NOTIF_APPRAISAL + " #" + sc_count)
                     .setOngoing(true)
                     .setContentIntent(contentPI)
                     .setGroup("intervention")
@@ -596,6 +614,7 @@ public class SensorService extends Service implements SensorEventListener {
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, interventionNotifBuilder.build());
         }
         else {
+            PendingIntent contentPI = PendingIntent.getService(this, 0, contentIntent, 0);
             NotificationCompat.Builder interventionNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), "sensor_service_intervention" )
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
                     .setContentTitle("Dash Monitor")
@@ -603,7 +622,7 @@ public class SensorService extends Service implements SensorEventListener {
                     .setAutoCancel(true)
                     .setOngoing(true)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setContentText("Great Job! You are active " + sc_count)
+                    .setContentText(Constants.NOTIF_APPRAISAL + " #" + sc_count)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setPriority(Notification.PRIORITY_MAX)
                     .setContentIntent(contentPI)
@@ -671,12 +690,11 @@ public class SensorService extends Service implements SensorEventListener {
                 unregisterSensorListener();
                 Log.d(Constants.TAG, "SensorService:TimePoint set");
                 setTimepoint(System.currentTimeMillis());
-//                notifyInactive(0, true);
-//                sendMessageServiceAction(Constants.ACTION_NOTIFY_INACTIVITY);
+//                notifyUserIfThreshold(10);
             }
              else if(ALARM_MINUTE_FLAG) {
                     Log.d(Constants.TAG, "SensorService: Peeking step count" + peekStepCount(count));
-                    sendMessageServiceAction(Constants.ACTION_SYNC_DATA);
+//                    sendMessageServiceAction(Constants.ACTION_SYNC_DATA);
                     Log.d(Constants.TAG, "SensorService: alarm minute flag");
                     unregisterSensorListener();
                     calculateMinuteStepCount(count);
@@ -703,6 +721,7 @@ public class SensorService extends Service implements SensorEventListener {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                            cancelSnoozeInactivityNotif();
                         }
                         else if(isEndOfInterval()) {
                             Log.d(Constants.TAG, "SensorService: End of interval: " + getCurrentAlarmType());
@@ -769,5 +788,13 @@ public class SensorService extends Service implements SensorEventListener {
 
     public void setWasPrevTimePointTimeToNotify(boolean wasPrevTimePointTimeToNotify) {
         this.wasPrevTimePointTimeToNotify = wasPrevTimePointTimeToNotify;
+    }
+
+    public boolean isSnoozeActive() {
+        return snoozeActive;
+    }
+
+    public void setSnoozeActive(boolean snoozeActive) {
+        this.snoozeActive = snoozeActive;
     }
 }
