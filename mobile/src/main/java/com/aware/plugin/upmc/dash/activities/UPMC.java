@@ -187,8 +187,8 @@ public class UPMC extends AppCompatActivity {
                             //UPMC Dash
                             isRegistered = true;
                             Log.d(Constants.TAG, "Joining Study");
-                            Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
-                            //Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/1625/1RNJ8hhucJ9M");
+                            //Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/81/Rhi4Q8PqLASf");
+                            Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/118/TKKPrzN2s0km");
                         } else {
                             if (!isMyServiceRunning(MessageService.class)) { // add Fitbit Service
                                 if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT))
