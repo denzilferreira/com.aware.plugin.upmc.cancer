@@ -10,11 +10,15 @@ import android.content.SyncRequest;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
+import com.aware.plugin.upmc.dash.services.FitbitMessageService;
+import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.services.Survey;
 import com.aware.plugin.upmc.dash.settings.Settings;
+import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.utils.Aware_Plugin;
 import com.aware.utils.Scheduler;
 
@@ -25,7 +29,7 @@ import java.util.Calendar;
 
 public class Plugin extends Aware_Plugin {
 
-    public static String ACTION_CANCER_SURVEY = "ACTION_CANCER_SURVEY";
+    public static final String ACTION_CANCER_SURVEY = "ACTION_CANCER_SURVEY";
 
     @Override
     public void onCreate() {
@@ -41,12 +45,8 @@ public class Plugin extends Aware_Plugin {
         REQUIRED_PERMISSIONS.add(Manifest.permission.VIBRATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
         REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH_ADMIN);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CALL_LOG);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CONTACTS);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
         REQUIRED_PERMISSIONS.add(Manifest.permission.WAKE_LOCK);
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -70,11 +70,11 @@ public class Plugin extends Aware_Plugin {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        Log.d(Constants.TAG, "Plugin:onStartCommand:schedule");
 
         if (PERMISSIONS_OK) {
 
             Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
-
             try {
                 if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0)
                     Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, 9);
@@ -84,14 +84,19 @@ public class Plugin extends Aware_Plugin {
 
                 int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
                 int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-
                 Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), "cancer_survey_morning");
+                Log.d(Constants.TAG, "Plugin:onStartCommand:schedule");
                 if (currentScheduler == null) {
+                    Log.d(Constants.TAG, "Plugin:onStartCommand:schedule");
+                    String className = MessageService.class.getName();
+                    if(Settings.readDeviceType(getApplicationContext()).equals(Constants.DEVICE_TYPE_FITBIT))
+                        className = FitbitMessageService.class.getName();
                     Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
                     schedule.addHour(morning_hour)
                             .addMinute(morning_minute)
+                            .setActionClass(className)
                             .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
-                            .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
+                            .setActionType(Scheduler.ACTION_TYPE_SERVICE);
                     Scheduler.saveSchedule(this, schedule);
                 } else {
                     JSONArray hours = currentScheduler.getHours();
@@ -111,12 +116,16 @@ public class Plugin extends Aware_Plugin {
                         }
                     }
                     if (hour_changed || minute_changed) {
+                        String className = MessageService.class.getName();
+                        if(Settings.readDeviceType(getApplicationContext()).equals(Constants.DEVICE_TYPE_FITBIT))
+                            className = FitbitMessageService.class.getName();
                         Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
                         Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
                         schedule.addHour(morning_hour)
                                 .addMinute(morning_minute)
+                                .setActionClass(className)
                                 .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
-                                .setActionType(Scheduler.ACTION_TYPE_BROADCAST);
+                                .setActionType(Scheduler.ACTION_TYPE_SERVICE);
                         Scheduler.saveSchedule(this, schedule);
                     }
                 }

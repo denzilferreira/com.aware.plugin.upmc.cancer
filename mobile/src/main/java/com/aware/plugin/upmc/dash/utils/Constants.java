@@ -114,12 +114,19 @@ public final class Constants {
     public static final int WEAR_NOT_IN_RANGE = 0;
     public static final int WEAR_VICINITY_CHECK_FAILED = -1;
 
-    //complete survey
+    // survey notification contents
 
-    public static final String COMPLETE_SURVEY = "Tap to begin your survey";
+    public static final String COMPLETE_SURVEY_CONTENT = "Tap to begin your survey";
+
+
+    public static final String SELF_REPORT_CONTENT = "Tap to begin your self-report";
+
+
+    // survey notification titles
+    public static final String SELF_REPORT_TITLE = "UPMC Dash Self-Report";
+    public static final String COMPLETE_SURVEY_TITLE = "UPMC Dash - Survey";
 
     //MessageService ACTIONS
-    public static final String ACTION_SURVEY = "action_survey";
     public static final String ACTION_FIRST_RUN = "first_run";
     public static final String ACTION_APPRAISAL = "action_appraisal_ok";
     public static final String ACTION_INACTIVITY = "action_inactivity_responses";
@@ -169,6 +176,12 @@ public final class Constants {
     // Demo mode Notification IDs
     public static final int DEMO_NOTIF_ID = 10;
     public static final String DEMO_NOTIF_CHNL_ID = "demo_notification";
+
+
+
+    // show morning questions
+
+    public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
 
 
 

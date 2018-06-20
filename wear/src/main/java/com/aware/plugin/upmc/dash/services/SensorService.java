@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SensorService extends Service implements SensorEventListener {
     boolean FIRST_TIME = true;
-    boolean DEBUG_MODE = false;
+    boolean DEBUG_MODE = true;
     private boolean wasPrevTimePointTimeToNotify = false;
     private int alarmType;
     private SensorManager sensorManager;
@@ -189,8 +189,16 @@ public class SensorService extends Service implements SensorEventListener {
                 Log.d(Constants.TAG, "SensorService:onStartCommand: ACTION_MINUTE_ALARM");
                 setALARM_MINUTE_FLAG(true);
                 registerSensorListener();
-                if(radomizedVicinityScan())
+                if(randomizer() && isTimeToNotify()) {
                     sendMessageServiceAction(Constants.ACTION_SCAN_PHONE);
+                    sendMessageServiceAction(Constants.ACTION_SYNC_DATA);
+                }
+
+                Calendar cal = Calendar.getInstance();
+                if(randomizer() && !isTimeToNotify()) {
+                    sendMessageServiceAction(Constants.ACTION_UPSTREAM_OK);
+                }
+
                 break;
 
             case Constants.ACTION_NOTIF_OK:
@@ -261,7 +269,7 @@ public class SensorService extends Service implements SensorEventListener {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public boolean radomizedVicinityScan() {
+    public boolean randomizer() {
         return ((new Random().nextInt(100) + 1) >= 50);
     }
 
@@ -694,7 +702,6 @@ public class SensorService extends Service implements SensorEventListener {
             }
              else if(ALARM_MINUTE_FLAG) {
                     Log.d(Constants.TAG, "SensorService: Peeking step count" + peekStepCount(count));
-//                    sendMessageServiceAction(Constants.ACTION_SYNC_DATA);
                     Log.d(Constants.TAG, "SensorService: alarm minute flag");
                     unregisterSensorListener();
                     calculateMinuteStepCount(count);

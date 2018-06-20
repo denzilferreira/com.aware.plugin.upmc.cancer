@@ -81,6 +81,8 @@ public class FitbitMessageService extends Service {
     private int id = 0;
     private int promptCount = 0;
     private String message;
+    private Notification.Builder surveyNotifBuilder;
+    private NotificationCompat.Builder surveyCompatNotifBuilder;
     private BroadcastReceiver mBluetootLocalReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -256,7 +258,7 @@ public class FitbitMessageService extends Service {
             case Constants.ACTION_SURVEY_COMPLETED:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand notify survey completed");
                 Log.d("yiyi", "action_survey_completed got called!");
-                notifySurvey(SURVEY_COMPLETED);
+                notifySurvey(false);
                 break;
             case Constants.ACTION_SETTINGS_CHANGED:
                 Log.d(Constants.TAG, "FibitMessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
@@ -284,6 +286,7 @@ public class FitbitMessageService extends Service {
                 Log.d(Constants.TAG, "FitbitMessageService:" + intentAction);
                 dismissIntervention();
                 break;
+
             default:
                 return i;
         }
@@ -292,7 +295,6 @@ public class FitbitMessageService extends Service {
 
     private void showSurveyNotif() {
         final Intent dashIntent = new Intent(this, UPMC.class);
-//        dashIntent.setAction(Constants.ACTION_SURVEY);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
@@ -300,31 +302,32 @@ public class FitbitMessageService extends Service {
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(true);
+            assert notificationManager != null;
             notificationManager.createNotificationChannel(notificationChannel);
-            Notification.Builder notificationBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
+            surveyNotifBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-            notificationBuilder.setAutoCancel(false)
+            surveyNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Survey")
+                    .setContentTitle(Constants.SELF_REPORT_TITLE)
                     .setGroup("Survey")
-                    .setContentText(Constants.COMPLETE_SURVEY)
+                    .setContentText(Constants.SELF_REPORT_CONTENT)
                     .setContentIntent(dashPendingIntent);
-            startForeground(Constants.SURVEY_NOTIF_ID, notificationBuilder.build());
+            startForeground(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
 
         } else {
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
-            notificationBuilder.setAutoCancel(false)
+            surveyCompatNotifBuilder = new NotificationCompat.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
+            surveyCompatNotifBuilder.setAutoCancel(false)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Survey")
-                    .setContentText(Constants.COMPLETE_SURVEY)
+                    .setContentTitle(Constants.SELF_REPORT_TITLE)
+                    .setContentText(Constants.SELF_REPORT_CONTENT)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setGroup("Survey")
                     .setContentInfo("Survey Notification")
                     .setContentIntent(dashPendingIntent);
-            startForeground(Constants.SURVEY_NOTIF_ID, notificationBuilder.build());
+            startForeground(Constants.SURVEY_NOTIF_ID, surveyCompatNotifBuilder.build());
         }
     }
 
@@ -379,21 +382,49 @@ public class FitbitMessageService extends Service {
         }
     }
 
-    public void notifySurvey(String contentText) {
-        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
-        wl.acquire(6000);
-        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(500);
+    private void notifySurvey(boolean daily) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupNotifBuilder.setContentText(contentText);
-            notificationManager.notify(Constants.SURVEY_NOTIF_ID, setupNotifBuilder.build());
-        } else {
-            setupNotifCompatBuilder.setContentText(contentText);
-            notificationManager.notify(Constants.SURVEY_NOTIF_ID, setupNotifCompatBuilder.build());
+        if(daily) {
+            final Intent dashIntent = new Intent(this, UPMC.class).setAction(Constants.ACTION_SHOW_MORNING);
+            PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                surveyNotifBuilder.setContentTitle(Constants.COMPLETE_SURVEY_TITLE);
+                surveyNotifBuilder.setContentText(Constants.COMPLETE_SURVEY_CONTENT);
+                surveyNotifBuilder.setContentIntent(dashPendingIntent);
+                assert notificationManager != null;
+                notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
+            }
+            else {
+                surveyCompatNotifBuilder.setContentTitle(Constants.COMPLETE_SURVEY_TITLE);
+                surveyCompatNotifBuilder.setContentText(Constants.COMPLETE_SURVEY_CONTENT);
+                surveyCompatNotifBuilder.setContentIntent(dashPendingIntent);
+                assert notificationManager != null;
+                notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
+
+            }
+        }
+        else {
+            final Intent dashIntent = new Intent(this, UPMC.class);
+            PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                surveyNotifBuilder.setContentTitle(Constants.SELF_REPORT_TITLE);
+                surveyNotifBuilder.setContentText(Constants.SELF_REPORT_CONTENT);
+                surveyNotifBuilder.setContentIntent(dashPendingIntent);
+                assert notificationManager != null;
+                notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
+            }
+            else {
+                surveyCompatNotifBuilder.setContentTitle(Constants.SELF_REPORT_TITLE);
+                surveyCompatNotifBuilder.setContentText(Constants.SELF_REPORT_CONTENT);
+                surveyCompatNotifBuilder.setContentIntent(dashPendingIntent);
+                assert notificationManager != null;
+                notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
+
+            }
+
         }
     }
+
 
 
     public void createInterventionNotifChannel() {
