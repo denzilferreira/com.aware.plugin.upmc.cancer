@@ -10,6 +10,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -29,12 +30,18 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.aware.Aware;
+import com.aware.Aware_Preferences;
 import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.activities.DataSyncingActivity;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
+import com.aware.plugin.upmc.dash.activities.Provider;
 import com.aware.plugin.upmc.dash.activities.UPMC;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.utils.KSWEBControl;
+import com.aware.utils.Scheduler;
+
+import org.json.JSONException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -60,6 +67,7 @@ import static com.aware.plugin.upmc.dash.utils.Constants.LIGHTTPD_START;
 import static com.aware.plugin.upmc.dash.utils.Constants.MINIMESSAGE;
 import static com.aware.plugin.upmc.dash.utils.Constants.NOTIFICATION;
 import static com.aware.plugin.upmc.dash.utils.Constants.NOTIF_NO_SNOOZE;
+import static com.aware.plugin.upmc.dash.utils.Constants.OTHER;
 import static com.aware.plugin.upmc.dash.utils.Constants.PACKAGE_FITBIT;
 import static com.aware.plugin.upmc.dash.utils.Constants.PACKAGE_KSWEB;
 import static com.aware.plugin.upmc.dash.utils.Constants.PASS;
@@ -517,6 +525,7 @@ public class FitbitMessageService extends Service {
         }
     }
 
+
     private void setUpDatabase() {
         lighttpdStart(getApplicationContext(), "start_lighttpd");
         lighttpdAddHost(getApplicationContext(), "add_host", "localhost", "8001", "/storage/emulated/0/ksweb/tools/phpMyAdmin");
@@ -570,10 +579,41 @@ public class FitbitMessageService extends Service {
         StringBuilder sb = new StringBuilder();
         sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR))));
         sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE))));
-        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR))));
-        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE))));
+        Integer evening_hour = Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        Integer evening_min = Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        sb.append(zeroPad(evening_hour));
+        sb.append(zeroPad(evening_min));
         Log.d(Constants.TAG, "time schedule is: " + sb.toString());
         new PostData().execute(TABLE_TS, sb.toString());
+        // now schedule a task to sync sensor data to aware every night after the patient's sleeping time
+        scheduleTimeForDataSyncing(evening_hour, evening_min);
+    }
+
+    private void scheduleTimeForDataSyncing(Integer hour, Integer min) {
+        try {
+            Scheduler.Schedule data_syncing = Scheduler.getSchedule(getApplicationContext(), "data_syncing");
+            if (data_syncing == null) {
+                data_syncing = new Scheduler.Schedule("data_syncing");
+                data_syncing.addHour(hour + 1);
+                data_syncing.addMinute(min);
+                data_syncing.setActionType(Scheduler.ACTION_TYPE_ACTIVITY);
+                data_syncing.setActionClass(getPackageName() + "/" + DataSyncingActivity.class.getName());
+                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
+            } else if (data_syncing.getHours().getInt(0) != hour
+                    || data_syncing.getMinutes().getInt(0) != min) {
+                Scheduler.removeSchedule(getApplicationContext(), "data_syncing");
+                data_syncing = new Scheduler.Schedule("data_syncing");
+                data_syncing.addHour(hour);
+                data_syncing.addMinute(min);
+                data_syncing.setActionType(Scheduler.ACTION_TYPE_ACTIVITY);
+                data_syncing.setActionClass(getPackageName() + "/" + DataSyncingActivity.class.getName());
+                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
+            }
+            Aware.startScheduler(getApplicationContext()); //apply scheduler
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private String zeroPad(Integer i) {
@@ -726,6 +766,8 @@ public class FitbitMessageService extends Service {
                     notifyUserWithAppraisal();
                 } else if (message.equals(CLOSE_NOTIF)) {
                     dismissIntervention();
+                } else if (message.equals(OTHER)) {
+                    // show up a text input box for specified reasons
                 }
             }
         }

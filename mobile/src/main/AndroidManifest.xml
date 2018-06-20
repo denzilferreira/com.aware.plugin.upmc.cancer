@@ -74,11 +74,9 @@
             android:theme="@style/Theme.AppCompat.Dialog" />
 
 
-
         <service
             android:name=".services.FitbitMessageService"
-            android:exported="false"
-             />
+            android:exported="false" />
 
         <service
             android:name=".activities.Plugin"
@@ -181,6 +179,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.DataSyncingActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

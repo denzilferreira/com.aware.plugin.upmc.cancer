@@ -214,6 +214,7 @@ public final class Constants {
     public static final String TABLE_PROMPT = "PromptFromWatch";
     public static final String TABLE_CONN = "Connection";
     public static final String TABLE_COMMAND = "CommandFromPhone";
+    public static final String TABLE_SENSOR_DATA = "SensorData";
 
     // Messages sent to the watch
     public static final String CASE1 = "<7";
@@ -226,6 +227,7 @@ public final class Constants {
     public static final String NOTIF_NO_SNOOZE = "Ready!";
     public static final String MINIMESSAGE = "Great job!";
     public static final String CLOSE_NOTIF = "Close";
+    public static final String OTHER = "Other";
 
     // Package names of apps required on the phone
     public static final String PACKAGE_KSWEB = "ru.kslabs.ksweb";
