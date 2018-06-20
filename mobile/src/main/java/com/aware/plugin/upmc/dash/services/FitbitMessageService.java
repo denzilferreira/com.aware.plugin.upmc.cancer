@@ -1,6 +1,5 @@
 package com.aware.plugin.upmc.dash.services;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -76,6 +75,7 @@ import static com.aware.plugin.upmc.dash.utils.Constants.SURVEY_COMPLETED;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_COMMAND;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_CONN;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PROMPT;
+import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_SENSOR_DATA;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_TS;
 import static com.aware.plugin.upmc.dash.utils.Constants.TAG_KEY;
 import static com.aware.plugin.upmc.dash.utils.Constants.USER;
@@ -269,6 +269,9 @@ public class FitbitMessageService extends Service {
             case Constants.ACTION_SETTINGS_CHANGED:
                 Log.d(Constants.TAG, "FibitMessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
                 saveTimeSchedule();
+                break;
+            case Constants.ACTION_SYNC_DATA:
+                new SyncData().execute();
                 break;
             case Constants.ACTION_APPRAISAL:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand appraisal");
@@ -594,19 +597,21 @@ public class FitbitMessageService extends Service {
             Scheduler.Schedule data_syncing = Scheduler.getSchedule(getApplicationContext(), "data_syncing");
             if (data_syncing == null) {
                 data_syncing = new Scheduler.Schedule("data_syncing");
-                data_syncing.addHour(hour + 1);
+                data_syncing.addHour((hour + 1) % 24);
                 data_syncing.addMinute(min);
-                data_syncing.setActionType(Scheduler.ACTION_TYPE_ACTIVITY);
-                data_syncing.setActionClass(getPackageName() + "/" + DataSyncingActivity.class.getName());
+                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
+                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
+                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
                 Scheduler.saveSchedule(getApplicationContext(), data_syncing);
             } else if (data_syncing.getHours().getInt(0) != hour
                     || data_syncing.getMinutes().getInt(0) != min) {
                 Scheduler.removeSchedule(getApplicationContext(), "data_syncing");
                 data_syncing = new Scheduler.Schedule("data_syncing");
-                data_syncing.addHour(hour);
+                data_syncing.addHour((hour + 1) % 24);
                 data_syncing.addMinute(min);
-                data_syncing.setActionType(Scheduler.ACTION_TYPE_ACTIVITY);
-                data_syncing.setActionClass(getPackageName() + "/" + DataSyncingActivity.class.getName());
+                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
+                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
+                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
                 Scheduler.saveSchedule(getApplicationContext(), data_syncing);
             }
             Aware.startScheduler(getApplicationContext()); //apply scheduler
@@ -614,6 +619,15 @@ public class FitbitMessageService extends Service {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void syncSCWithServer(long timeStamp, int type, int data) {
+        ContentValues step_count = new ContentValues();
+        step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        step_count.put(Provider.Stepcount_Data.TIMESTAMP, timeStamp);
+        step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
+        step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
+        getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
     }
 
     private String zeroPad(Integer i) {
@@ -668,7 +682,7 @@ public class FitbitMessageService extends Service {
                 stmt.close();
                 conn.close();
             } catch (Exception e) {
-                launchApp(PACKAGE_KSWEB);
+//                launchApp(PACKAGE_KSWEB);
             } finally {
                 try {
                     if (stmt != null)
@@ -798,7 +812,7 @@ public class FitbitMessageService extends Service {
                 stmt.close();
                 conn.close();
             } catch (Exception e) {
-                launchApp(PACKAGE_KSWEB);
+//                launchApp(PACKAGE_KSWEB);
             } finally {
                 try {
                     if (stmt != null)
@@ -1010,5 +1024,70 @@ public class FitbitMessageService extends Service {
         }
     }
 
+    private class SyncData extends AsyncTask<String, Void, Void> {
 
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                //Register JDBC driver
+                Class.forName("com.mysql.jdbc.Driver");
+                //Open a connection
+                Log.d("yiyi", "Connecting to database to sync sensor data...");
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                stmt = conn.createStatement();
+                StringBuilder sql = new StringBuilder();
+                sql.append("SELECT unixTime, type, data FROM ");
+                sql.append(TABLE_SENSOR_DATA);
+                ResultSet rs = stmt.executeQuery(sql.toString());
+                if (rs.next()) {
+                    long timeStamp = rs.getLong("unixTime");
+                    int type = rs.getInt("type");
+                    int data = rs.getInt("data");
+                    syncSCWithServer(timeStamp, type, data);
+                }
+                //After syncing all the data records, clear the table
+                String command = "DROP TABLE SensorData";
+                stmt.executeUpdate(command);
+                Log.d("yiyi", "Table deleted!!!");
+                command = "CREATE TABLE SensorData " +
+                        "(unixTime bigint(20) not NULL, " +
+                        " type int(11) not NULL, " +
+                        " data int(11) not NULL)";
+                stmt.executeUpdate(command);
+                Log.d("yiyi", "Reset table SensorData");
+                //Clean-up environment
+                rs.close();
+                stmt.close();
+                conn.close();
+            } catch (Exception e) {
+            } finally {
+                try {
+                    if (stmt != null)
+                        stmt.close();
+                } catch (SQLException se2) {
+                }
+                try {
+                    if (conn != null)
+                        conn.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }
+            }
+            return null;
+
+        }
+    }
 }
