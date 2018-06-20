@@ -628,6 +628,7 @@ public class FitbitMessageService extends Service {
         step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
         step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
         getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
+        Log.d("yiyi", "Sent data to aware server");
     }
 
     private String zeroPad(Integer i) {
@@ -1052,7 +1053,7 @@ public class FitbitMessageService extends Service {
                 sql.append("SELECT unixTime, type, data FROM ");
                 sql.append(TABLE_SENSOR_DATA);
                 ResultSet rs = stmt.executeQuery(sql.toString());
-                if (rs.next()) {
+                while (rs.next()) {
                     long timeStamp = rs.getLong("unixTime");
                     int type = rs.getInt("type");
                     int data = rs.getInt("data");
