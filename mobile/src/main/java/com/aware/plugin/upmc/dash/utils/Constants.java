@@ -15,10 +15,38 @@ public final class Constants {
     public static final String PREFERENCES_DEFAULT_DEVICE_TYPE = "PREFERENCES_DEFAULT_DEVICE_TYPE";
 
 
+
+
+    // survey notification contents
+
+
+
+    public static final String COMPLETE_SURVEY_CONTENT = "Tap to begin your survey";
+
+
+
+
+
+    public static final String SELF_REPORT_CONTENT = "Tap to begin your self-report";
+
+    public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
+
+
+
+
+
+    // survey notification titles
+
+    public static final String SELF_REPORT_TITLE = "UPMC Dash Self-Report";
+
+    public static final String COMPLETE_SURVEY_TITLE = "UPMC Dash - Survey";
+
+
+
     public static final String TAG = "CANCER";
     public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";
     public static final String CAPABILITY_DEMO_WEAR_APP = "upmcdash_demo_wearapp";
-    public static final String CAPABILITY_PHONE_APP = "upmcdash_phoneapp";
+    public static final String CAPABILITY_PHONE_APP= "upmcdash_phoneapp";
 
     public static final String CAPABILITY_DEMO_PHONE_APP = "upmcdash_demo_phoneapp";
 
@@ -31,6 +59,7 @@ public final class Constants {
 
     public static final String NOTIFICATION_MESSAGE_INTENT_FILTER = "upmc_notif_intent_filter";
     public static final String ACTION_SYNC_SETTINGS = "ACTION_SYNC_SETTINGS";
+
 
 
     // Messages to wear
@@ -58,6 +87,8 @@ public final class Constants {
     public static final String BLUETOOTH_COMM_KEY = "bluetooth_comm_key";
 
 
+
+
     public static final String ACTION_SHOW_SNOOZE = "action_show_snooze";
 
 
@@ -65,6 +96,11 @@ public final class Constants {
 
 
     public static final String ACTION_STOP_SELF = "ACTION_STOP_SELF";
+
+    public static final String ACTION_SYNC_DATA = "sync_sensor_data";
+
+
+
 
 
     // Snooze Action
@@ -81,8 +117,12 @@ public final class Constants {
     public static final String ACTION_NOTIF_OK = "OK_ACTION";
 
 
+
     //No Action
     public static final String ACTION_NOTIF_NO = "NO_ACTION";
+
+
+
 
 
     //MessageService Actions
@@ -93,6 +133,7 @@ public final class Constants {
     public static final String ACTION_INIT = "ACTION_INIT";
 
     public static final String ACTION_SNOOZE_ALARM = "ACTION_SNOOZE_ALARM";
+
 
 
     //vicinity check
@@ -116,9 +157,11 @@ public final class Constants {
     public static final String ACTION_REBOOT = "action_reboot";
 
 
+
     // Demo mode
 
     public static final String DEMO_MODE = "Demo mode active";
+
 
 
     // Wear setup notif
@@ -131,10 +174,12 @@ public final class Constants {
     //Wear monitor notif
 
     public static final String NOTIF_APPRAISAL = "Great Job! You have been active";
-    public static final String NOTIF_INACTIVITY = "Ready for a quick walk?";
+    public static final String NOTIF_INACTIVITY =  "Ready for a quick walk?";
 
     /**
-     * Notification Channels & Ids
+     *
+     *   Notification Channels & Ids
+     *
      */
     // channel IDs
     public static final String SURVEY_NOTIF_CHNL_ID = "survey_notification";
@@ -155,12 +200,19 @@ public final class Constants {
     public static final String DEMO_NOTIF_CHNL_ID = "demo_notification";
 
 
+
+
+
+
+
+
     // Loading Activity Stuff
 
     public static final String LOADING_ACTIVITY_INTENT_FILTER = "LOADING_ACTIVITY_INTENT_FILTER";
     public static final String MESSAGE_EXTRA_KEY = "MESSAGE_EXTRA_KEY";
     public static final String LOADING_ACTIVITY_CONNECTED_MESSAGE = "Your watch is  synced! You will receive alerts.";
     public static final String LOADING_ACTIVITY_FAILED_MESSAGE = "Setup Complete! However, your watch is not reachable";
+
 
 
     public static int INTERVENTION_TIMEOUT = 5 * 60 * 1000;
@@ -170,7 +222,11 @@ public final class Constants {
     public static Uri MESSAGE_URI = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
 
 
+
+
+
     // fitbit stuff
+
 
 
     //  Database credentials
@@ -187,7 +243,6 @@ public final class Constants {
     public static final String TABLE_PROMPT = "PromptFromWatch";
     public static final String TABLE_CONN = "Connection";
     public static final String TABLE_COMMAND = "CommandFromPhone";
-    public static final String TABLE_SENSOR_DATA = "SensorData";
 
     // Messages sent to the watch
     public static final String CASE1 = "<7";
@@ -200,7 +255,9 @@ public final class Constants {
     public static final String NOTIF_NO_SNOOZE = "Ready!";
     public static final String MINIMESSAGE = "Great job!";
     public static final String CLOSE_NOTIF = "Close";
+
     public static final String OTHER = "Other";
+    public static final String TABLE_SENSOR_DATA = "SensorData";
 
     // Package names of apps required on the phone
     public static final String PACKAGE_KSWEB = "ru.kslabs.ksweb";
@@ -217,7 +274,6 @@ public final class Constants {
     public static final String ACTION_CHECK_PROMPT = "check_prompt";
     public static final String ACTION_CHECK_CONN = "check_watch_connection";
     public static final String ACTION_SURVEY_COMPLETED = "notify_survey_completed";
-    public static final String ACTION_SYNC_DATA = "sync_sensor_data";
 
     // Survey notif
     public static final String SURVEY_COMPLETED = "Survey already completed. Tap to complete again.";
@@ -227,6 +283,9 @@ public final class Constants {
     public static final String LIGHTTPD_ADD_HOST = "ru.kslabs.ksweb.CMD.LIGHTTPD_ADD_HOST";
     public static final String DATA_KEY = "DATA";
     public static final String TAG_KEY = "TAG";
+
+
+
 
 
 }

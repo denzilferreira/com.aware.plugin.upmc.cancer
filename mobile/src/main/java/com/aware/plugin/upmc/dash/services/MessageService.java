@@ -234,6 +234,13 @@ public class MessageService extends WearableListenerService implements
     }
 
 
+    public void setupMorningSruveySchedule() {
+
+
+    }
+
+
+
     public void syncSCWithServer(){
         ContentValues step_count = new ContentValues();
         step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));

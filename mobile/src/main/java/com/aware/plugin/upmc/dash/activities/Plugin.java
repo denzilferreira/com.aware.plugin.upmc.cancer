@@ -57,15 +57,15 @@ public class Plugin extends Aware_Plugin {
         REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_STATS);
     }
 
-    public static class SurveyListener extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ACTION_CANCER_SURVEY)) {
-                Intent surveyService = new Intent(context, Survey.class);
-                context.startService(surveyService);
-            }
-        }
-    }
+//    public static class SurveyListener extends BroadcastReceiver {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            if (intent.getAction().equals(ACTION_CANCER_SURVEY)) {
+//                Intent surveyService = new Intent(context, Survey.class);
+//                context.startService(surveyService);
+//            }
+//        }
+//    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

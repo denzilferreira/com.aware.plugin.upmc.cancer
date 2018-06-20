@@ -850,6 +850,10 @@ public class UPMC extends AppCompatActivity {
         return deviceType;
     }
 
+
+
+
+
     private class JoinedStudy extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -908,9 +912,13 @@ public class UPMC extends AppCompatActivity {
                 } else
                     sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
 
+
                 finish();
             }
         }
+
+
+
 
 
     }
