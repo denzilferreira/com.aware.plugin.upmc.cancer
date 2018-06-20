@@ -632,65 +632,65 @@ public class FitbitMessageService extends Service {
 
 
     public void scheduleTimeForMorningSurvey() {
-        return;
-//        Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey");
-//        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
-//        try {
-//            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0)
-//                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, 9);
-//
-//            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() == 0)
-//                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, 0);
-//
-//            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-//            int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-//            Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), "cancer_survey_morning");
-//            Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
-//            if (currentScheduler == null) {
-//                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
-//                String className = FitbitMessageService.class.getName();
-//                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
-//                schedule.addHour(morning_hour)
-//                        .addMinute(morning_minute)
-//                        .setActionClass(className)
-//                        .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
-//                        .setActionType(Scheduler.ACTION_TYPE_SERVICE);
-//                Scheduler.saveSchedule(this, schedule);
-//            } else {
-//                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:else part");
-//                JSONArray hours = currentScheduler.getHours();
-//                JSONArray minutes = currentScheduler.getMinutes();
-//                boolean hour_changed = false;
-//                boolean minute_changed = false;
-//                for (int i = 0; i < hours.length(); i++) {
-//                    if (hours.getInt(i) != morning_hour) {
-//                        hour_changed = true;
-//                        break;
-//                    }
-//                }
-//                for (int i = 0; i < minutes.length(); i++) {
-//                    if (minutes.getInt(i) != morning_minute) {
-//                        minute_changed = true;
-//                        break;
-//                    }
-//                }
-//                if (hour_changed || minute_changed) {
-//                    String className = MessageService.class.getName();
-//                    if(Settings.readDeviceType(getApplicationContext()).equals(Constants.DEVICE_TYPE_FITBIT))
-//                        className = FitbitMessageService.class.getName();
-//                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
-//                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
-//                    schedule.addHour(morning_hour)
-//                            .addMinute(morning_minute)
-//                            .setActionClass(className)
-//                            .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
-//                            .setActionType(Scheduler.ACTION_TYPE_SERVICE);
-//                    Scheduler.saveSchedule(this, schedule);
-//                }
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey");
+        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+        try {
+
+            String  className = getPackageName() + "/" + FitbitMessageService.class.getName();
+            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0)
+                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, 9);
+
+            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() == 0)
+                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, 0);
+
+            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+            int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+            Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), "cancer_survey_morning");
+            Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
+            if (currentScheduler == null) {
+                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
+
+                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
+                schedule.addHour(morning_hour)
+                        .addMinute(morning_minute)
+                        .setActionClass(className)
+                        .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
+                        .setActionType(Scheduler.ACTION_TYPE_SERVICE);
+                Scheduler.saveSchedule(getApplicationContext(), schedule);
+                Aware.startScheduler(getApplicationContext()); //apply scheduler
+            } else {
+                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:else part");
+                JSONArray hours = currentScheduler.getHours();
+                JSONArray minutes = currentScheduler.getMinutes();
+                boolean hour_changed = false;
+                boolean minute_changed = false;
+                for (int i = 0; i < hours.length(); i++) {
+                    if (hours.getInt(i) != morning_hour) {
+                        hour_changed = true;
+                        break;
+                    }
+                }
+                for (int i = 0; i < minutes.length(); i++) {
+                    if (minutes.getInt(i) != morning_minute) {
+                        minute_changed = true;
+                        break;
+                    }
+                }
+                if (hour_changed || minute_changed) {
+                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
+                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
+                    schedule.addHour(morning_hour)
+                            .addMinute(morning_minute)
+                            .setActionClass(className)
+                            .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
+                            .setActionType(Scheduler.ACTION_TYPE_SERVICE);
+                    Scheduler.saveSchedule(this, schedule);
+                    Aware.startScheduler(getApplicationContext()); //apply scheduler
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void scheduleTimeForDataSyncing(Integer hour, Integer min) {
