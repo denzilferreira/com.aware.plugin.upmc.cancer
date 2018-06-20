@@ -273,6 +273,13 @@ public class UPMC extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        boolean show_morning = false;
+        if(getIntent()!=null) {
+            if(getIntent().getAction()!=null) {
+                if(getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING));
+                    show_morning = true;
+            }
+        }
         ArrayList<String> REQUIRED_PERMISSIONS = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             REQUIRED_PERMISSIONS.add(Manifest.permission.BODY_SENSORS);
@@ -280,13 +287,8 @@ public class UPMC extends AppCompatActivity {
         REQUIRED_PERMISSIONS.add(Manifest.permission.VIBRATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
         REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH_ADMIN);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CALL_LOG);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_CONTACTS);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SMS);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
         REQUIRED_PERMISSIONS.add(Manifest.permission.WAKE_LOCK);
         //these are needed for the sync adapter to work...
         REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
@@ -336,7 +338,7 @@ public class UPMC extends AppCompatActivity {
                     else
                         sendMessageServiceAction(Constants.ACTION_REBOOT);
                 }
-                showSymptomSurvey();
+                showSymptomSurvey(show_morning);
             }
         }
     }
@@ -360,7 +362,7 @@ public class UPMC extends AppCompatActivity {
         }
     }
 
-    public void showSymptomSurvey() {
+    public void showSymptomSurvey(boolean show_morning) {
         ratingList = new ArrayList<>(12);
         for (int i = 0; i < 12; i++) {
             ratingList.add(i, -1);
@@ -374,7 +376,7 @@ public class UPMC extends AppCompatActivity {
         final TimePicker to_bed = findViewById(R.id.bed_time);
         final TimePicker from_bed = findViewById(R.id.woke_time);
         final RadioGroup qos_sleep = findViewById(R.id.qos_sleep);
-        if (cal.get(Calendar.HOUR_OF_DAY) >= Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR)) && cal.get(Calendar.HOUR_OF_DAY) <= 12) {
+        if (show_morning) {
             morning_questions.setVisibility(View.VISIBLE);
 
             Calendar today = Calendar.getInstance();
@@ -698,7 +700,6 @@ public class UPMC extends AppCompatActivity {
                         finish();
                     }
                 }
-
                 answer_questions.setEnabled(false);
                 answer_questions.setText("Saving answers..");
                 Log.d(Constants.TAG, "UPMC:Questionnaire");
@@ -724,8 +725,6 @@ public class UPMC extends AppCompatActivity {
                 answer.put(Provider.Symptom_Data.SCORE_OTHER, parseAnswer(other_rating.getText().toString()));
                 answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
                 getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
-
-
                 if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID)) {
                     int severity = checkSymptoms();
                     final Context context = getApplicationContext();
@@ -741,8 +740,10 @@ public class UPMC extends AppCompatActivity {
                         Aware.setSetting(context, Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, severity);
                         sendMessageServiceAction(Constants.ACTION_INIT);
                     }
+                    sendMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
                 } else if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
                     checkSymptoms();
+                    sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
                 }
                 Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();
                 finish();

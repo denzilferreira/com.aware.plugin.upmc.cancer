@@ -438,7 +438,6 @@ public class DemoMessageService extends WearableListenerService implements Messa
 
     private void showDemoNotif() {
         final Intent dashIntent = new Intent(this, UPMC.class);
-        dashIntent.setAction(Constants.ACTION_SURVEY);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(Constants.DEMO_NOTIF_CHNL_ID, "UPMC Dash Demo", NotificationManager.IMPORTANCE_HIGH);

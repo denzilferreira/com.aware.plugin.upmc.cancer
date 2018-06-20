@@ -160,6 +160,8 @@ public final class Constants {
     public static final String ACTION_NOTIF_OK_PHONE = "OK_ACTION_PHONE";
     public static final String ACTION_NOTIF_NO_PHONE = "NO_ACTION_PHONE";
 
+    public static final String ACTION_UPSTREAM_OK = "ACTION_UPSTREAM_OK";
+
 
     //NotificationResponse actions
     public static final String ACTION_SHOW_SNOOZE = "actopm_show_all";
@@ -206,6 +208,10 @@ public final class Constants {
     public static final String DEMO_MODE = "Demo Mode";
 
 
+    public static final String NOTIF_APPRAISAL = "Great job being active!";
+    public static final String NOTIF_INACTIVITY =  "Ready for a short walk?";
+
+
     // intervention timeout
 
     public static int INTERVENTION_TIMEOUT =  5 * 60 * 1000;
@@ -217,6 +223,8 @@ public final class Constants {
 
 
     public static String ACTION_SHOW_ONLY_OK = "ACTION_SHOW_ONLY_OK";
+
+    public static final String ACTION_FEEDBACK_OK = "ACTION_FEEDBACK_OK";
 
 
 

@@ -1,14 +1,17 @@
 package com.aware.plugin.upmc.dash.settings;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.aware.Aware;
 import com.aware.plugin.upmc.dash.R;
+import com.aware.plugin.upmc.dash.utils.Constants;
 
 /**
  * Created by denzil on 13/04/15.
@@ -70,6 +73,16 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
         }
         min_interval_prompts.setText(Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL));
         min_interval_prompts.setSummary(Aware.getSetting(this, PLUGIN_UPMC_CANCER_PROMPT_INTERVAL) + " minutes");
+    }
+
+
+
+    public static String readDeviceType(Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String deviceType = sharedPref.getString(Constants.PREFERENCES_KEY_DEVICE_TYPE, Constants.PREFERENCES_DEFAULT_DEVICE_TYPE);
+        if (deviceType.equals(Constants.PREFERENCES_DEFAULT_DEVICE_TYPE))
+            Log.d(Constants.TAG, "Settings:readDeviceType: " + deviceType);
+        return deviceType;
     }
 
     @Override

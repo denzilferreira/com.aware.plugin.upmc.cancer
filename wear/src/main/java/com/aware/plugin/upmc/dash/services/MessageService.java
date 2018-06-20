@@ -166,6 +166,10 @@ public class MessageService extends WearableListenerService implements
                 stopForeground(true);
                 stopSelf();
                 break;
+            case Constants.ACTION_UPSTREAM_OK:
+                Log.d(Constants.TAG, "MessageService:onStartCommand: ACTION_UPSTREAM_OK");
+                sendMessageToPhone(Constants.ACTION_UPSTREAM_OK);
+                break;
             default:
                 return i;
         }
@@ -444,7 +448,7 @@ public class MessageService extends WearableListenerService implements
                     setPhoneAround(true);
                     break;
                 case Constants.ACTION_INIT:
-                    Log.d(Constants.TAG, "MessageService:onMessageReceived:INIT_TS");
+                    Log.d(Constants.TAG, "MessageService:onMessageReceived:ACTION_INIT");
                     parseAndStorePref(message);
                     checkAndStartSession();
                     sendStateToPhone();
@@ -501,6 +505,7 @@ public class MessageService extends WearableListenerService implements
     }
 
     public void parseAndStorePref(String message) {
+        Log.d(Constants.TAG, "parseAndStorePref: " + message);
         String[] arr = message.split("\\s+");
         int morn_hour = Integer.parseInt(arr[1]);
         int morn_minute = Integer.parseInt(arr[2]);
