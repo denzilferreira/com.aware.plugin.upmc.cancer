@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">UPMC DASH</string>
+    <string name="plugin_upmc_dash">Plugin: UPMC Dash</string>
+    <string name="cancer_intro">Please rate how severe the following symptoms are <b><u>right now</u></b> from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be).</string>
+    <string name="dash_intro">Please rate how severe the following symptoms have been <b><u>in the last 24 hours</u></b> from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be).</string>
+    <string name="evening_intro">What was the most stressful or negative event you experienced today?</string>
+    <string name="aware_description">This service makes sure the application is running at all times. Please activate it during the study.</string>
+    <string name="aware_activate_accessibility">Activate UPMC DASH in the accessibility services.</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_inability_response_form">InabilityResponseForm</string>
+    <string name="title_activity_demo_esm">DemoESM</string>
+
+    <string name="title_activity_wear_status">WearStatusActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_notification_response">NotificationResponseActivity</string>
+    <string name="title_activity_demo_mode">DemoMode</string>
+    <string name="title_activity_inability_response">InabilityResponseActivity</string>
+
+</resources>

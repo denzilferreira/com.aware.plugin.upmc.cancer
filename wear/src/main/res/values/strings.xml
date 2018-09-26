@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">UPMC DASH</string>
+    <string name="hello_world">Hello World!</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_wear_response">WearResponseActivity</string>
+    <string name="title_activity_notification_response">NotificationResponse</string>
+    <string name="title_activity_demo_mode">DemoMode</string>
+    <string name="title_activity_inability_response_form">InabilityResponseForm</string>
+</resources>

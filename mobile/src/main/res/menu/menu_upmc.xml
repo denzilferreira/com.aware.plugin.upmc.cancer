@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activities.UPMC">
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_action_timer"
+        android:orderInCategory="100"
+        android:title="Settings"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_study"
+        android:icon="@drawable/ic_action_participant"
+        android:orderInCategory="200"
+        android:title="Participant"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_esm_example"
+        android:orderInCategory="300"
+        android:title="Demo ESM"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_motivation_example"
+        android:title="Demo Watch"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/study_sync"
+        android:icon="@drawable/ic_stat_aware_sync"
+        android:orderInCategory="101"
+        android:title="Sync"
+        app:showAsAction="always" />
+</menu>
