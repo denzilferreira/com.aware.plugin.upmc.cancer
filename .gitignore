@@ -9,3 +9,4 @@ local.properties mobile/mobile.iml wear/wear.iml
 local.properties
 *.iml
 *.properties
+*.apk
