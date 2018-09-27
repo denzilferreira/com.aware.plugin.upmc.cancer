@@ -1,4 +1,14 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion compile_sdk
@@ -78,6 +88,7 @@ if (System.getenv("storeFile") != null && System.getenv("storePassword") != null
 
 repositories {
     maven { url "https://jitpack.io" }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 configurations.all {
@@ -97,6 +108,11 @@ dependencies {
     api 'com.android.support.constraint:constraint-layout:1.1.2'
     api "com.google.android.gms:play-services-wearable:$google_libs"
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    api group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
 
+    api 'com.google.firebase:firebase-crash:16.2.0'
+    api "com.crashlytics.sdk.android:crashlytics:2.9.5"
+    api 'com.google.firebase:firebase-core:16.0.3'
 }
+
+apply plugin: 'com.google.gms.google-services'

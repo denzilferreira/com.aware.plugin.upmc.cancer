@@ -178,6 +178,9 @@
         <activity
             android:name=".activities.DataSyncingActivity"
             android:exported="true" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="edf1b350fc8819daef11e8ab26f363e0badab054" />
     </application>
 
 </manifest>

@@ -21,6 +21,8 @@ import com.aware.plugin.upmc.dash.fileutils.FileManager;
 import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.utils.Constants;
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import java.io.IOException;
 
 public class PhoneMainActivity extends AppCompatActivity {
@@ -28,6 +30,7 @@ public class PhoneMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         this.setFinishOnTouchOutside(false);
         String[] REQUIRED_PERMISSIONS = new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE};

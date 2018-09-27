@@ -101,7 +101,15 @@ public class UPMC extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mNotifBroadcastReceiver, new IntentFilter(Constants.NOTIFICATION_MESSAGE_INTENT_FILTER));
+        //crash for fun
+
     }
+
+
+    public void forceCrash(View view) {
+        throw new RuntimeException("This is a crash");
+    }
+
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
