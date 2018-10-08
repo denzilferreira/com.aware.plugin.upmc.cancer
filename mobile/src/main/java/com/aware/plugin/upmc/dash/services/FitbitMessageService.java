@@ -224,6 +224,7 @@ public class FitbitMessageService extends Service {
                     @Override
                     public void run() {
                         Intent upmc = new Intent(getApplicationContext(), UPMC.class);
+                        upmc.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(upmc);
                         new ResetTable().execute();
                         startFitbitCheckPromptAlarm();
