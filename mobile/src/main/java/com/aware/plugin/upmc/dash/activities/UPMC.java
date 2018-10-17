@@ -868,20 +868,19 @@ public class UPMC extends AppCompatActivity {
             Log.d(Constants.TAG, "JoinedStudy:onReceive:");
             if (intent.getAction().equalsIgnoreCase(Aware.ACTION_JOINED_STUDY)) {
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true); //enable logcat debug messages
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
-                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SIGNIFICANT_MOTION, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ACCELEROMETER, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_ACCELEROMETER, 200000);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.STATUS_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, true);
+//                Aware.setSetting(getApplicationContext(), com.aware.plugin.google.activity_recognition.Settings.FREQUENCY_PLUGIN_GOOGLE_ACTIVITY_RECOGNITION, 300);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_ESM, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_LIGHT, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.THRESHOLD_LIGHT, 5);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_BATTERY, true);
+//                Aware.setSetting(getApplicationContext(), Aware_Preferences.STATUS_SCREEN, true);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                 Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -895,7 +894,7 @@ public class UPMC extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, night_timer.getCurrentHour());
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, night_timer.getCurrentMinute());
                 }
-                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
+//                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
                 Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
                 //Ask accessibility to be activated
                 Applications.isAccessibilityServiceActive(getApplicationContext());

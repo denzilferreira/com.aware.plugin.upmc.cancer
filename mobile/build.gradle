@@ -51,7 +51,7 @@ android {
         resValue "string", "provider_wifi", android.defaultConfig.applicationId + ".provider.wifi"
 
         //Bundled plugins provider authority overrides
-        resValue "string", "provider_google_activity_recognition", android.defaultConfig.applicationId + ".provider.gar"
+//        resValue "string", "provider_google_activity_recognition", android.defaultConfig.applicationId + ".provider.gar"
         resValue "string", "provider_upmc", android.defaultConfig.applicationId + ".provider.survey"
     }
 
