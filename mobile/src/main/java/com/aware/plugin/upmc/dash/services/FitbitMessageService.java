@@ -316,15 +316,8 @@ public class FitbitMessageService extends Service {
 
     private void showSurveyNotif() {
         final Intent dashIntent = new Intent(this, UPMC.class);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        createSurveyNotifChannel(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, "UPMC Dash", NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.setDescription("UPMC Dash Survey Notification");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.enableVibration(true);
-            assert notificationManager != null;
-            notificationManager.createNotificationChannel(notificationChannel);
             surveyNotifBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             surveyNotifBuilder.setAutoCancel(false)
@@ -405,7 +398,9 @@ public class FitbitMessageService extends Service {
 
     private void notifySurvey(boolean daily) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        createSurveyNotifChannel(daily);
         if(daily) {
+            wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
             final Intent dashIntent = new Intent(this, UPMC.class).setAction(Constants.ACTION_SHOW_MORNING);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -445,8 +440,6 @@ public class FitbitMessageService extends Service {
         }
     }
 
-
-
     public void createInterventionNotifChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(Constants.INTERVENTION_NOTIF_CHNL_ID, Constants.INTERVENTION_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
@@ -455,6 +448,27 @@ public class FitbitMessageService extends Service {
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(false);
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
+    public void createSurveyNotifChannel(boolean daily) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel;
+            if(daily) {
+                notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, Constants.SURVEY_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
+                notificationChannel.enableLights(true);
+                notificationChannel.setLightColor(Color.RED);
+                notificationChannel.enableVibration(true);
+            }
+            else {
+                notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, Constants.SURVEY_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_LOW);
+                notificationChannel.enableLights(false);
+                notificationChannel.enableVibration(false);
+            }
+            notificationChannel.setDescription(Constants.SURVEY_NOTIF_CHNL_DESC);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            assert notificationManager != null;
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }

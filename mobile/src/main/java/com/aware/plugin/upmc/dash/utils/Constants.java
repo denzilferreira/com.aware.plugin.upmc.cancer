@@ -21,13 +21,13 @@ public final class Constants {
 
 
 
-    public static final String COMPLETE_SURVEY_CONTENT = "Tap to begin your survey";
+    public static final String COMPLETE_SURVEY_CONTENT = "Tap to report";
 
 
 
 
 
-    public static final String SELF_REPORT_CONTENT = "Tap to begin your self-report";
+    public static final String SELF_REPORT_CONTENT = "Tap to edit";
 
     public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
 
@@ -182,11 +182,12 @@ public final class Constants {
      *
      */
     // channel IDs
-    public static final String SURVEY_NOTIF_CHNL_ID = "survey_notification";
+
 
     public static final String INTERVENTION_NOTIF_CHNL_ID = "intervention_notification";
     public static final String INTERVENTION_NOTIF_CHNL_NAME = "UPMC Dash intervention notification";
     public static final String INTERVENTION_NOTIF_CHNL_DESC = "UPMC Dash intervention notification";
+
 
 
     // Notification IDs
@@ -199,6 +200,10 @@ public final class Constants {
     public static final int DEMO_NOTIF_ID = 10;
     public static final String DEMO_NOTIF_CHNL_ID = "demo_notification";
 
+
+    public static final String SURVEY_NOTIF_CHNL_NAME= "UPMC Dash Survey notification";
+    public static final String SURVEY_NOTIF_CHNL_ID = "survey_notification";
+    public static final String SURVEY_NOTIF_CHNL_DESC= "UPMC Dash Survey notification";
 
 
 
