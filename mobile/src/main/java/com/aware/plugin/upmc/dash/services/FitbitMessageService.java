@@ -438,7 +438,7 @@ public class FitbitMessageService extends Service {
                 surveyCompatNotifBuilder.setContentText(Constants.SELF_REPORT_CONTENT);
                 surveyCompatNotifBuilder.setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
-                notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
+                notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyCompatNotifBuilder.build());
 
             }
 
