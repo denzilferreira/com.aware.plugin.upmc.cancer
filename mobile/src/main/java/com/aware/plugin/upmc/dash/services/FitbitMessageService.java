@@ -59,6 +59,7 @@ import static com.aware.plugin.upmc.dash.utils.Constants.CONNECTED_WEAR;
 import static com.aware.plugin.upmc.dash.utils.Constants.CONTENT_TITLE_FITBIT;
 import static com.aware.plugin.upmc.dash.utils.Constants.DB_NAME;
 import static com.aware.plugin.upmc.dash.utils.Constants.DB_URL;
+import static com.aware.plugin.upmc.dash.utils.Constants.DO_NOT_DISTURB_COMMAND;
 import static com.aware.plugin.upmc.dash.utils.Constants.FAILED_WEAR;
 import static com.aware.plugin.upmc.dash.utils.Constants.HOST_URL;
 import static com.aware.plugin.upmc.dash.utils.Constants.INTERVENTION_TIMEOUT;
@@ -303,11 +304,12 @@ public class FitbitMessageService extends Service {
                 break;
             case Constants.ACTION_NOTIF_NO:
                 new PostData().execute(TABLE_COMMAND, CLOSE_COMMAND);
-//                sendMessageToWear(intentAction);
                 Log.d(Constants.TAG, "FitbitMessageService:" + intentAction);
                 dismissIntervention();
                 break;
-
+            case Constants.ACTION_DO_NOT_DISTURB:
+                new PostData().execute(TABLE_COMMAND, DO_NOT_DISTURB_COMMAND);
+                break;
             default:
                 return i;
         }
@@ -399,7 +401,7 @@ public class FitbitMessageService extends Service {
     private void notifySurvey(boolean daily) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         createSurveyNotifChannel(daily);
-        if(daily) {
+        if (daily) {
             wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
             final Intent dashIntent = new Intent(this, UPMC.class).setAction(Constants.ACTION_SHOW_MORNING);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
@@ -409,16 +411,14 @@ public class FitbitMessageService extends Service {
                 surveyNotifBuilder.setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
-            }
-            else {
+            } else {
                 surveyCompatNotifBuilder.setContentTitle(Constants.COMPLETE_SURVEY_TITLE);
                 surveyCompatNotifBuilder.setContentText(Constants.COMPLETE_SURVEY_CONTENT);
                 surveyCompatNotifBuilder.setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
             }
-        }
-        else {
+        } else {
             final Intent dashIntent = new Intent(this, UPMC.class);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -427,8 +427,7 @@ public class FitbitMessageService extends Service {
                 surveyNotifBuilder.setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
-            }
-            else {
+            } else {
                 surveyCompatNotifBuilder.setContentTitle(Constants.SELF_REPORT_TITLE);
                 surveyCompatNotifBuilder.setContentText(Constants.SELF_REPORT_CONTENT);
                 surveyCompatNotifBuilder.setContentIntent(dashPendingIntent);
@@ -455,13 +454,12 @@ public class FitbitMessageService extends Service {
     public void createSurveyNotifChannel(boolean daily) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel;
-            if(daily) {
+            if (daily) {
                 notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, Constants.SURVEY_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
                 notificationChannel.enableLights(true);
                 notificationChannel.setLightColor(Color.RED);
                 notificationChannel.enableVibration(true);
-            }
-            else {
+            } else {
                 notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, Constants.SURVEY_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_LOW);
                 notificationChannel.enableLights(false);
                 notificationChannel.enableVibration(false);
@@ -652,7 +650,7 @@ public class FitbitMessageService extends Service {
         Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
         try {
 
-            String  className = getPackageName() + "/" + FitbitMessageService.class.getName();
+            String className = getPackageName() + "/" + FitbitMessageService.class.getName();
             if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0)
                 Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, 9);
 

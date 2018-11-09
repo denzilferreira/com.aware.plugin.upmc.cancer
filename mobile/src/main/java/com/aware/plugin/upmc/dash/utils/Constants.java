@@ -122,8 +122,8 @@ public final class Constants {
     public static final String ACTION_NOTIF_NO = "NO_ACTION";
 
 
-
-
+    // Do Not Disturb Action
+    public static final String ACTION_DO_NOT_DISTURB = "ACTION_DO_NOT_DISTURB";
 
     //MessageService Actions
     public static final String ACTION_SETUP_WEAR = "setup_wear";
@@ -254,6 +254,7 @@ public final class Constants {
     public static final String CASE2 = ">=7";
     public static final String SNOOZE_COMMAND = "Snooze";
     public static final String CLOSE_COMMAND = "Close";
+    public static final String DO_NOT_DISTURB_COMMAND = "Do Not Disturb";
 
     // Messages received from the watch
     public static final String NOTIFICATION = "Ready?";
