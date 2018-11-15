@@ -179,7 +179,7 @@ public class NotificationResponseActivity extends AppCompatActivity {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String deviceType = sharedPref.getString(Constants.PREFERENCES_KEY_DEVICE_TYPE, Constants.PREFERENCES_DEFAULT_DEVICE_TYPE);
         if (deviceType.equals(Constants.PREFERENCES_DEFAULT_DEVICE_TYPE))
-            Log.d(Constants.TAG, "PhoneMainActivity:writeDeviceType: " + deviceType);
+            Log.d(Constants.TAG, "OnboardingActivity:writeDeviceType: " + deviceType);
         return deviceType;
     }
 

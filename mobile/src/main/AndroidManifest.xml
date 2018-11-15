@@ -3,13 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.aware.plugin.upmc.dash">
 
-    <uses-feature
-        android:name="android.hardware.sensor.stepcounter"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.sensor.stepdetector"
-        android:required="false" />
-
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -24,7 +17,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
 
     <permission
         android:name="com.aware.READ_CONTEXT_DATA"
@@ -69,11 +61,9 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
-
         <service
             android:name=".services.FitbitMessageService"
             android:exported="false" />
-
         <service
             android:name=".activities.Plugin"
             android:exported="true"
@@ -123,12 +113,12 @@
             android:syncable="true"
             android:writePermission="com.aware.WRITE_CONTEXT_DATA" />
 
-        <receiver android:name=".activities.Plugin$SurveyListener">
-            <intent-filter>
-                <action android:name="ACTION_CANCER_SURVEY" />
-                <action android:name="ACTION_CANCER_EMOTION" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".activities.Plugin$SurveyListener">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="ACTION_CANCER_SURVEY" />-->
+                <!--<action android:name="ACTION_CANCER_EMOTION" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
         <receiver android:name=".activities.Plugin$SyncReceiver">
             <intent-filter>
                 <action android:name="ACTION_AWARE_SYNC_DATA" />
@@ -167,20 +157,44 @@
             android:label="@string/title_activity_notification_response"
             android:theme="@style/Theme.AppCompat.Dialog.Alert" />
         <activity
-            android:name=".activities.PhoneMainActivity"
+            android:name=".activities.OnboardingActivity"
             android:label="UPMC Dash"
             android:theme="@style/AppTheme.NoActionBar">
+
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
         <activity
             android:name=".activities.DataSyncingActivity"
             android:exported="true" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="edf1b350fc8819daef11e8ab26f363e0badab054" />
+
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="@string/title_activity_main"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme"
+            >
+
+
+            <intent-filter>
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+
+
+        </activity>
     </application>
 
 </manifest>

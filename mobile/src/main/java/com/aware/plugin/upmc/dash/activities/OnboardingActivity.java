@@ -8,29 +8,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.aware.Aware;
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.fileutils.FileManager;
-import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.utils.Constants;
 
-import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
 import java.io.IOException;
 
-public class PhoneMainActivity extends AppCompatActivity {
+public class OnboardingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
         this.setFinishOnTouchOutside(false);
         String[] REQUIRED_PERMISSIONS = new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -44,22 +38,21 @@ public class PhoneMainActivity extends AppCompatActivity {
     }
 
     public void onRadioButtonClicked(View view) {
-        if(view.getId() == R.id.radio_fitbit) {
-            Log.d(Constants.TAG, "PhoneMainActivity: starting in Fitbit mode");
-            writeDeviceType(Constants.DEVICE_TYPE_FITBIT);
-            try {
-                FileManager.writeResourcesToHtdocs(view.getContext());
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            FileManager.writeResourcesToHtdocs(view.getContext());
+        } catch (IllegalAccessException | IOException e) {
+            e.printStackTrace();
+        }
+
+        if(view.getId() == R.id.radio_control) {
+            Log.d(Constants.TAG, "OnboardingActivity: starting in control mode");
+            writeDeviceType(Constants.DEVICE_TYPE_CONTROL);
         }
         else {
-            Log.d(Constants.TAG, "PhoneMainActivity: starting in Android mode");
-            writeDeviceType(Constants.DEVICE_TYPE_ANDROID);
+            Log.d(Constants.TAG, "OnboardingActivity: starting in regular mode");
+            writeDeviceType(Constants.DEVICE_TYPE_REGULAR);
         }
-        Intent intent = new Intent(this, UPMC.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
@@ -68,19 +61,19 @@ public class PhoneMainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1: {
-                Log.d(Constants.TAG, "PhoneMainActivity:Permissions Granted");
+                Log.d(Constants.TAG, "OnboardingActivity:Permissions Granted");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     String deviceType = readDeviceType();
                     switch (deviceType) {
-                        case Constants.DEVICE_TYPE_FITBIT:
-                        case Constants.DEVICE_TYPE_ANDROID:
-                            Intent intent = new Intent(this, UPMC.class);
+                        case Constants.DEVICE_TYPE_REGULAR:
+                        case Constants.DEVICE_TYPE_CONTROL:
+                            Intent intent = new Intent(this, MainActivity.class);
                             startActivity(intent);
                             finish();
                             break;
                         case Constants.PREFERENCES_DEFAULT_DEVICE_TYPE:
-                            Log.d(Constants.TAG, "PhoneMainActivity: showing mode selection UI");
-                            setContentView(R.layout.activity_main);
+                            Log.d(Constants.TAG, "OnboardingActivity: showing mode selection UI");
+                            setContentView(R.layout.activity_onboarding);
                             break;
                     }
 
@@ -91,7 +84,7 @@ public class PhoneMainActivity extends AppCompatActivity {
 
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    Toast.makeText(PhoneMainActivity.this, "Permission denied. Cannot continue", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OnboardingActivity.this, "Permission denied. Cannot continue", Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
@@ -106,14 +99,14 @@ public class PhoneMainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(Constants.PREFERENCES_KEY_DEVICE_TYPE, deviceType);
         editor.apply();
-        Log.d(Constants.TAG, "PhoneMainActivity:writeDeviceType: " + deviceType);
+        Log.d(Constants.TAG, "OnboardingActivity:writeDeviceType: " + deviceType);
     }
 
     public String readDeviceType() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String deviceType = sharedPref.getString(Constants.PREFERENCES_KEY_DEVICE_TYPE, Constants.PREFERENCES_DEFAULT_DEVICE_TYPE);
         if (deviceType.equals(Constants.PREFERENCES_DEFAULT_DEVICE_TYPE))
-            Log.d(Constants.TAG, "PhoneMainActivity:readDeviceType: " + deviceType);
+            Log.d(Constants.TAG, "OnboardingActivity:readDeviceType: " + deviceType);
         return deviceType;
     }
 

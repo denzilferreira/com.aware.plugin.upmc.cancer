@@ -8,8 +8,12 @@ import android.net.Uri;
 
 public final class Constants {
 
-    public static final String DEVICE_TYPE_FITBIT = "DEVICE_TYPE_FITBIT";
-    public static final String DEVICE_TYPE_ANDROID = "DEVICE_TYPE_ANDROID";
+    public static final String DEVICE_TYPE_REGULAR = "DEVICE_TYPE_REGULAR";
+    public static final String DEVICE_TYPE_CONTROL = "DEVICE_TYPE_CONTROL";
+
+
+    public static final String DEVICE_TYPE_FITBIT = "DEVICE_TYPE_REGULAR";
+    public static final String DEVICE_TYPE_ANDROID = "DEVICE_TYPE_CONTROL";
 
     public static final String PREFERENCES_KEY_DEVICE_TYPE = "PREFERENCES_KEY_DEVICE_TYPE";
     public static final String PREFERENCES_DEFAULT_DEVICE_TYPE = "PREFERENCES_DEFAULT_DEVICE_TYPE";
