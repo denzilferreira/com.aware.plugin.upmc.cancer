@@ -11,18 +11,18 @@
         <RadioButton android:id="@+id/radio_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="OK!"
+            android:text="@string/ok_response"
             android:onClick="onRadioButtonClicked"/>
         <RadioButton android:id="@+id/radio_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NO"
+            android:text="@string/no_response"
             android:onClick="onRadioButtonClicked"/>
         <RadioButton android:id="@+id/radio_snooze"
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SNOOZE"
+            android:text="@string/snooze_response"
             android:onClick="onRadioButtonClicked"/>
     </RadioGroup>
     <Button

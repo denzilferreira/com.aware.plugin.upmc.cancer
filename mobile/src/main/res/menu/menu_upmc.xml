@@ -6,31 +6,29 @@
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_timer"
         android:orderInCategory="100"
-        android:title="Settings"
+        android:title="@string/settings"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_study"
         android:icon="@drawable/ic_action_participant"
         android:orderInCategory="200"
-        android:title="Participant"
+        android:title="@string/participant"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_dnd"
+        android:icon="@drawable/do_not_disturb_off_white_24x24"
+        android:orderInCategory="100"
+        android:title="@string/do_not_disturb"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_esm_example"
-        android:orderInCategory="300"
-        android:title="Demo ESM"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_motivation_example"
-        android:title="Demo Watch"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/study_sync"
         android:icon="@drawable/ic_stat_aware_sync"
         android:orderInCategory="101"
-        android:title="Sync"
-        app:showAsAction="always" />
+        android:title="@string/sync"
+        app:showAsAction="never" />
+
+
 </menu>

@@ -11,37 +11,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onCheckBoxClicked"
-        android:text="Busy"/>
+        android:text="@string/no_busy_response"/>
     <CheckBox
         android:id="@+id/pain_heckbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onCheckBoxClicked"
-        android:text="Pain"/>
+        android:text="@string/no_pain_response"/>
     <CheckBox
         android:id="@+id/nausea_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onCheckBoxClicked"
-        android:text="Nausea"/>
+        android:text="@string/no_nausea_response"/>
+
+    <CheckBox
+        android:id="@+id/tired_response"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/no_response_tired"/>
+
     <CheckBox
         android:id="@+id/other_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onCheckBoxClicked"
-        android:text="Other"/>
+        android:text="@string/no_other_response"/>
 
     <EditText
         android:id="@+id/reason_field"
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Please enter reason here"
+        android:hint="@string/no_other_hint"
         />
 
     <Button
         android:id="@+id/inability_submit"
-        android:text="SUBMIT"
+        android:text="@string/submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

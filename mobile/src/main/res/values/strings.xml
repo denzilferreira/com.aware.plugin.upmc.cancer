@@ -15,7 +15,7 @@
     <string name="title_activity_wear_status">WearStatusActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_notification_response">NotificationResponseActivity</string>
+    <string name="title_activity_notification_response">Your Response</string>
     <string name="title_activity_demo_mode">DemoMode</string>
     <string name="title_activity_inability_response">InabilityResponseActivity</string>
 
@@ -52,6 +52,20 @@
     <string name="fairly_good">Fairly good</string>
     <string name="fairly_bad">Fairly bad</string>
     <string name="very_bad">Very bad</string>
+    <string name="settings">Settings</string>
+    <string name="participant">Participant</string>
+    <string name="sync">Sync</string>
+    <string name="do_not_disturb">Dnd1</string>
+    <string name="ok_response">OK!</string>
+    <string name="no_response">NO</string>
+    <string name="snooze_response">SNOOZE</string>
+    <string name="no_busy_response">Busy</string>
+    <string name="no_pain_response">Pain</string>
+    <string name="no_nausea_response">Nausea</string>
+    <string name="no_other_response">Other</string>
+    <string name="no_other_hint">Please enter reason here</string>
+    <string name="submit">SUBMIT</string>
+    <string name="no_response_tired">Tired</string>
 
 
 </resources>

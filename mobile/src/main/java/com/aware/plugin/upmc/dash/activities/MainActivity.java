@@ -163,6 +163,9 @@ public class MainActivity extends AppCompatActivity {
                         if(getIntent().getAction()!=null) {
                             if (getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING))
                                 showSymptomSurvey(true);
+                            if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
+                                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF );
+                            }
                         }
                         else {
                             showSymptomSurvey(false);
@@ -373,20 +376,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
-        if (!STUDYLESS_DEBUG) {
+        if (!Aware.isStudy(getApplicationContext()) || STUDYLESS_DEBUG) {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
-                if (item.getTitle().toString().equalsIgnoreCase("Sync") && !Aware.isStudy(getApplicationContext())) {
+                if (item.getTitle().toString().equalsIgnoreCase("sync"))
                     item.setVisible(false);
-                }
-                if (item.getTitle().toString().equalsIgnoreCase("settings") && !Aware.isStudy(getApplicationContext())) {
+                if (item.getTitle().toString().equalsIgnoreCase("settings"))
+                    item.setVisible(false);
+                if(item.getTitle().toString().equalsIgnoreCase("dnd1"))
+                    item.setVisible(false);
+            }
+        }
+        else {
+            for (int i = 0; i < menu.size(); i++) {
+                MenuItem item = menu.getItem(i);
+                if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON )) {
                     item.setVisible(false);
                 }
             }
         }
         return true;
     }
-
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -419,11 +429,20 @@ public class MainActivity extends AppCompatActivity {
             mBuilder.create().show();
             return true;
         } else if (title.equalsIgnoreCase("Sync")) {
-            Log.d(Constants.TAG, "UPMC:Sync happened");
+            Log.d(Constants.TAG, "MainActivity:Sync happened");
             Random ran = new Random();
             for (int i=0; i<1000; i++)
                 syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101));
             return true;
+        }
+        else if (title.equalsIgnoreCase("Dnd1")) {
+            Log.d(Constants.TAG, "MainActivity:Do not disturb on");
+            sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
+            item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
+            item.setVisible(false);
+            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_ON);
+            Toast.makeText(getApplicationContext(), "You will not receive prompts for the rest of the day", Toast.LENGTH_SHORT).show();
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -598,6 +617,7 @@ public class MainActivity extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, false);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, String.valueOf(-1));
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, "off");
                     Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
                     Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
                     Applications.isAccessibilityServiceActive(getApplicationContext());

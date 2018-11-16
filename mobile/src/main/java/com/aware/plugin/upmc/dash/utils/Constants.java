@@ -80,6 +80,8 @@ public final class Constants {
     //No Action
     public static final String ACTION_NOTIF_NO = "NO_ACTION";
 
+    // Tired response
+
 
 
 
@@ -220,7 +222,8 @@ public final class Constants {
     //wakelock
     public static final String WAKELOCK_TAG = "upmcdash:notifwakelock";
 
-
+    public static final String DND_MODE_ON = "DND_MODE_ON";
+    public static final String DND_MODE_OFF = "DND_MODE_OFF";
 
 
 

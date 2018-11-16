@@ -226,7 +226,7 @@ public class FitbitMessageService extends Service {
                     new ResetTable().execute();
                     startFitbitCheckPromptAlarm();
                 }, 3000);
-
+                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand first run");
@@ -250,6 +250,7 @@ public class FitbitMessageService extends Service {
                     setUpDatabase();
                     startFitbitCheckPromptAlarm();
                 }, 5000);
+                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
             case Constants.ACTION_CHECK_PROMPT:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand check prompt repeatedly");
