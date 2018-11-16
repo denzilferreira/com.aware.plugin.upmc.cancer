@@ -15,6 +15,8 @@
         android:animateLayoutChanges="true">
 
 
+
+
         <RelativeLayout
             android:background="@color/background_material_light"
             android:layout_width="match_parent"
@@ -25,9 +27,91 @@
             android:paddingTop="@dimen/activity_vertical_margin">
 
 
+            <LinearLayout
+                android:id="@+id/morning_questions"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/lbl_bed_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:text="I went to bed last night at:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <TimePicker
+                    android:id="@+id/bed_time"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    android:id="@+id/lbl_woke_up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:paddingBottom="10dp"
+                    android:text="I got out of bed this morning at:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <TimePicker
+                    android:id="@+id/woke_time"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    android:id="@+id/lbl_quality_sleep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Last night my sleep was:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <RadioGroup
+                    android:id="@+id/qos_sleep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <RadioButton
+                        android:id="@+id/qos_very_good"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Very good" />
+
+                    <RadioButton
+                        android:id="@+id/qos_fairly_good"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fairly good" />
+
+                    <RadioButton
+                        android:id="@+id/qos_fairly_bad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fairly bad" />
+
+                    <RadioButton
+                        android:id="@+id/qos_very_bad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Very bad" />
+                </RadioGroup>
+            </LinearLayout>
+
+
             <TextView
                 android:id="@+id/lbl_rating_intro"
                 android:paddingTop="20dp"
+                android:layout_below="@+id/morning_questions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/dash_intro"
@@ -92,12 +176,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="center"
-                    android:scaleX="2"
-                    android:scaleY="2"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:layout_toRightOf="@id/rg1"
                     android:layout_centerVertical="true"
                     android:background="#0000"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:enabled="false"
                     android:src="@drawable/baseline_edit_black_18"
                     android:layout_toEndOf="@id/rg1" />
@@ -113,7 +198,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe1"
-                    android:layout_marginLeft="7dp"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -204,6 +289,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg2"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -222,6 +311,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe2"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -311,6 +401,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg3"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -329,6 +423,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe3"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -419,6 +514,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg4"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -437,6 +536,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe4"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -525,6 +625,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg5"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -540,6 +644,7 @@
                     android:visibility="gone"
                     android:textSize="@dimen/edit_btn_text"
                     android:layout_alignTop="@+id/ibe5"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe5"
@@ -631,6 +736,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg6"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -649,6 +758,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe6"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -736,6 +846,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg7"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -754,6 +868,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe7"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -840,6 +955,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg8"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -858,6 +977,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe8"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -944,6 +1064,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg9"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -962,6 +1086,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe9"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -1048,6 +1173,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg10"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -1066,6 +1195,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe10"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -1154,6 +1284,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg11"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -1172,6 +1306,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe11"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"
@@ -1225,9 +1360,14 @@
                     android:textColor="@color/colorAccent" />
 
                 <EditText
-                    android:layout_width="wrap_content"
+                    android:id="@+id/other_entry"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:hint="@string/other_hint"
+                    android:maxLines="5"
+                    android:inputType="text"
+                    android:scrollHorizontally="true"
+                    android:visibility="visible"
                     android:layout_toRightOf="@+id/sympView12"/>
 
 
@@ -1266,6 +1406,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/rg12"
                     android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
                     android:background="#0000"
                     android:visibility="gone"
                     android:enabled="false"
@@ -1284,6 +1428,7 @@
                     android:text="@string/img_btn_text"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ibe12"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
                     android:textColor="@color/black_overlay"

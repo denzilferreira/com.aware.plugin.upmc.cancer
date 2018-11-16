@@ -12,13 +12,14 @@ public final class Constants {
     public static final String DEVICE_TYPE_CONTROL = "DEVICE_TYPE_CONTROL";
 
 
-    public static final String DEVICE_TYPE_FITBIT = "DEVICE_TYPE_REGULAR";
-    public static final String DEVICE_TYPE_ANDROID = "DEVICE_TYPE_CONTROL";
 
     public static final String PREFERENCES_KEY_DEVICE_TYPE = "PREFERENCES_KEY_DEVICE_TYPE";
     public static final String PREFERENCES_DEFAULT_DEVICE_TYPE = "PREFERENCES_DEFAULT_DEVICE_TYPE";
 
 
+
+    //scheduler ids
+    public static final String MORNING_SURVEY_SCHED_ID = "cancer_survey_morning";
 
 
     // survey notification contents
@@ -48,47 +49,6 @@ public final class Constants {
 
 
     public static final String TAG = "CANCER";
-    public static final String CAPABILITY_WEAR_APP = "upmcdash_wearapp";
-    public static final String CAPABILITY_DEMO_WEAR_APP = "upmcdash_demo_wearapp";
-    public static final String CAPABILITY_PHONE_APP= "upmcdash_phoneapp";
-
-    public static final String CAPABILITY_DEMO_PHONE_APP = "upmcdash_demo_phoneapp";
-
-    public static final String PREFERENCES_KEY_WEAR_NODEID = "pref_key_wear_nodeid";
-    public static final String PREFERENCES_DEFAULT_WEAR_NODEID = "pref_default_wear_nodeid";
-
-
-    //local broadcast receivers/ MessageService stuff
-    // intent filters for Broadcast Receivers
-
-    public static final String NOTIFICATION_MESSAGE_INTENT_FILTER = "upmc_notif_intent_filter";
-    public static final String ACTION_SYNC_SETTINGS = "ACTION_SYNC_SETTINGS";
-
-
-
-    // Messages to wear
-    public static final String IS_WEAR_RUNNING = "is_wear_running";
-    public static final String ACK = "device_acknowledges";
-
-    //replies from wear
-
-    public static final String COMM_KEY_UPMC = "message_upmc";  // key in putExtra
-
-    //messages from wear
-    public static final String NOTIFY_INACTIVITY = "user is inactive";
-    public static final String NOTIFY_INACTIVITY_SNOOZED = "user is inactive after snooze";
-
-    public static final String NOTIFY_GREAT_JOB = "user is active";
-
-
-    //states
-    public static final String STATE_INIT = "STATE_INIT";
-    public static final String STATE_LOGGING = "STATE_LOGGING"; // currently logging
-    public static final String STATE_INACTIVE = "STATE_INACTIVE"; //  currently paused
-
-    //Bluetooth Communication
-    public static final String BLUETOOTH_COMM = "bluetooth_comm";
-    public static final String BLUETOOTH_COMM_KEY = "bluetooth_comm_key";
 
 
 
@@ -107,12 +67,9 @@ public final class Constants {
 
 
 
-    // Snooze Action
 
-    public static final String ALARM_COMM = "AlarmComm";
-    public static final String SNOOZE_ALARM_INTENT_FILTER = "snooze alarm intent filter";
-    public static final String SNOOZE_ALARM_EXTRA_KEY = "snooze alarm extra key";
-    public static final String SNOOZE_ALARM_EXTRA = "snooze alarm extra";
+
+
 
 
     // Ok Action
@@ -129,42 +86,17 @@ public final class Constants {
 
 
 
-    //MessageService Actions
-    public static final String ACTION_SETUP_WEAR = "setup_wear";
-
-    //
-
-    public static final String ACTION_INIT = "ACTION_INIT";
-
-    public static final String ACTION_SNOOZE_ALARM = "ACTION_SNOOZE_ALARM";
 
 
 
-    //vicinity check
-    public static final String VICINITY_CHECK_INTENT_FILTER = "vcheckfilter";
-    public static final String VICINITY_RESULT_KEY = "vicinity result key";
-    public static final int WEAR_IN_RANGE = 1;
-    public static final int WEAR_NOT_IN_RANGE = 0;
-    public static final int WEAR_VICINITY_CHECK_FAILED = -1;
-
-    //complete survey
-
-    public static final String COMPLETE_SURVEY = "Tap to begin your survey";
-
-    //MessageService ACTIONS
-    public static final String ACTION_SURVEY = "action_survey";
     public static final String ACTION_FIRST_RUN = "first_run";
     public static final String ACTION_APPRAISAL = "action_appraisal_ok";
     public static final String ACTION_INACTIVITY = "action_inactivity_responses";
-    public static final String ACTION_VICINITY = "action_vicinity";
     public static final String ACTION_SETTINGS_CHANGED = "action_settings_changed";
     public static final String ACTION_REBOOT = "action_reboot";
 
 
 
-    // Demo mode
-
-    public static final String DEMO_MODE = "Demo mode active";
 
 
 
@@ -172,7 +104,7 @@ public final class Constants {
     public static final String SETUP_WEAR = "Tap to setup watch";
     public static final String CONNECTED_WEAR = "Connected: Watch is monitoring your activity..";
     public static final String FAILED_WEAR = "Disconnected: Watch is not in range";
-    public static final String FAILED_WEAR_DISCOVERY = "Setup Failed: Tap to retry";
+
 
 
     //Wear monitor notif
@@ -215,20 +147,11 @@ public final class Constants {
 
 
 
-    // Loading Activity Stuff
-
-    public static final String LOADING_ACTIVITY_INTENT_FILTER = "LOADING_ACTIVITY_INTENT_FILTER";
-    public static final String MESSAGE_EXTRA_KEY = "MESSAGE_EXTRA_KEY";
-    public static final String LOADING_ACTIVITY_CONNECTED_MESSAGE = "Your watch is  synced! You will receive alerts.";
-    public static final String LOADING_ACTIVITY_FAILED_MESSAGE = "Setup Complete! However, your watch is not reachable";
-
 
 
     public static int INTERVENTION_TIMEOUT = 5 * 60 * 1000;
     public static int DURATION_AWAKE = 15000;
     public static int DURATION_VIBRATE = 3000;
-
-    public static Uri MESSAGE_URI = new Uri.Builder().scheme("wear").path("/upmc-dash").build();
 
 
 
@@ -292,6 +215,10 @@ public final class Constants {
     public static final String LIGHTTPD_ADD_HOST = "ru.kslabs.ksweb.CMD.LIGHTTPD_ADD_HOST";
     public static final String DATA_KEY = "DATA";
     public static final String TAG_KEY = "TAG";
+
+
+    //wakelock
+    public static final String WAKELOCK_TAG = "upmcdash:notifwakelock";
 
 
 

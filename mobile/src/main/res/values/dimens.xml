@@ -9,4 +9,8 @@
 
     <dimen name="symp_text_size">19sp</dimen>
     <dimen name="edit_btn_text">14sp</dimen>
+
+    <dimen name="img_btn_scale">2</dimen>
+    <dimen name="img_btn_margin_left">10dp</dimen>
+    <dimen name="edit_txt_margin_left">7dp</dimen>
 </resources>

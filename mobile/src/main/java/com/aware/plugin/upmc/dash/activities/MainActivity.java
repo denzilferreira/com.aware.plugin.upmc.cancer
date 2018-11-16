@@ -4,15 +4,14 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +28,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
+import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.plugin.upmc.dash.R;
@@ -37,18 +36,28 @@ import com.aware.plugin.upmc.dash.services.FitbitMessageService;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.ui.PermissionsHandler;
+import com.aware.utils.Scheduler;
 import com.crashlytics.android.Crashlytics;
 import com.ramotion.fluidslider.FluidSlider;
-
+import org.json.JSONException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-
+import java.util.Random;
 import io.fabric.sdk.android.Fabric;
 import kotlin.Unit;
+import static com.aware.plugin.upmc.dash.utils.Constants.CASE1;
+import static com.aware.plugin.upmc.dash.utils.Constants.CASE2;
+import static com.aware.plugin.upmc.dash.utils.Constants.DB_URL;
+import static com.aware.plugin.upmc.dash.utils.Constants.PASS;
+import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PS;
+import static com.aware.plugin.upmc.dash.utils.Constants.USER;
 
 public class MainActivity extends AppCompatActivity {
 
     private boolean STUDYLESS_DEBUG = false;
-    private boolean FIRST_RUN = true;
     private boolean isRegistered = false;
     private JoinedStudy joinedObserver = new JoinedStudy();
 
@@ -69,11 +78,10 @@ public class MainActivity extends AppCompatActivity {
         // Fabric
         Fabric.with(this, new Crashlytics());
 
-        FIRST_RUN = Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0;
     }
 
 
-    public void hideOtherSlidersExcept(int except_id, int[] FS_IDS, int[] TVE_IDS, int[] IBE_IDS) {
+    public void hideOtherSlidersExcept(int except_id, int[] FS_IDS, int[] TVE_IDS, int[] IBE_IDS, int other_entry) {
         for (int i = 0; i < FS_IDS.length; i++) {
             if (i != except_id) {
                 View view = findViewById(FS_IDS[i]);
@@ -82,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
                     findViewById(TVE_IDS[i]).setVisibility(View.VISIBLE);
                     findViewById(FS_IDS[i]).setVisibility(View.GONE);
                 }
+                if(i==11)
+                    findViewById(other_entry).setVisibility(View.GONE);
+
             }
         }
     }
@@ -138,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     showSettings(true);
                 }
                 else {
-                    showSymptomSurvey();
+                    showSymptomSurvey(false);
                 }
             }
         }
@@ -146,32 +157,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void showSymptomSurvey() {
+
+    public void engageScheduler() {
+        Aware.setSetting(getApplicationContext(), Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+        int morning_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        String  className = getPackageName() + "/" + FitbitMessageService.class.getName();
+        createSchedule(morning_hour, morning_minute, Constants.MORNING_SURVEY_SCHED_ID,
+                className, Scheduler.ACTION_TYPE_SERVICE, Plugin.ACTION_CANCER_SURVEY);
+
+    }
+
+    public void createSchedule(int hour, int minute, String id, String className, String classType, String action) {
+        Log.d(Constants.TAG, "MainActivity:createSchedule:creating a schedule..");
+        Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), id);
+        if (currentScheduler != null)
+            Scheduler.removeSchedule(getApplicationContext(), id);
+        Scheduler.Schedule schedule = new Scheduler.Schedule(id);
+        try {
+            schedule.addHour(hour)
+                    .addMinute(minute)
+                    .setActionClass(className)
+                    .setActionIntentAction(action)
+                    .setActionType(classType);
+            Scheduler.saveSchedule(this, schedule);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Aware.startScheduler(getApplicationContext());
+    }
+
+
+    public void showSymptomSurvey(boolean showMorning) {
 
         final int[] FS_IDS = {R.id.fluidSlider1, R.id.fluidSlider2, R.id.fluidSlider3, R.id.fluidSlider4,
                 R.id.fluidSlider5, R.id.fluidSlider6, R.id.fluidSlider7, R.id.fluidSlider8,
-                R.id.fluidSlider9, R.id.fluidSlider10, R.id.fluidSlider11};
+                R.id.fluidSlider9, R.id.fluidSlider10, R.id.fluidSlider11, R.id.fluidSlider12};
         final int[] RG_IDS = {R.id.rg1, R.id.rg2, R.id.rg3, R.id.rg4,
                 R.id.rg5, R.id.rg6, R.id.rg7, R.id.rg8,
-                R.id.rg9, R.id.rg10, R.id.rg11
+                R.id.rg9, R.id.rg10, R.id.rg11, R.id.rg12
         };
         final int[] IBE_IDS = {R.id.ibe1, R.id.ibe2, R.id.ibe3, R.id.ibe4,
                 R.id.ibe5, R.id.ibe6, R.id.ibe7, R.id.ibe8,
-                R.id.ibe9, R.id.ibe10, R.id.ibe11
+                R.id.ibe9, R.id.ibe10, R.id.ibe11, R.id.ibe12
         };
         final int[] TVE_IDS = {R.id.editView1, R.id.editView2, R.id.editView3, R.id.editView4,
                 R.id.editView5, R.id.editView6, R.id.editView7, R.id.editView8,
-                R.id.editView9, R.id.editView10, R.id.editView11
+                R.id.editView9, R.id.editView10, R.id.editView11, R.id.editView12
         };
         final int[] RBP_IDS = {R.id.rbp1, R.id.rbp2, R.id.rbp3, R.id.rbp4,
                 R.id.rbp5, R.id.rbp6, R.id.rbp7, R.id.rbp8,
-                R.id.rbp9, R.id.rbp10, R.id.rbp11};
+                R.id.rbp9, R.id.rbp10, R.id.rbp11, R.id.rbp12};
         setContentView(R.layout.activity_main);
+
+
+        final String [] PROVIDERS = new String[] {Provider.Symptom_Data.SCORE_PAIN, Provider.Symptom_Data.SCORE_FATIGUE,
+            Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE, Provider.Symptom_Data.SCORE_CONCENTRATING, Provider.Symptom_Data.SCORE_SAD,
+            Provider.Symptom_Data.SCORE_ANXIOUS, Provider.Symptom_Data.SCORE_SHORT_BREATH, Provider.Symptom_Data.SCORE_NUMBNESS,
+            Provider.Symptom_Data.SCORE_NAUSEA, Provider.Symptom_Data.SCORE_DIARRHEA , Provider.Symptom_Data.SCORE_DIZZY,
+            Provider.Symptom_Data.SCORE_OTHER};
+
+
+        final int other_entry = R.id.other_entry;
 
         // UI stuff
         ScrollView sv = findViewById(R.id.scroll_view);
-        for (int i = 0; i < FS_IDS.length; i++) {
-            FluidSlider fs = findViewById(FS_IDS[i]);
+        for (int FS_ID : FS_IDS) {
+            FluidSlider fs = findViewById(FS_ID);
             fs.setPositionListener(pos -> {
                 final String value = String.valueOf((int) (pos * 100) / 10);
                 fs.setBubbleText(value);
@@ -186,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
             rg.setOnCheckedChangeListener((radioGroup, i1) -> {
                 RadioButton rb = findViewById(i1);
                 if (rb.getText().equals("Yes")) {
-                    hideOtherSlidersExcept(index, FS_IDS, TVE_IDS, IBE_IDS);
+                    hideOtherSlidersExcept(index, FS_IDS, TVE_IDS, IBE_IDS, other_entry);
                     FluidSlider fs = findViewById(FS_IDS[index]);
                     fs.setVisibility(View.VISIBLE);
                     if ((index > 5))
@@ -202,13 +254,21 @@ public class MainActivity extends AppCompatActivity {
                                 , 750);
                         return Unit.INSTANCE;
                     });
+                    if(index==11) {
+                        Toast.makeText(getApplicationContext(), "Please specify", Toast.LENGTH_SHORT).show();
+                    }
 
                 } else if (rb.getText().equals("No")) {
+                    hideOtherSlidersExcept(index, FS_IDS, TVE_IDS, IBE_IDS, other_entry);
                     findViewById(IBE_IDS[index]).setVisibility(View.GONE);
                     findViewById(TVE_IDS[index]).setVisibility(View.GONE);
                     FluidSlider fs = findViewById(FS_IDS[index]);
                     if (fs.getVisibility() == View.VISIBLE) {
                         fs.setVisibility(View.GONE);
+                    }
+                    if(index==11) {
+                        EditText editText = findViewById(other_entry);
+                        editText.setVisibility(View.GONE);
                     }
                 }
 
@@ -216,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             findViewById(IBE_IDS[index]).setOnClickListener(view -> {
-                hideOtherSlidersExcept(index, FS_IDS, TVE_IDS, IBE_IDS);
+                hideOtherSlidersExcept(index, FS_IDS, TVE_IDS, IBE_IDS, other_entry);
                 Log.d("tv", "clicked");
                 FluidSlider fs = findViewById(FS_IDS[index]);
                 fs.setVisibility(View.VISIBLE);
@@ -226,14 +286,46 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
+        // submit
         findViewById(R.id.submit).setOnClickListener(view -> {
+            ContentValues answer = new ContentValues();
+            answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+            answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
+            int oldSeverity = Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY));
+            int newSeverity = 0;
             for (int i = 0; i < RG_IDS.length; i++) {
                 RadioGroup rg = findViewById(RG_IDS[i]);
-
+                RadioButton rb = findViewById(rg.getCheckedRadioButtonId());
+                if(rb==null) {
+                    // nothing has been selected
+                    answer.put(PROVIDERS[i], "NA");
+                }
+                else if(rb.getText().equals("Yes")) {
+                    FluidSlider fs = findViewById(FS_IDS[i]);
+                    int rating = (int) (fs.getPosition()*10);
+                    if(rating>=7)
+                        newSeverity=1;
+                    answer.put(PROVIDERS[i], String.valueOf(rating));
+                    if(i==11) {
+                        EditText other_label = findViewById(other_entry);
+                        answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
+                    }
+                }
+                else if (rb.getText().equals("No")) {
+                    answer.put(PROVIDERS[i], "No");
+                }
             }
+            if(oldSeverity!=newSeverity && isMyServiceRunning(FitbitMessageService.class))
+                sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+            // post it to KSWEB DB
+            new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+            Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
+            getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
+            toastThanks(getApplicationContext());
+            finish();
         });
     }
+
 
 
     @Override
@@ -285,12 +377,24 @@ public class MainActivity extends AppCompatActivity {
             mBuilder.create().show();
             return true;
         } else if (title.equalsIgnoreCase("Sync")) {
-            sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
             Log.d(Constants.TAG, "UPMC:Sync happened");
+            Random ran = new Random();
+            for (int i=0; i<1000; i++)
+                syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101));
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public void syncSCWithServer(long timeStamp, int type, int data) {
+        ContentValues step_count = new ContentValues();
+        step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        step_count.put(Provider.Stepcount_Data.TIMESTAMP, timeStamp);
+        step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
+        step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
+        getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
     }
 
 
@@ -306,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
         TimePicker mornPicker = findViewById(R.id.morning_start_time);
         TimePicker nightPicker = findViewById(R.id.night_sleep_time);
         if (firstRun) {
-            saveSchedule.setText("Join Study");
+            saveSchedule.setText(R.string.join_btn_text);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mornPicker.setHour(9);
                 mornPicker.setMinute(0);
@@ -339,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         saveSchedule.setOnClickListener(view -> {
-            saveSchedule.setText("Saving Schedule....");
+            saveSchedule.setText(R.string.join_btn_saving_txt);
             int morningHour;
             int morningMinute;
             int nightHour;
@@ -392,11 +496,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     // if not first time, settings have changed
+                    Aware.startAWARE(getApplicationContext());  // need call startAware to apply the settings
                     Log.d(Constants.TAG, "MainActivity:showSettings: settings changed" );
                     sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
                     toastThanks(getApplicationContext());
                     finish();
                 }
+                // modifying the schedules
+                engageScheduler();
             }
             else {
                 // settings did not change, do nothing!
@@ -439,69 +546,90 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(Constants.TAG, "MainActivity:JoinedStudy:onReceive:");
-            if (intent.getAction().equalsIgnoreCase(Aware.ACTION_JOINED_STUDY)) {
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true); //enable logcat debug messages
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
-                Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, false);
-                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
-                Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
-                Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
-                if (Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL).length() == 0) {
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, "upmc_dash_user");
-
+            if(intent!=null) {
+                if (intent.getAction().equalsIgnoreCase(Aware.ACTION_JOINED_STUDY)) {
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true); //enable logcat debug messages
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, false);
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, String.valueOf(-1));
+                    Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
+                    Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
+                    Applications.isAccessibilityServiceActive(getApplicationContext());
+                    Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
+                    if (Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL).length() == 0)
+                        Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, "upmc_dash_user");
+                    unregisterReceiver(joinedObserver);
+                    isRegistered = false;
+                    sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
+                    finish();
                 }
-                unregisterReceiver(joinedObserver);
-                isRegistered = false;
-//                sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
-
-
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getHour());
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getMinute());
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, night_timer.getHour());
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, night_timer.getMinute());
-//                } else {
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, morning_timer.getCurrentHour());
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, morning_timer.getCurrentMinute());
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR, night_timer.getCurrentHour());
-//                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE, night_timer.getCurrentMinute());
-//                }
-////                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.google.activity_recognition");
-//                Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
-//                //Ask accessibility to be activated
-//                Applications.isAccessibilityServiceActive(getApplicationContext());
-//                Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
-//
-//                unregisterReceiver(joinedObserver);
-//                isRegistered = false;
-//                Toast.makeText(getApplicationContext(), "Joined Study!", Toast.LENGTH_SHORT).show();
-//                Toast.makeText(getApplicationContext(), "ID:" + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID), Toast.LENGTH_SHORT).show();
-//                Log.d(Constants.TAG, "ID: " + Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-//
-//                if (Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL).length() == 0) {
-//                    Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, "upmc_dash_user");
-//
-//                }
-//                String label = Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL);
-//                String prefix = getDeviceTypePostfix();
-//                Aware.setSetting(getApplicationContext(), Aware_Preferences.DEVICE_LABEL, label + prefix);
-//                if (readDeviceType().equals(Constants.DEVICE_TYPE_FITBIT)) {
-//                    sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
-////                    startFitbitCheckPromptAlarm();
-//                } else
-//                    sendMessageServiceAction(Constants.ACTION_FIRST_RUN);
-
-
-                finish();
             }
+
         }
 
 
+    }
+
+    private static class PostData extends AsyncTask<String, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                stmt = conn.createStatement();
+                StringBuilder sb = new StringBuilder();
+                sb.append("INSERT INTO ");
+                sb.append(strings[0]);
+                sb.append(" VALUES (null, '");
+                sb.append(strings[1]);
+                sb.append("')");
+                stmt.executeUpdate(sb.toString());
+                Log.d("yiyi", "Inserted records into the table...");
+
+            } catch (SQLException se) {
+                //Handle errors for JDBC
+                se.printStackTrace();
+            } catch (Exception e) {
+                //Handle errors for Class.forName
+                e.printStackTrace();
+            } finally {
+                //finally block used to close resources
+                try {
+                    if (stmt != null)
+                        conn.close();
+                } catch (SQLException se) {
+                }// do nothing
+                try {
+                    if (conn != null)
+                        conn.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }//end finally try
+            }//end try
+
+
+            return null;
+
+        }
     }
 }
 

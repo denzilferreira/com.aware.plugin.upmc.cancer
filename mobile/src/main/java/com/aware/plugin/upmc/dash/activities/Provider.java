@@ -68,6 +68,7 @@ public class Provider extends ContentProvider {
         static final String SCORE_NUMBNESS = "score_numbness";
         static final String SCORE_NAUSEA = "score_nausea";
         static final String SCORE_DIARRHEA = "score_diarrhea";
+        static final String SCORE_DIZZY = "score_dizzy";
         static final String SCORE_OTHER = "score_other";
         static final String OTHER_LABEL = "other_label";
     }
@@ -110,6 +111,7 @@ public class Provider extends ContentProvider {
                     Symptom_Data.SCORE_NUMBNESS + " text default ''," +
                     Symptom_Data.SCORE_NAUSEA + " text default ''," +
                     Symptom_Data.SCORE_DIARRHEA + " text default ''," +
+                    Symptom_Data.SCORE_DIZZY + " text default ''," +
                     Symptom_Data.SCORE_OTHER + " text default ''," +
                     Symptom_Data.OTHER_LABEL + " text default ''",
 
@@ -173,6 +175,7 @@ public class Provider extends ContentProvider {
         surveyMap.put(Symptom_Data.SCORE_NUMBNESS, Symptom_Data.SCORE_NUMBNESS);
         surveyMap.put(Symptom_Data.SCORE_NAUSEA, Symptom_Data.SCORE_NAUSEA);
         surveyMap.put(Symptom_Data.SCORE_DIARRHEA, Symptom_Data.SCORE_DIARRHEA);
+        surveyMap.put(Symptom_Data.SCORE_DIZZY, Symptom_Data.SCORE_DIZZY);
         surveyMap.put(Symptom_Data.SCORE_OTHER, Symptom_Data.SCORE_OTHER);
         surveyMap.put(Symptom_Data.OTHER_LABEL, Symptom_Data.OTHER_LABEL);
 

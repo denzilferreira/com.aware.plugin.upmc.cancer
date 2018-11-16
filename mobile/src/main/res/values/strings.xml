@@ -42,8 +42,9 @@
     <string name="control">Control</string>
     <string name="choose_participant_type">Choose participant type:</string>
 
-    <string name="other_hint"><font size="15">What are you feeling?</font></string>
-
+    <string name="other_hint"><font size="18">Please specify</font></string>
+    <string name="join_btn_text">Join Study</string>
+    <string name="join_btn_saving_txt">Saving Schedule....</string>
 
 
 </resources>
