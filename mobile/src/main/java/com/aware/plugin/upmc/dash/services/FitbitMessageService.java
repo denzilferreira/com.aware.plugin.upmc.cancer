@@ -131,7 +131,7 @@ public class FitbitMessageService extends Service {
                     Log.d(Constants.TAG, "mConnectivityReceiver: Wifi");
                     break;
                 case ConnectivityManager.TYPE_ETHERNET:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: ether");
+                    Log.d(Constants.TAG, "mConnecti vityReceiver: ether");
                     break;
 
                 case ConnectivityManager.TYPE_MOBILE:
@@ -518,6 +518,7 @@ public class FitbitMessageService extends Service {
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent)
                     .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
 
         } else {
@@ -532,6 +533,7 @@ public class FitbitMessageService extends Service {
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorCompatNotifBuilder.build());
         }
     }
@@ -539,6 +541,7 @@ public class FitbitMessageService extends Service {
 
     public void wakeUpAndVibrate(Context context, int duration_awake, int duration_vibrate) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        assert pm != null;
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, Constants.WAKELOCK_TAG);
         wl.acquire(duration_awake);
         final Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
@@ -617,6 +620,7 @@ public class FitbitMessageService extends Service {
         alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
         int interval = 60 * 1000;
         PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
+        assert myAlarmManager != null;
         myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPendingIntent_min);
     }
 

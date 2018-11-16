@@ -45,6 +45,13 @@
     <string name="other_hint"><font size="18">Please specify</font></string>
     <string name="join_btn_text">Join Study</string>
     <string name="join_btn_saving_txt">Saving Schedule....</string>
+    <string name="i_went_to_bed_last_night_at">I went to bed last night at:</string>
+    <string name="i_got_out_of_bed_this_morning_at">I got out of bed this morning at:</string>
+    <string name="last_night_my_sleep_was">Last night my sleep was:</string>
+    <string name="very_good">Very good</string>
+    <string name="fairly_good">Fairly good</string>
+    <string name="fairly_bad">Fairly bad</string>
+    <string name="very_bad">Very bad</string>
 
 
 </resources>

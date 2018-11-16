@@ -1,13 +1,17 @@
 package com.aware.plugin.upmc.dash.activities;
 
 import android.Manifest;
+import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SyncRequest;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -45,6 +50,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
 import io.fabric.sdk.android.Fabric;
 import kotlin.Unit;
@@ -103,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Checking for more permissions
+        Log.d(Constants.TAG, "MainActivity:onResume");
         ArrayList<String> REQUIRED_PERMISSIONS = new ArrayList<>();
         REQUIRED_PERMISSIONS.add(Manifest.permission.VIBRATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
@@ -149,7 +156,19 @@ public class MainActivity extends AppCompatActivity {
                     showSettings(true);
                 }
                 else {
-                    showSymptomSurvey(false);
+                    if(!isMyServiceRunning(FitbitMessageService.class))
+                        sendFitbitMessageServiceAction(Constants.ACTION_REBOOT);
+
+                    if(getIntent()!=null) {
+                        if(getIntent().getAction()!=null) {
+                            if (getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING))
+                                showSymptomSurvey(true);
+                        }
+                        else {
+                            showSymptomSurvey(false);
+                        }
+                    }
+
                 }
             }
         }
@@ -188,8 +207,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void showSymptomSurvey(boolean showMorning) {
-
+    public void showSymptomSurvey(boolean daily) {
         final int[] FS_IDS = {R.id.fluidSlider1, R.id.fluidSlider2, R.id.fluidSlider3, R.id.fluidSlider4,
                 R.id.fluidSlider5, R.id.fluidSlider6, R.id.fluidSlider7, R.id.fluidSlider8,
                 R.id.fluidSlider9, R.id.fluidSlider10, R.id.fluidSlider11, R.id.fluidSlider12};
@@ -209,16 +227,32 @@ public class MainActivity extends AppCompatActivity {
                 R.id.rbp5, R.id.rbp6, R.id.rbp7, R.id.rbp8,
                 R.id.rbp9, R.id.rbp10, R.id.rbp11, R.id.rbp12};
         setContentView(R.layout.activity_main);
-
-
+        final LinearLayout morning_questions = findViewById(R.id.morning_questions);
+        final TimePicker to_bed = findViewById(R.id.bed_time);
+        final TimePicker from_bed = findViewById(R.id.woke_time);
+        final RadioGroup qos_sleep = findViewById(R.id.qos_sleep);
         final String [] PROVIDERS = new String[] {Provider.Symptom_Data.SCORE_PAIN, Provider.Symptom_Data.SCORE_FATIGUE,
-            Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE, Provider.Symptom_Data.SCORE_CONCENTRATING, Provider.Symptom_Data.SCORE_SAD,
-            Provider.Symptom_Data.SCORE_ANXIOUS, Provider.Symptom_Data.SCORE_SHORT_BREATH, Provider.Symptom_Data.SCORE_NUMBNESS,
-            Provider.Symptom_Data.SCORE_NAUSEA, Provider.Symptom_Data.SCORE_DIARRHEA , Provider.Symptom_Data.SCORE_DIZZY,
-            Provider.Symptom_Data.SCORE_OTHER};
-
-
+                Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE, Provider.Symptom_Data.SCORE_CONCENTRATING, Provider.Symptom_Data.SCORE_SAD,
+                Provider.Symptom_Data.SCORE_ANXIOUS, Provider.Symptom_Data.SCORE_SHORT_BREATH, Provider.Symptom_Data.SCORE_NUMBNESS,
+                Provider.Symptom_Data.SCORE_NAUSEA, Provider.Symptom_Data.SCORE_DIARRHEA , Provider.Symptom_Data.SCORE_DIZZY,
+                Provider.Symptom_Data.SCORE_OTHER};
         final int other_entry = R.id.other_entry;
+
+        if(daily) {
+            morning_questions.setVisibility(View.VISIBLE);
+            Calendar today = Calendar.getInstance();
+            today.setTimeInMillis(System.currentTimeMillis());
+            today.set(Calendar.HOUR_OF_DAY, 1);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            Cursor already_answered = getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, null, Provider.Symptom_Data.TIMESTAMP + " > " + today.getTimeInMillis() + " AND (" + Provider.Symptom_Data.TO_BED + " != '' OR " + Provider.Symptom_Data.FROM_BED + " !='')", null, null);
+            if (already_answered != null && already_answered.getCount() > 0) {
+                findViewById(R.id.morning_questions).setVisibility(View.GONE);
+            }
+            if (already_answered != null && !already_answered.isClosed())
+                already_answered.close();
+
+        }
 
         // UI stuff
         ScrollView sv = findViewById(R.id.scroll_view);
@@ -291,6 +325,11 @@ public class MainActivity extends AppCompatActivity {
             ContentValues answer = new ContentValues();
             answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
             answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
+            if(daily) {
+                answer.put(Provider.Symptom_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
+                answer.put(Provider.Symptom_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h" + from_bed.getCurrentMinute() : "");
+                answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
+            }
             int oldSeverity = Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY));
             int newSeverity = 0;
             for (int i = 0; i < RG_IDS.length; i++) {
@@ -319,6 +358,9 @@ public class MainActivity extends AppCompatActivity {
                 sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
             // post it to KSWEB DB
             new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+            // switch back to old notification
+            if(daily)
+                sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
             Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
             getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
             toastThanks(getApplicationContext());
@@ -551,7 +593,7 @@ public class MainActivity extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true); //enable logcat debug messages
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 30);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 1);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, false);
@@ -566,6 +608,21 @@ public class MainActivity extends AppCompatActivity {
                     unregisterReceiver(joinedObserver);
                     isRegistered = false;
                     sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
+
+
+                Account aware_account = Aware.getAWAREAccount(getApplicationContext());
+                String authority = Provider.getAuthority(getApplicationContext());
+                long frequency = Long.parseLong(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
+
+                ContentResolver.setIsSyncable(aware_account, authority, 1);
+                ContentResolver.setSyncAutomatically(aware_account, authority, true);
+                SyncRequest request = new SyncRequest.Builder()
+                        .syncPeriodic(frequency, frequency / 3)
+                        .setSyncAdapter(aware_account, authority)
+                        .setExtras(new Bundle()).build();
+                ContentResolver.requestSync(request);
+
+
                     finish();
                 }
             }
@@ -632,5 +689,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
-

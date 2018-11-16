@@ -1,7 +1,5 @@
 package com.aware.plugin.upmc.dash.utils;
 
-import android.net.Uri;
-
 /**
  * Created by RaghuTeja on 6/22/17.
  */

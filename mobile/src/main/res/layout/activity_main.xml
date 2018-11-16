@@ -39,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
-                    android:text="I went to bed last night at:"
+                    android:text="@string/i_went_to_bed_last_night_at"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#000" />
 
@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:paddingBottom="10dp"
-                    android:text="I got out of bed this morning at:"
+                    android:text="@string/i_got_out_of_bed_this_morning_at"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#000" />
 
@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Last night my sleep was:"
+                    android:text="@string/last_night_my_sleep_was"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#000" />
 
@@ -85,25 +85,25 @@
                         android:id="@+id/qos_very_good"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Very good" />
+                        android:text="@string/very_good" />
 
                     <RadioButton
                         android:id="@+id/qos_fairly_good"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Fairly good" />
+                        android:text="@string/fairly_good" />
 
                     <RadioButton
                         android:id="@+id/qos_fairly_bad"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Fairly bad" />
+                        android:text="@string/fairly_bad" />
 
                     <RadioButton
                         android:id="@+id/qos_very_bad"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Very bad" />
+                        android:text="@string/very_bad" />
                 </RadioGroup>
             </LinearLayout>
 
