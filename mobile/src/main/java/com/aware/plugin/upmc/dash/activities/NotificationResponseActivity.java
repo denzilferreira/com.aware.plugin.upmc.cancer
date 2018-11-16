@@ -1,21 +1,14 @@
 package com.aware.plugin.upmc.dash.activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -25,7 +18,6 @@ import android.widget.Toast;
 
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.services.FitbitMessageService;
-import com.aware.plugin.upmc.dash.services.MessageService;
 import com.aware.plugin.upmc.dash.utils.Constants;
 
 public class NotificationResponseActivity extends AppCompatActivity {
@@ -81,13 +73,11 @@ public class NotificationResponseActivity extends AppCompatActivity {
             if (action.length() != 0) {
                 Log.d(Constants.TAG, "NotificationResponseActivity:submitResponse " + action);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
-                    startForegroundService(new Intent(this, MessageService.class).setAction(action));
-                    else startForegroundService(new Intent(this, FitbitMessageService.class).setAction(action));
+                    startForegroundService(new Intent(this, FitbitMessageService.class).setAction(action));
+
                 } else {
-                    if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
-                    startService(new Intent(this, MessageService.class).setAction(action));
-                    else startService(new Intent(this, FitbitMessageService.class).setAction(action));
+                    startService(new Intent(this, FitbitMessageService.class).setAction(action));
+
                 }
                 finish();
             }
@@ -118,26 +108,15 @@ public class NotificationResponseActivity extends AppCompatActivity {
             }
         });
 
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (editText.getText().length() == 0 && isOtherChecked()) {
-                    Toast.makeText(view.getContext(), "Please specify a reason for other", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
-                            startForegroundService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
-                        else
-                            startForegroundService(new Intent(getApplicationContext(), FitbitMessageService.class).setAction(action));
-                    } else {
-                        if (readDeviceType().equals(Constants.DEVICE_TYPE_ANDROID))
-                            startService(new Intent(getApplicationContext(), MessageService.class).setAction(action));
-                        else
-                            startService(new Intent(getApplicationContext(), FitbitMessageService.class).setAction(action));
-
-                    }
-                    finish();
-                }
+        submitButton.setOnClickListener(view -> {
+            if (editText.getText().length() == 0 && isOtherChecked()) {
+                Toast.makeText(view.getContext(), "Please specify a reason for other", Toast.LENGTH_SHORT).show();
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    startForegroundService(new Intent(getApplicationContext(), FitbitMessageService.class).setAction(action));
+                else
+                    startService(new Intent(getApplicationContext(), FitbitMessageService.class).setAction(action));
+                finish();
             }
         });
 
@@ -179,7 +158,7 @@ public class NotificationResponseActivity extends AppCompatActivity {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String deviceType = sharedPref.getString(Constants.PREFERENCES_KEY_DEVICE_TYPE, Constants.PREFERENCES_DEFAULT_DEVICE_TYPE);
         if (deviceType.equals(Constants.PREFERENCES_DEFAULT_DEVICE_TYPE))
-            Log.d(Constants.TAG, "PhoneMainActivity:writeDeviceType: " + deviceType);
+            Log.d(Constants.TAG, "OnboardingActivity:writeDeviceType: " + deviceType);
         return deviceType;
     }
 

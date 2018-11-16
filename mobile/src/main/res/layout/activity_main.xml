@@ -1,39 +1,1482 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context=".activities.PhoneMainActivity">
+    android:animateLayoutChanges="true"
+    android:background="@android:color/white"
+    tools:context=".activities.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:id="@+id/scroll_view"
         android:layout_height="wrap_content"
-        android:textAllCaps="true"
-        android:textSize="20sp"
-        android:text="Choose your wearable device type"/>
+        android:animateLayoutChanges="true">
 
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:id="@+id/radio_group"
-        android:orientation="vertical">
-        <RadioButton android:id="@+id/radio_fitbit"
-            android:layout_width="wrap_content"
+
+
+
+        <RelativeLayout
+            android:background="@color/background_material_light"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAllCaps="true"
-            android:textSize="20sp"
-            android:text="Fitbit Ionic / Versa"
-            android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/radio_wear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textAllCaps="true"
-            android:textSize="20sp"
-            android:text="LG Watch Style"
-            android:onClick="onRadioButtonClicked"/>
-    </RadioGroup>
-</LinearLayout>
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+
+            <LinearLayout
+                android:id="@+id/morning_questions"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/lbl_bed_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:text="@string/i_went_to_bed_last_night_at"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <TimePicker
+                    android:id="@+id/bed_time"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    android:id="@+id/lbl_woke_up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:paddingBottom="10dp"
+                    android:text="@string/i_got_out_of_bed_this_morning_at"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <TimePicker
+                    android:id="@+id/woke_time"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    android:id="@+id/lbl_quality_sleep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/last_night_my_sleep_was"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000" />
+
+                <RadioGroup
+                    android:id="@+id/qos_sleep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <RadioButton
+                        android:id="@+id/qos_very_good"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/very_good" />
+
+                    <RadioButton
+                        android:id="@+id/qos_fairly_good"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fairly_good" />
+
+                    <RadioButton
+                        android:id="@+id/qos_fairly_bad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fairly_bad" />
+
+                    <RadioButton
+                        android:id="@+id/qos_very_bad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/very_bad" />
+                </RadioGroup>
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/lbl_rating_intro"
+                android:paddingTop="20dp"
+                android:layout_below="@+id/morning_questions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dash_intro"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#000" />
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll1"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/lbl_rating_intro"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe1"
+                    android:text="@string/symptom1"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg1"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="@dimen/rg_left_margin">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb1_text"
+                        android:id="@+id/rbp1"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:layout_toRightOf="@id/rg1"
+                    android:layout_centerVertical="true"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+                    android:layout_toEndOf="@id/rg1" />
+
+
+                <TextView
+                    android:id="@+id/editView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe1"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe1"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe1" />
+
+
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider1"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll2"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider1"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe2"
+                    android:text="@string/symptom2"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg2"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp2"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg2"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg2" />
+
+
+                <TextView
+                    android:id="@+id/editView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe2"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe2"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe2" />
+
+
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider2"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll3"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider2"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe3"
+                    android:text="@string/symptom3"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg3"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp3"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg3"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg3" />
+
+
+                <TextView
+                    android:id="@+id/editView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe3"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe3"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe3" />
+
+
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider3"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll4"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider3"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView4"
+                    android:layout_width="200dp"
+                    android:minLines="2"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe4"
+                    android:text="@string/symptom4"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg4"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp4"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg4"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg4" />
+
+
+                <TextView
+                    android:id="@+id/editView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe4"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe4"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe4" />
+
+
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider4"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+            <RelativeLayout
+                android:id="@+id/ll5"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider4"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe5"
+                    android:text="@string/symptom5"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg5"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp5"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg5"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg5" />
+
+
+                <TextView
+                    android:id="@+id/editView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe5"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe5"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe5" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider5"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll6"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider5"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe6"
+                    android:text="@string/symptom6"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg6"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp6"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg6"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg6" />
+
+
+                <TextView
+                    android:id="@+id/editView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe6"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe6"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe6" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider6"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll7"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider6"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe7"
+                    android:text="@string/symptom7"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg7"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp7"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg7"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg7" />
+
+
+                <TextView
+                    android:id="@+id/editView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe7"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe7"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe7" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider7"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+            <RelativeLayout
+                android:id="@+id/ll8"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider7"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe8"
+                    android:text="@string/symptom8"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg8"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp8"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg8"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg8" />
+
+
+                <TextView
+                    android:id="@+id/editView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe8"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe8"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe8" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider8"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+            <RelativeLayout
+                android:id="@+id/ll9"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider8"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe9"
+                    android:text="@string/symptom9"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg9"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp9"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg9"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg9" />
+
+
+                <TextView
+                    android:id="@+id/editView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe9"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe9"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe9" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider9"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+            <RelativeLayout
+                android:id="@+id/ll10"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider9"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe10"
+                    android:text="@string/symptom10"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg10"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp10"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg10"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg10" />
+
+
+                <TextView
+                    android:id="@+id/editView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe10"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe10"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe10" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider10"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll11"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider10"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView11"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:minLines="2"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe11"
+                    android:text="@string/symptom11"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+
+                <RadioGroup
+                    android:id="@+id/rg11"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp11"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg11"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg11" />
+
+
+                <TextView
+                    android:id="@+id/editView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe11"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe11"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe11" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider11"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+
+            <RelativeLayout
+                android:id="@+id/ll12"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/fluidSlider11"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sympView12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/symp_text_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@+id/ibe12"
+                    android:text="@string/symptom12"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+                <EditText
+                    android:id="@+id/other_entry"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/other_hint"
+                    android:maxLines="5"
+                    android:inputType="text"
+                    android:scrollHorizontally="true"
+                    android:visibility="visible"
+                    android:layout_toRightOf="@+id/sympView12"/>
+
+
+                <RadioGroup
+                    android:id="@+id/rg12"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/rg_left_margin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/rg_left_margin"
+                    android:layout_alignParentStart="true">
+
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:id="@+id/rbp12"
+                        android:text="@string/rb1_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:text="@string/rb2_text"
+                        android:layout_marginRight="@dimen/rb_left_margin"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/rb_left_margin" />
+
+                </RadioGroup>
+
+
+                <ImageButton
+                    android:id="@+id/ibe12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/rg12"
+                    android:layout_centerVertical="true"
+                    android:scaleType="center"
+                    android:layout_marginLeft="@dimen/img_btn_margin_left"
+                    android:scaleX="@dimen/img_btn_scale"
+                    android:scaleY="@dimen/img_btn_scale"
+                    android:background="#0000"
+                    android:visibility="gone"
+                    android:enabled="false"
+                    android:src="@drawable/baseline_edit_black_18"
+
+                    android:layout_toEndOf="@id/rg12" />
+
+
+                <TextView
+                    android:id="@+id/editView12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="@dimen/edit_btn_text"
+                    android:layout_alignTop="@+id/ibe12"
+                    android:text="@string/img_btn_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/ibe12"
+                    android:layout_marginLeft="@dimen/edit_txt_margin_left"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/black_overlay"
+                    android:layout_toEndOf="@+id/ibe12" />
+
+
+            </RelativeLayout>
+
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:id="@+id/fluidSlider12"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/ll12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:duration="@android:integer/config_mediumAnimTime"
+                app:size="small"
+                app:initial_position="0.0"
+                app:text_size="15dp"
+                android:visibility="gone"
+                app:start_text="0"
+                app:end_text="10"
+                app:bar_color="#d3d3d3"
+                app:bar_text_color="#000"
+                app:bubble_color="@color/colorAccent"
+                android:elevation="2dp"
+                />
+
+
+
+
+
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="75dp"
+                android:layout_below="@+id/fluidSlider12"
+                android:text="@string/save_btn_text"
+                android:visibility="visible"
+                android:background="@color/colorPrimary"
+                android:textStyle="normal|bold"
+                android:textColor="@android:color/white" />
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

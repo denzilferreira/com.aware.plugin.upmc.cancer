@@ -12,7 +12,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion compile_sdk
-    buildToolsVersion build_tools
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.aware.plugin.upmc.dash"
@@ -70,6 +70,10 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 
     lintOptions {
         abortOnError false
@@ -99,6 +103,7 @@ configurations.all {
 
 dependencies {
     //AWARE is now self-contained. No more leftover dependencies!
+    api 'com.ramotion.fluidslider:fluid-slider:0.3.0'
     api "com.github.denzilferreira:aware-client:master-SNAPSHOT"
     api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
     api "com.google.android.gms:play-services-wearable:$google_libs"

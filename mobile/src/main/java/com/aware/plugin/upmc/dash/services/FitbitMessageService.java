@@ -31,17 +31,14 @@ import android.widget.Toast;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 import com.aware.plugin.upmc.dash.R;
-import com.aware.plugin.upmc.dash.activities.DataSyncingActivity;
+import com.aware.plugin.upmc.dash.activities.MainActivity;
 import com.aware.plugin.upmc.dash.activities.NotificationResponseActivity;
 import com.aware.plugin.upmc.dash.activities.Plugin;
 import com.aware.plugin.upmc.dash.activities.Provider;
-import com.aware.plugin.upmc.dash.activities.UPMC;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
-import com.aware.plugin.upmc.dash.utils.KSWEBControl;
 import com.aware.utils.Scheduler;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.sql.Connection;
@@ -74,7 +71,6 @@ import static com.aware.plugin.upmc.dash.utils.Constants.PACKAGE_FITBIT;
 import static com.aware.plugin.upmc.dash.utils.Constants.PACKAGE_KSWEB;
 import static com.aware.plugin.upmc.dash.utils.Constants.PASS;
 import static com.aware.plugin.upmc.dash.utils.Constants.SNOOZE_COMMAND;
-import static com.aware.plugin.upmc.dash.utils.Constants.SURVEY_COMPLETED;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_COMMAND;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_CONN;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PROMPT;
@@ -136,7 +132,7 @@ public class FitbitMessageService extends Service {
                     Log.d(Constants.TAG, "mConnectivityReceiver: Wifi");
                     break;
                 case ConnectivityManager.TYPE_ETHERNET:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: ether");
+                    Log.d(Constants.TAG, "mConnecti vityReceiver: ether");
                     break;
 
                 case ConnectivityManager.TYPE_MOBILE:
@@ -166,6 +162,7 @@ public class FitbitMessageService extends Service {
         unregisterReceiver(mBluetootLocalReceiver);
         unregisterReceiver(mConnectivityReceiver);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert mNotificationManager != null;
         mNotificationManager.cancelAll();
         stopSelf();
     }
@@ -178,6 +175,7 @@ public class FitbitMessageService extends Service {
 
     public void enableWifiIfOff() {
         WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        assert wifiManager != null;
         if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
     }
@@ -221,15 +219,12 @@ public class FitbitMessageService extends Service {
                 if (!isAppRunning(PACKAGE_KSWEB)) {
                     launchApp(PACKAGE_KSWEB);
                 }
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent upmc = new Intent(getApplicationContext(), UPMC.class);
-                        upmc.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(upmc);
-                        new ResetTable().execute();
-                        startFitbitCheckPromptAlarm();
-                    }
+                new Handler().postDelayed(() -> {
+                    Intent upmc = new Intent(getApplicationContext(), MainActivity.class);
+                    upmc.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(upmc);
+                    new ResetTable().execute();
+                    startFitbitCheckPromptAlarm();
                 }, 3000);
 
                 break;
@@ -242,22 +237,18 @@ public class FitbitMessageService extends Service {
                 showSurveyNotif();
                 showFitbitNotif();
                 createInterventionNotifChannel();
-                scheduleTimeForMorningSurvey();
                 if (!isAppRunning(PACKAGE_FITBIT)) {
                     launchApp(PACKAGE_FITBIT);
                 }
                 if (!isAppRunning(PACKAGE_KSWEB)) {
                     launchApp(PACKAGE_KSWEB);
                 }
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent upmc = new Intent(getApplicationContext(), UPMC.class);
-                        upmc.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(upmc);
-                        setUpDatabase();
-                        startFitbitCheckPromptAlarm();
-                    }
+                new Handler().postDelayed(() -> {
+                    Intent upmc = new Intent(getApplicationContext(), MainActivity.class);
+                    upmc.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(upmc);
+                    setUpDatabase();
+                    startFitbitCheckPromptAlarm();
                 }, 5000);
                 break;
             case Constants.ACTION_CHECK_PROMPT:
@@ -281,7 +272,6 @@ public class FitbitMessageService extends Service {
             case Constants.ACTION_SETTINGS_CHANGED:
                 Log.d(Constants.TAG, "FibitMessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
                 saveTimeSchedule();
-                scheduleTimeForMorningSurvey();
                 break;
             case Constants.ACTION_SYNC_DATA:
                 new SyncData().execute();
@@ -317,7 +307,7 @@ public class FitbitMessageService extends Service {
     }
 
     private void showSurveyNotif() {
-        final Intent dashIntent = new Intent(this, UPMC.class);
+        final Intent dashIntent = new Intent(this, MainActivity.class);
         createSurveyNotifChannel(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             surveyNotifBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
@@ -384,7 +374,7 @@ public class FitbitMessageService extends Service {
 
     public void notifySetup(String contentText) {
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, Constants.WAKELOCK_TAG);
         wl.acquire(6000);
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(500);
@@ -403,7 +393,7 @@ public class FitbitMessageService extends Service {
         createSurveyNotifChannel(daily);
         if (daily) {
             wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
-            final Intent dashIntent = new Intent(this, UPMC.class).setAction(Constants.ACTION_SHOW_MORNING);
+            final Intent dashIntent = new Intent(this, MainActivity.class).setAction(Constants.ACTION_SHOW_MORNING);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 surveyNotifBuilder.setContentTitle(Constants.COMPLETE_SURVEY_TITLE);
@@ -418,8 +408,9 @@ public class FitbitMessageService extends Service {
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
             }
-        } else {
-            final Intent dashIntent = new Intent(this, UPMC.class);
+        }
+        else {
+            final Intent dashIntent = new Intent(this, MainActivity.class);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 surveyNotifBuilder.setContentTitle(Constants.SELF_REPORT_TITLE);
@@ -527,6 +518,7 @@ public class FitbitMessageService extends Service {
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent)
                     .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
 
         } else {
@@ -541,6 +533,7 @@ public class FitbitMessageService extends Service {
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorCompatNotifBuilder.build());
         }
     }
@@ -548,7 +541,8 @@ public class FitbitMessageService extends Service {
 
     public void wakeUpAndVibrate(Context context, int duration_awake, int duration_vibrate) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Wake Up");
+        assert pm != null;
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, Constants.WAKELOCK_TAG);
         wl.acquire(duration_awake);
         final Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
         long[] pattern = {0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
@@ -626,6 +620,7 @@ public class FitbitMessageService extends Service {
         alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
         int interval = 60 * 1000;
         PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
+        assert myAlarmManager != null;
         myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPendingIntent_min);
     }
 
@@ -645,67 +640,69 @@ public class FitbitMessageService extends Service {
     }
 
 
-    public void scheduleTimeForMorningSurvey() {
-        Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey");
-        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
-        try {
 
-            String className = getPackageName() + "/" + FitbitMessageService.class.getName();
-            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0)
-                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, 9);
+//    public void scheduleTimeForMorningSurvey() {
+//        Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey");
+//        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+//        try {
+//
+//            String  className = getPackageName() + "/" + FitbitMessageService.class.getName();
+//            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0)
+//                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, 9);
+//
+//            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() == 0)
+//                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, 0);
+//
+//            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+//            int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+//            Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), "cancer_survey_morning");
+//            Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
+//            if (currentScheduler == null) {
+//                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
+//
+//                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
+//                schedule.addHour(morning_hour)
+//                        .addMinute(morning_minute)
+//                        .setActionClass(className)
+//                        .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
+//                        .setActionType(Scheduler.ACTION_TYPE_SERVICE);
+//                Scheduler.saveSchedule(getApplicationContext(), schedule);
+//                Aware.startScheduler(getApplicationContext()); //apply scheduler
+//            } else {
+//                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:else part");
+//                JSONArray hours = currentScheduler.getHours();
+//                JSONArray minutes = currentScheduler.getMinutes();
+//                boolean hour_changed = false;
+//                boolean minute_changed = false;
+//                for (int i = 0; i < hours.length(); i++) {
+//                    if (hours.getInt(i) != morning_hour) {
+//                        hour_changed = true;
+//                        break;
+//                    }
+//                }
+//                for (int i = 0; i < minutes.length(); i++) {
+//                    if (minutes.getInt(i) != morning_minute) {
+//                        minute_changed = true;
+//                        break;
+//                    }
+//                }
+//                if (hour_changed || minute_changed) {
+//                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
+//                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
+//                    schedule.addHour(morning_hour)
+//                            .addMinute(morning_minute)
+//                            .setActionClass(className)
+//                            .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
+//                            .setActionType(Scheduler.ACTION_TYPE_SERVICE);
+//                    Scheduler.saveSchedule(this, schedule);
+//                    Aware.startScheduler(getApplicationContext()); //apply scheduler
+//                }
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() == 0)
-                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, 0);
-
-            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-            int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-            Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), "cancer_survey_morning");
-            Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
-            if (currentScheduler == null) {
-                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
-
-                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
-                schedule.addHour(morning_hour)
-                        .addMinute(morning_minute)
-                        .setActionClass(className)
-                        .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
-                        .setActionType(Scheduler.ACTION_TYPE_SERVICE);
-                Scheduler.saveSchedule(getApplicationContext(), schedule);
-                Aware.startScheduler(getApplicationContext()); //apply scheduler
-            } else {
-                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:else part");
-                JSONArray hours = currentScheduler.getHours();
-                JSONArray minutes = currentScheduler.getMinutes();
-                boolean hour_changed = false;
-                boolean minute_changed = false;
-                for (int i = 0; i < hours.length(); i++) {
-                    if (hours.getInt(i) != morning_hour) {
-                        hour_changed = true;
-                        break;
-                    }
-                }
-                for (int i = 0; i < minutes.length(); i++) {
-                    if (minutes.getInt(i) != morning_minute) {
-                        minute_changed = true;
-                        break;
-                    }
-                }
-                if (hour_changed || minute_changed) {
-                    Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
-                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
-                    schedule.addHour(morning_hour)
-                            .addMinute(morning_minute)
-                            .setActionClass(className)
-                            .setActionIntentAction(Plugin.ACTION_CANCER_SURVEY)
-                            .setActionType(Scheduler.ACTION_TYPE_SERVICE);
-                    Scheduler.saveSchedule(this, schedule);
-                    Aware.startScheduler(getApplicationContext()); //apply scheduler
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void scheduleTimeForDataSyncing(Integer hour, Integer min) {
         try {
@@ -743,7 +740,6 @@ public class FitbitMessageService extends Service {
         step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
         step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
         getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
-        sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
         Log.d("yiyi", "Sent data to aware server");
     }
 

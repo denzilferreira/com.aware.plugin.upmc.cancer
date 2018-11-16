@@ -7,21 +7,21 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
-import com.aware.plugin.upmc.dash.services.MessageService;
+import com.aware.plugin.upmc.dash.services.FitbitMessageService;
 import com.aware.plugin.upmc.dash.utils.Constants;
 
 public class ShutdownReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(Constants.TAG,"ShutdownReceiver: onReceive: Shutdown");
-        if(isMyServiceRunning(MessageService.class, context)) {
-            Intent messageServiceIntent = new Intent(context, MessageService.class).setAction(Constants.ACTION_STOP_SELF);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(messageServiceIntent);
-            }
-            else {
-                context.startService(messageServiceIntent);
-            }
+        if(isMyServiceRunning(FitbitMessageService.class, context)) {
+//            Intent messageServiceIntent = new Intent(context, FitbitMessageService.class).setAction(Constants.ACTION_STOP_SELF);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                context.startForegroundService(messageServiceIntent);
+//            }
+//            else {
+//                context.startService(messageServiceIntent);
+//            }
         }
     }
 
