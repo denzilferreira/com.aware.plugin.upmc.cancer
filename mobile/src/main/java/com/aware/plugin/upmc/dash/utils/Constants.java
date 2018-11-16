@@ -81,8 +81,8 @@ public final class Constants {
     public static final String ACTION_NOTIF_NO = "NO_ACTION";
 
 
-    // Do Not Disturb Action
-    public static final String ACTION_DO_NOT_DISTURB = "ACTION_DO_NOT_DISTURB";
+
+
 
 
 
@@ -205,6 +205,7 @@ public final class Constants {
     public static final String ACTION_CHECK_PROMPT = "check_prompt";
     public static final String ACTION_CHECK_CONN = "check_watch_connection";
     public static final String ACTION_SURVEY_COMPLETED = "notify_survey_completed";
+    public static final String ACTION_DO_NOT_DISTURB = "ACTION_DO_NOT_DISTURB";
 
     // Survey notif
     public static final String SURVEY_COMPLETED = "Survey already completed. Tap to complete again.";
