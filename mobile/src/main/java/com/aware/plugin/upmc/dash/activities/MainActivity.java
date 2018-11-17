@@ -188,6 +188,17 @@ public class MainActivity extends AppCompatActivity {
         createSchedule(morning_hour, morning_minute, Constants.MORNING_SURVEY_SCHED_ID,
                 className, Scheduler.ACTION_TYPE_SERVICE, Plugin.ACTION_CANCER_SURVEY);
 
+        int evening_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        int evening_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+
+        createSchedule(evening_hour, evening_minute, Constants.MORNING_SURVEY_SCHED_ID,
+                className, Scheduler.ACTION_TYPE_SERVICE, Constants.ACTION_SYNC_DATA);
+
+
+
+
+
+
     }
 
     public void createSchedule(int hour, int minute, String id, String className, String classType, String action) {

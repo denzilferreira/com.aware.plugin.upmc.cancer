@@ -226,7 +226,6 @@ public class FitbitMessageService extends Service {
                     new ResetTable().execute();
                     startFitbitCheckPromptAlarm();
                 }, 3000);
-                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
             case Constants.ACTION_FIRST_RUN:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand first run");
@@ -250,7 +249,6 @@ public class FitbitMessageService extends Service {
                     setUpDatabase();
                     startFitbitCheckPromptAlarm();
                 }, 5000);
-                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
             case Constants.ACTION_CHECK_PROMPT:
                 Log.d(Constants.TAG, "FitbitMessageService: onStartCommand check prompt repeatedly");
@@ -641,7 +639,7 @@ public class FitbitMessageService extends Service {
         Log.d(Constants.TAG, "time schedule is: " + sb.toString());
         new PostData().execute(TABLE_TS, sb.toString());
         // now schedule a task to sync sensor data to aware every night after the patient's sleeping time
-        scheduleTimeForDataSyncing(evening_hour, evening_min);
+//        scheduleTimeForDataSyncing(evening_hour, evening_min);
     }
 
 
@@ -708,35 +706,35 @@ public class FitbitMessageService extends Service {
 //        }
 //    }
 
-
-    private void scheduleTimeForDataSyncing(Integer hour, Integer min) {
-        try {
-            Scheduler.Schedule data_syncing = Scheduler.getSchedule(getApplicationContext(), "data_syncing");
-            if (data_syncing == null) {
-                data_syncing = new Scheduler.Schedule("data_syncing");
-                data_syncing.addHour((hour + 1) % 24);
-                data_syncing.addMinute(min);
-                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
-                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
-                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
-                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
-            } else if (data_syncing.getHours().getInt(0) != hour
-                    || data_syncing.getMinutes().getInt(0) != min) {
-                Scheduler.removeSchedule(getApplicationContext(), "data_syncing");
-                data_syncing = new Scheduler.Schedule("data_syncing");
-                data_syncing.addHour((hour + 1) % 24);
-                data_syncing.addMinute(min);
-                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
-                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
-                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
-                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
-            }
-            Aware.startScheduler(getApplicationContext()); //apply scheduler
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    private void scheduleTimeForDataSyncing(Integer hour, Integer min) {
+//        try {
+//            Scheduler.Schedule data_syncing = Scheduler.getSchedule(getApplicationContext(), "data_syncing");
+//            if (data_syncing == null) {
+//                data_syncing = new Scheduler.Schedule("data_syncing");
+//                data_syncing.addHour((hour + 1) % 24);
+//                data_syncing.addMinute(min);
+//                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
+//                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
+//                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
+//                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
+//            } else if (data_syncing.getHours().getInt(0) != hour
+//                    || data_syncing.getMinutes().getInt(0) != min) {
+//                Scheduler.removeSchedule(getApplicationContext(), "data_syncing");
+//                data_syncing = new Scheduler.Schedule("data_syncing");
+//                data_syncing.addHour((hour + 1) % 24);
+//                data_syncing.addMinute(min);
+//                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
+//                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
+//                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
+//                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
+//            }
+//            Aware.startScheduler(getApplicationContext()); //apply scheduler
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void syncSCWithServer(long timeStamp, int type, int data) {
         ContentValues step_count = new ContentValues();
