@@ -368,8 +368,8 @@ public class MainActivity extends AppCompatActivity {
                     answer.put(PROVIDERS[i], "No");
                 }
             }
-            if(oldSeverity!=newSeverity && isMyServiceRunning(FitbitMessageService.class))
-                sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
+//            if(oldSeverity!=newSeverity && isMyServiceRunning(FitbitMessageService.class))
+//                sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
             // post it to KSWEB DB
             new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
             // switch back to old notification

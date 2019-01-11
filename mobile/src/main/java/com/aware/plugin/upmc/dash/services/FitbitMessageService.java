@@ -297,6 +297,7 @@ public class FitbitMessageService extends Service {
                 dismissIntervention();
                 break;
             case Constants.ACTION_DO_NOT_DISTURB:
+                Log.d("yiyi", "FitbitMessageService:" + intentAction);
                 new PostData().execute(TABLE_COMMAND, DO_NOT_DISTURB_COMMAND);
                 break;
 
@@ -845,24 +846,23 @@ public class FitbitMessageService extends Service {
                 sb.append(strings[1]);
                 sb.append("')");
                 stmt.executeUpdate(sb.toString());
-                Log.d("yiyi", "Inserted records into the table...");
+                Log.d("yiyi", "statement is: "+sb.toString());
 
             } catch (SQLException se) {
+                Log.d("yiyi", "sql error");
+                Log.d("yiyi",se.getMessage());
+                Log.d("yiyi", se.getSQLState());
                 //Handle errors for JDBC
                 se.printStackTrace();
             } catch (Exception e) {
                 //Handle errors for Class.forName
+                Log.d("yiyi", "found exception");
                 e.printStackTrace();
             } finally {
-                //finally block used to close resources
-                try {
-                    if (stmt != null)
-                        conn.close();
-                } catch (SQLException se) {
-                }// do nothing
                 try {
                     if (conn != null)
                         conn.close();
+                    Log.d("yiyi", "PostData success!");
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }//end finally try
@@ -1023,17 +1023,17 @@ public class FitbitMessageService extends Service {
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE PromptFromWatch " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
-                        " message varchar(10) not NULL, " +
+                        " message varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE CommandFromPhone " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
-                        " command varchar(10) not NULL, " +
+                        " command varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE PatientSurvey " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
-                        " result varchar(10) not NULL, " +
+                        " result varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE SensorData " +
@@ -1043,20 +1043,20 @@ public class FitbitMessageService extends Service {
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE TimeSchedule " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
-                        " timeRange varchar(10) not NULL, " +
+                        " timeRange varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE Notification " +
                         "(unixTime bigint(20) not NULL, " +
-                        " message varchar(10) not NULL)";
+                        " message varchar(255) not NULL)";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE InterventionResponse " +
                         "(unixTime bigint(20) not NULL, " +
-                        " response varchar(10) not NULL)";
+                        " response varchar(255) not NULL)";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE ReasonsForNo " +
                         "(unixTime bigint(20) not NULL, " +
-                        " reasons varchar(10) not NULL)";
+                        " reasons varchar(255) not NULL)";
                 stmt.executeUpdate(sql);
                 Log.d("yiyi", "Created tables in given database...");
             } catch (SQLException se) {
@@ -1114,7 +1114,7 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "Table deleted!!!");
                 sql = "CREATE TABLE PromptFromWatch " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
-                        " message varchar(10) not NULL, " +
+                        " message varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 Log.d("yiyi", "Reset table in given database...");
