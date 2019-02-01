@@ -14,3 +14,9 @@ local.properties
 *.apk
 *.iml
 *.iml
+mobile/.idea/
+mobile/gradle
+mobile/gradlew
+mobile/gradlew.bat
+.DS_Store
+mobile/mobile.iml

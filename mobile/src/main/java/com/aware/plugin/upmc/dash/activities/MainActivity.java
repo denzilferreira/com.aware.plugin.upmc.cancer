@@ -4,22 +4,30 @@ import android.Manifest;
 import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SyncRequest;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,6 +64,7 @@ import io.fabric.sdk.android.Fabric;
 import kotlin.Unit;
 import static com.aware.plugin.upmc.dash.utils.Constants.CASE1;
 import static com.aware.plugin.upmc.dash.utils.Constants.CASE2;
+import static com.aware.plugin.upmc.dash.utils.Constants.CONTENT_TITLE_FITBIT;
 import static com.aware.plugin.upmc.dash.utils.Constants.DB_URL;
 import static com.aware.plugin.upmc.dash.utils.Constants.PASS;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PS;
@@ -66,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean STUDYLESS_DEBUG = false;
     private boolean isRegistered = false;
     private JoinedStudy joinedObserver = new JoinedStudy();
+    private boolean SHOW_INCOMPLETE_NOTIF = false;
 
 
     @Override
@@ -83,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(Constants.TAG, "MainActivity:onCreate");
         // Fabric
         Fabric.with(this, new Crashlytics());
-
     }
 
 
@@ -102,6 +111,43 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+
+    public void showIncompleteAlert(int newSeverity, boolean daily, ContentValues answer) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.myDialog));
+        builder.setMessage("Symptom ratings not complete. Submit anyway?")
+                .setTitle("Alert!");
+        builder.setPositiveButton("Submit Anyway", (dialogInterface, i) -> {
+            new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+            // switch back to old notification
+            if(daily)
+                sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
+
+            Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
+            getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
+            toastThanks(getApplicationContext());
+            finish();
+        });
+        builder.setNegativeButton("Go back", (dialogInterface, i) -> dialogInterface.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+//        new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+//        // switch back to old notification
+//        if(daily)
+//            sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
+//
+//        Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
+//        getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
+//        toastThanks(getApplicationContext());
+//        finish();
+    }
+
+
+
+
+
 
 
 
@@ -297,13 +343,19 @@ public class MainActivity extends AppCompatActivity {
                                     fs.setVisibility(View.GONE);
                                     radioGroup.check(RBP_IDS[index]);
                                     findViewById(IBE_IDS[index]).setVisibility(View.VISIBLE);
-                                    findViewById(TVE_IDS[index]).setVisibility(View.VISIBLE);
+                                    TextView tv = findViewById(TVE_IDS[index]);
+                                    tv.setVisibility(View.VISIBLE);
+                                    int rating = (int) (fs.getPosition()*10);
+                                    tv.setText(String.valueOf(rating));
+
                                 }
                                 , 750);
                         return Unit.INSTANCE;
                     });
                     if(index==11) {
                         Toast.makeText(getApplicationContext(), "Please specify", Toast.LENGTH_SHORT).show();
+                        EditText editText = findViewById(other_entry);
+                        editText.setVisibility(View.VISIBLE);
                     }
 
                 } else if (rb.getText().equals("No")) {
@@ -344,7 +396,6 @@ public class MainActivity extends AppCompatActivity {
                 answer.put(Provider.Symptom_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h" + from_bed.getCurrentMinute() : "");
                 answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
             }
-            int oldSeverity = Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY));
             int newSeverity = 0;
             for (int i = 0; i < RG_IDS.length; i++) {
                 RadioGroup rg = findViewById(RG_IDS[i]);
@@ -352,6 +403,7 @@ public class MainActivity extends AppCompatActivity {
                 if(rb==null) {
                     // nothing has been selected
                     answer.put(PROVIDERS[i], "NA");
+                    SHOW_INCOMPLETE_NOTIF = true;
                 }
                 else if(rb.getText().equals("Yes")) {
                     FluidSlider fs = findViewById(FS_IDS[i]);
@@ -368,17 +420,20 @@ public class MainActivity extends AppCompatActivity {
                     answer.put(PROVIDERS[i], "No");
                 }
             }
+            if(SHOW_INCOMPLETE_NOTIF)
+                showIncompleteAlert(newSeverity, daily, answer);
 //            if(oldSeverity!=newSeverity && isMyServiceRunning(FitbitMessageService.class))
 //                sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
             // post it to KSWEB DB
-            new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
-            // switch back to old notification
-            if(daily)
-                sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
-            Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
-            getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
-            toastThanks(getApplicationContext());
-            finish();
+//            new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+//            // switch back to old notification
+//            if(daily)
+//                sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
+//
+//            Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
+//            getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
+//            toastThanks(getApplicationContext());
+//            finish();
         });
     }
 
@@ -543,7 +598,6 @@ public class MainActivity extends AppCompatActivity {
                 night_hour = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR)) != nightHour;
                 night_minute = Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE)) != nightMinute;
             } catch (NumberFormatException ex) {
-                Log.d(Constants.TAG, "Exception!");
                 morning_hour = true;
                 morning_minute = true;
                 night_hour = true;

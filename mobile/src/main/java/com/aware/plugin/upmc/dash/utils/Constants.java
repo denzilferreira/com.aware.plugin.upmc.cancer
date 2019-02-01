@@ -109,8 +109,8 @@ public final class Constants {
 
     //Wear monitor notif
 
-    public static final String NOTIF_APPRAISAL = "Great Job! You have been active";
-    public static final String NOTIF_INACTIVITY =  "Ready for a quick walk?";
+    public static final String NOTIF_APPRAISAL = "Great job on being active!";
+    public static final String NOTIF_INACTIVITY =  "Ready for a short walk?";
 
     /**
      *
@@ -139,7 +139,10 @@ public final class Constants {
 
     public static final String SURVEY_NOTIF_CHNL_NAME= "UPMC Dash Survey notification";
     public static final String SURVEY_NOTIF_CHNL_ID = "survey_notification";
+    public static final String REMINDER_NOTIF_CHNL_ID = "reminder_notification";
     public static final String SURVEY_NOTIF_CHNL_DESC= "UPMC Dash Survey notification";
+    public static final String REMINDER_NOTIF_CHNL_DESC= "UPMC Dash Reminder notification";
+
 
 
 
@@ -224,6 +227,10 @@ public final class Constants {
 
     public static final String DND_MODE_ON = "DND_MODE_ON";
     public static final String DND_MODE_OFF = "DND_MODE_OFF";
+
+
+    public static final String INCOMPLETE_SYMPS_TEXT = "Symptom ratings not complete";
+    public static final String SURVEY_CONTENT_TEXT = "UPMC DASH SURVEY";
 
 
 

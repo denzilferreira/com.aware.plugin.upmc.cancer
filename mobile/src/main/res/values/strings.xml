@@ -36,7 +36,7 @@
 
     <string name="rb1_text">Yes</string>
     <string name="rb2_text">No</string>
-    <string name="img_btn_text">Edit</string>
+    <string name="img_btn_text"></string>
     <string name="save_btn_text">Save answers</string>
     <string name="regular">Regular</string>
     <string name="control">Control</string>

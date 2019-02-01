@@ -182,10 +182,14 @@ public class FitbitMessageService extends Service {
 
     public boolean enableBluetoothIfOff() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        boolean isEnabled = bluetoothAdapter.isEnabled();
-        if (!isEnabled)
-            return bluetoothAdapter.enable();
-        return true;
+        if (bluetoothAdapter!=null) {
+            boolean isEnabled = bluetoothAdapter.isEnabled();
+            if (!isEnabled)
+                return bluetoothAdapter.enable();
+            return true;
+        }
+        else
+            return false;
     }
 
 
@@ -337,6 +341,8 @@ public class FitbitMessageService extends Service {
             startForeground(Constants.SURVEY_NOTIF_ID, surveyCompatNotifBuilder.build());
         }
     }
+
+
 
 
     private void showFitbitNotif() {
