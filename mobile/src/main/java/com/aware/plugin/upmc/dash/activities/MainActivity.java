@@ -397,13 +397,15 @@ public class MainActivity extends AppCompatActivity {
                 answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
             }
             int newSeverity = 0;
+            SHOW_INCOMPLETE_NOTIF = false;
             for (int i = 0; i < RG_IDS.length; i++) {
                 RadioGroup rg = findViewById(RG_IDS[i]);
                 RadioButton rb = findViewById(rg.getCheckedRadioButtonId());
                 if(rb==null) {
                     // nothing has been selected
                     answer.put(PROVIDERS[i], "NA");
-                    SHOW_INCOMPLETE_NOTIF = true;
+                    if(i!=11)
+                        SHOW_INCOMPLETE_NOTIF = true;
                 }
                 else if(rb.getText().equals("Yes")) {
                     FluidSlider fs = findViewById(FS_IDS[i]);
@@ -422,18 +424,19 @@ public class MainActivity extends AppCompatActivity {
             }
             if(SHOW_INCOMPLETE_NOTIF)
                 showIncompleteAlert(newSeverity, daily, answer);
-//            if(oldSeverity!=newSeverity && isMyServiceRunning(FitbitMessageService.class))
-//                sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
-            // post it to KSWEB DB
-//            new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
-//            // switch back to old notification
-//            if(daily)
-//                sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
-//
-//            Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
-//            getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
-//            toastThanks(getApplicationContext());
-//            finish();
+            else {
+                // post it to KSWEB DB
+                new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+                // switch back to old notification
+                if(daily)
+                    sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
+
+                Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
+                getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
+                toastThanks(getApplicationContext());
+                finish();
+            }
+
         });
     }
 
@@ -457,7 +460,8 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
                 if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON )) {
-                    item.setVisible(false);
+                    item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
+                    item.setTitle("Dnd2");
                 }
             }
         }
@@ -501,14 +505,24 @@ public class MainActivity extends AppCompatActivity {
                 syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101));
             return true;
         }
+        // do not disturb on
         else if (title.equalsIgnoreCase("Dnd1")) {
             Log.d(Constants.TAG, "MainActivity:Do not disturb on");
             sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
             item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
-            item.setVisible(false);
             Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_ON);
             Toast.makeText(getApplicationContext(), "You will not receive prompts for the rest of the day", Toast.LENGTH_SHORT).show();
-
+            item.setTitle("Dnd2");
+        }
+        // do not disturb off
+        else if (title.equalsIgnoreCase("Dnd2")) {
+            Log.d(Constants.TAG, "MainActivity:Do not disturb on");
+            sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
+            item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
+            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
+            Toast.makeText(getApplicationContext(), "You will receive prompts", Toast.LENGTH_SHORT).show();
+            item.setTitle("Dnd1");
+            sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
         }
 
         return super.onOptionsItemSelected(item);
@@ -682,7 +696,7 @@ public class MainActivity extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, false);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, String.valueOf(-1));
-                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, "off");
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
                     Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
                     Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
                     Applications.isAccessibilityServiceActive(getApplicationContext());
