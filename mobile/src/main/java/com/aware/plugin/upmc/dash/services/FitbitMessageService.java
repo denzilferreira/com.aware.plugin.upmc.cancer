@@ -302,7 +302,8 @@ public class FitbitMessageService extends Service {
                 break;
             case Constants.ACTION_DO_NOT_DISTURB:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-                new PostData().execute(TABLE_COMMAND, DO_NOT_DISTURB_COMMAND);
+                String mode = Aware.getSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_DND_MODE);
+                new PostData().execute(TABLE_COMMAND, mode.equals(Constants.DND_MODE_ON)?Constants.DO_NOT_DISTURB_COMMAND:Constants.REMOVE_DO_NOT_DISTURB);
                 break;
 
             default:

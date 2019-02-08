@@ -184,7 +184,8 @@ public final class Constants {
     public static final String CASE2 = ">=7";
     public static final String SNOOZE_COMMAND = "Snooze";
     public static final String CLOSE_COMMAND = "Close";
-    public static final String DO_NOT_DISTURB_COMMAND = "Do Not Disturb";
+    public static final String DO_NOT_DISTURB_COMMAND = "Do Not Disturb On";
+    public static final String REMOVE_DO_NOT_DISTURB = "Do Not Disturb Off";
 
     // Messages received from the watch
     public static final String NOTIFICATION = "Ready?";
