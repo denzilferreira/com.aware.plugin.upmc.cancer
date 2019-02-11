@@ -522,7 +522,6 @@ public class MainActivity extends AppCompatActivity {
             Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
             Toast.makeText(getApplicationContext(), "You will receive prompts", Toast.LENGTH_SHORT).show();
             item.setTitle("Dnd1");
-            sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
         }
 
         return super.onOptionsItemSelected(item);
