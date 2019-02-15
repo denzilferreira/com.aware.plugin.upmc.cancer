@@ -78,6 +78,18 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
 }
 
 if (System.getenv("storeFile") != null && System.getenv("storePassword") != null && System.getenv("keyAlias") != null && System.getenv("keyPassword") != null) {
@@ -105,7 +117,7 @@ dependencies {
     //AWARE is now self-contained. No more leftover dependencies!
     api 'com.ramotion.fluidslider:fluid-slider:0.3.0'
     api "com.github.denzilferreira:aware-client:master-SNAPSHOT"
-    api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
+//    api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
     api "com.google.android.gms:play-services-wearable:$google_libs"
     api "com.android.support:design:$support_libs"
     api "com.android.support:support-v4:$support_libs"
@@ -116,8 +128,8 @@ dependencies {
     api group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
 
     api 'com.google.firebase:firebase-crash:16.2.1'
-    api "com.crashlytics.sdk.android:crashlytics:2.9.8"
-    api 'com.google.firebase:firebase-core:16.0.6'
+    api "com.crashlytics.sdk.android:crashlytics:2.9.9"
+    api 'com.google.firebase:firebase-core:16.0.7'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -6,6 +6,15 @@ package com.aware.plugin.upmc.dash.utils;
 
 public final class Constants {
 
+
+    public static final String SNOOZE_ON_ALERT = "Are you sure you want to disable notifications to walk for the rest of the day?";
+    public static final String SNOOZE_OFF_ALERT = "Are you sure you want to resume notifications to walk?";
+
+
+    public static final String SNOOZE_ALERT_POS = "Confirm";
+    public static final String SNOOZE_ALERT_NEG = "Cancel";
+
+
     public static final String DEVICE_TYPE_REGULAR = "DEVICE_TYPE_REGULAR";
     public static final String DEVICE_TYPE_CONTROL = "DEVICE_TYPE_CONTROL";
 
@@ -109,7 +118,7 @@ public final class Constants {
 
     //Wear monitor notif
 
-    public static final String NOTIF_APPRAISAL = "Great job on being active!";
+    public static final String NOTIF_APPRAISAL = "Great job being active!";
     public static final String NOTIF_INACTIVITY =  "Ready for a short walk?";
 
     /**

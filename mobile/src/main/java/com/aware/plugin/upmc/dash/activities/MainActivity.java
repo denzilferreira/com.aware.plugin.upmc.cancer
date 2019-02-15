@@ -240,11 +240,6 @@ public class MainActivity extends AppCompatActivity {
         createSchedule(evening_hour, evening_minute, Constants.MORNING_SURVEY_SCHED_ID,
                 className, Scheduler.ACTION_TYPE_SERVICE, Constants.ACTION_SYNC_DATA);
 
-
-
-
-
-
     }
 
     public void createSchedule(int hour, int minute, String id, String className, String classType, String action) {
@@ -468,6 +463,35 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+
+    public void showSnoozeAlert(String DND_STATUS, MenuItem item) {
+        String message = DND_STATUS.equals(Constants.DND_MODE_ON)? Constants.SNOOZE_ON_ALERT: Constants.SNOOZE_OFF_ALERT;
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.myDialog));
+        builder.setMessage(message)
+                .setTitle("Alert!");
+        builder.setPositiveButton(Constants.SNOOZE_ALERT_POS, (dialogInterface, i) -> {
+            if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
+                sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
+                item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
+                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_ON);
+//            Toast.makeText(getApplicationContext(), "You will not receive prompts for the rest of the day", Toast.LENGTH_SHORT).show();
+                item.setTitle("Dnd2");
+            }
+            else {
+
+                sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
+                item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
+                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
+                item.setTitle("Dnd1");
+            }
+
+        });
+        builder.setNegativeButton(Constants.SNOOZE_ALERT_NEG, (dialogInterface, i) -> dialogInterface.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -508,24 +532,21 @@ public class MainActivity extends AppCompatActivity {
         // do not disturb on
         else if (title.equalsIgnoreCase("Dnd1")) {
             Log.d(Constants.TAG, "MainActivity:Do not disturb on");
-            sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
-            item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
-            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_ON);
-            Toast.makeText(getApplicationContext(), "You will not receive prompts for the rest of the day", Toast.LENGTH_SHORT).show();
-            item.setTitle("Dnd2");
+            showSnoozeAlert(Constants.DND_MODE_ON, item);
         }
         // do not disturb off
         else if (title.equalsIgnoreCase("Dnd2")) {
             Log.d(Constants.TAG, "MainActivity:Do not disturb on");
-            sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
-            item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
-            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
-            Toast.makeText(getApplicationContext(), "You will receive prompts", Toast.LENGTH_SHORT).show();
-            item.setTitle("Dnd1");
+            showSnoozeAlert(Constants.DND_MODE_OFF, item);
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
+
+
 
 
     public void syncSCWithServer(long timeStamp, int type, int data) {
@@ -688,8 +709,9 @@ public class MainActivity extends AppCompatActivity {
             if(intent!=null) {
                 if (intent.getAction().equalsIgnoreCase(Aware.ACTION_JOINED_STUDY)) {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true); //enable logcat debug messages
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, true);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 6);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, false);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_FALLBACK_NETWORK, 1);
+                    Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 15);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 1);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
@@ -719,6 +741,8 @@ public class MainActivity extends AppCompatActivity {
                         .setSyncAdapter(aware_account, authority)
                         .setExtras(new Bundle()).build();
                 ContentResolver.requestSync(request);
+
+                engageScheduler();
 
 
                     finish();
