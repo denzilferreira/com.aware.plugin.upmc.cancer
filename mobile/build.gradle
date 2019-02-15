@@ -20,6 +20,7 @@ android {
         targetSdkVersion target_sdk
         versionCode 18
         versionName "2.0"
+        multiDexEnabled true
 
         //AWARE core sensors provider authority overrides
         resValue "string", "provider_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer"
@@ -53,6 +54,8 @@ android {
         //Bundled plugins provider authority overrides
 //        resValue "string", "provider_google_activity_recognition", android.defaultConfig.applicationId + ".provider.gar"
         resValue "string", "provider_upmc", android.defaultConfig.applicationId + ".provider.survey"
+
+
     }
 
     lintOptions {
