@@ -13,7 +13,7 @@
         android:onClick="onCheckBoxClicked"
         android:text="@string/no_busy_response"/>
     <CheckBox
-        android:id="@+id/pain_heckbox"
+        android:id="@+id/pain_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onCheckBoxClicked"
@@ -26,7 +26,7 @@
         android:text="@string/no_nausea_response"/>
 
     <CheckBox
-        android:id="@+id/tired_response"
+        android:id="@+id/tired_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onCheckBoxClicked"

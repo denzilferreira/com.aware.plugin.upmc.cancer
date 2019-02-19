@@ -76,6 +76,7 @@ import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_CONN;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_PROMPT;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_SENSOR_DATA;
 import static com.aware.plugin.upmc.dash.utils.Constants.TABLE_TS;
+import static com.aware.plugin.upmc.dash.utils.Constants.TAG;
 import static com.aware.plugin.upmc.dash.utils.Constants.TAG_KEY;
 import static com.aware.plugin.upmc.dash.utils.Constants.USER;
 import static com.aware.plugin.upmc.dash.utils.KSWEBControl.DATA_KEY;
@@ -96,22 +97,22 @@ public class FitbitMessageService extends Service {
             int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
             switch (state) {
                 case BluetoothAdapter.STATE_OFF:
-                    Log.d(Constants.TAG, "FitbitMessageService:BluetoothReceiver:StateOff");
+                    Log.d(TAG, "FitbitMessageService:BluetoothReceiver:StateOff");
                     notifySetup(Constants.FAILED_WEAR_BLUETOOTH);
                     if (!enableBluetoothIfOff())
                         Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
                     break;
                 case BluetoothAdapter.STATE_TURNING_OFF:
-                    Log.d(Constants.TAG, "FitbitMessageService:BluetoothReceiver:StateTurningOff");
+                    Log.d(TAG, "FitbitMessageService:BluetoothReceiver:StateTurningOff");
                     BluetoothAdapter.getDefaultAdapter().enable();
                     notifySetup(Constants.FAILED_WEAR_BLUETOOTH);
                     break;
                 case BluetoothAdapter.STATE_ON:
-                    Log.d(Constants.TAG, "FitbitMessageService:BluetoothReceiver:StateOn");
+                    Log.d(TAG, "FitbitMessageService:BluetoothReceiver:StateOn");
                     notifySetup(BLUETOOTH_ON);
                     break;
                 case BluetoothAdapter.STATE_TURNING_ON:
-                    Log.d(Constants.TAG, "FitbitMessageService:BluetoothReceiver:StateTurningOn");
+                    Log.d(TAG, "FitbitMessageService:BluetoothReceiver:StateTurningOn");
                     notifySetup(BLUETOOTH_ON);
                     break;
             }
@@ -123,20 +124,20 @@ public class FitbitMessageService extends Service {
         public void onReceive(Context context, Intent intent) {
             int state = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
             enableWifiIfOff();
-            Log.d(Constants.TAG, "Caught intent ");
+            Log.d(TAG, "Caught intent ");
             switch (state) {
                 case ConnectivityManager.TYPE_BLUETOOTH:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: Blue");
+                    Log.d(TAG, "mConnectivityReceiver: Blue");
                     break;
                 case ConnectivityManager.TYPE_WIFI:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: Wifi");
+                    Log.d(TAG, "mConnectivityReceiver: Wifi");
                     break;
                 case ConnectivityManager.TYPE_ETHERNET:
-                    Log.d(Constants.TAG, "mConnecti vityReceiver: ether");
+                    Log.d(TAG, "mConnecti vityReceiver: ether");
                     break;
 
                 case ConnectivityManager.TYPE_MOBILE:
-                    Log.d(Constants.TAG, "mConnectivityReceiver: mob");
+                    Log.d(TAG, "mConnectivityReceiver: mob");
                     break;
 
             }
@@ -157,7 +158,7 @@ public class FitbitMessageService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(Constants.TAG, "FitbitMessageService:onDestroy");
+        Log.d(TAG, "FitbitMessageService:onDestroy");
         stopForeground(true);
         unregisterReceiver(mBluetootLocalReceiver);
         unregisterReceiver(mConnectivityReceiver);
@@ -169,7 +170,7 @@ public class FitbitMessageService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d(Constants.TAG, "FitbitMessageService: onCreate");
+        Log.d(TAG, "FitbitMessageService: onCreate");
         super.onCreate();
     }
 
@@ -207,7 +208,7 @@ public class FitbitMessageService extends Service {
             intentAction = intent.getAction();
         if (intentAction == null)
             return i;
-        Log.d(Constants.TAG, "FitbitMessageService: onStartCommand " + intentAction);
+        Log.d(TAG, "FitbitMessageService: onStartCommand " + intentAction);
         switch (intentAction) {
             case Constants.ACTION_REBOOT:
                 enableBluetoothIfOff();
@@ -232,15 +233,13 @@ public class FitbitMessageService extends Service {
                 }, 3000);
                 break;
             case Constants.ACTION_FIRST_RUN:
-                Log.d(Constants.TAG, "FitbitMessageService: onStartCommand first run");
+                Log.d(TAG, "FitbitMessageService: onStartCommand first run");
                 enableBluetoothIfOff();
                 enableWifiIfOff();
                 registerBluetoothReceiver();
                 registerConnectivityReceiver();
                 showSurveyNotif();
                 showFitbitNotif();
-                createInterventionNotifChannel();
-                notifyUserWithInactivity(getApplicationContext(), true);
                 if (!isAppRunning(PACKAGE_FITBIT)) {
                     launchApp(PACKAGE_FITBIT);
                 }
@@ -256,36 +255,36 @@ public class FitbitMessageService extends Service {
                 }, 5000);
                 break;
             case Constants.ACTION_CHECK_PROMPT:
-                Log.d(Constants.TAG, "FitbitMessageService: onStartCommand check prompt repeatedly");
+                Log.d(TAG, "FitbitMessageService: onStartCommand check prompt repeatedly");
                 new CheckPrompt().execute();
                 break;
             case Constants.ACTION_CHECK_CONN:
-                Log.d(Constants.TAG, "FitbitMessageService: onStartCommand check watch connection");
+                Log.d(TAG, "FitbitMessageService: onStartCommand check watch connection");
 //                startActivity(new Intent(this, SetupLoadingActvity.class));
                 new CheckConn().execute();
                 break;
             case Constants.ACTION_SURVEY_COMPLETED:
-                Log.d(Constants.TAG, "FitbitMessageService: onStartCommand notify survey completed");
+                Log.d(TAG, "FitbitMessageService: onStartCommand notify survey completed");
                 Log.d("yiyi", "action_survey_completed got called!");
                 notifySurvey(false);
                 break;
             case Plugin.ACTION_CANCER_SURVEY:
-                Log.d(Constants.TAG, "FitbitMessageService:onStartCommand: ACTION_CANCER_SURVEY");
+                Log.d(TAG, "FitbitMessageService:onStartCommand: ACTION_CANCER_SURVEY");
                 notifySurvey(true);
                 break;
             case Constants.ACTION_SETTINGS_CHANGED:
-                Log.d(Constants.TAG, "FibitMessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
+                Log.d(TAG, "FibitMessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
                 saveTimeSchedule();
                 break;
             case Constants.ACTION_SYNC_DATA:
                 new SyncData().execute();
                 break;
             case Constants.ACTION_APPRAISAL:
-                Log.d(Constants.TAG, "FitbitMessageService: onStartCommand appraisal");
+                Log.d(TAG, "FitbitMessageService: onStartCommand appraisal");
                 dismissIntervention();
                 break;
             case Constants.ACTION_INACTIVITY:
-                Log.d(Constants.TAG, "FitbitMessageService: onStartCommand : inactivity");
+                Log.d(TAG, "FitbitMessageService: onStartCommand : inactivity");
                 startActivity(new Intent(this, NotificationResponseActivity.class));
                 break;
             case Constants.ACTION_NOTIF_SNOOZE:
@@ -298,7 +297,8 @@ public class FitbitMessageService extends Service {
                 break;
             case Constants.ACTION_NOTIF_NO:
                 new PostData().execute(TABLE_COMMAND, CLOSE_COMMAND);
-                Log.d(Constants.TAG, "FitbitMessageService:" + intentAction);
+                Log.d(TAG, "FitbitMessageService:" + intentAction);
+                saveResponseForNo(intent);
                 dismissIntervention();
                 break;
             case Constants.ACTION_DO_NOT_DISTURB:
@@ -309,13 +309,19 @@ public class FitbitMessageService extends Service {
 
             case Constants.ACTION_TEST:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-                notifyUserWithInactivity(getApplicationContext(), true);
+//                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
 
             default:
                 return i;
         }
         return i;
+    }
+
+    public void saveResponseForNo(Intent intent) {
+        String no_output = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
+        Log.d(Constants.TAG, "FitbitMessageService:saveResponseForNo" +no_output);
+
     }
 
     private void showSurveyNotif() {
@@ -452,6 +458,7 @@ public class FitbitMessageService extends Service {
             notificationChannel.setDescription(Constants.INTERVENTION_NOTIF_CHNL_DESC);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationChannel.enableVibration(false);
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             assert notificationManager != null;
@@ -486,38 +493,42 @@ public class FitbitMessageService extends Service {
     }
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption) {
-        wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
-        Intent dashIntent = new Intent(context, NotificationResponseActivity.class);
+       try {
+           Log.d(TAG, "notifyUserWithInactivity");
+           createInterventionNotifChannel();
+           wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
+           Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
         if (snoozeOption)
             dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
-        PendingIntent dashPendingIntent = PendingIntent.getActivity(context, 0, dashIntent, 0);
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder monitorNotifBuilder = new Notification.Builder(context, Constants.INTERVENTION_NOTIF_CHNL_ID);
-            monitorNotifBuilder.setAutoCancel(false)
-                    .setWhen(System.currentTimeMillis())
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Monitor")
-                    .setContentText(Constants.NOTIF_INACTIVITY)
-                    .setGroup("Prompt")
-                    .setOngoing(true)
-                    .setContentIntent(dashPendingIntent)
-                    .setTimeoutAfter(INTERVENTION_TIMEOUT);
+           PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
+           NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+               Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+               monitorNotifBuilder.setAutoCancel(false)
+                       .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                       .setContentTitle("UPMC Dash Monitor")
+                       .setContentText(Constants.NOTIF_INACTIVITY)
+                       .setOngoing(true)
+                       .setContentIntent(dashPendingIntent)
+                       .setTimeoutAfter(INTERVENTION_TIMEOUT);
             assert mNotificationManager != null;
-            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
-        } else {
-            NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .setContentTitle("UPMC Dash Monitor")
-                    .setContentText(Constants.NOTIF_INACTIVITY)
-                    .setOngoing(true)
-                    .setContentIntent(dashPendingIntent)
-                    .setGroup("Prompt")
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setTimeoutAfter(INTERVENTION_TIMEOUT);
-            assert mNotificationManager != null;
-            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
+               mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
+           } else {
+               NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
+                       .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                       .setContentTitle("UPMC Dash Monitor")
+                       .setContentText(Constants.NOTIF_INACTIVITY)
+                       .setOngoing(true)
+                       .setContentIntent(dashPendingIntent)
+                       .setGroup("Prompt")
+                       .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                       .setPriority(NotificationCompat.PRIORITY_MAX)
+                       .setTimeoutAfter(INTERVENTION_TIMEOUT);
+               assert mNotificationManager != null;
+               mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
+           }
+       } catch (Exception e){
+           Log.d(TAG,e.getMessage());
         }
     }
 
@@ -648,7 +659,7 @@ public class FitbitMessageService extends Service {
         Integer evening_min = Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
         sb.append(zeroPad(evening_hour));
         sb.append(zeroPad(evening_min));
-        Log.d(Constants.TAG, "time schedule is: " + sb.toString());
+        Log.d(TAG, "time schedule is: " + sb.toString());
         new PostData().execute(TABLE_TS, sb.toString());
         // now schedule a task to sync sensor data to aware every night after the patient's sleeping time
 //        scheduleTimeForDataSyncing(evening_hour, evening_min);

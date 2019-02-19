@@ -40,6 +40,7 @@ public final class Constants {
 
 
     public static final String SELF_REPORT_CONTENT = "Tap to edit";
+    public static final String NOTIF_RESPONSE_EXTRA_KEY = "NOTIF_RESPONSE_EXTRA_KEY";
 
     public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
 

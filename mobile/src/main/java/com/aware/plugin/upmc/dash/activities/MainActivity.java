@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
 
             Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
+            sendFitbitMessageServiceAction(Constants.ACTION_TEST);
             getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
             toastThanks(getApplicationContext());
             finish();
