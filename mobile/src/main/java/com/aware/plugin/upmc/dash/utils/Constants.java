@@ -70,6 +70,8 @@ public final class Constants {
 
     public static final String ACTION_SYNC_DATA = "sync_sensor_data";
 
+    public static final String ACTION_TEST = "ACTION_TEST";
+
 
 
 

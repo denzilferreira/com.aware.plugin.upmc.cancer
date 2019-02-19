@@ -240,6 +240,7 @@ public class FitbitMessageService extends Service {
                 showSurveyNotif();
                 showFitbitNotif();
                 createInterventionNotifChannel();
+                notifyUserWithInactivity(getApplicationContext(), true);
                 if (!isAppRunning(PACKAGE_FITBIT)) {
                     launchApp(PACKAGE_FITBIT);
                 }
@@ -304,6 +305,11 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
                 String mode = Aware.getSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_DND_MODE);
                 new PostData().execute(TABLE_COMMAND, mode.equals(Constants.DND_MODE_ON)?Constants.DO_NOT_DISTURB_COMMAND:Constants.REMOVE_DO_NOT_DISTURB);
+                break;
+
+            case Constants.ACTION_TEST:
+                Log.d("yiyi", "FitbitMessageService:" + intentAction);
+                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
 
             default:
@@ -448,6 +454,7 @@ public class FitbitMessageService extends Service {
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(false);
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            assert notificationManager != null;
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }
@@ -496,6 +503,7 @@ public class FitbitMessageService extends Service {
                     .setOngoing(true)
                     .setContentIntent(dashPendingIntent)
                     .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
         } else {
             NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
@@ -508,6 +516,7 @@ public class FitbitMessageService extends Service {
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
             mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
         }
     }
@@ -560,12 +569,7 @@ public class FitbitMessageService extends Service {
         assert vibrator != null;
         vibrator.vibrate(pattern, 0);
         Handler handler2 = new Handler();
-        handler2.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                vibrator.cancel();
-            }
-        }, duration_vibrate);
+        handler2.postDelayed(() -> vibrator.cancel(), duration_vibrate);
     }
 
     private boolean isAppRunning(String app) {

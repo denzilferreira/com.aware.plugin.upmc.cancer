@@ -209,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
                         if(getIntent().getAction()!=null) {
                             if (getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING))
                                 showSymptomSurvey(true);
+
+                            //check this out
                             if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
                                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF );
                             }
@@ -218,6 +220,26 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
+                }
+            }
+            else {
+                if(!isMyServiceRunning(FitbitMessageService.class))
+                    sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
+
+
+                if(getIntent()!=null) {
+                    if(getIntent().getAction()!=null) {
+                        if (getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING))
+                            showSymptomSurvey(true);
+
+                        //check this out
+                        if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
+                            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF );
+                        }
+                    }
+                    else {
+                        showSymptomSurvey(false);
+                    }
                 }
             }
         }
@@ -423,6 +445,7 @@ public class MainActivity extends AppCompatActivity {
                 // post it to KSWEB DB
                 new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
                 // switch back to old notification
+
                 if(daily)
                     sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
 
@@ -440,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
-        if (!Aware.isStudy(getApplicationContext()) || STUDYLESS_DEBUG) {
+        if (!Aware.isStudy(getApplicationContext())) {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
                 if (item.getTitle().toString().equalsIgnoreCase("sync"))
@@ -455,8 +478,12 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
                 if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON )) {
-                    item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
+                    item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
                     item.setTitle("Dnd2");
+                }
+                else if(item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
+                    item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
+                    item.setTitle("Dnd1");
                 }
             }
         }
@@ -744,7 +771,6 @@ public class MainActivity extends AppCompatActivity {
 
                 engageScheduler();
 
-
                     finish();
                 }
             }
@@ -753,6 +779,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
     private static class PostData extends AsyncTask<String, Void, Void> {
 
