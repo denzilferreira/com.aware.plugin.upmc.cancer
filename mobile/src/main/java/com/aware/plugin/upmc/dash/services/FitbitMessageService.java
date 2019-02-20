@@ -309,7 +309,7 @@ public class FitbitMessageService extends Service {
 
             case Constants.ACTION_TEST:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-//                notifyUserWithInactivity(getApplicationContext(), true);
+                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
 
             default:
@@ -493,49 +493,61 @@ public class FitbitMessageService extends Service {
     }
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption) {
-       try {
-           Log.d(TAG, "notifyUserWithInactivity");
-           createInterventionNotifChannel();
-           wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
-           Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
-        if (snoozeOption)
-            dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
-           PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-           NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-               Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
-               monitorNotifBuilder.setAutoCancel(false)
-                       .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                       .setContentTitle("UPMC Dash Monitor")
-                       .setContentText(Constants.NOTIF_INACTIVITY)
-                       .setOngoing(true)
-                       .setContentIntent(dashPendingIntent)
-                       .setTimeoutAfter(INTERVENTION_TIMEOUT);
-            assert mNotificationManager != null;
-               mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
-           } else {
-               NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
-                       .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                       .setContentTitle("UPMC Dash Monitor")
-                       .setContentText(Constants.NOTIF_INACTIVITY)
-                       .setOngoing(true)
-                       .setContentIntent(dashPendingIntent)
-                       .setGroup("Prompt")
-                       .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                       .setPriority(NotificationCompat.PRIORITY_MAX)
-                       .setTimeoutAfter(INTERVENTION_TIMEOUT);
-               assert mNotificationManager != null;
-               mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
-           }
-       } catch (Exception e){
-           Log.d(TAG,e.getMessage());
-        }
+       Log.d(TAG, "notifyUserWithInactivity");
+       saveIntervention("test-inact", Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption? Constants.SNOOZE_SHOWN:Constants.SNOOZE_NOT_SHOWN);
+       createInterventionNotifChannel();
+       wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
+       Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
+    if (snoozeOption)
+        dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
+       PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
+       NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+           Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+           monitorNotifBuilder.setAutoCancel(false)
+                   .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                   .setContentTitle("UPMC Dash Monitor")
+                   .setContentText(Constants.NOTIF_INACTIVITY)
+                   .setOngoing(true)
+                   .setContentIntent(dashPendingIntent)
+                   .setTimeoutAfter(INTERVENTION_TIMEOUT);
+        assert mNotificationManager != null;
+           mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
+       } else {
+           NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
+                   .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                   .setContentTitle("UPMC Dash Monitor")
+                   .setContentText(Constants.NOTIF_INACTIVITY)
+                   .setOngoing(true)
+                   .setContentIntent(dashPendingIntent)
+                   .setGroup("Prompt")
+                   .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                   .setPriority(NotificationCompat.PRIORITY_MAX)
+                   .setTimeoutAfter(INTERVENTION_TIMEOUT);
+           assert mNotificationManager != null;
+           mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
+       }
+    }
+
+
+
+    public void saveIntervention(String notif_id, int notif_type, int notif_device, int snooze_shown) {
+        ContentValues intervention = new ContentValues();
+        intervention.put(Provider.Notification_Interventions.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        intervention.put(Provider.Notification_Interventions.TIMESTAMP, System.currentTimeMillis());
+        intervention.put(Provider.Notification_Interventions.NOTIF_ID, notif_id);
+        intervention.put(Provider.Notification_Interventions.NOTIF_TYPE, notif_type);
+        intervention.put(Provider.Notification_Interventions.NOTIF_DEVICE, notif_device);
+        intervention.put(Provider.Notification_Interventions.SNOOZE_SHOWN, snooze_shown);
+        getContentResolver().insert(Provider.Notification_Interventions.CONTENT_URI, intervention);
+        Log.d(Constants.TAG, "saveIntervention:saving intervention");
     }
 
 
     public void notifyUserWithAppraisal() {
         wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         Intent dashIntent = new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_APPRAISAL);
+        saveIntervention("test-apprai", Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE, Constants.SNOOZE_NOT_SHOWN);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
@@ -768,6 +780,8 @@ public class FitbitMessageService extends Service {
         getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
         Log.d("yiyi", "Sent data to aware server");
     }
+
+
 
     private String zeroPad(Integer i) {
         StringBuilder sb = new StringBuilder();

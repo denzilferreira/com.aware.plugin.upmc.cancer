@@ -41,6 +41,11 @@ public final class Constants {
 
     public static final String SELF_REPORT_CONTENT = "Tap to edit";
     public static final String NOTIF_RESPONSE_EXTRA_KEY = "NOTIF_RESPONSE_EXTRA_KEY";
+    public static final int NOTIF_TYPE_INACTIVITY = 1;
+    public static final int NOTIF_DEVICE_PHONE = 0;
+    public static final int SNOOZE_SHOWN = 1;
+    public static final int SNOOZE_NOT_SHOWN = 0;
+    public static final int NOTIF_TYPE_APPRAISAL = 0;
 
     public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
 

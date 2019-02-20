@@ -14,20 +14,22 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.aware.Aware;
+import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.utils.DatabaseHelper;
 
 import java.util.HashMap;
 
 public class Provider extends ContentProvider {
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-    public static final int DATABASE_VERSION = 10; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 18; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
     public static final String[] DATABASE_TABLES = {
             "upmc_dash",
             "upmc_dash_motivation",
-            "upmc_dash_stepcount"
+            "upmc_dash_stepcount",
+            "upmc_dash_interventions",
     };
 
 
@@ -37,6 +39,8 @@ public class Provider extends ContentProvider {
     private static final int MOTIVATIONS_ID = 4;
     private static final int STEPCOUNT = 5;
     private static final int STEPCOUNT_ID = 6;
+    private static final int INTERVENTION = 7;
+    private static final int INTERVENTION_ID = 8;
 
 
     // These are the columns that we need to sync data, don't change this!
@@ -89,6 +93,27 @@ public class Provider extends ContentProvider {
         public static final String ALARM_TYPE = "alarmtype";
     }
 
+    public static final class Notification_Interventions implements AWAREColumns {
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_interventions");
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.interventions";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.interventions";
+        public static final String NOTIF_ID = "notif_id";
+        public static final String NOTIF_TYPE = "notif_type";
+        public static final String NOTIF_DEVICE = "notif_device";
+        public static final String SNOOZE_SHOWN = "snooze_shown";
+
+
+
+    }
+
+//    public static final class Notification_Responses implements AWAREColumns {
+//        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_responses");
+//        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.responses";
+//        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.responses";
+//
+//
+//    }
+
     public static final String[] TABLES_FIELDS = {
             Symptom_Data._ID + " integer primary key autoincrement," +
                     Symptom_Data.TIMESTAMP + " real default 0," +
@@ -124,13 +149,23 @@ public class Provider extends ContentProvider {
                     Stepcount_Data.TIMESTAMP + " real default 0," +
                     Stepcount_Data.DEVICE_ID + " text default ''," +
                     Stepcount_Data.STEP_COUNT + " integer default -1," +
-                    Stepcount_Data.ALARM_TYPE + " integer default -1"
+                    Stepcount_Data.ALARM_TYPE + " integer default -1",
+
+            Notification_Interventions._ID + " integer primary key autoincrement," +
+                    Notification_Interventions.TIMESTAMP + " real default 0," +
+                    Notification_Interventions.DEVICE_ID + " text default ''," +
+                    Notification_Interventions.NOTIF_ID + " text default ''," +
+                    Notification_Interventions.NOTIF_TYPE + " integer default -1," +
+                    Notification_Interventions.NOTIF_DEVICE + " integer default -1," +
+                    Notification_Interventions.SNOOZE_SHOWN + " integer default -1"
+
     };
 
     private static UriMatcher sUriMatcher = null;
     private static HashMap<String, String> surveyMap = null;
     private static HashMap<String, String> motivationMap = null;
     private static HashMap<String, String> stepcountMap = null;
+    private static HashMap<String, String> interventionsMap = null;
     private DatabaseHelper dbHelper = null;
     private static SQLiteDatabase database = null;
 
@@ -152,6 +187,8 @@ public class Provider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1] + "/#", MOTIVATIONS_ID);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2], STEPCOUNT);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2] + "/#", STEPCOUNT_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3], INTERVENTION);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3] + "/#", INTERVENTION_ID);
 
         surveyMap = new HashMap<>();
         surveyMap.put(Symptom_Data._ID, Symptom_Data._ID);
@@ -192,6 +229,17 @@ public class Provider extends ContentProvider {
         stepcountMap.put(Stepcount_Data.STEP_COUNT, Stepcount_Data.STEP_COUNT);
         stepcountMap.put(Stepcount_Data.ALARM_TYPE, Stepcount_Data.ALARM_TYPE);
 
+
+
+        interventionsMap = new HashMap<>();
+        interventionsMap.put(Notification_Interventions._ID, Notification_Interventions._ID);
+        interventionsMap.put(Notification_Interventions.TIMESTAMP, Notification_Interventions.TIMESTAMP);
+        interventionsMap.put(Notification_Interventions.DEVICE_ID, Notification_Interventions.DEVICE_ID);
+        interventionsMap.put(Notification_Interventions.NOTIF_ID, Notification_Interventions.NOTIF_ID);
+        interventionsMap.put(Notification_Interventions.NOTIF_TYPE, Notification_Interventions.NOTIF_TYPE);
+        interventionsMap.put(Notification_Interventions.NOTIF_DEVICE, Notification_Interventions.NOTIF_DEVICE);
+        interventionsMap.put(Notification_Interventions.SNOOZE_SHOWN, Notification_Interventions.SNOOZE_SHOWN);
+
         return true;
     }
 
@@ -201,6 +249,7 @@ public class Provider extends ContentProvider {
         initialiseDatabase();
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        Log.d(Constants.TAG, "RATM: " +sUriMatcher.match(uri));
         switch (sUriMatcher.match(uri)) {
             case ANSWERS:
                 qb.setTables(DATABASE_TABLES[0]);
@@ -214,10 +263,15 @@ public class Provider extends ContentProvider {
                 qb.setTables(DATABASE_TABLES[2]);
                 qb.setProjectionMap(stepcountMap);
                 break;
+            case INTERVENTION:
+                qb.setTables(DATABASE_TABLES[3]);
+                qb.setProjectionMap(interventionsMap);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
         try {
+
             Cursor c = qb.query(database, projection, selection, selectionArgs,
                     null, null, sortOrder);
             c.setNotificationUri(getContext().getContentResolver(), uri);
@@ -245,6 +299,10 @@ public class Provider extends ContentProvider {
                 return Stepcount_Data.CONTENT_TYPE;
             case STEPCOUNT_ID:
                 return Stepcount_Data.CONTENT_ITEM_TYPE;
+            case INTERVENTION:
+                return Notification_Interventions.CONTENT_TYPE;
+            case INTERVENTION_ID:
+                return Notification_Interventions.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -299,6 +357,20 @@ public class Provider extends ContentProvider {
                 }
                 database.endTransaction();
                 throw new SQLException("Failed to insert row into " + uri);
+
+            case INTERVENTION:
+                long interv_id = database.insertWithOnConflict(DATABASE_TABLES[3],
+                        Notification_Interventions.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
+                database.setTransactionSuccessful();
+                database.endTransaction();
+                if (interv_id > 0) {
+                    Uri intervUri = ContentUris.withAppendedId(Notification_Interventions.CONTENT_URI,
+                            interv_id);
+                    getContext().getContentResolver().notifyChange(intervUri, null, false);
+                    return intervUri;
+                }
+                database.endTransaction();
+                throw new SQLException("Failed to insert row into " + uri);
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -322,6 +394,9 @@ public class Provider extends ContentProvider {
                 break;
             case STEPCOUNT:
                 count = database.delete(DATABASE_TABLES[2], selection, selectionArgs);
+                break;
+            case INTERVENTION:
+                count = database.delete(DATABASE_TABLES[3], selection, selectionArgs);
                 break;
             default:
                 database.endTransaction();
@@ -352,6 +427,9 @@ public class Provider extends ContentProvider {
                 break;
             case STEPCOUNT:
                 count = database.update(DATABASE_TABLES[2], values, selection, selectionArgs);
+                break;
+            case INTERVENTION:
+                count = database.update(DATABASE_TABLES[3], values, selection, selectionArgs);
                 break;
             default:
                 database.endTransaction();
