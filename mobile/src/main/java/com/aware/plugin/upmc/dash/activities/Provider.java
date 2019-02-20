@@ -21,13 +21,12 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider {
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-    public static final int DATABASE_VERSION = 18; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 19; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
     public static final String[] DATABASE_TABLES = {
             "upmc_dash",
-            "upmc_dash_motivation",
             "upmc_dash_stepcount",
             "upmc_dash_interventions",
     };
@@ -35,12 +34,10 @@ public class Provider extends ContentProvider {
 
     private static final int ANSWERS = 1;
     private static final int ANSWERS_ID = 2;
-    private static final int MOTIVATIONS = 3;
-    private static final int MOTIVATIONS_ID = 4;
-    private static final int STEPCOUNT = 5;
-    private static final int STEPCOUNT_ID = 6;
-    private static final int INTERVENTION = 7;
-    private static final int INTERVENTION_ID = 8;
+    private static final int STEPCOUNT = 3;
+    private static final int STEPCOUNT_ID = 4;
+    private static final int INTERVENTION = 5;
+    private static final int INTERVENTION_ID = 6;
 
 
     // These are the columns that we need to sync data, don't change this!
@@ -75,13 +72,6 @@ public class Provider extends ContentProvider {
         static final String SCORE_DIZZY = "score_dizzy";
         static final String SCORE_OTHER = "score_other";
         static final String OTHER_LABEL = "other_label";
-    }
-
-    public static final class Motivational_Data implements AWAREColumns {
-        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_motivation");
-        static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.motivation";
-        static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.motivation";
-        static final String RATIONALE = "motivation_rationale";
     }
 
 
@@ -140,10 +130,6 @@ public class Provider extends ContentProvider {
                     Symptom_Data.SCORE_OTHER + " text default ''," +
                     Symptom_Data.OTHER_LABEL + " text default ''",
 
-            Motivational_Data._ID + " integer primary key autoincrement," +
-                    Motivational_Data.TIMESTAMP + " real default 0," +
-                    Motivational_Data.DEVICE_ID + " text default ''," +
-                    Motivational_Data.RATIONALE + " text default ''",
 
             Stepcount_Data._ID + " integer primary key autoincrement," +
                     Stepcount_Data.TIMESTAMP + " real default 0," +
@@ -163,7 +149,6 @@ public class Provider extends ContentProvider {
 
     private static UriMatcher sUriMatcher = null;
     private static HashMap<String, String> surveyMap = null;
-    private static HashMap<String, String> motivationMap = null;
     private static HashMap<String, String> stepcountMap = null;
     private static HashMap<String, String> interventionsMap = null;
     private DatabaseHelper dbHelper = null;
@@ -183,12 +168,10 @@ public class Provider extends ContentProvider {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[0], ANSWERS);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[0] + "/#", ANSWERS_ID);
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1], MOTIVATIONS);
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1] + "/#", MOTIVATIONS_ID);
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2], STEPCOUNT);
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2] + "/#", STEPCOUNT_ID);
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3], INTERVENTION);
-        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3] + "/#", INTERVENTION_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1], STEPCOUNT);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1] + "/#", STEPCOUNT_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2], INTERVENTION);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2] + "/#", INTERVENTION_ID);
 
         surveyMap = new HashMap<>();
         surveyMap.put(Symptom_Data._ID, Symptom_Data._ID);
@@ -216,11 +199,6 @@ public class Provider extends ContentProvider {
         surveyMap.put(Symptom_Data.SCORE_OTHER, Symptom_Data.SCORE_OTHER);
         surveyMap.put(Symptom_Data.OTHER_LABEL, Symptom_Data.OTHER_LABEL);
 
-        motivationMap = new HashMap<>();
-        motivationMap.put(Motivational_Data._ID, Motivational_Data._ID);
-        motivationMap.put(Motivational_Data.TIMESTAMP, Motivational_Data.TIMESTAMP);
-        motivationMap.put(Motivational_Data.DEVICE_ID, Motivational_Data.DEVICE_ID);
-        motivationMap.put(Motivational_Data.RATIONALE, Motivational_Data.RATIONALE);
 
         stepcountMap = new HashMap<>();
         stepcountMap.put(Stepcount_Data._ID, Stepcount_Data._ID);
@@ -255,16 +233,12 @@ public class Provider extends ContentProvider {
                 qb.setTables(DATABASE_TABLES[0]);
                 qb.setProjectionMap(surveyMap);
                 break;
-            case MOTIVATIONS:
-                qb.setTables(DATABASE_TABLES[1]);
-                qb.setProjectionMap(motivationMap);
-                break;
             case STEPCOUNT:
-                qb.setTables(DATABASE_TABLES[2]);
+                qb.setTables(DATABASE_TABLES[1]);
                 qb.setProjectionMap(stepcountMap);
                 break;
             case INTERVENTION:
-                qb.setTables(DATABASE_TABLES[3]);
+                qb.setTables(DATABASE_TABLES[2]);
                 qb.setProjectionMap(interventionsMap);
                 break;
             default:
@@ -291,10 +265,6 @@ public class Provider extends ContentProvider {
                 return Symptom_Data.CONTENT_TYPE;
             case ANSWERS_ID:
                 return Symptom_Data.CONTENT_ITEM_TYPE;
-            case MOTIVATIONS:
-                return Motivational_Data.CONTENT_TYPE;
-            case MOTIVATIONS_ID:
-                return Motivational_Data.CONTENT_ITEM_TYPE;
             case STEPCOUNT:
                 return Stepcount_Data.CONTENT_TYPE;
             case STEPCOUNT_ID:
@@ -331,21 +301,8 @@ public class Provider extends ContentProvider {
                 }
                 database.endTransaction();
                 throw new SQLException("Failed to insert row into " + uri);
-            case MOTIVATIONS:
-                long motiv_id = database.insertWithOnConflict(DATABASE_TABLES[1],
-                        Motivational_Data.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
-                database.setTransactionSuccessful();
-                database.endTransaction();
-                if (motiv_id > 0) {
-                    Uri questUri = ContentUris.withAppendedId(Motivational_Data.CONTENT_URI,
-                            motiv_id);
-                    getContext().getContentResolver().notifyChange(questUri, null, false);
-                    return questUri;
-                }
-                database.endTransaction();
-                throw new SQLException("Failed to insert row into " + uri);
             case STEPCOUNT:
-                long step_id = database.insertWithOnConflict(DATABASE_TABLES[2],
+                long step_id = database.insertWithOnConflict(DATABASE_TABLES[1],
                         Stepcount_Data.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
                 database.setTransactionSuccessful();
                 database.endTransaction();
@@ -359,7 +316,7 @@ public class Provider extends ContentProvider {
                 throw new SQLException("Failed to insert row into " + uri);
 
             case INTERVENTION:
-                long interv_id = database.insertWithOnConflict(DATABASE_TABLES[3],
+                long interv_id = database.insertWithOnConflict(DATABASE_TABLES[2],
                         Notification_Interventions.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
                 database.setTransactionSuccessful();
                 database.endTransaction();
@@ -389,14 +346,11 @@ public class Provider extends ContentProvider {
             case ANSWERS:
                 count = database.delete(DATABASE_TABLES[0], selection, selectionArgs);
                 break;
-            case MOTIVATIONS:
+            case STEPCOUNT:
                 count = database.delete(DATABASE_TABLES[1], selection, selectionArgs);
                 break;
-            case STEPCOUNT:
-                count = database.delete(DATABASE_TABLES[2], selection, selectionArgs);
-                break;
             case INTERVENTION:
-                count = database.delete(DATABASE_TABLES[3], selection, selectionArgs);
+                count = database.delete(DATABASE_TABLES[2], selection, selectionArgs);
                 break;
             default:
                 database.endTransaction();
@@ -422,14 +376,11 @@ public class Provider extends ContentProvider {
             case ANSWERS:
                 count = database.update(DATABASE_TABLES[0], values, selection, selectionArgs);
                 break;
-            case MOTIVATIONS:
+            case STEPCOUNT:
                 count = database.update(DATABASE_TABLES[1], values, selection, selectionArgs);
                 break;
-            case STEPCOUNT:
-                count = database.update(DATABASE_TABLES[2], values, selection, selectionArgs);
-                break;
             case INTERVENTION:
-                count = database.update(DATABASE_TABLES[3], values, selection, selectionArgs);
+                count = database.update(DATABASE_TABLES[2], values, selection, selectionArgs);
                 break;
             default:
                 database.endTransaction();

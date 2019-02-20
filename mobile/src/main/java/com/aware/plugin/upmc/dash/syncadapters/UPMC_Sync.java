@@ -27,7 +27,6 @@ public class UPMC_Sync extends Service {
                         Provider.DATABASE_TABLES, Provider.TABLES_FIELDS,
                         new Uri[]{
                                 Provider.Symptom_Data.CONTENT_URI,
-                                Provider.Motivational_Data.CONTENT_URI,
                                 Provider.Stepcount_Data.CONTENT_URI,
                                 Provider.Notification_Interventions.CONTENT_URI
                         }

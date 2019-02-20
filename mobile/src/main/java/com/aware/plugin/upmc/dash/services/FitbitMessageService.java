@@ -494,7 +494,7 @@ public class FitbitMessageService extends Service {
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption) {
        Log.d(TAG, "notifyUserWithInactivity");
-       saveIntervention("test-inact", Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption? Constants.SNOOZE_SHOWN:Constants.SNOOZE_NOT_SHOWN);
+       saveIntervention("test-inactasd", Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption? Constants.SNOOZE_SHOWN:Constants.SNOOZE_NOT_SHOWN);
        createInterventionNotifChannel();
        wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
        Intent dashIntent = new Intent(this, NotificationResponseActivity.class);

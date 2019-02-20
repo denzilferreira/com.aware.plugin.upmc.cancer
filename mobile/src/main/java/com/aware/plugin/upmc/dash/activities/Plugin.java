@@ -201,22 +201,22 @@ public class Plugin extends Aware_Plugin {
     }
 
     public static Integer walkingPromptsCount(Context c) {
-        Integer todays_count;
-
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        Cursor todayPrompts = c.getContentResolver().query(Provider.Motivational_Data.CONTENT_URI, new String[]{"count(*) as total_count"}, Provider.Motivational_Data.TIMESTAMP + " >= " + today.getTimeInMillis(), null, null);
-        if (todayPrompts != null && todayPrompts.moveToFirst()) {
-            todays_count = todayPrompts.getInt(0);
-        } else {
-            return null;
-        }
-        if (!todayPrompts.isClosed()) todayPrompts.close();
-        return todays_count;
+//        Integer todays_count;
+//
+//        Calendar today = Calendar.getInstance();
+//        today.set(Calendar.HOUR_OF_DAY, 0);
+//        today.set(Calendar.MINUTE, 0);
+//        today.set(Calendar.SECOND, 0);
+//        today.set(Calendar.MILLISECOND, 0);
+//
+//        Cursor todayPrompts = c.getContentResolver().query(Provider.Motivational_Data.CONTENT_URI, new String[]{"count(*) as total_count"}, Provider.Motivational_Data.TIMESTAMP + " >= " + today.getTimeInMillis(), null, null);
+//        if (todayPrompts != null && todayPrompts.moveToFirst()) {
+//            todays_count = todayPrompts.getInt(0);
+//        } else {
+//            return null;
+//        }
+//        if (!todayPrompts.isClosed()) todayPrompts.close();
+        return 0;
     }
 
 //    public static class FitbitAnalyser extends BroadcastReceiver {
