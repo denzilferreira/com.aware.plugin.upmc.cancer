@@ -499,6 +499,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage(message)
                 .setTitle("Alert!");
         builder.setPositiveButton(Constants.SNOOZE_ALERT_POS, (dialogInterface, i) -> {
+
             if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
                 sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
                 item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
@@ -513,12 +514,27 @@ public class MainActivity extends AppCompatActivity {
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
                 item.setTitle("Dnd1");
             }
-
+            saveDndAction(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE), Constants.DND_TOGGLE_MANUAL);
         });
         builder.setNegativeButton(Constants.SNOOZE_ALERT_NEG, (dialogInterface, i) -> dialogInterface.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+
+    public void saveDndAction(String mode, int toggled_by) {
+        ContentValues response = new ContentValues();
+        response.put(Provider.Dnd_Toggle.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        response.put(Provider.Dnd_Toggle.TIMESTAMP, System.currentTimeMillis());
+        response.put(Provider.Dnd_Toggle.TOGGLE_POS, mode.equals(Constants.DND_MODE_ON)? 1:0);
+        response.put(Provider.Dnd_Toggle.TOGGLED_BY, toggled_by);
+        getContentResolver().insert(Provider.Dnd_Toggle.CONTENT_URI, response);
+        Log.d(Constants.TAG, "MainActivity:saveDndAction");
+
+    }
+
+
+
 
     @SuppressLint("SetTextI18n")
     @Override

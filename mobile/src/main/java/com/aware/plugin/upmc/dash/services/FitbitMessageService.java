@@ -309,7 +309,7 @@ public class FitbitMessageService extends Service {
 
             case Constants.ACTION_TEST:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-                notifyUserWithInactivity(getApplicationContext(), true);
+//                notifyUserWithInactivity(getApplicationContext(), true);
                 break;
 
             default:

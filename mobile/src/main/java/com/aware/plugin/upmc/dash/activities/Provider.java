@@ -9,7 +9,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.net.Uri; 
+import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider {
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-    public static final int DATABASE_VERSION = 21; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 24; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
@@ -29,7 +29,8 @@ public class Provider extends ContentProvider {
             "upmc_dash",
             "upmc_dash_stepcount",
             "upmc_dash_interventions",
-            "upmc_dash_responses"
+            "upmc_dash_responses",
+            "upmc_dash_dndtoggle"
     };
 
 
@@ -41,6 +42,8 @@ public class Provider extends ContentProvider {
     private static final int INTERVENTION_ID = 6;
     private static final int RESPONSE = 7;
     private static final int RESPONSE_ID = 8;
+    private static final int DND = 9;
+    private static final int DND_ID = 10;
 
 
 
@@ -119,6 +122,19 @@ public class Provider extends ContentProvider {
 
     }
 
+
+    public static final class Dnd_Toggle implements AWAREColumns {
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_dndtoggle");
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.dndtoggle";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.dndtoggle";
+        public static final String TOGGLE_POS = "toggle_pos";
+        public static final String TOGGLED_BY = "toggled_by";
+
+    }
+
+
+
+
     public static final String[] TABLES_FIELDS = {
             Symptom_Data._ID + " integer primary key autoincrement," +
                     Symptom_Data.TIMESTAMP + " real default 0," +
@@ -177,7 +193,13 @@ public class Provider extends ContentProvider {
                     Notification_Responses.RESP_NAUSEA + " integer default -1," +
                     Notification_Responses.RESP_TIRED + " integer default -1," +
                     Notification_Responses.RESP_OTHER + " integer default -1," +
-                    Notification_Responses.RESP_OTHER_SYMP + " text default ''"
+                    Notification_Responses.RESP_OTHER_SYMP + " text default ''",
+
+            Dnd_Toggle._ID + " integer primary key autoincrement," +
+                    Dnd_Toggle.TIMESTAMP + " real default 0," +
+                    Dnd_Toggle.DEVICE_ID + " text default ''," +
+                    Dnd_Toggle.TOGGLE_POS + " integer default -1," +
+                    Dnd_Toggle.TOGGLED_BY + " integer default -1"
 
 
 
@@ -188,6 +210,7 @@ public class Provider extends ContentProvider {
     private static HashMap<String, String> stepcountMap = null;
     private static HashMap<String, String> interventionsMap = null;
     private static HashMap<String, String> respMap = null;
+    private static HashMap<String, String> dndMap = null;
     private DatabaseHelper dbHelper = null;
     private static SQLiteDatabase database = null;
 
@@ -211,6 +234,8 @@ public class Provider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2] + "/#", INTERVENTION_ID);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3], RESPONSE);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3] + "/#", RESPONSE_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[4], DND);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[4] + "/#", DND_ID);
 
         surveyMap = new HashMap<>();
         surveyMap.put(Symptom_Data._ID, Symptom_Data._ID);
@@ -277,6 +302,14 @@ public class Provider extends ContentProvider {
         respMap.put(Notification_Responses.RESP_OTHER, Notification_Responses.RESP_OTHER);
         respMap.put(Notification_Responses.RESP_OTHER_SYMP, Notification_Responses.RESP_OTHER_SYMP);
 
+
+        dndMap = new HashMap<>();
+        dndMap.put(Dnd_Toggle._ID, Dnd_Toggle._ID);
+        dndMap.put(Dnd_Toggle.TIMESTAMP, Dnd_Toggle.TIMESTAMP);
+        dndMap.put(Dnd_Toggle.DEVICE_ID, Dnd_Toggle.DEVICE_ID);
+        dndMap.put(Dnd_Toggle.TOGGLE_POS, Dnd_Toggle.TOGGLE_POS);
+        dndMap.put(Dnd_Toggle.TOGGLED_BY, Dnd_Toggle.TOGGLED_BY);
+
         return true;
     }
 
@@ -303,6 +336,10 @@ public class Provider extends ContentProvider {
             case RESPONSE:
                 qb.setTables(DATABASE_TABLES[3]);
                 qb.setProjectionMap(respMap);
+                break;
+            case DND:
+                qb.setTables(DATABASE_TABLES[4]);
+                qb.setProjectionMap(dndMap);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -340,6 +377,10 @@ public class Provider extends ContentProvider {
                 return Notification_Responses.CONTENT_TYPE;
             case RESPONSE_ID:
                 return Notification_Responses.CONTENT_ITEM_TYPE;
+            case DND:
+                return Dnd_Toggle.CONTENT_TYPE;
+            case DND_ID:
+                return Dnd_Toggle.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -409,6 +450,20 @@ public class Provider extends ContentProvider {
                 }
                 database.endTransaction();
                 throw new SQLException("Failed to insert row into " + uri);
+
+            case DND:
+                long dnd_id = database.insertWithOnConflict(DATABASE_TABLES[4],
+                        Dnd_Toggle.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
+                database.setTransactionSuccessful();
+                database.endTransaction();
+                if (dnd_id > 0) {
+                    Uri dndUri = ContentUris.withAppendedId(Dnd_Toggle.CONTENT_URI,
+                            dnd_id);
+                    getContext().getContentResolver().notifyChange(dndUri, null, false);
+                    return dndUri;
+                }
+                database.endTransaction();
+                throw new SQLException("Failed to insert row into " + uri);
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -436,6 +491,9 @@ public class Provider extends ContentProvider {
             case RESPONSE:
                 count = database.delete(DATABASE_TABLES[3], selection, selectionArgs);
             break;
+            case DND:
+                count = database.delete(DATABASE_TABLES[4], selection, selectionArgs);
+                break;
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -468,6 +526,9 @@ public class Provider extends ContentProvider {
                 break;
             case RESPONSE:
                 count = database.update(DATABASE_TABLES[3], values, selection, selectionArgs);
+                break;
+            case DND:
+                count = database.update(DATABASE_TABLES[4], values, selection, selectionArgs);
                 break;
             default:
                 database.endTransaction();
