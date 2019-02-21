@@ -9,7 +9,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.net.Uri;
+import android.net.Uri; 
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider {
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-    public static final int DATABASE_VERSION = 19; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 21; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
@@ -29,6 +29,7 @@ public class Provider extends ContentProvider {
             "upmc_dash",
             "upmc_dash_stepcount",
             "upmc_dash_interventions",
+            "upmc_dash_responses"
     };
 
 
@@ -38,6 +39,9 @@ public class Provider extends ContentProvider {
     private static final int STEPCOUNT_ID = 4;
     private static final int INTERVENTION = 5;
     private static final int INTERVENTION_ID = 6;
+    private static final int RESPONSE = 7;
+    private static final int RESPONSE_ID = 8;
+
 
 
     // These are the columns that we need to sync data, don't change this!
@@ -96,13 +100,24 @@ public class Provider extends ContentProvider {
 
     }
 
-//    public static final class Notification_Responses implements AWAREColumns {
-//        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_responses");
-//        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.responses";
-//        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.responses";
-//
-//
-//    }
+    public static final class Notification_Responses implements AWAREColumns {
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_responses");
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.responses";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.responses";
+        public static final String NOTIF_ID = "notif_id";
+        public static final String NOTIF_TYPE = "notif_type";
+        public static final String NOTIF_DEVICE = "notif_device";
+        public static final String RESP_OK = "resp_ok";
+        public static final String RESP_NO = "resp_no";
+        public static final String RESP_SNOOZE = "resp_snooze";
+        public static final String RESP_BUSY = "resp_busy";
+        public static final String RESP_PAIN = "resp_pain";
+        public static final String RESP_NAUSEA = "resp_nausea";
+        public static final String RESP_TIRED = "resp_tired";
+        public static final String RESP_OTHER = "resp_other";
+        public static final String RESP_OTHER_SYMP = "resp_other_symp";
+
+    }
 
     public static final String[] TABLES_FIELDS = {
             Symptom_Data._ID + " integer primary key autoincrement," +
@@ -143,7 +158,28 @@ public class Provider extends ContentProvider {
                     Notification_Interventions.NOTIF_ID + " text default ''," +
                     Notification_Interventions.NOTIF_TYPE + " integer default -1," +
                     Notification_Interventions.NOTIF_DEVICE + " integer default -1," +
-                    Notification_Interventions.SNOOZE_SHOWN + " integer default -1"
+                    Notification_Interventions.SNOOZE_SHOWN + " integer default -1",
+
+
+
+
+            Notification_Responses._ID + " integer primary key autoincrement," +
+                    Notification_Responses.TIMESTAMP + " real default 0," +
+                    Notification_Responses.DEVICE_ID + " text default ''," +
+                    Notification_Responses.NOTIF_ID + " text default ''," +
+                    Notification_Responses.NOTIF_TYPE + " integer default -1," +
+                    Notification_Responses.NOTIF_DEVICE + " integer default -1," +
+                    Notification_Responses.RESP_OK + " integer default -1," +
+                    Notification_Responses.RESP_NO + " integer default -1," +
+                    Notification_Responses.RESP_SNOOZE + " integer default -1," +
+                    Notification_Responses.RESP_BUSY + " integer default -1," +
+                    Notification_Responses.RESP_PAIN + " integer default -1," +
+                    Notification_Responses.RESP_NAUSEA + " integer default -1," +
+                    Notification_Responses.RESP_TIRED + " integer default -1," +
+                    Notification_Responses.RESP_OTHER + " integer default -1," +
+                    Notification_Responses.RESP_OTHER_SYMP + " text default ''"
+
+
 
     };
 
@@ -151,6 +187,7 @@ public class Provider extends ContentProvider {
     private static HashMap<String, String> surveyMap = null;
     private static HashMap<String, String> stepcountMap = null;
     private static HashMap<String, String> interventionsMap = null;
+    private static HashMap<String, String> respMap = null;
     private DatabaseHelper dbHelper = null;
     private static SQLiteDatabase database = null;
 
@@ -172,6 +209,8 @@ public class Provider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[1] + "/#", STEPCOUNT_ID);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2], INTERVENTION);
         sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[2] + "/#", INTERVENTION_ID);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3], RESPONSE);
+        sUriMatcher.addURI(AUTHORITY, DATABASE_TABLES[3] + "/#", RESPONSE_ID);
 
         surveyMap = new HashMap<>();
         surveyMap.put(Symptom_Data._ID, Symptom_Data._ID);
@@ -218,6 +257,26 @@ public class Provider extends ContentProvider {
         interventionsMap.put(Notification_Interventions.NOTIF_DEVICE, Notification_Interventions.NOTIF_DEVICE);
         interventionsMap.put(Notification_Interventions.SNOOZE_SHOWN, Notification_Interventions.SNOOZE_SHOWN);
 
+
+
+
+        respMap = new HashMap<>();
+        respMap.put(Notification_Responses._ID, Notification_Responses._ID);
+        respMap.put(Notification_Responses.TIMESTAMP, Notification_Responses.TIMESTAMP);
+        respMap.put(Notification_Responses.DEVICE_ID, Notification_Responses.DEVICE_ID);
+        respMap.put(Notification_Responses.NOTIF_ID, Notification_Responses.NOTIF_ID);
+        respMap.put(Notification_Responses.NOTIF_TYPE, Notification_Responses.NOTIF_TYPE);
+        respMap.put(Notification_Responses.NOTIF_DEVICE, Notification_Responses.NOTIF_DEVICE);
+        respMap.put(Notification_Responses.RESP_OK, Notification_Responses.RESP_OK);
+        respMap.put(Notification_Responses.RESP_NO, Notification_Responses.RESP_NO);
+        respMap.put(Notification_Responses.RESP_SNOOZE, Notification_Responses.RESP_SNOOZE);
+        respMap.put(Notification_Responses.RESP_BUSY, Notification_Responses.RESP_BUSY);
+        respMap.put(Notification_Responses.RESP_PAIN, Notification_Responses.RESP_PAIN);
+        respMap.put(Notification_Responses.RESP_NAUSEA, Notification_Responses.RESP_NAUSEA);
+        respMap.put(Notification_Responses.RESP_TIRED, Notification_Responses.RESP_TIRED);
+        respMap.put(Notification_Responses.RESP_OTHER, Notification_Responses.RESP_OTHER);
+        respMap.put(Notification_Responses.RESP_OTHER_SYMP, Notification_Responses.RESP_OTHER_SYMP);
+
         return true;
     }
 
@@ -240,6 +299,10 @@ public class Provider extends ContentProvider {
             case INTERVENTION:
                 qb.setTables(DATABASE_TABLES[2]);
                 qb.setProjectionMap(interventionsMap);
+                break;
+            case RESPONSE:
+                qb.setTables(DATABASE_TABLES[3]);
+                qb.setProjectionMap(respMap);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -273,6 +336,10 @@ public class Provider extends ContentProvider {
                 return Notification_Interventions.CONTENT_TYPE;
             case INTERVENTION_ID:
                 return Notification_Interventions.CONTENT_ITEM_TYPE;
+            case RESPONSE:
+                return Notification_Responses.CONTENT_TYPE;
+            case RESPONSE_ID:
+                return Notification_Responses.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -328,6 +395,20 @@ public class Provider extends ContentProvider {
                 }
                 database.endTransaction();
                 throw new SQLException("Failed to insert row into " + uri);
+
+            case RESPONSE:
+                long resp_id = database.insertWithOnConflict(DATABASE_TABLES[3],
+                        Notification_Responses.DEVICE_ID, values, SQLiteDatabase.CONFLICT_IGNORE);
+                database.setTransactionSuccessful();
+                database.endTransaction();
+                if (resp_id > 0) {
+                    Uri respUri = ContentUris.withAppendedId(Notification_Responses.CONTENT_URI,
+                            resp_id);
+                    getContext().getContentResolver().notifyChange(respUri, null, false);
+                    return respUri;
+                }
+                database.endTransaction();
+                throw new SQLException("Failed to insert row into " + uri);
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -352,6 +433,9 @@ public class Provider extends ContentProvider {
             case INTERVENTION:
                 count = database.delete(DATABASE_TABLES[2], selection, selectionArgs);
                 break;
+            case RESPONSE:
+                count = database.delete(DATABASE_TABLES[3], selection, selectionArgs);
+            break;
             default:
                 database.endTransaction();
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -381,6 +465,9 @@ public class Provider extends ContentProvider {
                 break;
             case INTERVENTION:
                 count = database.update(DATABASE_TABLES[2], values, selection, selectionArgs);
+                break;
+            case RESPONSE:
+                count = database.update(DATABASE_TABLES[3], values, selection, selectionArgs);
                 break;
             default:
                 database.endTransaction();

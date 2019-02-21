@@ -28,7 +28,8 @@ public class UPMC_Sync extends Service {
                         new Uri[]{
                                 Provider.Symptom_Data.CONTENT_URI,
                                 Provider.Stepcount_Data.CONTENT_URI,
-                                Provider.Notification_Interventions.CONTENT_URI
+                                Provider.Notification_Interventions.CONTENT_URI,
+                                Provider.Notification_Responses.CONTENT_URI
                         }
                 );
             }

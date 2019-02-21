@@ -321,6 +321,25 @@ public class FitbitMessageService extends Service {
     public void saveResponseForNo(Intent intent) {
         String no_output = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
         Log.d(Constants.TAG, "FitbitMessageService:saveResponseForNo" +no_output);
+        String resp = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
+        char[] resp_array  = resp.toCharArray();
+        ContentValues response = new ContentValues();
+        response.put(Provider.Notification_Responses.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
+        response.put(Provider.Notification_Responses.NOTIF_ID, "resp_test-id-123");
+        response.put(Provider.Notification_Responses.NOTIF_TYPE, Constants.NOTIF_TYPE_INACTIVITY);
+        response.put(Provider.Notification_Responses.NOTIF_DEVICE, Constants.NOTIF_DEVICE_PHONE);
+        response.put(Provider.Notification_Responses.RESP_OK, 0);
+        response.put(Provider.Notification_Responses.RESP_NO, 1);
+        response.put(Provider.Notification_Responses.RESP_SNOOZE, 0);
+        response.put(Provider.Notification_Responses.RESP_BUSY, Integer.parseInt("" + resp_array[0]));
+        response.put(Provider.Notification_Responses.RESP_PAIN, Integer.parseInt("" + resp_array[1]));
+        response.put(Provider.Notification_Responses.RESP_NAUSEA, Integer.parseInt("" + resp_array[2]));
+        response.put(Provider.Notification_Responses.RESP_TIRED, Integer.parseInt("" + resp_array[3]));
+        response.put(Provider.Notification_Responses.RESP_OTHER, Integer.parseInt("" + resp_array[4]));
+        getContentResolver().insert(Provider.Notification_Responses.CONTENT_URI, response);
+        Log.d(Constants.TAG, "saveIntervention:saving response");
+
 
     }
 
