@@ -53,6 +53,7 @@ import com.aware.utils.Scheduler;
 import com.crashlytics.android.Crashlytics;
 import com.ramotion.fluidslider.FluidSlider;
 import org.json.JSONException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -60,8 +61,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
+
 import io.fabric.sdk.android.Fabric;
 import kotlin.Unit;
+
 import static com.aware.plugin.upmc.dash.utils.Constants.CASE1;
 import static com.aware.plugin.upmc.dash.utils.Constants.CASE2;
 import static com.aware.plugin.upmc.dash.utils.Constants.CONTENT_TITLE_FITBIT;
@@ -77,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
     private JoinedStudy joinedObserver = new JoinedStudy();
     private boolean SHOW_INCOMPLETE_NOTIF = false;
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -85,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         if (isRegistered)
             unregisterReceiver(joinedObserver);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                     findViewById(TVE_IDS[i]).setVisibility(View.VISIBLE);
                     findViewById(FS_IDS[i]).setVisibility(View.GONE);
                 }
-                if(i==11)
+                if (i == 11)
                     findViewById(other_entry).setVisibility(View.GONE);
 
             }
@@ -113,15 +114,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     public void showIncompleteAlert(int newSeverity, boolean daily, ContentValues answer) {
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.myDialog));
         builder.setMessage("Symptom ratings not complete. Submit anyway?")
                 .setTitle("Alert!");
         builder.setPositiveButton("Submit Anyway", (dialogInterface, i) -> {
-            new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+            new PostData().execute(TABLE_PS, newSeverity == 1 ? CASE2 : CASE1);
             // switch back to old notification
-            if(daily)
+            if (daily)
                 sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
 
             Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
@@ -144,12 +144,6 @@ public class MainActivity extends AppCompatActivity {
 //        toastThanks(getApplicationContext());
 //        finish();
     }
-
-
-
-
-
-
 
 
     @Override
@@ -201,44 +195,40 @@ public class MainActivity extends AppCompatActivity {
                     IntentFilter filter = new IntentFilter(Aware.ACTION_JOINED_STUDY);
                     registerReceiver(joinedObserver, filter);
                     showSettings(true);
-                }
-                else {
-                    if(!isMyServiceRunning(FitbitMessageService.class))
+                } else {
+                    if (!isMyServiceRunning(FitbitMessageService.class))
                         sendFitbitMessageServiceAction(Constants.ACTION_REBOOT);
 
-                    if(getIntent()!=null) {
-                        if(getIntent().getAction()!=null) {
+                    if (getIntent() != null) {
+                        if (getIntent().getAction() != null) {
                             if (getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING))
                                 showSymptomSurvey(true);
 
                             //check this out
-                            if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
-                                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF );
+                            if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
+                                Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
                             }
-                        }
-                        else {
+                        } else {
                             showSymptomSurvey(false);
                         }
                     }
 
                 }
-            }
-            else {
-                if(!isMyServiceRunning(FitbitMessageService.class))
+            } else {
+                if (!isMyServiceRunning(FitbitMessageService.class))
                     sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
 
 
-                if(getIntent()!=null) {
-                    if(getIntent().getAction()!=null) {
+                if (getIntent() != null) {
+                    if (getIntent().getAction() != null) {
                         if (getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING))
                             showSymptomSurvey(true);
 
                         //check this out
-                        if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
-                            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF );
+                        if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
+                            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
                         }
-                    }
-                    else {
+                    } else {
                         showSymptomSurvey(false);
                     }
                 }
@@ -248,21 +238,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     public void engageScheduler() {
         Aware.setSetting(getApplicationContext(), Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+
         int morning_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
         int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-        String  className = getPackageName() + "/" + FitbitMessageService.class.getName();
+        String className = getPackageName() + "/" + FitbitMessageService.class.getName();
+
         createSchedule(morning_hour, morning_minute, Constants.MORNING_SURVEY_SCHED_ID,
                 className, Scheduler.ACTION_TYPE_SERVICE, Plugin.ACTION_CANCER_SURVEY);
 
         int evening_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
         int evening_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
 
-        createSchedule(evening_hour, evening_minute, Constants.MORNING_SURVEY_SCHED_ID,
+        createSchedule(evening_hour, evening_minute, Constants.EVENING_SYNC_ID,
                 className, Scheduler.ACTION_TYPE_SERVICE, Constants.ACTION_SYNC_DATA);
-
     }
 
     public void createSchedule(int hour, int minute, String id, String className, String classType, String action) {
@@ -270,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
         Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), id);
         if (currentScheduler != null)
             Scheduler.removeSchedule(getApplicationContext(), id);
+
         Scheduler.Schedule schedule = new Scheduler.Schedule(id);
         try {
             schedule.addHour(hour)
@@ -309,14 +300,14 @@ public class MainActivity extends AppCompatActivity {
         final TimePicker to_bed = findViewById(R.id.bed_time);
         final TimePicker from_bed = findViewById(R.id.woke_time);
         final RadioGroup qos_sleep = findViewById(R.id.qos_sleep);
-        final String [] PROVIDERS = new String[] {Provider.Symptom_Data.SCORE_PAIN, Provider.Symptom_Data.SCORE_FATIGUE,
+        final String[] PROVIDERS = new String[]{Provider.Symptom_Data.SCORE_PAIN, Provider.Symptom_Data.SCORE_FATIGUE,
                 Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE, Provider.Symptom_Data.SCORE_CONCENTRATING, Provider.Symptom_Data.SCORE_SAD,
                 Provider.Symptom_Data.SCORE_ANXIOUS, Provider.Symptom_Data.SCORE_SHORT_BREATH, Provider.Symptom_Data.SCORE_NUMBNESS,
-                Provider.Symptom_Data.SCORE_NAUSEA, Provider.Symptom_Data.SCORE_DIARRHEA , Provider.Symptom_Data.SCORE_DIZZY,
+                Provider.Symptom_Data.SCORE_NAUSEA, Provider.Symptom_Data.SCORE_DIARRHEA, Provider.Symptom_Data.SCORE_DIZZY,
                 Provider.Symptom_Data.SCORE_OTHER};
         final int other_entry = R.id.other_entry;
 
-        if(daily) {
+        if (daily) {
             morning_questions.setVisibility(View.VISIBLE);
             Calendar today = Calendar.getInstance();
             today.setTimeInMillis(System.currentTimeMillis());
@@ -363,14 +354,14 @@ public class MainActivity extends AppCompatActivity {
                                     findViewById(IBE_IDS[index]).setVisibility(View.VISIBLE);
                                     TextView tv = findViewById(TVE_IDS[index]);
                                     tv.setVisibility(View.VISIBLE);
-                                    int rating = (int) (fs.getPosition()*10);
+                                    int rating = (int) (fs.getPosition() * 10);
                                     tv.setText(String.valueOf(rating));
 
                                 }
                                 , 750);
                         return Unit.INSTANCE;
                     });
-                    if(index==11) {
+                    if (index == 11) {
                         Toast.makeText(getApplicationContext(), "Please specify", Toast.LENGTH_SHORT).show();
                         EditText editText = findViewById(other_entry);
                         editText.setVisibility(View.VISIBLE);
@@ -384,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                     if (fs.getVisibility() == View.VISIBLE) {
                         fs.setVisibility(View.GONE);
                     }
-                    if(index==11) {
+                    if (index == 11) {
                         EditText editText = findViewById(other_entry);
                         editText.setVisibility(View.GONE);
                     }
@@ -409,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
             ContentValues answer = new ContentValues();
             answer.put(Provider.Symptom_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
             answer.put(Provider.Symptom_Data.TIMESTAMP, System.currentTimeMillis());
-            if(daily) {
+            if (daily) {
                 answer.put(Provider.Symptom_Data.TO_BED, (to_bed != null) ? to_bed.getCurrentHour() + "h" + to_bed.getCurrentMinute() : "");
                 answer.put(Provider.Symptom_Data.FROM_BED, (from_bed != null) ? from_bed.getCurrentHour() + "h" + from_bed.getCurrentMinute() : "");
                 answer.put(Provider.Symptom_Data.SCORE_SLEEP, (qos_sleep != null && qos_sleep.getCheckedRadioButtonId() != -1) ? (String) ((RadioButton) findViewById(qos_sleep.getCheckedRadioButtonId())).getText() : "");
@@ -419,35 +410,33 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < RG_IDS.length; i++) {
                 RadioGroup rg = findViewById(RG_IDS[i]);
                 RadioButton rb = findViewById(rg.getCheckedRadioButtonId());
-                if(rb==null) {
+                if (rb == null) {
                     // nothing has been selected
                     answer.put(PROVIDERS[i], "NA");
-                    if(i!=11)
+                    if (i != 11)
                         SHOW_INCOMPLETE_NOTIF = true;
-                }
-                else if(rb.getText().equals("Yes")) {
+                } else if (rb.getText().equals("Yes")) {
                     FluidSlider fs = findViewById(FS_IDS[i]);
-                    int rating = (int) (fs.getPosition()*10);
-                    if(rating>=7)
-                        newSeverity=1;
+                    int rating = (int) (fs.getPosition() * 10);
+                    if (rating >= 7)
+                        newSeverity = 1;
                     answer.put(PROVIDERS[i], String.valueOf(rating));
-                    if(i==11) {
+                    if (i == 11) {
                         EditText other_label = findViewById(other_entry);
                         answer.put(Provider.Symptom_Data.OTHER_LABEL, other_label.getText().toString());
                     }
-                }
-                else if (rb.getText().equals("No")) {
+                } else if (rb.getText().equals("No")) {
                     answer.put(PROVIDERS[i], "No");
                 }
             }
-            if(SHOW_INCOMPLETE_NOTIF)
+            if (SHOW_INCOMPLETE_NOTIF)
                 showIncompleteAlert(newSeverity, daily, answer);
             else {
                 // post it to KSWEB DB
-                new PostData().execute(TABLE_PS, newSeverity==1? CASE2:CASE1);
+                new PostData().execute(TABLE_PS, newSeverity == 1 ? CASE2 : CASE1);
                 // switch back to old notification
 
-                if(daily)
+                if (daily)
                     sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
 
                 Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
@@ -460,7 +449,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
@@ -471,18 +459,16 @@ public class MainActivity extends AppCompatActivity {
                     item.setVisible(false);
                 if (item.getTitle().toString().equalsIgnoreCase("settings"))
                     item.setVisible(false);
-                if(item.getTitle().toString().equalsIgnoreCase("dnd1"))
+                if (item.getTitle().toString().equalsIgnoreCase("dnd1"))
                     item.setVisible(false);
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
-                if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON )) {
+                if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
                     item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
                     item.setTitle("Dnd2");
-                }
-                else if(item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
+                } else if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
                     item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
                     item.setTitle("Dnd1");
                 }
@@ -492,22 +478,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     public void showSnoozeAlert(String DND_STATUS, MenuItem item) {
-        String message = DND_STATUS.equals(Constants.DND_MODE_ON)? Constants.SNOOZE_ON_ALERT: Constants.SNOOZE_OFF_ALERT;
+        String message = DND_STATUS.equals(Constants.DND_MODE_ON) ? Constants.SNOOZE_ON_ALERT : Constants.SNOOZE_OFF_ALERT;
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.myDialog));
         builder.setMessage(message)
                 .setTitle("Alert!");
         builder.setPositiveButton(Constants.SNOOZE_ALERT_POS, (dialogInterface, i) -> {
 
-            if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
+            if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
                 sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
                 item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_ON);
 //            Toast.makeText(getApplicationContext(), "You will not receive prompts for the rest of the day", Toast.LENGTH_SHORT).show();
                 item.setTitle("Dnd2");
-            }
-            else {
+            } else {
 
                 sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
                 item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
@@ -526,14 +510,12 @@ public class MainActivity extends AppCompatActivity {
         ContentValues response = new ContentValues();
         response.put(Provider.Dnd_Toggle.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         response.put(Provider.Dnd_Toggle.TIMESTAMP, System.currentTimeMillis());
-        response.put(Provider.Dnd_Toggle.TOGGLE_POS, mode.equals(Constants.DND_MODE_ON)? 1:0);
+        response.put(Provider.Dnd_Toggle.TOGGLE_POS, mode.equals(Constants.DND_MODE_ON) ? 1 : 0);
         response.put(Provider.Dnd_Toggle.TOGGLED_BY, toggled_by);
         getContentResolver().insert(Provider.Dnd_Toggle.CONTENT_URI, response);
         Log.d(Constants.TAG, "MainActivity:saveDndAction");
 
     }
-
-
 
 
     @SuppressLint("SetTextI18n")
@@ -569,7 +551,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (title.equalsIgnoreCase("Sync")) {
             Log.d(Constants.TAG, "MainActivity:Sync happened");
             Random ran = new Random();
-            for (int i=0; i<1000; i++)
+            for (int i = 0; i < 1000; i++)
                 syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101));
             return true;
         }
@@ -588,11 +570,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-
     public void syncSCWithServer(long timeStamp, int type, int data) {
         ContentValues step_count = new ContentValues();
         step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
@@ -601,8 +578,6 @@ public class MainActivity extends AppCompatActivity {
         step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
         getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
     }
-
-
 
 
     private void showSettings(final boolean firstRun) {
@@ -704,15 +679,14 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // if not first time, settings have changed
                     Aware.startAWARE(getApplicationContext());  // need call startAware to apply the settings
-                    Log.d(Constants.TAG, "MainActivity:showSettings: settings changed" );
+                    Log.d(Constants.TAG, "MainActivity:showSettings: settings changed");
                     sendFitbitMessageServiceAction(Constants.ACTION_SETTINGS_CHANGED);
                     toastThanks(getApplicationContext());
                     finish();
                 }
                 // modifying the schedules
                 engageScheduler();
-            }
-            else {
+            } else {
                 // settings did not change, do nothing!
                 Log.d(Constants.TAG, "MainActivity:showSettings: settings did not change");
                 toastThanks(getApplicationContext());
@@ -753,7 +727,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(Constants.TAG, "MainActivity:JoinedStudy:onReceive:");
-            if(intent!=null) {
+            if (intent != null) {
                 if (intent.getAction().equalsIgnoreCase(Aware.ACTION_JOINED_STUDY)) {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, true); //enable logcat debug messages
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_WIFI_ONLY, false);
@@ -762,7 +736,6 @@ public class MainActivity extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE, 1);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_CLEAN_OLD_DATA, 1);
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
-                    Aware.setSetting(getApplicationContext(), Aware_Preferences.DEBUG_FLAG, false);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, String.valueOf(-1));
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
                     Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
@@ -777,19 +750,19 @@ public class MainActivity extends AppCompatActivity {
                     sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
 
 
-                Account aware_account = Aware.getAWAREAccount(getApplicationContext());
-                String authority = Provider.getAuthority(getApplicationContext());
-                long frequency = Long.parseLong(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
+                    Account aware_account = Aware.getAWAREAccount(getApplicationContext());
+                    String authority = Provider.getAuthority(getApplicationContext());
+                    long frequency = Long.parseLong(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
 
-                ContentResolver.setIsSyncable(aware_account, authority, 1);
-                ContentResolver.setSyncAutomatically(aware_account, authority, true);
-                SyncRequest request = new SyncRequest.Builder()
-                        .syncPeriodic(frequency, frequency / 3)
-                        .setSyncAdapter(aware_account, authority)
-                        .setExtras(new Bundle()).build();
-                ContentResolver.requestSync(request);
+                    ContentResolver.setIsSyncable(aware_account, authority, 1);
+                    ContentResolver.setSyncAutomatically(aware_account, authority, true);
+                    SyncRequest request = new SyncRequest.Builder()
+                            .syncPeriodic(frequency, frequency / 3)
+                            .setSyncAdapter(aware_account, authority)
+                            .setExtras(new Bundle()).build();
+                    ContentResolver.requestSync(request);
 
-                engageScheduler();
+                    engageScheduler();
 
                     finish();
                 }

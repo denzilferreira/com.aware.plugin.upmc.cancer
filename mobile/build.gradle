@@ -119,7 +119,7 @@ configurations.all {
 dependencies {
     //AWARE is now self-contained. No more leftover dependencies!
     api 'com.ramotion.fluidslider:fluid-slider:0.3.0'
-    api "com.github.denzilferreira:aware-client:master-SNAPSHOT"
+    api "com.github.denzilferreira:aware-client:4.0.808"
 //    api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
     api "com.google.android.gms:play-services-wearable:$google_libs"
     api "com.android.support:design:$support_libs"

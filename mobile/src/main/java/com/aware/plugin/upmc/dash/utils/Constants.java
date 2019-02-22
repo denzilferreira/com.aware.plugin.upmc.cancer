@@ -27,7 +27,7 @@ public final class Constants {
 
     //scheduler ids
     public static final String MORNING_SURVEY_SCHED_ID = "cancer_survey_morning";
-
+    public static final String EVENING_SYNC_ID = "cancer_sync_data";
 
     // survey notification contents
 
