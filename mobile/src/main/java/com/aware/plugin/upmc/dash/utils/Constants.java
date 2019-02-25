@@ -47,6 +47,7 @@ public final class Constants {
     public static final int SNOOZE_NOT_SHOWN = 0;
     public static final int NOTIF_TYPE_APPRAISAL = 0;
     public static final int DND_TOGGLE_MANUAL = 1;
+    public static final int DND_TOGGLE_AUTO = 0;
 
     public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
 

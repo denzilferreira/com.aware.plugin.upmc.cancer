@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.aware.Aware;
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.fileutils.FileManager;
+import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 
 import java.io.IOException;
@@ -46,11 +47,13 @@ public class OnboardingActivity extends AppCompatActivity {
 
         if(view.getId() == R.id.radio_control) {
             Log.d(Constants.TAG, "OnboardingActivity: starting in control mode");
-            writeDeviceType(Constants.DEVICE_TYPE_CONTROL);
+            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DEVICE_TYPE, Constants.DEVICE_TYPE_CONTROL );
+
         }
         else {
             Log.d(Constants.TAG, "OnboardingActivity: starting in regular mode");
-            writeDeviceType(Constants.DEVICE_TYPE_REGULAR);
+            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DEVICE_TYPE, Constants.DEVICE_TYPE_REGULAR );
+
         }
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
@@ -63,7 +66,8 @@ public class OnboardingActivity extends AppCompatActivity {
             case 1: {
                 Log.d(Constants.TAG, "OnboardingActivity:Permissions Granted");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    String deviceType = readDeviceType();
+//                    String deviceType = readDeviceType();
+                    String deviceType = Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DEVICE_TYPE);
                     switch (deviceType) {
                         case Constants.DEVICE_TYPE_REGULAR:
                         case Constants.DEVICE_TYPE_CONTROL:
@@ -71,7 +75,7 @@ public class OnboardingActivity extends AppCompatActivity {
                             startActivity(intent);
                             finish();
                             break;
-                        case Constants.PREFERENCES_DEFAULT_DEVICE_TYPE:
+                        default:
                             Log.d(Constants.TAG, "OnboardingActivity: showing mode selection UI");
                             setContentView(R.layout.activity_onboarding);
                             break;

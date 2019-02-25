@@ -270,6 +270,8 @@ public class FitbitMessageService extends Service {
                 break;
             case Plugin.ACTION_CANCER_SURVEY:
                 Log.d(TAG, "FitbitMessageService:onStartCommand: ACTION_CANCER_SURVEY");
+                // do not disturb mode forced to off.
+                forceDndOffIfNeeded();
                 notifySurvey(true);
                 break;
             case Constants.ACTION_SETTINGS_CHANGED:
@@ -316,6 +318,26 @@ public class FitbitMessageService extends Service {
                 return i;
         }
         return i;
+    }
+
+    public void forceDndOffIfNeeded() {
+        if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equalsIgnoreCase(Constants.DND_MODE_ON)) {
+            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
+            saveDndAction(Constants.DND_MODE_OFF, Constants.DND_TOGGLE_AUTO);
+        }
+    }
+
+
+
+    public void saveDndAction(String mode, int toggled_by) {
+        ContentValues response = new ContentValues();
+        response.put(Provider.Dnd_Toggle.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        response.put(Provider.Dnd_Toggle.TIMESTAMP, System.currentTimeMillis());
+        response.put(Provider.Dnd_Toggle.TOGGLE_POS, mode.equals(Constants.DND_MODE_ON) ? 1 : 0);
+        response.put(Provider.Dnd_Toggle.TOGGLED_BY, toggled_by);
+        getContentResolver().insert(Provider.Dnd_Toggle.CONTENT_URI, response);
+        Log.d(Constants.TAG, "FitbitMessageService:saveDndAction");
+
     }
 
     public void saveResponseForNo(Intent intent) {
@@ -1258,7 +1280,6 @@ public class FitbitMessageService extends Service {
                 }
             }
             return null;
-
         }
     }
 }

@@ -61,6 +61,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
+import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 import kotlin.Unit;
@@ -452,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_upmc, menu);
-        if (!Aware.isStudy(getApplicationContext())) {
+        if (!Aware.isStudy(getApplicationContext()) || Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DEVICE_TYPE).equalsIgnoreCase(Constants.DEVICE_TYPE_CONTROL)) {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
                 if (item.getTitle().toString().equalsIgnoreCase("sync"))
@@ -465,10 +466,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
-                if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
+                if ((item.getTitle().toString().equalsIgnoreCase("dnd1") || item.getTitle().toString().equalsIgnoreCase("dnd2")) && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
                     item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
                     item.setTitle("Dnd2");
-                } else if (item.getTitle().toString().equalsIgnoreCase("dnd1") && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
+                } else if ((item.getTitle().toString().equalsIgnoreCase("dnd1") || item.getTitle().toString().equalsIgnoreCase("dnd2")) && Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
                     item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
                     item.setTitle("Dnd1");
                 }
