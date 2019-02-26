@@ -48,6 +48,11 @@ public final class Constants {
     public static final int NOTIF_TYPE_APPRAISAL = 0;
     public static final int DND_TOGGLE_MANUAL = 1;
     public static final int DND_TOGGLE_AUTO = 0;
+    public static final String SHOW_MORNING_SURVEY =  "SHOW_MORNING_SURVEY";
+    public static final String SHOW_NORMAL_SURVEY = "SHOW_NORMAL_SURVEY" ;
+    public static final String FITBIT_STATUS_CHNL_ID = "FITBIT_STATUS_CHNL_ID";
+    public static final CharSequence FITBIT_STATUS_CHNL_NAME = "UPMC Dash Fitbit Status Channel";
+    public static final String FITBIT_STATUS_CHNL_DESC = "Fitbit notifications";
 
     public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
 
@@ -140,7 +145,7 @@ public final class Constants {
 
 
     public static final String INTERVENTION_NOTIF_CHNL_ID = "intervention_notification";
-    public static final String INTERVENTION_NOTIF_CHNL_NAME = "UPMC Dash intervention notification";
+    public static final String INTERVENTION_NOTIF_CHNL_NAME = "UPMC Dash Intervention Channel";
     public static final String INTERVENTION_NOTIF_CHNL_DESC = "UPMC Dash intervention notification";
 
 
@@ -156,11 +161,14 @@ public final class Constants {
     public static final String DEMO_NOTIF_CHNL_ID = "demo_notification";
 
 
-    public static final String SURVEY_NOTIF_CHNL_NAME= "UPMC Dash Survey notification";
+    public static final String SURVEY_NOTIF_CHNL_NAME= "UPMC Dash Survey Channel";
     public static final String SURVEY_NOTIF_CHNL_ID = "survey_notification";
-    public static final String REMINDER_NOTIF_CHNL_ID = "reminder_notification";
-    public static final String SURVEY_NOTIF_CHNL_DESC= "UPMC Dash Survey notification";
-    public static final String REMINDER_NOTIF_CHNL_DESC= "UPMC Dash Reminder notification";
+    public static final String SURVEY_NOTIF_CHNL_DESC= "Notifications for daily surveys.";
+
+    public static final String SELF_REPORT_NOTIF_CHNL_NAME = "UPMC Dash Self-Report Channel";
+    public static final String SELF_REPORT_CHNL_ID = "selfreport_notification";
+    public static final String SELF_REPORT_CHNL_DESC= "Notification for self-reports.";
+
 
 
 

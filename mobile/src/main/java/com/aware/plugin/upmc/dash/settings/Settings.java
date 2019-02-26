@@ -41,6 +41,7 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
     public static final String PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY =  "plugin_upmc_cancer_symptom_severity";
     public static final String PLUGIN_UPMC_CANCER_DND_MODE = "PLUGIN_UPMC_CANCER_DND_MODE";
     public static final String PLUGIN_UPMC_CANCER_DEVICE_TYPE = "PLUGIN_UPMC_CANCER_DEVICE_TYPE";
+    public static final String PLUGIN_UPMC_CANCER_SHOW_MORNING = "PLUGIN_UPMC_CANCER_SHOW_MORNING";
 
 
     private CheckBoxPreference status;

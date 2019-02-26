@@ -4,7 +4,7 @@
     <string name="app_name">UPMC DASH</string>
     <string name="plugin_upmc_dash">Plugin: UPMC Dash</string>
     <string name="cancer_intro">Please rate how severe the following symptoms are <b><u>right now</u></b> from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be).</string>
-    <string name="dash_intro">Please choose Yes or No if you experienced the following symptoms <b><u>in the last 24 hours.</u></b> For any symptoms marked as Yes, rate how severe the symptom was in the last 24 hours from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be)</string>
+    <string name="dash_intro">Please choose Yes or Not to indicate whether you experienced the following symptoms <b><u>in the last 24 hours.</u></b> For any symptoms marked as Yes, rate how severe the symptom was in the last 24 hours from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be)</string>
     <string name="evening_intro">What was the most stressful or negative event you experienced today?</string>
     <string name="aware_description">This service makes sure the application is running at all times. Please activate it during the study.</string>
     <string name="aware_activate_accessibility">Activate UPMC DASH in the accessibility services.</string>

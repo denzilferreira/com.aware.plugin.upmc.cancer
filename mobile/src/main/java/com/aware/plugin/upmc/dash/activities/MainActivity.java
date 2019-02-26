@@ -150,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        invalidateOptionsMenu();
         // Checking for more permissions
         Log.d(Constants.TAG, "MainActivity:onResume");
         ArrayList<String> REQUIRED_PERMISSIONS = new ArrayList<>();
@@ -205,12 +206,14 @@ public class MainActivity extends AppCompatActivity {
                             if (getIntent().getAction().equals(Constants.ACTION_SHOW_MORNING))
                                 showSymptomSurvey(true);
 
+
                             //check this out
                             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_ON)) {
                                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
                             }
                         } else {
-                            showSymptomSurvey(false);
+                            boolean show_daily = Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SHOW_MORNING).equalsIgnoreCase(Constants.SHOW_MORNING_SURVEY);
+                            showSymptomSurvey(show_daily);
                         }
                     }
 
@@ -670,9 +673,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(Constants.TAG, "MainActivity:showSettings: Joining Study");
                         progressBar.setVisibility(View.VISIBLE);
 
-//                        Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/2251/ysMIR58Boiad\n");
+                        Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/2251/ysMIR58Boiad\n");
 
-                        Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/118/TKKPrzN2s0km");
+//                        Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/118/TKKPrzN2s0km");
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))
                             sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
@@ -739,6 +742,7 @@ public class MainActivity extends AppCompatActivity {
                     Aware.setSetting(getApplicationContext(), Aware_Preferences.WEBSERVICE_SILENT, true);
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SYMPTOM_SEVERITY, String.valueOf(-1));
                     Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
+                    Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SHOW_MORNING, Constants.SHOW_NORMAL_SURVEY);
                     Aware.startPlugin(getApplicationContext(), "com.aware.plugin.upmc.dash");
                     Aware.isBatteryOptimizationIgnored(getApplicationContext(), "com.aware.plugin.upmc.dash");
                     Applications.isAccessibilityServiceActive(getApplicationContext());
