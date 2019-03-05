@@ -88,6 +88,7 @@ public class Provider extends ContentProvider {
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
         public static final String STEP_COUNT = "stepcount";
         public static final String ALARM_TYPE = "alarmtype";
+        public static final String SESSION_ID = "session_id";
     }
 
     public static final class Notification_Interventions implements AWAREColumns {

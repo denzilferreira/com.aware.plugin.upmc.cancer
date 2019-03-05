@@ -490,18 +490,18 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton(Constants.SNOOZE_ALERT_POS, (dialogInterface, i) -> {
 
             if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equals(Constants.DND_MODE_OFF)) {
-                sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
+
                 item.setIcon(R.drawable.do_not_disturb_off_white_24x24);
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_ON);
+
 //            Toast.makeText(getApplicationContext(), "You will not receive prompts for the rest of the day", Toast.LENGTH_SHORT).show();
                 item.setTitle("Dnd2");
             } else {
-
-                sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
                 item.setIcon(R.drawable.do_not_disturb_on_white_24x24);
                 Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
                 item.setTitle("Dnd1");
             }
+            sendFitbitMessageServiceAction(Constants.ACTION_DO_NOT_DISTURB);
             saveDndAction(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE), Constants.DND_TOGGLE_MANUAL);
         });
         builder.setNegativeButton(Constants.SNOOZE_ALERT_NEG, (dialogInterface, i) -> dialogInterface.dismiss());

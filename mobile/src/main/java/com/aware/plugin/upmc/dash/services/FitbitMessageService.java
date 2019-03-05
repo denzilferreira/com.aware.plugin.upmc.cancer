@@ -85,7 +85,7 @@ public class FitbitMessageService extends Service {
 
     private Notification.Builder setupNotifBuilder;
     private NotificationCompat.Builder setupNotifCompatBuilder;
-    //    private int count = 0;
+    private String session_id;
     private int id = 0;
     private int promptCount = 0;
     private String message;
@@ -879,12 +879,13 @@ public class FitbitMessageService extends Service {
 //        }
 //    }
 
-    public void syncSCWithServer(long timeStamp, int type, int data) {
+    public void syncSCWithServer(double timeStamp, int type, int data, String sessionId) {
         ContentValues step_count = new ContentValues();
         step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         step_count.put(Provider.Stepcount_Data.TIMESTAMP, timeStamp);
         step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
         step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
+//        step_count.put(Provider.Stepcount_Data.SESSION_ID, sessionId);
         getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
         Log.d("yiyi", "Sent data to aware server");
     }
@@ -1041,7 +1042,7 @@ public class FitbitMessageService extends Service {
                 } else if (message.equals(CLOSE_NOTIF)) {
                     dismissIntervention();
                 } else if (message.equals(OTHER)) {
-                    // show up a text input box for specified reasons
+                    // TO DO(Raghu): show up a text input box for specified reasons
                 }
             }
         }
@@ -1059,13 +1060,14 @@ public class FitbitMessageService extends Service {
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
                 StringBuilder sql1 = new StringBuilder();
-                sql1.append("SELECT id, message FROM ");
+                sql1.append("SELECT * FROM ");
                 sql1.append(TABLE_PROMPT);
                 sql1.append(" ORDER BY id DESC");
                 ResultSet rs = stmt.executeQuery(sql1.toString());
                 if (rs.next()) {
                     id = rs.getInt("id");
                     message = rs.getString("message");
+                    session_id = rs.getString("session_id");
                 }
                 //Clean-up environment
                 rs.close();
@@ -1167,6 +1169,7 @@ public class FitbitMessageService extends Service {
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE PromptFromWatch " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " session_id varchar(255) NULL, " +
                         " message varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
@@ -1181,7 +1184,8 @@ public class FitbitMessageService extends Service {
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE SensorData " +
-                        "(unixTime bigint(20) not NULL, " +
+                        "(timestamp double not NULL, " +
+                        " session_id varchar(255) NULL, " +
                         " type int(11) not NULL, " +
                         " data int(11) not NULL)";
                 stmt.executeUpdate(sql);
@@ -1190,17 +1194,26 @@ public class FitbitMessageService extends Service {
                         " timeRange varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE Notification " +
-                        "(unixTime bigint(20) not NULL, " +
-                        " message varchar(255) not NULL)";
+                sql = "CREATE TABLE interventions_watch " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " timestamp double not NULL, " +
+                        " session_id varchar(255) NULL, " +
+                        " notif_type int NOT NULL, "+
+                        " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE InterventionResponse " +
-                        "(unixTime bigint(20) not NULL, " +
-                        " response varchar(255) not NULL)";
-                stmt.executeUpdate(sql);
-                sql = "CREATE TABLE ReasonsForNo " +
-                        "(unixTime bigint(20) not NULL, " +
-                        " reasons varchar(255) not NULL)";
+                sql = "CREATE TABLE responses_watch " +
+                        "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " timestamp double not NULL, " +
+                        " session_id varchar(255) NULL, " +
+                        " ok int NULL, "+
+                        " no int NULL, " +
+                        " snooze int NULL, " +
+                        " busy int NULL, " +
+                        " pain int NULL, " +
+                        " nausea int NULL, " +
+                        " tired int NULL, " +
+                        " other int NULL, " +
+                        " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 Log.d("yiyi", "Created tables in given database...");
             } catch (SQLException se) {
@@ -1258,6 +1271,7 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "Table deleted!!!");
                 sql = "CREATE TABLE PromptFromWatch " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
+                        " session_id varchar(255) NULL, " +
                         " message varchar(255) not NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
@@ -1309,21 +1323,23 @@ public class FitbitMessageService extends Service {
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
                 StringBuilder sql = new StringBuilder();
-                sql.append("SELECT unixTime, type, data FROM ");
+                sql.append("SELECT * FROM ");
                 sql.append(TABLE_SENSOR_DATA);
                 ResultSet rs = stmt.executeQuery(sql.toString());
                 while (rs.next()) {
-                    long timeStamp = rs.getLong("unixTime");
+                    double timeStamp = rs.getDouble("timestamp");
                     int type = rs.getInt("type");
                     int data = rs.getInt("data");
-                    syncSCWithServer(timeStamp, type, data);
+                    String sessionId = rs.getString("session_id");
+                    syncSCWithServer(timeStamp, type, data,sessionId);
                 }
                 //After syncing all the data records, clear the table
                 String command = "DROP TABLE SensorData";
                 stmt.executeUpdate(command);
                 Log.d("yiyi", "Table deleted!!!");
                 command = "CREATE TABLE SensorData " +
-                        "(unixTime bigint(20) not NULL, " +
+                        "(timestamp double not NULL, " +
+                        " session_id varchar(255) NULL, " +
                         " type int(11) not NULL, " +
                         " data int(11) not NULL)";
                 stmt.executeUpdate(command);
