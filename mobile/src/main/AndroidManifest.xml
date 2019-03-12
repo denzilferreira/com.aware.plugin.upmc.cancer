@@ -141,7 +141,7 @@
                 android:value="edf1b350fc8819daef11e8ab26f363e0badab054"/>
 
         <activity
-                android:name=".activities.MainActivity"
+                android:name="com.aware.plugin.upmc.dash.activities.MainActivity"
                 android:label="@string/title_activity_main"
                 android:exported="true"
                 android:launchMode="singleTop"
