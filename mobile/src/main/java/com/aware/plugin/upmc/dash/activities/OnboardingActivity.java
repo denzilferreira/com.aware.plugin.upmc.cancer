@@ -37,6 +37,7 @@ public class OnboardingActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Please grant permission!", Toast.LENGTH_SHORT).show();
         }
 
+
     }
 
     public void onRadioButtonClicked(View view) {
@@ -69,6 +70,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 //                    String deviceType = readDeviceType();
                     String deviceType = Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DEVICE_TYPE);
+                    Log.d(Constants.TAG, "OnboardingActivity: deviceType " + deviceType);
                     switch (deviceType) {
                         case Constants.DEVICE_TYPE_REGULAR:
                         case Constants.DEVICE_TYPE_CONTROL:
