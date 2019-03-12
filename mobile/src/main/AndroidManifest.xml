@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -122,7 +123,7 @@
                 android:label="@string/title_activity_notification_response"
                 android:theme="@style/Theme.AppCompat.Dialog.Alert"/>
         <activity
-                android:name=".activities.OnboardingActivity"
+                android:name="com.aware.plugin.upmc.dash.activities.OnboardingActivity"
                 android:label="UPMC Dash"
                 android:theme="@style/AppTheme.NoActionBar">
 
@@ -147,12 +148,6 @@
                 android:launchMode="singleTop"
                 android:theme="@style/AppTheme"
         >
-
-
-            <intent-filter>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
 
 
         </activity>

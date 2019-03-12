@@ -27,9 +27,10 @@ public class OnboardingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setFinishOnTouchOutside(false);
-        String[] REQUIRED_PERMISSIONS = new String[]{
-                Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            String[] REQUIRED_PERMISSIONS = new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.FOREGROUND_SERVICE};
             requestPermissions(REQUIRED_PERMISSIONS, 1);
         }
         else {
