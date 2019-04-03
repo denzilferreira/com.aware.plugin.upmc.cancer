@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider {
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-    public static final int DATABASE_VERSION = 27; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 28; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
@@ -95,7 +95,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_interventions");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.interventions";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.interventions";
-        public static final String NOTIF_ID = "notif_id";
+        public static final String NOTIF_ID = "session_id";
         public static final String NOTIF_TYPE = "notif_type";
         public static final String NOTIF_DEVICE = "notif_device";
         public static final String SNOOZE_SHOWN = "snooze_shown";
@@ -108,7 +108,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_responses");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.responses";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.responses";
-        public static final String NOTIF_ID = "notif_id";
+        public static final String NOTIF_ID = "session_id";
         public static final String NOTIF_TYPE = "notif_type";
         public static final String NOTIF_DEVICE = "notif_device";
         public static final String RESP_OK = "resp_ok";

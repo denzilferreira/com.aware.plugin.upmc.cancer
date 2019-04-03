@@ -677,7 +677,7 @@ public class MainActivity extends AppCompatActivity {
 //                        Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/2251/ysMIR58Boiad\n");
 
 //                        Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/118/TKKPrzN2s0km");
-                        Aware.joinStudy(getApplicationContext(), "https://upmcdash.pittbotlab.org/aware-server/index.php/webservice/index/7/2ZOB1ctEZLFE");
+                        Aware.joinStudy(getApplicationContext(), "https://upmcdash.pittbotlab.org/aware-server/index.php/webservice/index/8/NPJHTw5kC255");
 
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))

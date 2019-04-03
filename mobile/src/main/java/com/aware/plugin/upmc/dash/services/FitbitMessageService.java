@@ -82,7 +82,7 @@ public class FitbitMessageService extends Service {
 
     private Notification.Builder setupNotifBuilder;
     private NotificationCompat.Builder setupNotifCompatBuilder;
-    private String session_id;
+    private String session_id = "DEBUG";
     private int id = 0;
     private int promptCount = 0;
     private String message;
@@ -136,7 +136,6 @@ public class FitbitMessageService extends Service {
                 case ConnectivityManager.TYPE_MOBILE:
                     Log.d(TAG, "mConnectivityReceiver: mob");
                     break;
-
             }
 
         }
@@ -356,7 +355,7 @@ public class FitbitMessageService extends Service {
         ContentValues response = new ContentValues();
         response.put(Provider.Notification_Responses.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
-        response.put(Provider.Notification_Responses.NOTIF_ID, "resp_test-id-123");
+        response.put(Provider.Notification_Responses.NOTIF_ID, session_id);
         response.put(Provider.Notification_Responses.NOTIF_TYPE, Constants.NOTIF_TYPE_INACTIVITY);
         response.put(Provider.Notification_Responses.NOTIF_DEVICE, Constants.NOTIF_DEVICE_PHONE);
         response.put(Provider.Notification_Responses.RESP_OK, 0);
@@ -599,9 +598,9 @@ public class FitbitMessageService extends Service {
         mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
 
-    public void notifyUserWithInactivity(Context context, boolean snoozeOption) {
+    public void notifyUserWithInactivity(Context context, boolean snoozeOption, String session_id) {
        Log.d(TAG, "notifyUserWithInactivity");
-       saveIntervention("test-inactasd", Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption? Constants.SNOOZE_SHOWN:Constants.SNOOZE_NOT_SHOWN);
+       saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption? Constants.SNOOZE_SHOWN:Constants.SNOOZE_NOT_SHOWN);
        wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
        Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
     if (snoozeOption)
@@ -650,10 +649,10 @@ public class FitbitMessageService extends Service {
     }
 
 
-    public void notifyUserWithAppraisal() {
+    public void notifyUserWithAppraisal(String session_id) {
         wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         Intent dashIntent = new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_APPRAISAL);
-        saveIntervention("test-apprai", Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE, Constants.SNOOZE_NOT_SHOWN);
+        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE, Constants.SNOOZE_NOT_SHOWN);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
@@ -870,7 +869,7 @@ public class FitbitMessageService extends Service {
         step_count.put(Provider.Stepcount_Data.TIMESTAMP, timeStamp);
         step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
         step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
-//        step_count.put(Provider.Stepcount_Data.SESSION_ID, sessionId);
+        step_count.put(Provider.Stepcount_Data.SESSION_ID, sessionId);
         getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
         Log.d("yiyi", "Sent data to aware server");
     }
@@ -1019,11 +1018,11 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "Prompt ID: " + id + ". Show new prompt on phone!!!");
                 promptCount = id;
                 if (message.equals(NOTIFICATION)) {
-                    notifyUserWithInactivity(getApplicationContext(), true);
+                    notifyUserWithInactivity(getApplicationContext(), true,  session_id);
                 } else if (message.equals(NOTIF_NO_SNOOZE)) {
-                    notifyUserWithInactivity(getApplicationContext(), false);
+                    notifyUserWithInactivity(getApplicationContext(), false, session_id);
                 } else if (message.equals(MINIMESSAGE)) {
-                    notifyUserWithAppraisal();
+                    notifyUserWithAppraisal(session_id);
                 } else if (message.equals(CLOSE_NOTIF)) {
                     dismissIntervention();
                 } else if (message.equals(OTHER)) {
@@ -1353,7 +1352,7 @@ public class FitbitMessageService extends Service {
                     int type = rs.getInt("type");
                     int data = rs.getInt("data");
                     String sessionId = rs.getString("session_id");
-                    syncSCWithServer(timeStamp, type, data,sessionId);
+                    syncSCWithServer(timeStamp, type, data, sessionId);
                 }
                 //After syncing all the data records, clear the table
                 String command = "DROP TABLE SensorData";
