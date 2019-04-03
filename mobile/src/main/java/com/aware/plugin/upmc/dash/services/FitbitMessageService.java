@@ -281,6 +281,7 @@ public class FitbitMessageService extends Service {
                 saveTimeSchedule();
                 break;
             case Constants.ACTION_SYNC_DATA:
+                Log.d(Constants.TAG, "FitbitMessageService:onCommand : ACTION_SYNC_DATA");
                 new SyncData().execute();
                 break;
             case Constants.ACTION_APPRAISAL:
@@ -314,7 +315,7 @@ public class FitbitMessageService extends Service {
             case Constants.ACTION_TEST:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
 //                notifyUserWithInactivity(getApplicationContext(), true);
-                new FakeData().execute();
+//                new FakeData().execute();
                 break;
 
             default:
