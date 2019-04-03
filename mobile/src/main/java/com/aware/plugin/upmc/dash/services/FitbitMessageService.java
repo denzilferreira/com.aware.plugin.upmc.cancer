@@ -38,9 +38,6 @@ import com.aware.plugin.upmc.dash.activities.Plugin;
 import com.aware.plugin.upmc.dash.activities.Provider;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
-import com.aware.utils.Scheduler;
-
-import org.json.JSONException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -318,6 +315,7 @@ public class FitbitMessageService extends Service {
             case Constants.ACTION_TEST:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
 //                notifyUserWithInactivity(getApplicationContext(), true);
+                new FakeData().execute();
                 break;
 
             default:
@@ -724,24 +722,11 @@ public class FitbitMessageService extends Service {
     private void setUpDatabase() {
         lighttpdStart(getApplicationContext(), "start_lighttpd");
         lighttpdAddHost(getApplicationContext(), "add_host", "localhost", "8001", "/storage/emulated/0/ksweb/tools/phpMyAdmin");
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new CreateDB().execute();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        new CreateTables().execute();
-                    }
-                }, 1000);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        saveTimeSchedule();
-                    }
-                }, 3000);
+        new Handler().postDelayed(() -> {
+            new CreateDB().execute();
+            new Handler().postDelayed(() -> new CreateTables().execute(), 1000);
+            new Handler().postDelayed(() -> saveTimeSchedule(), 3000);
 
-            }
         }, 1000);
     }
 
@@ -1298,12 +1283,49 @@ public class FitbitMessageService extends Service {
         }
     }
 
+    private class FakeData extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... strings) {
+
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                //Open a connection
+                Log.d("yiyi", "Connecting to database to ingest fake sensor data");
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                stmt = conn.createStatement();
+                for (int i=0;i<100;i++) {
+                    StringBuilder sql = new StringBuilder();
+                    String timestamp = ""+ System.currentTimeMillis();
+                    sql.append("INSERT into SensorData VALUES (");
+                    sql.append(Double.valueOf(timestamp));
+                    sql.append(", '1'");
+                    sql.append(", 1");
+                    sql.append(", 23)");
+                    stmt.execute(sql.toString());
+                }
+
+                stmt.close();
+                conn.close();
+
+            }
+            catch (Exception e) {
+
+            }
+
+
+            return null;
+        }
+    }
+
     private class SyncData extends AsyncTask<String, Void, Void> {
 
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+
         }
 
         @Override

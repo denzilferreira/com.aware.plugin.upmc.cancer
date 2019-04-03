@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider {
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-    public static final int DATABASE_VERSION = 24; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 27; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
@@ -167,7 +167,8 @@ public class Provider extends ContentProvider {
                     Stepcount_Data.TIMESTAMP + " real default 0," +
                     Stepcount_Data.DEVICE_ID + " text default ''," +
                     Stepcount_Data.STEP_COUNT + " integer default -1," +
-                    Stepcount_Data.ALARM_TYPE + " integer default -1",
+                    Stepcount_Data.ALARM_TYPE + " integer default -1," +
+                    Stepcount_Data.SESSION_ID + " text default ''",
 
             Notification_Interventions._ID + " integer primary key autoincrement," +
                     Notification_Interventions.TIMESTAMP + " real default 0," +
@@ -271,6 +272,7 @@ public class Provider extends ContentProvider {
         stepcountMap.put(Stepcount_Data.DEVICE_ID, Stepcount_Data.DEVICE_ID);
         stepcountMap.put(Stepcount_Data.STEP_COUNT, Stepcount_Data.STEP_COUNT);
         stepcountMap.put(Stepcount_Data.ALARM_TYPE, Stepcount_Data.ALARM_TYPE);
+        stepcountMap.put(Stepcount_Data.SESSION_ID, Stepcount_Data.SESSION_ID);
 
 
 

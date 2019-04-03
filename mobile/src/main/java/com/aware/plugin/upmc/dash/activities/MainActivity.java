@@ -556,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(Constants.TAG, "MainActivity:Sync happened");
             Random ran = new Random();
             for (int i = 0; i < 1000; i++)
-                syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101));
+                syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101), "DEBUG");
             return true;
         }
         // do not disturb on
@@ -574,12 +574,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void syncSCWithServer(long timeStamp, int type, int data) {
+    public void syncSCWithServer(long timeStamp, int type, int data, String session_id) {
         ContentValues step_count = new ContentValues();
         step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         step_count.put(Provider.Stepcount_Data.TIMESTAMP, timeStamp);
         step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
         step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
+        step_count.put(Provider.Stepcount_Data.SESSION_ID, session_id );
         getContentResolver().insert(Provider.Stepcount_Data.CONTENT_URI, step_count);
     }
 
@@ -676,7 +677,7 @@ public class MainActivity extends AppCompatActivity {
 //                        Aware.joinStudy(getApplicationContext(), "https://api.awareframework.com/index.php/webservice/index/2251/ysMIR58Boiad\n");
 
 //                        Aware.joinStudy(getApplicationContext(), "https://r2d2.hcii.cs.cmu.edu/aware/dashboard/index.php/webservice/index/118/TKKPrzN2s0km");
-                        Aware.joinStudy(getApplicationContext(), "https://upmcdash.pittbotlab.org/aware-server/index.php/webservice/index/6/7v5amtZgy5Lj");
+                        Aware.joinStudy(getApplicationContext(), "https://upmcdash.pittbotlab.org/aware-server/index.php/webservice/index/7/2ZOB1ctEZLFE");
 
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))
