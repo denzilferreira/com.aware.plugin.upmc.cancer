@@ -43,6 +43,8 @@ public final class Constants {
     public static final String NOTIF_RESPONSE_EXTRA_KEY = "NOTIF_RESPONSE_EXTRA_KEY";
     public static final int NOTIF_TYPE_INACTIVITY = 1;
     public static final int NOTIF_DEVICE_PHONE = 0;
+    public static final int NOTIF_DEVICE_WATCH = 1;
+    public static final int NOTIF_TYPE_BATT_LOW = 2;
     public static final int SNOOZE_SHOWN = 1;
     public static final int SNOOZE_NOT_SHOWN = 0;
     public static final int NOTIF_TYPE_APPRAISAL = 0;
@@ -222,6 +224,8 @@ public final class Constants {
 
     public static final String OTHER = "Other";
     public static final String TABLE_SENSOR_DATA = "SensorData";
+    public static final String TABLE_RESPONSES = "responses_watch";
+    public static final String TABLE_INTERVENTIONS = "interventions_watch";
 
     // Package names of apps required on the phone
     public static final String PACKAGE_KSWEB = "ru.kslabs.ksweb";

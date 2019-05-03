@@ -1,8 +1,8 @@
 package com.aware.plugin.upmc.dash.activities;
 
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.recyclerview.widget.RecyclerView;
 import android.support.wear.widget.WearableLinearLayoutManager;
 import android.support.wear.widget.WearableRecyclerView;
 import android.support.wearable.activity.WearableActivity;

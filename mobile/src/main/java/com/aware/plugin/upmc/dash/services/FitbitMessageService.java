@@ -24,8 +24,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.Vibrator;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
+
+import androidx.core.app.NotificationCompat;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,6 +41,7 @@ import com.aware.plugin.upmc.dash.activities.Plugin;
 import com.aware.plugin.upmc.dash.activities.Provider;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.workers.LocalDBWorker;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -45,6 +49,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.aware.plugin.upmc.dash.utils.Constants.ACTION_CHECK_PROMPT;
 import static com.aware.plugin.upmc.dash.utils.Constants.BLUETOOTH_ON;
@@ -179,18 +184,16 @@ public class FitbitMessageService extends Service {
 
     public boolean enableBluetoothIfOff() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter!=null) {
+        if (bluetoothAdapter != null) {
             boolean isEnabled = bluetoothAdapter.isEnabled();
             if (!isEnabled)
                 return bluetoothAdapter.enable();
             return true;
-        }
-        else
+        } else
             return false;
     }
 
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -282,7 +285,7 @@ public class FitbitMessageService extends Service {
                 break;
             case Constants.ACTION_SYNC_DATA:
                 Log.d(Constants.TAG, "FitbitMessageService:onCommand : ACTION_SYNC_DATA");
-                new SyncData().execute();
+                enqueueOneTimeDBWorker();
                 break;
             case Constants.ACTION_APPRAISAL:
                 Log.d(TAG, "FitbitMessageService: onStartCommand appraisal");
@@ -295,10 +298,12 @@ public class FitbitMessageService extends Service {
             case Constants.ACTION_NOTIF_SNOOZE:
                 new PostData().execute(TABLE_COMMAND, SNOOZE_COMMAND);
                 dismissIntervention();
+                saveResponseForOther(false);
                 break;
             case Constants.ACTION_NOTIF_OK:
                 new PostData().execute(TABLE_COMMAND, CLOSE_COMMAND);
                 dismissIntervention();
+                saveResponseForOther(true);
                 break;
             case Constants.ACTION_NOTIF_NO:
                 new PostData().execute(TABLE_COMMAND, CLOSE_COMMAND);
@@ -308,14 +313,16 @@ public class FitbitMessageService extends Service {
                 break;
             case Constants.ACTION_DO_NOT_DISTURB:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-                String mode = Aware.getSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_DND_MODE);
-                new PostData().execute(TABLE_COMMAND, mode.equals(Constants.DND_MODE_ON)?Constants.DO_NOT_DISTURB_COMMAND:Constants.REMOVE_DO_NOT_DISTURB);
+                String mode = Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE);
+                new PostData().execute(TABLE_COMMAND, mode.equals(Constants.DND_MODE_ON) ? Constants.DO_NOT_DISTURB_COMMAND : Constants.REMOVE_DO_NOT_DISTURB);
                 break;
 
             case Constants.ACTION_TEST:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-//                notifyUserWithInactivity(getApplicationContext(), true);
+
+                notifyUserWithInactivity(getApplicationContext(), true, "sample");
 //                new FakeData().execute();
+
                 break;
 
             default:
@@ -324,17 +331,23 @@ public class FitbitMessageService extends Service {
         return i;
     }
 
+    private void enqueueOneTimeDBWorker() {
+        OneTimeWorkRequest localDbWorker = new OneTimeWorkRequest.Builder(LocalDBWorker.class)
+                .setInitialDelay(1, TimeUnit.MINUTES)
+                .build();
+        WorkManager.getInstance().enqueue(localDbWorker);
+    }
+
     private void setShowMorningSetting(boolean b) {
-        Aware.setSetting(getApplicationContext(),Settings.PLUGIN_UPMC_CANCER_SHOW_MORNING, b? Constants.SHOW_MORNING_SURVEY: Constants.SHOW_NORMAL_SURVEY);
+        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SHOW_MORNING, b ? Constants.SHOW_MORNING_SURVEY : Constants.SHOW_NORMAL_SURVEY);
     }
 
     public void forceDndOffIfNeeded() {
-        if(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equalsIgnoreCase(Constants.DND_MODE_ON)) {
+        if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equalsIgnoreCase(Constants.DND_MODE_ON)) {
             Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
             saveDndAction(Constants.DND_MODE_OFF, Constants.DND_TOGGLE_AUTO);
         }
     }
-
 
 
     public void saveDndAction(String mode, int toggled_by) {
@@ -350,9 +363,9 @@ public class FitbitMessageService extends Service {
 
     public void saveResponseForNo(Intent intent) {
         String no_output = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
-        Log.d(Constants.TAG, "FitbitMessageService:saveResponseForNo" +no_output);
+        Log.d(Constants.TAG, "FitbitMessageService:saveResponseForNo" + no_output);
         String resp = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
-        char[] resp_array  = resp.toCharArray();
+        char[] resp_array = resp.toCharArray();
         ContentValues response = new ContentValues();
         response.put(Provider.Notification_Responses.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
@@ -367,11 +380,31 @@ public class FitbitMessageService extends Service {
         response.put(Provider.Notification_Responses.RESP_NAUSEA, Integer.parseInt("" + resp_array[2]));
         response.put(Provider.Notification_Responses.RESP_TIRED, Integer.parseInt("" + resp_array[3]));
         response.put(Provider.Notification_Responses.RESP_OTHER, Integer.parseInt("" + resp_array[4]));
+        response.put(Provider.Notification_Responses.RESP_OTHER_SYMP, resp.substring(5));
         getContentResolver().insert(Provider.Notification_Responses.CONTENT_URI, response);
-        Log.d(Constants.TAG, "saveIntervention:saving response");
-
 
     }
+
+    public void saveResponseForOther(boolean ok) {
+        Log.d(Constants.TAG, "FitbitMessageService:saveResponseForOther");
+        ContentValues response = new ContentValues();
+        response.put(Provider.Notification_Responses.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
+        response.put(Provider.Notification_Responses.NOTIF_ID, session_id);
+        response.put(Provider.Notification_Responses.NOTIF_TYPE, Constants.NOTIF_TYPE_INACTIVITY);
+        response.put(Provider.Notification_Responses.NOTIF_DEVICE, Constants.NOTIF_DEVICE_PHONE);
+        response.put(Provider.Notification_Responses.RESP_OK, ok? 1:0);
+        response.put(Provider.Notification_Responses.RESP_NO, ok? 0:1);
+        response.put(Provider.Notification_Responses.RESP_SNOOZE, 0);
+        response.put(Provider.Notification_Responses.RESP_BUSY, 0);
+        response.put(Provider.Notification_Responses.RESP_PAIN,0);
+        response.put(Provider.Notification_Responses.RESP_NAUSEA, 0);
+        response.put(Provider.Notification_Responses.RESP_TIRED, 0);
+        response.put(Provider.Notification_Responses.RESP_OTHER, 0);
+        getContentResolver().insert(Provider.Notification_Responses.CONTENT_URI, response);
+
+    }
+
 
     private void showSurveyNotif() {
         final Intent dashIntent = new Intent(this, MainActivity.class);
@@ -402,8 +435,6 @@ public class FitbitMessageService extends Service {
             startForeground(Constants.SURVEY_NOTIF_ID, surveyCompatNotifBuilder.build());
         }
     }
-
-
 
 
     private void showFitbitNotif() {
@@ -464,7 +495,7 @@ public class FitbitMessageService extends Service {
 
     private void notifySurvey(boolean daily) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(daily) {
+        if (daily) {
 //            wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
             final Intent dashIntent = new Intent(this, MainActivity.class).setAction(Constants.ACTION_SHOW_MORNING);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
@@ -479,8 +510,7 @@ public class FitbitMessageService extends Service {
                         .setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
-            }
-            else {
+            } else {
                 surveyCompatNotifBuilder = new NotificationCompat.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
                 surveyCompatNotifBuilder.setAutoCancel(false)
                         .setWhen(System.currentTimeMillis())
@@ -494,8 +524,7 @@ public class FitbitMessageService extends Service {
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
             }
-        }
-        else {
+        } else {
             final Intent dashIntent = new Intent(this, MainActivity.class);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -509,8 +538,7 @@ public class FitbitMessageService extends Service {
                         .setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
-            }
-            else {
+            } else {
                 surveyCompatNotifBuilder = new NotificationCompat.Builder(this, Constants.SELF_REPORT_CHNL_ID);
                 surveyCompatNotifBuilder.setAutoCancel(false)
                         .setWhen(System.currentTimeMillis())
@@ -549,7 +577,7 @@ public class FitbitMessageService extends Service {
             notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, Constants.SURVEY_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
             notificationChannel.setDescription(Constants.SURVEY_NOTIF_CHNL_DESC);
             notificationChannel.enableLights(true);
-            notificationChannel.setVibrationPattern(new long[] {0, 800, 100, 800, 100, 800, 100, 800, 100, 800});
+            notificationChannel.setVibrationPattern(new long[]{0, 800, 100, 800, 100, 800, 100, 800, 100, 800});
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -600,41 +628,40 @@ public class FitbitMessageService extends Service {
     }
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption, String session_id) {
-       Log.d(TAG, "notifyUserWithInactivity");
-       saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption? Constants.SNOOZE_SHOWN:Constants.SNOOZE_NOT_SHOWN);
-       wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
-       Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
-    if (snoozeOption)
-        dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
-       PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-       NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-           Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
-           monitorNotifBuilder.setAutoCancel(false)
-                   .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                   .setContentTitle("UPMC Dash Monitor")
-                   .setContentText(Constants.NOTIF_INACTIVITY)
-                   .setOngoing(true)
-                   .setContentIntent(dashPendingIntent)
-                   .setTimeoutAfter(INTERVENTION_TIMEOUT);
-        assert mNotificationManager != null;
-           mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
-       } else {
-           NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
-                   .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
-                   .setContentTitle("UPMC Dash Monitor")
-                   .setContentText(Constants.NOTIF_INACTIVITY)
-                   .setOngoing(true)
-                   .setContentIntent(dashPendingIntent)
-                   .setGroup("Prompt")
-                   .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                   .setPriority(NotificationCompat.PRIORITY_MAX)
-                   .setTimeoutAfter(INTERVENTION_TIMEOUT);
-           assert mNotificationManager != null;
-           mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
-       }
+        Log.d(TAG, "notifyUserWithInactivity");
+        saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption ? Constants.SNOOZE_SHOWN : Constants.SNOOZE_NOT_SHOWN);
+        wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
+        Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
+        if (snoozeOption)
+            dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
+        PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+            monitorNotifBuilder.setAutoCancel(false)
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash Monitor")
+                    .setContentText(Constants.NOTIF_INACTIVITY)
+                    .setOngoing(true)
+                    .setContentIntent(dashPendingIntent)
+                    .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
+        } else {
+            NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID)
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash Monitor")
+                    .setContentText(Constants.NOTIF_INACTIVITY)
+                    .setOngoing(true)
+                    .setContentIntent(dashPendingIntent)
+                    .setGroup("Prompt")
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setTimeoutAfter(INTERVENTION_TIMEOUT);
+            assert mNotificationManager != null;
+            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
+        }
     }
-
 
 
     public void saveIntervention(String notif_id, int notif_type, int notif_device, int snooze_shown) {
@@ -771,7 +798,6 @@ public class FitbitMessageService extends Service {
     }
 
 
-
 //    public void scheduleTimeForMorningSurvey() {
 //        Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey");
 //        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
@@ -876,7 +902,6 @@ public class FitbitMessageService extends Service {
     }
 
 
-
     private String zeroPad(Integer i) {
         StringBuilder sb = new StringBuilder();
         if (i < 10) {
@@ -976,11 +1001,11 @@ public class FitbitMessageService extends Service {
                 sb.append(strings[1]);
                 sb.append("')");
                 stmt.executeUpdate(sb.toString());
-                Log.d("yiyi", "statement is: "+sb.toString());
+                Log.d("yiyi", "statement is: " + sb.toString());
 
             } catch (SQLException se) {
                 Log.d("yiyi", "sql error");
-                Log.d("yiyi",se.getMessage());
+                Log.d("yiyi", se.getMessage());
                 Log.d("yiyi", se.getSQLState());
                 //Handle errors for JDBC
                 se.printStackTrace();
@@ -1019,7 +1044,7 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "Prompt ID: " + id + ". Show new prompt on phone!!!");
                 promptCount = id;
                 if (message.equals(NOTIFICATION)) {
-                    notifyUserWithInactivity(getApplicationContext(), true,  session_id);
+                    notifyUserWithInactivity(getApplicationContext(), true, session_id);
                 } else if (message.equals(NOTIF_NO_SNOOZE)) {
                     notifyUserWithInactivity(getApplicationContext(), false, session_id);
                 } else if (message.equals(MINIMESSAGE)) {
@@ -1183,14 +1208,14 @@ public class FitbitMessageService extends Service {
                         "(id int(11) not NULL AUTO_INCREMENT, " +
                         " timestamp double not NULL, " +
                         " session_id varchar(255) NULL, " +
-                        " notif_type int NOT NULL, "+
+                        " notif_type int NOT NULL, " +
                         " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 sql = "CREATE TABLE responses_watch " +
                         "(id int(11) not NULL AUTO_INCREMENT, " +
                         " timestamp double not NULL, " +
                         " session_id varchar(255) NULL, " +
-                        " ok int NULL, "+
+                        " ok int NULL, " +
                         " no int NULL, " +
                         " snooze int NULL, " +
                         " busy int NULL, " +
@@ -1296,9 +1321,10 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "Connecting to database to ingest fake sensor data");
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
-                for (int i=0;i<100;i++) {
+                for (int i = 0; i < 100; i++) {
+                    // 1. Fake Step Count Data
                     StringBuilder sql = new StringBuilder();
-                    String timestamp = ""+ System.currentTimeMillis();
+                    String timestamp = "" + System.currentTimeMillis();
                     sql.append("INSERT into SensorData VALUES (");
                     sql.append(Double.valueOf(timestamp));
                     sql.append(", '1'");
@@ -1306,16 +1332,39 @@ public class FitbitMessageService extends Service {
                     sql.append(", 23)");
                     stmt.execute(sql.toString());
                 }
-
+                // 2. Interventions from watch
+                for (int i = 0; i < 100; i++) {
+                    StringBuilder sql = new StringBuilder();
+                    String timestamp = "" + System.currentTimeMillis();
+                    sql.append("INSERT into interventions_watch(notif_type, session_id, timestamp) VALUES (");
+                    sql.append("1");
+                    sql.append(", '1'");
+                    sql.append(",").append(Double.valueOf(timestamp)).append(")");
+                    stmt.execute(sql.toString());
+                }
+                // 3. Interventions from watch
+                for (int i = 0; i < 100; i++) {
+                    StringBuilder sql = new StringBuilder();
+                    String timestamp = "" + System.currentTimeMillis();
+                    sql.append("INSERT into responses_watch(busy, nausea, no, ok, other, pain, session_id, snooze, timestamp, tired) VALUES (");
+                    sql.append("1");
+                    sql.append(", 1");
+                    sql.append(", 1");
+                    sql.append(", 1");
+                    sql.append(", '1'");
+                    sql.append(", 1");
+                    sql.append(", '1'");
+                    sql.append(", 1");
+                    sql.append(",").append(Double.valueOf(timestamp));
+                    sql.append(", 1").append(")");
+                    stmt.execute(sql.toString());
+                }
                 stmt.close();
                 conn.close();
 
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
 
             }
-
-
             return null;
         }
     }

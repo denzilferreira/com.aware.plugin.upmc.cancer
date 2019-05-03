@@ -2,31 +2,24 @@ package com.aware.plugin.upmc.dash.fileutils;
 
 import android.content.Context;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.utils.Constants;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataClient;
-import com.google.android.gms.wearable.Wearable;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by RaghuTeja on 10/23/17.

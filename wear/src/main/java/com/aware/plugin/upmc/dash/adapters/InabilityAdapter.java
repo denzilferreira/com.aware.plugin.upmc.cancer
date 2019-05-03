@@ -1,6 +1,6 @@
 package com.aware.plugin.upmc.dash.adapters;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;

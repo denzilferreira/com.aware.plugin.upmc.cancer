@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,8 +30,8 @@ public class NotificationResponseActivity extends AppCompatActivity {
     private Button submitButton;
     private boolean isOtherChecked;
     public int CHECKBOX_IDS[] = {R.id.busy_checkbox, R.id.pain_checkbox, R.id.nausea_checkbox,
-    R.id.tired_checkbox};
-    public int OHTER_CHECKBOX_ID =  R.id.other_checkbox;
+            R.id.tired_checkbox};
+    public int OHTER_CHECKBOX_ID = R.id.other_checkbox;
 
 
     @Override
@@ -140,9 +142,9 @@ public class NotificationResponseActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
 
 
-                for(int id: CHECKBOX_IDS) {
+                for (int id : CHECKBOX_IDS) {
                     CheckBox box = findViewById(id);
-                    if(box.isChecked())
+                    if (box.isChecked())
                         sb.append(1);
                     else
                         sb.append(0);
@@ -151,14 +153,11 @@ public class NotificationResponseActivity extends AppCompatActivity {
                 CheckBox other_box = findViewById(OHTER_CHECKBOX_ID);
 
 
-                if(other_box.isChecked()) {
+                if (other_box.isChecked()) {
                     sb.append(1);
                     sb.append(editText.getText().toString());
-                }
-                else
+                } else
                     sb.append(0);
-
-
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                     startForegroundService(new Intent(getApplicationContext(), FitbitMessageService.class).setAction(action).putExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY, sb.toString()));
