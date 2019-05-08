@@ -26,7 +26,7 @@ public class Provider extends ContentProvider {
 
     //Add here your database table names, as many as you need
     public static final String[] DATABASE_TABLES = {
-            "upmc_dash",
+            "upmc_dash_surveys",
             "upmc_dash_stepcount",
             "upmc_dash_interventions",
             "upmc_dash_responses",
@@ -55,17 +55,11 @@ public class Provider extends ContentProvider {
     }
 
     public static final class Symptom_Data implements AWAREColumns {
-        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash");
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_surveys");
         static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash";
         static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash";
         static final String TO_BED = "to_bed";
         static final String FROM_BED = "from_bed";
-        static final String SCORE_SLEEP = "score_sleep";
-        static final String SCORE_STRESS = "score_stress";
-        static final String SCORE_ANGRY = "score_angry";
-        static final String SCORE_HAPPY = "score_happy";
-        static final String SCORE_MOST_STRESS = "score_most_stress";
-        static final String MOST_STRESS_LABEL = "most_stress_label";
         static final String SCORE_PAIN = "score_pain";
         static final String SCORE_FATIGUE = "score_fatigue";
         static final String SCORE_SLEEP_DISTURBANCE = "score_sleep_dist";
@@ -142,12 +136,6 @@ public class Provider extends ContentProvider {
                     Symptom_Data.DEVICE_ID + " text default ''," +
                     Symptom_Data.TO_BED + " text default ''," +
                     Symptom_Data.FROM_BED + " text default ''," +
-                    Symptom_Data.SCORE_SLEEP + " text default ''," +
-                    Symptom_Data.SCORE_STRESS + " text default ''," +
-                    Symptom_Data.SCORE_ANGRY + " text default ''," +
-                    Symptom_Data.SCORE_HAPPY + " text default ''," +
-                    Symptom_Data.SCORE_MOST_STRESS + " text default ''," +
-                    Symptom_Data.MOST_STRESS_LABEL + " text default ''," +
                     Symptom_Data.SCORE_PAIN + " text default ''," +
                     Symptom_Data.SCORE_FATIGUE + " text default ''," +
                     Symptom_Data.SCORE_SLEEP_DISTURBANCE + " text default ''," +
@@ -245,12 +233,6 @@ public class Provider extends ContentProvider {
         surveyMap.put(Symptom_Data.DEVICE_ID, Symptom_Data.DEVICE_ID);
         surveyMap.put(Symptom_Data.TO_BED, Symptom_Data.TO_BED);
         surveyMap.put(Symptom_Data.FROM_BED, Symptom_Data.FROM_BED);
-        surveyMap.put(Symptom_Data.SCORE_SLEEP, Symptom_Data.SCORE_SLEEP);
-        surveyMap.put(Symptom_Data.SCORE_STRESS, Symptom_Data.SCORE_STRESS);
-        surveyMap.put(Symptom_Data.SCORE_ANGRY, Symptom_Data.SCORE_ANGRY);
-        surveyMap.put(Symptom_Data.SCORE_HAPPY, Symptom_Data.SCORE_HAPPY);
-        surveyMap.put(Symptom_Data.SCORE_MOST_STRESS, Symptom_Data.SCORE_MOST_STRESS);
-        surveyMap.put(Symptom_Data.MOST_STRESS_LABEL, Symptom_Data.MOST_STRESS_LABEL);
         surveyMap.put(Symptom_Data.SCORE_PAIN, Symptom_Data.SCORE_PAIN);
         surveyMap.put(Symptom_Data.SCORE_FATIGUE, Symptom_Data.SCORE_FATIGUE);
         surveyMap.put(Symptom_Data.SCORE_SLEEP_DISTURBANCE, Symptom_Data.SCORE_SLEEP_DISTURBANCE);

@@ -20,32 +20,28 @@ public class Plugin extends Aware_Plugin {
 
     public static final String ACTION_CANCER_SURVEY = "ACTION_CANCER_SURVEY";
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        AUTHORITY = Provider.getAuthority(getApplicationContext());
-
-        TAG = "UPMC Cancer";
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            REQUIRED_PERMISSIONS.add(Manifest.permission.BODY_SENSORS);
+    public static Float symptomAvg(Context c) {
+        Float todays_symptoms;
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        Cursor symptoms = c.getContentResolver().query(Provider.Symptom_Data.CONTENT_URI,
+                new String[]{
+                        "AVG(" + Provider.Symptom_Data.SCORE_FATIGUE + "+" + Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE + "+" + Provider.Symptom_Data.SCORE_CONCENTRATING + "+" + Provider.Symptom_Data.SCORE_SAD + "+" + Provider.Symptom_Data.SCORE_ANXIOUS + "+" + Provider.Symptom_Data.SCORE_SHORT_BREATH + "+" + Provider.Symptom_Data.SCORE_NUMBNESS + "+" + Provider.Symptom_Data.SCORE_NAUSEA + "+" + Provider.Symptom_Data.SCORE_DIARRHEA + "+" + Provider.Symptom_Data.SCORE_OTHER + ") as avg_symptoms"},
+                Provider.Symptom_Data.TIMESTAMP + " >= " + today
+                        .getTimeInMillis() + " " + "AND " + Provider.Symptom_Data.SCORE_FATIGUE + ">=0 AND " + Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE + ">=0 AND " + Provider.Symptom_Data.SCORE_CONCENTRATING + ">=0 AND " + Provider.Symptom_Data.SCORE_SAD + ">=0 AND " + Provider.Symptom_Data.SCORE_ANXIOUS + ">=0 AND " + Provider.Symptom_Data.SCORE_SHORT_BREATH + ">=0 AND " + Provider.Symptom_Data.SCORE_NUMBNESS + ">=0 AND " + Provider.Symptom_Data.SCORE_NAUSEA + ">=0 AND " + Provider.Symptom_Data.SCORE_DIARRHEA + ">=0 AND " + Provider.Symptom_Data.SCORE_OTHER + ">=0",
+                null, null);
+        if (symptoms != null && symptoms.moveToFirst()) {
+            todays_symptoms = symptoms.getFloat(0);
+        } else {
+            return null;
         }
-        REQUIRED_PERMISSIONS.add(Manifest.permission.VIBRATE);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH_ADMIN);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.WAKE_LOCK);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        //these are needed for the sync adapter to work...
-        REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_SYNC_SETTINGS);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_SETTINGS);
-        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_STATS);
+        if (!symptoms.isClosed())
+            symptoms.close();
+        return todays_symptoms;
     }
-
 //    public static class SurveyListener extends BroadcastReceiver {
 //        @Override
 //        public void onReceive(Context context, Intent intent) {
@@ -56,6 +52,49 @@ public class Plugin extends Aware_Plugin {
 //        }
 //    }
 
+    public static Integer walkingPromptsCount(Context c) {
+//        Integer todays_count;
+//
+//        Calendar today = Calendar.getInstance();
+//        today.set(Calendar.HOUR_OF_DAY, 0);
+//        today.set(Calendar.MINUTE, 0);
+//        today.set(Calendar.SECOND, 0);
+//        today.set(Calendar.MILLISECOND, 0);
+//
+//        Cursor todayPrompts = c.getContentResolver().query(Provider.Motivational_Data
+//        .CONTENT_URI, new String[]{"count(*) as total_count"}, Provider.Motivational_Data
+//        .TIMESTAMP + " >= " + today.getTimeInMillis(), null, null);
+//        if (todayPrompts != null && todayPrompts.moveToFirst()) {
+//            todays_count = todayPrompts.getInt(0);
+//        } else {
+//            return null;
+//        }
+//        if (!todayPrompts.isClosed()) todayPrompts.close();
+        return 0;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        AUTHORITY = Provider.getAuthority(getApplicationContext());
+        TAG = "UPMC Cancer";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            REQUIRED_PERMISSIONS.add(Manifest.permission.BODY_SENSORS);
+        }
+        REQUIRED_PERMISSIONS.add(Manifest.permission.VIBRATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH_ADMIN);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WAKE_LOCK);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        //these are needed for the sync adapter to work...
+        REQUIRED_PERMISSIONS.add(Manifest.permission.GET_ACCOUNTS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_SYNC_SETTINGS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_SETTINGS);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_SYNC_STATS);
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -65,20 +104,26 @@ public class Plugin extends Aware_Plugin {
 //
 //            Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
 //            try {
-//                if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length() == 0)
+//                if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR).length()
+//                == 0)
 //                    Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR, 9);
 //
-//                if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() == 0)
+//                if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length()
+//                == 0)
 //                    Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, 0);
 //
-//                int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-//                int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-//                Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), "cancer_survey_morning");
+//                int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings
+//                .PLUGIN_UPMC_CANCER_MORNING_HOUR));
+//                int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings
+//                .PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+//                Scheduler.Schedule currentScheduler = Scheduler.getSchedule
+//                (getApplicationContext(), "cancer_survey_morning");
 //                Log.d(Constants.TAG, "Plugin:onStartCommand:schedule");
 //                if (currentScheduler == null) {
 //                    Log.d(Constants.TAG, "Plugin:onStartCommand:schedule");
 //                    String className = MessageService.class.getName();
-//                    if(Settings.readDeviceType(getApplicationContext()).equals(Constants.DEVICE_TYPE_FITBIT))
+//                    if(Settings.readDeviceType(getApplicationContext()).equals(Constants
+//                    .DEVICE_TYPE_FITBIT))
 //                        className = FitbitMessageService.class.getName();
 //                    Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
 //                    schedule.addHour(morning_hour)
@@ -106,10 +151,13 @@ public class Plugin extends Aware_Plugin {
 //                    }
 //                    if (hour_changed || minute_changed) {
 //                        String className = MessageService.class.getName();
-//                        if(Settings.readDeviceType(getApplicationContext()).equals(Constants.DEVICE_TYPE_FITBIT))
+//                        if(Settings.readDeviceType(getApplicationContext()).equals(Constants
+//                        .DEVICE_TYPE_FITBIT))
 //                            className = FitbitMessageService.class.getName();
-//                        Scheduler.removeSchedule(getApplicationContext(), "cancer_survey_morning");
-//                        Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
+//                        Scheduler.removeSchedule(getApplicationContext(),
+//                        "cancer_survey_morning");
+//                        Scheduler.Schedule schedule = new Scheduler.Schedule
+//                        ("cancer_survey_morning");
 //                        schedule.addHour(morning_hour)
 //                                .addMinute(morning_minute)
 //                                .setActionClass(className)
@@ -125,7 +173,8 @@ public class Plugin extends Aware_Plugin {
 //            if (Aware.isStudy(getApplicationContext())) {
 //                Account aware_account = Aware.getAWAREAccount(getApplicationContext());
 //                String authority = Provider.getAuthority(getApplicationContext());
-//                long frequency = Long.parseLong(Aware.getSetting(getApplicationContext(), Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
+//                long frequency = Long.parseLong(Aware.getSetting(getApplicationContext(),
+//                Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
 //
 //                ContentResolver.setIsSyncable(aware_account, authority, 1);
 //                ContentResolver.setSyncAutomatically(aware_account, authority, true);
@@ -142,108 +191,49 @@ public class Plugin extends Aware_Plugin {
         return START_STICKY;
     }
 
-    public static class SyncReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Aware.ACTION_AWARE_SYNC_DATA)) {
-                Bundle sync = new Bundle();
-                sync.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                sync.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                ContentResolver.requestSync(Aware.getAWAREAccount(context), Provider.getAuthority(context), sync);
-            }
-        }
-    }
-
-    public static Float symptomAvg(Context c) {
-
-        Float todays_symptoms;
-
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        Cursor symptoms = c.getContentResolver().query(Provider.Symptom_Data.CONTENT_URI, new String[]{
-                        "AVG(" +
-                                Provider.Symptom_Data.SCORE_PAIN + "+" +
-                                Provider.Symptom_Data.SCORE_FATIGUE + "+" +
-                                Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE + "+" +
-                                Provider.Symptom_Data.SCORE_CONCENTRATING + "+" +
-                                Provider.Symptom_Data.SCORE_SAD + "+" +
-                                Provider.Symptom_Data.SCORE_ANXIOUS + "+" +
-                                Provider.Symptom_Data.SCORE_SHORT_BREATH + "+" +
-                                Provider.Symptom_Data.SCORE_NUMBNESS + "+" +
-                                Provider.Symptom_Data.SCORE_NAUSEA + "+" +
-                                Provider.Symptom_Data.SCORE_DIARRHEA + "+" +
-                                Provider.Symptom_Data.SCORE_OTHER + ") as avg_symptoms"
-                }, Provider.Symptom_Data.TIMESTAMP + " >= " + today.getTimeInMillis() + " AND " +
-                        Provider.Symptom_Data.SCORE_PAIN + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_FATIGUE + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_SLEEP_DISTURBANCE + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_CONCENTRATING + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_SAD + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_ANXIOUS + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_SHORT_BREATH + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_NUMBNESS + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_NAUSEA + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_DIARRHEA + ">=0 AND " +
-                        Provider.Symptom_Data.SCORE_OTHER + ">=0"
-                , null, null);
-        if (symptoms != null && symptoms.moveToFirst()) {
-            todays_symptoms = symptoms.getFloat(0);
-        } else {
-            return null;
-        }
-        if (!symptoms.isClosed()) symptoms.close();
-
-        return todays_symptoms;
-    }
-
-    public static Integer walkingPromptsCount(Context c) {
-//        Integer todays_count;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        ContentResolver.removePeriodicSync(
+//                Aware.getAWAREAccount(getApplicationContext()),
+//                Provider.getAuthority(getApplicationContext()),
+//                Bundle.EMPTY
+//        );
 //
-//        Calendar today = Calendar.getInstance();
-//        today.set(Calendar.HOUR_OF_DAY, 0);
-//        today.set(Calendar.MINUTE, 0);
-//        today.set(Calendar.SECOND, 0);
-//        today.set(Calendar.MILLISECOND, 0);
-//
-//        Cursor todayPrompts = c.getContentResolver().query(Provider.Motivational_Data.CONTENT_URI, new String[]{"count(*) as total_count"}, Provider.Motivational_Data.TIMESTAMP + " >= " + today.getTimeInMillis(), null, null);
-//        if (todayPrompts != null && todayPrompts.moveToFirst()) {
-//            todays_count = todayPrompts.getInt(0);
-//        } else {
-//            return null;
-//        }
-//        if (!todayPrompts.isClosed()) todayPrompts.close();
-        return 0;
+//        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, false);
+//        Aware.stopAWARE(this);
     }
-
 //    public static class FitbitAnalyser extends BroadcastReceiver {
 //        @Override
 //        public void onReceive(Context context, Intent intent) {
-//            if (intent.getAction().equalsIgnoreCase(com.aware.plugin.fitbit.Plugin.ACTION_AWARE_PLUGIN_FITBIT)) {
+//            if (intent.getAction().equalsIgnoreCase(com.aware.plugin.fitbit.Plugin
+//            .ACTION_AWARE_PLUGIN_FITBIT)) {
 //                Integer walks = walkingPromptsCount(context);
 //                if (walks != null && walks <= 4) {
-//                    int last_3h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_3H, 1000);
-//                    int last_5h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin.EXTRA_LAST_5H, 1000);
+//                    int last_3h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin
+//                    .EXTRA_LAST_3H, 1000);
+//                    int last_5h = intent.getIntExtra(com.aware.plugin.fitbit.Plugin
+//                    .EXTRA_LAST_5H, 1000);
 //                    Float symptoms_today = symptomAvg(context);
 //
 //                    if (symptoms_today != null && last_3h < 50 && symptoms_today < 7) {
 //                        Intent walking = new Intent(context, UPMC_Motivation.class);
-//                        walking.putExtra("question_type", 1); //< 50 steps in past 3h, all symptoms < 7
-//                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        walking.putExtra("question_type", 1); //< 50 steps in past 3h, all
+//                        symptoms < 7
+//                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent
+//                        .FLAG_ACTIVITY_CLEAR_TOP);
 //                        notifyUser(context, walking);
 //                    } else if (symptoms_today != null && last_5h < 50 && symptoms_today >= 7) {
 //                        Intent walking = new Intent(context, UPMC_Motivation.class);
-//                        walking.putExtra("question_type", 2); //< 50 steps in past 5h, any symptoms >= 7
-//                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        walking.putExtra("question_type", 2); //< 50 steps in past 5h, any
+//                        symptoms >= 7
+//                        walking.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent
+//                        .FLAG_ACTIVITY_CLEAR_TOP);
 //                        notifyUser(context, walking);
 //                    }
 //                }
 //            }
 //        }
-
 //        private void notifyUser(Context context, Intent walk_condition) {
 //            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
 //            mBuilder.setSmallIcon( R.drawable.ic_stat_fitbit );
@@ -253,25 +243,27 @@ public class Plugin extends Aware_Plugin {
 //            mBuilder.setOnlyAlertOnce( true );
 //            mBuilder.setAutoCancel( true );
 //
-//            PendingIntent onclick = PendingIntent.getActivity(context, 0, walk_condition, PendingIntent.FLAG_UPDATE_CURRENT);
+//            PendingIntent onclick = PendingIntent.getActivity(context, 0, walk_condition,
+//            PendingIntent.FLAG_UPDATE_CURRENT);
 //            mBuilder.setContentIntent(onclick);
 //
-//            NotificationManager notManager = (NotificationManager) context.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+//            NotificationManager notManager = (NotificationManager) context
+//            .getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 //            notManager.notify(677, mBuilder.build());
 //        }
 //    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-//        ContentResolver.removePeriodicSync(
-//                Aware.getAWAREAccount(getApplicationContext()),
-//                Provider.getAuthority(getApplicationContext()),
-//                Bundle.EMPTY
-//        );
-//
-//        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, false);
-//        Aware.stopAWARE(this);
+    public static class SyncReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Aware.ACTION_AWARE_SYNC_DATA)) {
+                Bundle sync = new Bundle();
+                sync.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                sync.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                ContentResolver
+                        .requestSync(Aware.getAWAREAccount(context), Provider.getAuthority(context),
+                                sync);
+            }
+        }
     }
 }
