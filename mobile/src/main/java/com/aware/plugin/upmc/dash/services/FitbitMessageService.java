@@ -101,7 +101,8 @@ public class FitbitMessageService extends Service {
                     Log.d(TAG, "FitbitMessageService:BluetoothReceiver:StateOff");
                     notifySetup(Constants.FAILED_WEAR_BLUETOOTH);
                     if (!enableBluetoothIfOff())
-                        Toast.makeText(getApplicationContext(), "Bluetooth Error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Bluetooth Error",
+                                Toast.LENGTH_SHORT).show();
                     break;
                 case BluetoothAdapter.STATE_TURNING_OFF:
                     Log.d(TAG, "FitbitMessageService:BluetoothReceiver:StateTurningOff");
@@ -136,7 +137,6 @@ public class FitbitMessageService extends Service {
                 case ConnectivityManager.TYPE_ETHERNET:
                     Log.d(TAG, "mConnecti vityReceiver: ether");
                     break;
-
                 case ConnectivityManager.TYPE_MOBILE:
                     Log.d(TAG, "mConnectivityReceiver: mob");
                     break;
@@ -152,7 +152,8 @@ public class FitbitMessageService extends Service {
         context.sendBroadcast(intent);
     }
 
-    public static void lighttpdAddHost(Context context, String tag, String hostname, String port, String rootDir) {
+    public static void lighttpdAddHost(Context context, String tag, String hostname, String port,
+                                       String rootDir) {
         Intent intent = new Intent();
         intent.setAction(LIGHTTPD_ADD_HOST);
         intent.putExtra(TAG_KEY, tag);
@@ -177,7 +178,8 @@ public class FitbitMessageService extends Service {
         stopForeground(true);
         unregisterReceiver(mBluetootLocalReceiver);
         unregisterReceiver(mConnectivityReceiver);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert mNotificationManager != null;
         mNotificationManager.cancelAll();
         stopSelf();
@@ -192,16 +194,19 @@ public class FitbitMessageService extends Service {
     public void enableWifiIfOff() {
         WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         assert wifiManager != null;
-        if (!wifiManager.isWifiEnabled()) wifiManager.setWifiEnabled(true);
+        if (!wifiManager.isWifiEnabled())
+            wifiManager.setWifiEnabled(true);
     }
 
     public boolean enableBluetoothIfOff() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
             boolean isEnabled = bluetoothAdapter.isEnabled();
-            if (!isEnabled) return bluetoothAdapter.enable();
+            if (!isEnabled)
+                return bluetoothAdapter.enable();
             return true;
-        } else return false;
+        } else
+            return false;
     }
 
     @Override
@@ -213,8 +218,10 @@ public class FitbitMessageService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         final int i = super.onStartCommand(intent, flags, startId);
         String intentAction = null;
-        if (intent != null) intentAction = intent.getAction();
-        if (intentAction == null) return i;
+        if (intent != null)
+            intentAction = intent.getAction();
+        if (intentAction == null)
+            return i;
         Log.d(TAG, "FitbitMessageService: onStartCommand " + intentAction);
         switch (intentAction) {
             case Constants.ACTION_REBOOT:
@@ -321,18 +328,20 @@ public class FitbitMessageService extends Service {
                 break;
             case Constants.ACTION_DO_NOT_DISTURB:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-                String mode = Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE);
-                new PostData().execute(TABLE_COMMAND, mode.equals(Constants.DND_MODE_ON) ? Constants.DO_NOT_DISTURB_COMMAND : Constants.REMOVE_DO_NOT_DISTURB);
+                String mode = Aware.getSetting(getApplicationContext(),
+                        Settings.PLUGIN_UPMC_CANCER_DND_MODE);
+                new PostData().execute(TABLE_COMMAND, mode.equals(
+                        Constants.DND_MODE_ON) ? Constants.DO_NOT_DISTURB_COMMAND :
+                        Constants.REMOVE_DO_NOT_DISTURB);
                 break;
-
-            case Constants.ACTION_TEST:
+            case Constants.ACTION_TEST1:
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
-
-//                notifyUserWithInactivity(getApplicationContext(), true, "sample");
-//                new FakeData().execute();
-
+                new FakeData().execute();
                 break;
-
+            case Constants.ACTION_TEST2:
+                Log.d("yiyi", "FitbitMessageService:" + intentAction);
+                enqueueOneTimeDBWorker();
+                break;
             default:
                 return i;
         }
@@ -340,24 +349,29 @@ public class FitbitMessageService extends Service {
     }
 
     private void enqueueOneTimeDBWorker() {
-        OneTimeWorkRequest localDbWorker = new OneTimeWorkRequest.Builder(LocalDBWorker.class).setInitialDelay(1, TimeUnit.MINUTES).build();
+        OneTimeWorkRequest localDbWorker = new OneTimeWorkRequest.Builder(LocalDBWorker.class)
+                .setInitialDelay(1, TimeUnit.MINUTES).build();
         WorkManager.getInstance().enqueue(localDbWorker);
     }
 
     private void setShowMorningSetting(boolean b) {
-        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SHOW_MORNING, b ? Constants.SHOW_MORNING_SURVEY : Constants.SHOW_NORMAL_SURVEY);
+        Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_SHOW_MORNING,
+                b ? Constants.SHOW_MORNING_SURVEY : Constants.SHOW_NORMAL_SURVEY);
     }
 
     public void forceDndOffIfNeeded() {
-        if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE).equalsIgnoreCase(Constants.DND_MODE_ON)) {
-            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE, Constants.DND_MODE_OFF);
+        if (Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE)
+                .equalsIgnoreCase(Constants.DND_MODE_ON)) {
+            Aware.setSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_DND_MODE,
+                    Constants.DND_MODE_OFF);
             saveDndAction(Constants.DND_MODE_OFF, Constants.DND_TOGGLE_AUTO);
         }
     }
 
     public void saveDndAction(String mode, int toggled_by) {
         ContentValues response = new ContentValues();
-        response.put(Provider.Dnd_Toggle.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        response.put(Provider.Dnd_Toggle.DEVICE_ID,
+                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         response.put(Provider.Dnd_Toggle.TIMESTAMP, System.currentTimeMillis());
         response.put(Provider.Dnd_Toggle.TOGGLE_POS, mode.equals(Constants.DND_MODE_ON) ? 1 : 0);
         response.put(Provider.Dnd_Toggle.TOGGLED_BY, toggled_by);
@@ -372,7 +386,8 @@ public class FitbitMessageService extends Service {
         String resp = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
         char[] resp_array = resp.toCharArray();
         ContentValues response = new ContentValues();
-        response.put(Provider.Notification_Responses.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        response.put(Provider.Notification_Responses.DEVICE_ID,
+                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
         response.put(Provider.Notification_Responses.NOTIF_ID, session_id);
         response.put(Provider.Notification_Responses.NOTIF_TYPE, Constants.NOTIF_TYPE_INACTIVITY);
@@ -380,11 +395,16 @@ public class FitbitMessageService extends Service {
         response.put(Provider.Notification_Responses.RESP_OK, 0);
         response.put(Provider.Notification_Responses.RESP_NO, 1);
         response.put(Provider.Notification_Responses.RESP_SNOOZE, 0);
-        response.put(Provider.Notification_Responses.RESP_BUSY, Integer.parseInt("" + resp_array[0]));
-        response.put(Provider.Notification_Responses.RESP_PAIN, Integer.parseInt("" + resp_array[1]));
-        response.put(Provider.Notification_Responses.RESP_NAUSEA, Integer.parseInt("" + resp_array[2]));
-        response.put(Provider.Notification_Responses.RESP_TIRED, Integer.parseInt("" + resp_array[3]));
-        response.put(Provider.Notification_Responses.RESP_OTHER, Integer.parseInt("" + resp_array[4]));
+        response.put(Provider.Notification_Responses.RESP_BUSY,
+                Integer.parseInt("" + resp_array[0]));
+        response.put(Provider.Notification_Responses.RESP_PAIN,
+                Integer.parseInt("" + resp_array[1]));
+        response.put(Provider.Notification_Responses.RESP_NAUSEA,
+                Integer.parseInt("" + resp_array[2]));
+        response.put(Provider.Notification_Responses.RESP_TIRED,
+                Integer.parseInt("" + resp_array[3]));
+        response.put(Provider.Notification_Responses.RESP_OTHER,
+                Integer.parseInt("" + resp_array[4]));
         response.put(Provider.Notification_Responses.RESP_OTHER_SYMP, resp.substring(5));
         getContentResolver().insert(Provider.Notification_Responses.CONTENT_URI, response);
 
@@ -393,14 +413,15 @@ public class FitbitMessageService extends Service {
     public void saveResponseForOther(boolean ok) {
         Log.d(Constants.TAG, "FitbitMessageService:saveResponseForOther");
         ContentValues response = new ContentValues();
-        response.put(Provider.Notification_Responses.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        response.put(Provider.Notification_Responses.DEVICE_ID,
+                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
         response.put(Provider.Notification_Responses.NOTIF_ID, session_id);
         response.put(Provider.Notification_Responses.NOTIF_TYPE, Constants.NOTIF_TYPE_INACTIVITY);
         response.put(Provider.Notification_Responses.NOTIF_DEVICE, Constants.NOTIF_DEVICE_PHONE);
         response.put(Provider.Notification_Responses.RESP_OK, ok ? 1 : 0);
-        response.put(Provider.Notification_Responses.RESP_NO, ok ? 0 : 1);
-        response.put(Provider.Notification_Responses.RESP_SNOOZE, 0);
+        response.put(Provider.Notification_Responses.RESP_NO, 0);
+        response.put(Provider.Notification_Responses.RESP_SNOOZE, ok ? 0 : 1);
         response.put(Provider.Notification_Responses.RESP_BUSY, 0);
         response.put(Provider.Notification_Responses.RESP_PAIN, 0);
         response.put(Provider.Notification_Responses.RESP_NAUSEA, 0);
@@ -415,13 +436,23 @@ public class FitbitMessageService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             surveyNotifBuilder = new Notification.Builder(this, Constants.SELF_REPORT_CHNL_ID);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-            surveyNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(Constants.SELF_REPORT_TITLE).setGroup("Survey").setContentText(Constants.SELF_REPORT_CONTENT).setContentIntent(dashPendingIntent);
+            surveyNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle(Constants.SELF_REPORT_TITLE).setGroup("Survey")
+                    .setContentText(Constants.SELF_REPORT_CONTENT)
+                    .setContentIntent(dashPendingIntent);
             startForeground(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
 
         } else {
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-            surveyCompatNotifBuilder = new NotificationCompat.Builder(this, Constants.SELF_REPORT_CHNL_ID);
-            surveyCompatNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(Constants.SELF_REPORT_TITLE).setContentText(Constants.SELF_REPORT_CONTENT).setPriority(NotificationCompat.PRIORITY_HIGH).setGroup("Survey").setContentInfo("Survey Notification").setContentIntent(dashPendingIntent);
+            surveyCompatNotifBuilder =
+                    new NotificationCompat.Builder(this, Constants.SELF_REPORT_CHNL_ID);
+            surveyCompatNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle(Constants.SELF_REPORT_TITLE)
+                    .setContentText(Constants.SELF_REPORT_CONTENT)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH).setGroup("Survey")
+                    .setContentInfo("Survey Notification").setContentIntent(dashPendingIntent);
             startForeground(Constants.SURVEY_NOTIF_ID, surveyCompatNotifBuilder.build());
         }
     }
@@ -429,17 +460,28 @@ public class FitbitMessageService extends Service {
     private void showFitbitNotif() {
         final Intent dashIntent = new Intent(this, FitbitMessageService.class);
         dashIntent.setAction(Constants.ACTION_CHECK_CONN);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setupNotifBuilder = new Notification.Builder(this, Constants.FITBIT_STATUS_CHNL_ID);
-            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
-            setupNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(CONTENT_TITLE_FITBIT).setContentText(Constants.CONN_STATUS).setGroup("Setup").setOngoing(true).setContentIntent(dashPendingIntent);
+            PendingIntent dashPendingIntent =
+                    PendingIntent.getForegroundService(this, 0, dashIntent, 0);
+            setupNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle(CONTENT_TITLE_FITBIT).setContentText(Constants.CONN_STATUS)
+                    .setGroup("Setup").setOngoing(true).setContentIntent(dashPendingIntent);
             assert notificationManager != null;
             notificationManager.notify(2, setupNotifBuilder.build());
         } else {
             PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
-            setupNotifCompatBuilder = new NotificationCompat.Builder(this, Constants.FITBIT_STATUS_CHNL_ID);
-            setupNotifCompatBuilder.setAutoCancel(false).setOngoing(true).setGroup("Setup").setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(CONTENT_TITLE_FITBIT).setContentText(Constants.CONN_STATUS).setPriority(NotificationCompat.PRIORITY_HIGH).setContentInfo("info").setContentIntent(dashPendingIntent);
+            setupNotifCompatBuilder =
+                    new NotificationCompat.Builder(this, Constants.FITBIT_STATUS_CHNL_ID);
+            setupNotifCompatBuilder.setAutoCancel(false).setOngoing(true).setGroup("Setup")
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle(CONTENT_TITLE_FITBIT).setContentText(Constants.CONN_STATUS)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH).setContentInfo("info")
+                    .setContentIntent(dashPendingIntent);
             assert notificationManager != null;
             notificationManager.notify(2, setupNotifCompatBuilder.build());
         }
@@ -448,12 +490,15 @@ public class FitbitMessageService extends Service {
     public void notifySetup(String contentText) {
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         assert pm != null;
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, Constants.WAKELOCK_TAG);
+        PowerManager.WakeLock wl = pm.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                Constants.WAKELOCK_TAG);
         wl.acquire(6000);
         final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         assert vibrator != null;
         vibrator.vibrate(500);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setupNotifBuilder.setContentText(contentText);
             assert notificationManager != null;
@@ -466,19 +511,32 @@ public class FitbitMessageService extends Service {
     }
 
     private void notifySurvey(boolean daily) {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (daily) {
-//            wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
-            final Intent dashIntent = new Intent(this, MainActivity.class).setAction(Constants.ACTION_SHOW_MORNING);
+//            wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants
+//            .DURATION_VIBRATE);
+            final Intent dashIntent =
+                    new Intent(this, MainActivity.class).setAction(Constants.ACTION_SHOW_MORNING);
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 surveyNotifBuilder = new Notification.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
-                surveyNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(Constants.COMPLETE_SURVEY_TITLE).setGroup("Survey").setContentText(Constants.COMPLETE_SURVEY_CONTENT).setContentIntent(dashPendingIntent);
+                surveyNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                        .setContentTitle(Constants.COMPLETE_SURVEY_TITLE).setGroup("Survey")
+                        .setContentText(Constants.COMPLETE_SURVEY_CONTENT)
+                        .setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
             } else {
-                surveyCompatNotifBuilder = new NotificationCompat.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
-                surveyCompatNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(Constants.COMPLETE_SURVEY_TITLE).setContentText(Constants.COMPLETE_SURVEY_CONTENT).setPriority(NotificationCompat.PRIORITY_HIGH).setGroup("Survey").setContentInfo("Survey Notification").setContentIntent(dashPendingIntent);
+                surveyCompatNotifBuilder =
+                        new NotificationCompat.Builder(this, Constants.SURVEY_NOTIF_CHNL_ID);
+                surveyCompatNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                        .setContentTitle(Constants.COMPLETE_SURVEY_TITLE)
+                        .setContentText(Constants.COMPLETE_SURVEY_CONTENT)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH).setGroup("Survey")
+                        .setContentInfo("Survey Notification").setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
             }
@@ -487,14 +545,25 @@ public class FitbitMessageService extends Service {
             PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 surveyNotifBuilder = new Notification.Builder(this, Constants.SELF_REPORT_CHNL_ID);
-                surveyNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(Constants.SELF_REPORT_TITLE).setGroup("Survey").setContentText(Constants.SELF_REPORT_CONTENT).setContentIntent(dashPendingIntent);
+                surveyNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                        .setContentTitle(Constants.SELF_REPORT_TITLE).setGroup("Survey")
+                        .setContentText(Constants.SELF_REPORT_CONTENT)
+                        .setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
                 notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyNotifBuilder.build());
             } else {
-                surveyCompatNotifBuilder = new NotificationCompat.Builder(this, Constants.SELF_REPORT_CHNL_ID);
-                surveyCompatNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle(Constants.SELF_REPORT_TITLE).setContentText(Constants.SELF_REPORT_CONTENT).setPriority(NotificationCompat.PRIORITY_HIGH).setGroup("Survey").setContentInfo("Survey Notification").setContentIntent(dashPendingIntent);
+                surveyCompatNotifBuilder =
+                        new NotificationCompat.Builder(this, Constants.SELF_REPORT_CHNL_ID);
+                surveyCompatNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                        .setContentTitle(Constants.SELF_REPORT_TITLE)
+                        .setContentText(Constants.SELF_REPORT_CONTENT)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH).setGroup("Survey")
+                        .setContentInfo("Survey Notification").setContentIntent(dashPendingIntent);
                 assert notificationManager != null;
-                notificationManager.notify(Constants.SURVEY_NOTIF_ID, surveyCompatNotifBuilder.build());
+                notificationManager
+                        .notify(Constants.SURVEY_NOTIF_ID, surveyCompatNotifBuilder.build());
             }
 
         }
@@ -502,13 +571,17 @@ public class FitbitMessageService extends Service {
 
     public void createInterventionNotifChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(Constants.INTERVENTION_NOTIF_CHNL_ID, Constants.INTERVENTION_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel notificationChannel =
+                    new NotificationChannel(Constants.INTERVENTION_NOTIF_CHNL_ID,
+                            Constants.INTERVENTION_NOTIF_CHNL_NAME,
+                            NotificationManager.IMPORTANCE_HIGH);
             notificationChannel.setDescription(Constants.INTERVENTION_NOTIF_CHNL_DESC);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationChannel.enableVibration(false);
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             assert notificationManager != null;
             notificationManager.createNotificationChannel(notificationChannel);
         }
@@ -516,14 +589,21 @@ public class FitbitMessageService extends Service {
 
     public void createSurveyNotifChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel notificationChannel;
-            notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID, Constants.SURVEY_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel = new NotificationChannel(Constants.SURVEY_NOTIF_CHNL_ID,
+                    Constants.SURVEY_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_HIGH);
             notificationChannel.setDescription(Constants.SURVEY_NOTIF_CHNL_DESC);
             notificationChannel.enableLights(true);
-            notificationChannel.setVibrationPattern(new long[]{0, 800, 100, 800, 100, 800, 100, 800, 100, 800});
-            AudioAttributes audioAttributes = new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
-            notificationChannel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes);
+            notificationChannel.setVibrationPattern(
+                    new long[]{0, 800, 100, 800, 100, 800, 100, 800, 100, 800});
+            AudioAttributes audioAttributes =
+                    new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+            notificationChannel
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                            audioAttributes);
             notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(true);
@@ -534,9 +614,11 @@ public class FitbitMessageService extends Service {
 
     public void createSelfReportNotifChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel notificationChannel;
-            notificationChannel = new NotificationChannel(Constants.SELF_REPORT_CHNL_ID, Constants.SELF_REPORT_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_LOW);
+            notificationChannel = new NotificationChannel(Constants.SELF_REPORT_CHNL_ID,
+                    Constants.SELF_REPORT_NOTIF_CHNL_NAME, NotificationManager.IMPORTANCE_LOW);
             notificationChannel.setDescription(Constants.SELF_REPORT_CHNL_DESC);
             notificationChannel.enableLights(false);
             notificationChannel.enableVibration(false);
@@ -549,9 +631,11 @@ public class FitbitMessageService extends Service {
 
     public void createFitbitStatusNotifChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel notificationChannel;
-            notificationChannel = new NotificationChannel(Constants.FITBIT_STATUS_CHNL_ID, Constants.FITBIT_STATUS_CHNL_NAME, NotificationManager.IMPORTANCE_MIN);
+            notificationChannel = new NotificationChannel(Constants.FITBIT_STATUS_CHNL_ID,
+                    Constants.FITBIT_STATUS_CHNL_NAME, NotificationManager.IMPORTANCE_MIN);
             notificationChannel.setDescription(Constants.FITBIT_STATUS_CHNL_DESC);
             notificationChannel.enableLights(false);
             notificationChannel.enableVibration(false);
@@ -563,33 +647,55 @@ public class FitbitMessageService extends Service {
     }
 
     public void dismissIntervention() {
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(Constants.INTERVENTION_NOTIF_ID);
     }
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption, String session_id) {
         Log.d(TAG, "notifyUserWithInactivity");
-        saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE, snoozeOption ? Constants.SNOOZE_SHOWN : Constants.SNOOZE_NOT_SHOWN);
+        saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE,
+                snoozeOption ? Constants.SNOOZE_SHOWN : Constants.SNOOZE_NOT_SHOWN);
         wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
-        if (snoozeOption) dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
+        if (snoozeOption)
+            dashIntent.setAction(Constants.ACTION_SHOW_SNOOZE);
         PendingIntent dashPendingIntent = PendingIntent.getActivity(this, 0, dashIntent, 0);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
-            monitorNotifBuilder.setAutoCancel(false).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle("UPMC Dash Monitor").setContentText(Constants.NOTIF_INACTIVITY).setOngoing(true).setContentIntent(dashPendingIntent).setTimeoutAfter(INTERVENTION_TIMEOUT);
+            Notification.Builder monitorNotifBuilder =
+                    new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+            monitorNotifBuilder.setAutoCancel(false)
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash Monitor").setContentText(Constants.NOTIF_INACTIVITY)
+                    .setOngoing(true).setContentIntent(dashPendingIntent)
+                    .setTimeoutAfter(INTERVENTION_TIMEOUT);
             assert mNotificationManager != null;
-            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
+            mNotificationManager
+                    .notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
         } else {
-            NotificationCompat.Builder monitorNotifCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle("UPMC Dash Monitor").setContentText(Constants.NOTIF_INACTIVITY).setOngoing(true).setContentIntent(dashPendingIntent).setGroup("Prompt").setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).setPriority(NotificationCompat.PRIORITY_MAX).setTimeoutAfter(INTERVENTION_TIMEOUT);
+            NotificationCompat.Builder monitorNotifCompatBuilder =
+                    new NotificationCompat.Builder(getApplicationContext(),
+                            Constants.INTERVENTION_NOTIF_CHNL_ID)
+                            .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                            .setContentTitle("UPMC Dash Monitor")
+                            .setContentText(Constants.NOTIF_INACTIVITY).setOngoing(true)
+                            .setContentIntent(dashPendingIntent).setGroup("Prompt").setSound(
+                            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                            .setTimeoutAfter(INTERVENTION_TIMEOUT);
             assert mNotificationManager != null;
-            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
+            mNotificationManager
+                    .notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
         }
     }
 
-    public void saveIntervention(String notif_id, int notif_type, int notif_device, int snooze_shown) {
+    public void saveIntervention(String notif_id, int notif_type, int notif_device,
+                                 int snooze_shown) {
         ContentValues intervention = new ContentValues();
-        intervention.put(Provider.Notification_Interventions.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        intervention.put(Provider.Notification_Interventions.DEVICE_ID,
+                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         intervention.put(Provider.Notification_Interventions.TIMESTAMP, System.currentTimeMillis());
         intervention.put(Provider.Notification_Interventions.NOTIF_ID, notif_id);
         intervention.put(Provider.Notification_Interventions.NOTIF_TYPE, notif_type);
@@ -600,29 +706,52 @@ public class FitbitMessageService extends Service {
     }
 
     public void notifyUserWithAppraisal(String session_id) {
-        wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
-        Intent dashIntent = new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_APPRAISAL);
-        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE, Constants.SNOOZE_NOT_SHOWN);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE,
+                Constants.DURATION_VIBRATE);
+        Intent dashIntent =
+                new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_APPRAISAL);
+        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
+                Constants.SNOOZE_NOT_SHOWN);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder monitorNotifBuilder = new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
-            PendingIntent dashPendingIntent = PendingIntent.getForegroundService(this, 0, dashIntent, 0);
-            monitorNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis()).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle("UPMC Dash Monitor").setContentText(Constants.NOTIF_APPRAISAL).setGroup("Prompt").setOngoing(true).setContentIntent(dashPendingIntent).setTimeoutAfter(INTERVENTION_TIMEOUT);
+            Notification.Builder monitorNotifBuilder =
+                    new Notification.Builder(this, Constants.INTERVENTION_NOTIF_CHNL_ID);
+            PendingIntent dashPendingIntent =
+                    PendingIntent.getForegroundService(this, 0, dashIntent, 0);
+            monitorNotifBuilder.setAutoCancel(false).setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .setContentTitle("UPMC Dash Monitor").setContentText(Constants.NOTIF_APPRAISAL)
+                    .setGroup("Prompt").setOngoing(true).setContentIntent(dashPendingIntent)
+                    .setTimeoutAfter(INTERVENTION_TIMEOUT);
             assert mNotificationManager != null;
-            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
+            mNotificationManager
+                    .notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifBuilder.build());
 
         } else {
             PendingIntent dashPendingIntent = PendingIntent.getService(this, 0, dashIntent, 0);
-            NotificationCompat.Builder monitorCompatNotifBuilder = new NotificationCompat.Builder(getApplicationContext(), Constants.INTERVENTION_NOTIF_CHNL_ID).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal).setContentTitle("UPMC Dash Monitor").setContentText(Constants.NOTIF_APPRAISAL).setOngoing(true).setContentIntent(dashPendingIntent).setGroup("Prompt").setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).setPriority(NotificationCompat.PRIORITY_MAX).setTimeoutAfter(INTERVENTION_TIMEOUT);
+            NotificationCompat.Builder monitorCompatNotifBuilder =
+                    new NotificationCompat.Builder(getApplicationContext(),
+                            Constants.INTERVENTION_NOTIF_CHNL_ID)
+                            .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark_normal)
+                            .setContentTitle("UPMC Dash Monitor")
+                            .setContentText(Constants.NOTIF_APPRAISAL).setOngoing(true)
+                            .setContentIntent(dashPendingIntent).setGroup("Prompt").setSound(
+                            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                            .setTimeoutAfter(INTERVENTION_TIMEOUT);
             assert mNotificationManager != null;
-            mNotificationManager.notify(Constants.INTERVENTION_NOTIF_ID, monitorCompatNotifBuilder.build());
+            mNotificationManager
+                    .notify(Constants.INTERVENTION_NOTIF_ID, monitorCompatNotifBuilder.build());
         }
     }
 
     public void wakeUpAndVibrate(Context context, int duration_awake, int duration_vibrate) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         assert pm != null;
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, Constants.WAKELOCK_TAG);
+        PowerManager.WakeLock wl = pm.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                Constants.WAKELOCK_TAG);
         wl.acquire(duration_awake);
         final Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
         long[] pattern = {0, 800, 100, 800, 100, 800, 100, 800, 100, 800};
@@ -633,10 +762,13 @@ public class FitbitMessageService extends Service {
     }
 
     private boolean isAppRunning(String app) {
-        ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningServiceInfo> serviceList = activityManager.getRunningServices(Integer.MAX_VALUE);
+        ActivityManager activityManager =
+                (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> serviceList =
+                activityManager.getRunningServices(Integer.MAX_VALUE);
         for (ActivityManager.RunningServiceInfo service : serviceList) {
-            if (service.process.equals(app)) return true;
+            if (service.process.equals(app))
+                return true;
         }
         return false;
     }
@@ -650,7 +782,8 @@ public class FitbitMessageService extends Service {
 
     private void setUpDatabase() {
         lighttpdStart(getApplicationContext(), "start_lighttpd");
-        lighttpdAddHost(getApplicationContext(), "add_host", "localhost", "8001", "/storage/emulated/0/ksweb/tools/phpMyAdmin");
+        lighttpdAddHost(getApplicationContext(), "add_host", "localhost", "8001",
+                "/storage/emulated/0/ksweb/tools/phpMyAdmin");
         new Handler().postDelayed(() -> {
             new CreateDB().execute();
             new Handler().postDelayed(() -> new CreateTables().execute(), 1000);
@@ -664,27 +797,32 @@ public class FitbitMessageService extends Service {
         Intent alarmIntent_min = new Intent(getApplicationContext(), FitbitMessageService.class);
         alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
         int interval = 60 * 1000;
-        PendingIntent alarmPendingIntent_min = PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
+        PendingIntent alarmPendingIntent_min =
+                PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
         assert myAlarmManager != null;
-        myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, alarmPendingIntent_min);
+        myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval,
+                alarmPendingIntent_min);
     }
 
     private void saveTimeSchedule() {
         // Yiyi's code here....
         StringBuilder sb = new StringBuilder();
-        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR))));
-        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE))));
-        Integer evening_hour = Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
-        Integer evening_min = Integer.valueOf(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(),
+                Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR))));
+        sb.append(zeroPad(Integer.valueOf(Aware.getSetting(getApplicationContext(),
+                Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE))));
+        Integer evening_hour = Integer.valueOf(
+                Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        Integer evening_min = Integer.valueOf(Aware.getSetting(getApplicationContext(),
+                Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
         sb.append(zeroPad(evening_hour));
         sb.append(zeroPad(evening_min));
         Log.d(TAG, "time schedule is: " + sb.toString());
         new PostData().execute(TABLE_TS, sb.toString());
-        // now schedule a task to sync sensor data to aware every night after the patient's sleeping time
+        // now schedule a task to sync sensor data to aware every night after the patient's
+        // sleeping time
 //        scheduleTimeForDataSyncing(evening_hour, evening_min);
     }
-
-
 //    public void scheduleTimeForMorningSurvey() {
 //        Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey");
 //        Aware.setSetting(this, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
@@ -697,12 +835,16 @@ public class FitbitMessageService extends Service {
 //            if (Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE).length() == 0)
 //                Aware.setSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE, 0);
 //
-//            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-//            int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-//            Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), "cancer_survey_morning");
+//            int morning_hour = Integer.parseInt(Aware.getSetting(this, Settings
+//            .PLUGIN_UPMC_CANCER_MORNING_HOUR));
+//            int morning_minute = Integer.parseInt(Aware.getSetting(this, Settings
+//            .PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+//            Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext()
+//            , "cancer_survey_morning");
 //            Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
 //            if (currentScheduler == null) {
-//                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
+//                Log.d(Constants.TAG,
+//                "FitbitMessageService:scheduleTimeForMorningSurvey:schedule");
 //
 //                Scheduler.Schedule schedule = new Scheduler.Schedule("cancer_survey_morning");
 //                schedule.addHour(morning_hour)
@@ -713,7 +855,8 @@ public class FitbitMessageService extends Service {
 //                Scheduler.saveSchedule(getApplicationContext(), schedule);
 //                Aware.startScheduler(getApplicationContext()); //apply scheduler
 //            } else {
-//                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:else part");
+//                Log.d(Constants.TAG, "FitbitMessageService:scheduleTimeForMorningSurvey:else
+//                part");
 //                JSONArray hours = currentScheduler.getHours();
 //                JSONArray minutes = currentScheduler.getMinutes();
 //                boolean hour_changed = false;
@@ -746,18 +889,19 @@ public class FitbitMessageService extends Service {
 //            e.printStackTrace();
 //        }
 //    }
-
 //
 //    private void scheduleTimeForDataSyncing(Integer hour, Integer min) {
 //        try {
-//            Scheduler.Schedule data_syncing = Scheduler.getSchedule(getApplicationContext(), "data_syncing");
+//            Scheduler.Schedule data_syncing = Scheduler.getSchedule(getApplicationContext(),
+//            "data_syncing");
 //            if (data_syncing == null) {
 //                data_syncing = new Scheduler.Schedule("data_syncing");
 //                data_syncing.addHour((hour + 1) % 24);
 //                data_syncing.addMinute(min);
 //                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
 //                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
-//                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
+//                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class
+//                .getName());
 //                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
 //            } else if (data_syncing.getHours().getInt(0) != hour
 //                    || data_syncing.getMinutes().getInt(0) != min) {
@@ -767,7 +911,8 @@ public class FitbitMessageService extends Service {
 //                data_syncing.addMinute(min);
 //                data_syncing.setActionType(Scheduler.ACTION_TYPE_SERVICE);
 //                data_syncing.setActionIntentAction(Constants.ACTION_SYNC_DATA);
-//                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class.getName());
+//                data_syncing.setActionClass(getPackageName() + "/" + FitbitMessageService.class
+//                .getName());
 //                Scheduler.saveSchedule(getApplicationContext(), data_syncing);
 //            }
 //            Aware.startScheduler(getApplicationContext()); //apply scheduler
@@ -779,7 +924,8 @@ public class FitbitMessageService extends Service {
 
     public void syncSCWithServer(double timeStamp, int type, int data, String sessionId) {
         ContentValues step_count = new ContentValues();
-        step_count.put(Provider.Stepcount_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        step_count.put(Provider.Stepcount_Data.DEVICE_ID,
+                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
         step_count.put(Provider.Stepcount_Data.TIMESTAMP, timeStamp);
         step_count.put(Provider.Stepcount_Data.STEP_COUNT, data);
         step_count.put(Provider.Stepcount_Data.ALARM_TYPE, type);
@@ -844,11 +990,13 @@ public class FitbitMessageService extends Service {
 //                launchApp(PACKAGE_KSWEB);
             } finally {
                 try {
-                    if (stmt != null) stmt.close();
+                    if (stmt != null)
+                        stmt.close();
                 } catch (SQLException se2) {
                 }
                 try {
-                    if (conn != null) conn.close();
+                    if (conn != null)
+                        conn.close();
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }
@@ -858,8 +1006,6 @@ public class FitbitMessageService extends Service {
     }
 
     private class PostData extends AsyncTask<String, Void, Void> {
-
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -900,14 +1046,13 @@ public class FitbitMessageService extends Service {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (conn != null) conn.close();
+                    if (conn != null)
+                        conn.close();
                     Log.d("yiyi", "PostData success!");
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }//end finally try
             }//end try
-
-
             return null;
 
         }
@@ -971,11 +1116,13 @@ public class FitbitMessageService extends Service {
 //                launchApp(PACKAGE_KSWEB);
             } finally {
                 try {
-                    if (stmt != null) stmt.close();
+                    if (stmt != null)
+                        stmt.close();
                 } catch (SQLException se2) {
                 }
                 try {
-                    if (conn != null) conn.close();
+                    if (conn != null)
+                        conn.close();
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }
@@ -1017,11 +1164,13 @@ public class FitbitMessageService extends Service {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (stmt != null) stmt.close();
+                    if (stmt != null)
+                        stmt.close();
                 } catch (SQLException se2) {
                 }// nothing we can do
                 try {
-                    if (conn != null) conn.close();
+                    if (conn != null)
+                        conn.close();
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }
@@ -1052,21 +1201,36 @@ public class FitbitMessageService extends Service {
                 Class.forName(JDBC_DRIVER);
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
-                String sql = "CREATE TABLE Connection " + "(id int(11) not NULL AUTO_INCREMENT, " + " status int(11) not NULL, " + " PRIMARY KEY ( id ))";
+                String sql =
+                        "CREATE TABLE Connection " + "(id int(11) not NULL AUTO_INCREMENT, " + " "
+                                + "status int(11) not NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE PromptFromWatch " + "(id int(11) not NULL AUTO_INCREMENT, " + " session_id varchar(255) NULL, " + " message varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
+                sql =
+                        "CREATE TABLE PromptFromWatch " + "(id int(11) not NULL AUTO_INCREMENT, " + " session_id varchar(255) NULL, " + " message varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE CommandFromPhone " + "(id int(11) not NULL AUTO_INCREMENT, " + " command varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
+                sql =
+                        "CREATE TABLE CommandFromPhone " + "(id int(11) not NULL AUTO_INCREMENT, "
+                                + " command varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE PatientSurvey " + "(id int(11) not NULL AUTO_INCREMENT, " + " result varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
+                sql =
+                        "CREATE TABLE PatientSurvey " + "(id int(11) not NULL AUTO_INCREMENT, " + " result varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE SensorData " + "(timestamp double not NULL, " + " session_id varchar(255) NULL, " + " type int(11) not NULL, " + " data int(11) not NULL)";
+                sql =
+                        "CREATE TABLE SensorData " + "(timestamp double not NULL, " + " " +
+                                "session_id varchar(255) NULL, " + " type int(11) not NULL, " +
+                                " data int(11) not NULL)";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE TimeSchedule " + "(id int(11) not NULL AUTO_INCREMENT, " + " timeRange varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
+                sql =
+                        "CREATE TABLE TimeSchedule " + "(id int(11) not NULL AUTO_INCREMENT, " +
+                                " timeRange varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE interventions_watch " + "(id int(11) not NULL AUTO_INCREMENT, " + " timestamp double not NULL, " + " session_id varchar(255) NULL, " + " notif_type int NOT NULL, " + " PRIMARY KEY ( id ))";
+                sql =
+                        "CREATE TABLE interventions_watch " + "(id int(11) not NULL " +
+                                "AUTO_INCREMENT, " + " timestamp double not NULL, " + " " +
+                                "session_id varchar(255) NULL, " + " notif_type int NOT NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
-                sql = "CREATE TABLE responses_watch " + "(id int(11) not NULL AUTO_INCREMENT, " + " timestamp double not NULL, " + " session_id varchar(255) NULL, " + " ok int NULL, " + " no int NULL, " + " snooze int NULL, " + " busy int NULL, " + " pain int NULL, " + " nausea int NULL, " + " tired int NULL, " + " other int NULL, " + " PRIMARY KEY ( id ))";
+                sql =
+                        "CREATE TABLE responses_watch " + "(id int(11) not NULL AUTO_INCREMENT, " + " timestamp double not NULL, " + " session_id varchar(255) NULL, " + " ok int NULL, " + " no int NULL, " + " snooze int NULL, " + " busy int NULL, " + " pain int NULL, " + " nausea int NULL, " + " tired int NULL, " + " other int NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 Log.d("yiyi", "Created tables in given database...");
             } catch (SQLException se) {
@@ -1075,11 +1239,13 @@ public class FitbitMessageService extends Service {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (stmt != null) conn.close();
+                    if (stmt != null)
+                        conn.close();
                 } catch (SQLException se) {
                 }
                 try {
-                    if (conn != null) conn.close();
+                    if (conn != null)
+                        conn.close();
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }
@@ -1120,7 +1286,8 @@ public class FitbitMessageService extends Service {
                 sql = "DROP TABLE PromptFromWatch";
                 stmt.executeUpdate(sql);
                 Log.d("yiyi", "Table deleted!!!");
-                sql = "CREATE TABLE PromptFromWatch " + "(id int(11) not NULL AUTO_INCREMENT, " + " session_id varchar(255) NULL, " + " message varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
+                sql =
+                        "CREATE TABLE PromptFromWatch " + "(id int(11) not NULL AUTO_INCREMENT, " + " session_id varchar(255) NULL, " + " message varchar(255) not NULL, " + " PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 Log.d("yiyi", "Reset table in given database...");
             } catch (SQLException se) {
@@ -1129,11 +1296,13 @@ public class FitbitMessageService extends Service {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (stmt != null) conn.close();
+                    if (stmt != null)
+                        conn.close();
                 } catch (SQLException se) {
                 }
                 try {
-                    if (conn != null) conn.close();
+                    if (conn != null)
+                        conn.close();
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }
@@ -1147,7 +1316,6 @@ public class FitbitMessageService extends Service {
 
         @Override
         protected Void doInBackground(String... strings) {
-
             Connection conn = null;
             Statement stmt = null;
             try {
@@ -1171,7 +1339,8 @@ public class FitbitMessageService extends Service {
                 for (int i = 0; i < 100; i++) {
                     StringBuilder sql = new StringBuilder();
                     String timestamp = "" + System.currentTimeMillis();
-                    sql.append("INSERT into interventions_watch(notif_type, session_id, timestamp) VALUES (");
+                    sql.append(
+                            "INSERT into interventions_watch(notif_type, session_id, timestamp) " + "VALUES (");
                     sql.append("1");
                     sql.append(", '1'");
                     sql.append(",").append(Double.valueOf(timestamp)).append(")");
@@ -1181,7 +1350,9 @@ public class FitbitMessageService extends Service {
                 for (int i = 0; i < 100; i++) {
                     StringBuilder sql = new StringBuilder();
                     String timestamp = "" + System.currentTimeMillis();
-                    sql.append("INSERT into responses_watch(busy, nausea, no, ok, other, pain, session_id, snooze, timestamp, tired) VALUES (");
+                    sql.append(
+                            "INSERT into responses_watch(busy, nausea, no, ok, other, pain, " +
+                                    "session_id, snooze, timestamp, tired) VALUES (");
                     sql.append("1");
                     sql.append(", 1");
                     sql.append(", 1");
@@ -1198,7 +1369,6 @@ public class FitbitMessageService extends Service {
                 conn.close();
 
             } catch (Exception e) {
-
             }
             return null;
         }
@@ -1209,7 +1379,6 @@ public class FitbitMessageService extends Service {
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -1243,7 +1412,10 @@ public class FitbitMessageService extends Service {
                 String command = "DROP TABLE SensorData";
                 stmt.executeUpdate(command);
                 Log.d("yiyi", "Table deleted!!!");
-                command = "CREATE TABLE SensorData " + "(timestamp double not NULL, " + " session_id varchar(255) NULL, " + " type int(11) not NULL, " + " data int(11) not NULL)";
+                command =
+                        "CREATE TABLE SensorData " + "(timestamp double not NULL, " + " " +
+                                "session_id varchar(255) NULL, " + " type int(11) not NULL, " +
+                                " data int(11) not NULL)";
                 stmt.executeUpdate(command);
                 Log.d("yiyi", "Reset table SensorData");
                 //Clean-up environment
@@ -1253,11 +1425,13 @@ public class FitbitMessageService extends Service {
             } catch (Exception e) {
             } finally {
                 try {
-                    if (stmt != null) stmt.close();
+                    if (stmt != null)
+                        stmt.close();
                 } catch (SQLException se2) {
                 }
                 try {
-                    if (conn != null) conn.close();
+                    if (conn != null)
+                        conn.close();
                 } catch (SQLException se) {
                     se.printStackTrace();
                 }

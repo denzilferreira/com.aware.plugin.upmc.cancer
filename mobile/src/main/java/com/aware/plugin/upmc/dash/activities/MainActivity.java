@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isRegistered = false;
     private JoinedStudy joinedObserver = new JoinedStudy();
     private boolean SHOW_INCOMPLETE_NOTIF = false;
+    private int easter = 0;
 
     @Override
     protected void onDestroy() {
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(Constants.TAG, "MainActivity:onCreate");
         // Fabric
         Fabric.with(this, new Crashlytics());
+        easter = 0;
     }
 
 
@@ -117,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
             if (daily)
                 sendFitbitMessageServiceAction(Constants.ACTION_SURVEY_COMPLETED);
             Log.d(Constants.TAG, "MainActivity:showSymptomSurvey:submit:" + answer.toString());
-            sendFitbitMessageServiceAction(Constants.ACTION_TEST);
             getContentResolver().insert(Provider.Symptom_Data.CONTENT_URI, answer);
             toastThanks(getApplicationContext());
             finish();
@@ -584,6 +585,16 @@ public class MainActivity extends AppCompatActivity {
         else if (title.equalsIgnoreCase("Dnd2")) {
             Log.d(Constants.TAG, "MainActivity:Do not disturb on");
             showSnoozeAlert(Constants.DND_MODE_OFF, item);
+        } else if (title.equalsIgnoreCase("About")) {
+            Log.d(Constants.TAG, "MainActivity:Easter egg selected");
+            Toast.makeText(getApplicationContext(), "UPMC Dash app", Toast.LENGTH_SHORT).show();
+            easter++;
+            if (easter == 3) {
+                Log.d(Constants.TAG, "Congratulations! You are a developer now!");
+                Intent intent = new Intent(this, EasterEgg.class);
+                startActivity(intent);
+
+            }
         }
         return super.onOptionsItemSelected(item);
     }

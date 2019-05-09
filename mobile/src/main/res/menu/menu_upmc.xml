@@ -30,5 +30,13 @@
         android:title="@string/sync"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/easter_egg"
+        android:icon="@drawable/ic_stat_aware_sync"
+        android:orderInCategory="300"
+        android:title="@string/easter"
+        app:showAsAction="never" />
+
+
 
 </menu>

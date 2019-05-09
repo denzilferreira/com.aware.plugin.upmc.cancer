@@ -31,6 +31,7 @@ public class LocalDBWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        Log.d(Constants.TAG, "LocalDBWorker: Starting work...");
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -38,6 +39,7 @@ public class LocalDBWorker extends Worker {
             Class.forName("com.mysql.jdbc.Driver");
             // 1. Sync Step Count
             //Open a connection
+            int counter = 0;
             Log.d(Constants.TAG, "LocalDBWorker: Connecting to database [SensorData]");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
@@ -51,17 +53,16 @@ public class LocalDBWorker extends Worker {
                 int data = rs.getInt("data");
                 String sessionId = rs.getString("session_id");
                 DBUtils.saveSensor(getApplicationContext(), timeStamp, type, data, sessionId);
+                counter++;
             }
+            Log.d(Constants.TAG, "LocalDBWorker: Synced " + counter + " records [SensorData]");
             // 2. drop step count table
             //After syncing all the data records, clear the table
             String command = "DROP TABLE SensorData";
             stmt.executeUpdate(command);
             Log.d(Constants.TAG, "LocalDBWorker: Dropped table [SensorData]");
-            command = "CREATE TABLE SensorData " +
-                    "(timestamp double not NULL, " +
-                    " session_id varchar(255) NULL, " +
-                    " type int(11) not NULL, " +
-                    " data int(11) not NULL)";
+            command =
+                    "CREATE TABLE SensorData " + "(timestamp double not NULL, " + " session_id " + "varchar(255) NULL, " + " type int(11) not NULL, " + " data int(11) " + "not NULL)";
             stmt.executeUpdate(command);
             Log.d(Constants.TAG, "LocalDBWorker:Reset SensorData table");
             // 3. Sync Interventions Count
@@ -70,6 +71,7 @@ public class LocalDBWorker extends Worker {
             sql.append("SELECT * FROM ");
             sql.append(TABLE_INTERVENTIONS);
             rs = stmt.executeQuery(sql.toString());
+            counter = 0;
             while (rs.next()) {
                 double timeStamp = rs.getDouble("timestamp");
                 int type = rs.getInt("notif_type");
@@ -88,24 +90,24 @@ public class LocalDBWorker extends Worker {
                     Log.d(Constants.TAG, "LocalDBWorker: Corrupt  table [interventions_watch]");
                     return Result.failure();
                 }
-                DBUtils.saveIntervention(getApplicationContext(), timeStamp, session_id, type, Constants.NOTIF_DEVICE_WATCH,
-                        snooze_shown);
+                DBUtils.saveIntervention(getApplicationContext(), timeStamp, session_id, type,
+                        Constants.NOTIF_DEVICE_WATCH, snooze_shown);
+                counter++;
             }
+            Log.d(Constants.TAG,
+                    "LocalDBWorker: Synced " + counter + " records [interventions_watch]");
             // 4. drop interventions table
             command = "DROP TABLE interventions_watch";
             Log.d(Constants.TAG, "LocalDBWorker: Dropping table [interventions_watch]");
             stmt.executeUpdate(command);
-            command = "CREATE TABLE interventions_watch " +
-                    "(id int(11) not NULL AUTO_INCREMENT, " +
-                    " timestamp double not NULL, " +
-                    " session_id varchar(255) NULL, " +
-                    " notif_type int NOT NULL, " +
-                    " PRIMARY KEY ( id ))";
+            command =
+                    "CREATE TABLE interventions_watch " + "(id int(11) not NULL AUTO_INCREMENT, " + " timestamp double not NULL, " + " session_id varchar(255) NULL, " + " notif_type int NOT NULL, " + " PRIMARY KEY ( id ))";
             stmt.executeUpdate(command);
             // 5. Sync responses
             Log.d(Constants.TAG, "LocalDBWorker: Connecting to database [responses_watch]");
             command = "SELECT * FROM responses_watch";
             rs = stmt.executeQuery(command);
+            counter = 0;
             while (rs.next()) {
                 int busy = rs.getInt("busy");
                 int pain = rs.getInt("pain");
@@ -119,24 +121,17 @@ public class LocalDBWorker extends Worker {
                 String sessionId = rs.getString("session_id");
                 DBUtils.saveResponseWatch(getApplicationContext(), timeStamp, sessionId, busy, pain,
                         nausea, tired, other, ok, no, snooze);
+                counter++;
             }
+            Log.d(Constants.TAG, "LocalDBWorker: Synced " + counter + " records [responses_watch]");
             // 6. Drop responses table
             Log.d(Constants.TAG, "LocalDBWorker:Dropping table [responses_watch]");
-            command = "DROP TABLE response_watch";
+            command = "DROP TABLE responses_watch";
             stmt.executeUpdate(command);
-            command = "CREATE TABLE responses_watch " +
-                    "(id int(11) not NULL AUTO_INCREMENT, " +
-                    " timestamp double not NULL, " +
-                    " session_id varchar(255) NULL, " +
-                    " ok int NULL, " +
-                    " no int NULL, " +
-                    " snooze int NULL, " +
-                    " busy int NULL, " +
-                    " pain int NULL, " +
-                    " nausea int NULL, " +
-                    " tired int NULL, " +
-                    " other int NULL, " +
-                    " PRIMARY KEY ( id ))";
+            command =
+                    "CREATE TABLE responses_watch " + "(id int(11) not NULL AUTO_INCREMENT, " +
+                            " timestamp double not NULL, " + " session_id varchar(255) NULL, " +
+                            " ok int NULL, " + " no int NULL, " + " snooze int NULL, " + " busy " + "int NULL, " + " pain int NULL, " + " nausea int NULL, " + " tired " + "int NULL, " + " other int NULL, " + " PRIMARY KEY ( id ))";
             stmt.executeUpdate(command);
             //Clean-up environment
             rs.close();
@@ -163,7 +158,6 @@ public class LocalDBWorker extends Worker {
                 se.printStackTrace();
             }
         }
-
         return Result.success();
     }
 }
