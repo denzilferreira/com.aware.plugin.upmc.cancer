@@ -706,6 +706,9 @@ public class FitbitMessageService extends Service {
     }
 
     public void notifyUserWithAppraisal(String session_id) {
+        Log.d(TAG, "FitbitMessageService:notifyUserWithAppraisal");
+        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
+                Constants.SNOOZE_NOT_SHOWN);
         wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE,
                 Constants.DURATION_VIBRATE);
         Intent dashIntent =
@@ -1081,6 +1084,7 @@ public class FitbitMessageService extends Service {
                 } else if (message.equals(CLOSE_NOTIF)) {
                     dismissIntervention();
                 } else if (message.equals(OTHER)) {
+                    dismissIntervention();
                     // TO DO(Raghu): show up a text input box for specified reasons
                 }
             }
@@ -1324,7 +1328,7 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "Connecting to database to ingest fake sensor data");
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 1000; i++) {
                     // 1. Fake Step Count Data
                     StringBuilder sql = new StringBuilder();
                     String timestamp = "" + System.currentTimeMillis();
