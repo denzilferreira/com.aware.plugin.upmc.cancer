@@ -349,8 +349,9 @@ public class FitbitMessageService extends Service {
     }
 
     private void enqueueOneTimeDBWorker() {
-        OneTimeWorkRequest localDbWorker = new OneTimeWorkRequest.Builder(LocalDBWorker.class)
-                .setInitialDelay(1, TimeUnit.MINUTES).build();
+        OneTimeWorkRequest localDbWorker =
+                new OneTimeWorkRequest.Builder(LocalDBWorker.class).addTag("LocalDBWorker").build();
+
         WorkManager.getInstance().enqueue(localDbWorker);
     }
 

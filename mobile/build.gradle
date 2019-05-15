@@ -18,8 +18,8 @@ android {
         applicationId "com.aware.plugin.upmc.dash"
         minSdkVersion minimum_sdk
         targetSdkVersion target_sdk
-        versionCode 18
-        versionName "2.0"
+        versionCode 19
+        versionName "2.0.1"
         multiDexEnabled true
 
         //AWARE core sensors provider authority overrides

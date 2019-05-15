@@ -37,7 +37,16 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <activity android:name=".activities.EasterEgg"></activity>
+        <activity android:name=".activities.EasterEgg">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
