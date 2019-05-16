@@ -40,6 +40,7 @@ import com.aware.plugin.upmc.dash.activities.Plugin;
 import com.aware.plugin.upmc.dash.activities.Provider;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.utils.DBUtils;
 import com.aware.plugin.upmc.dash.workers.LocalDBWorker;
 
 import java.sql.Connection;
@@ -48,7 +49,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.aware.plugin.upmc.dash.utils.Constants.ACTION_CHECK_PROMPT;
 import static com.aware.plugin.upmc.dash.utils.Constants.BLUETOOTH_ON;
@@ -342,6 +342,18 @@ public class FitbitMessageService extends Service {
                 Log.d("yiyi", "FitbitMessageService:" + intentAction);
                 enqueueOneTimeDBWorker();
                 break;
+            case Constants.ACTION_TEST3:
+                Log.d("yiyi", "FitbitMessageService:" + intentAction);
+                notifyUserWithAppraisal("DEBUG");
+                break;
+            case Constants.ACTION_TEST4:
+                Log.d("yiyi", "FitbitMessageService:" + intentAction);
+                notifyUserWithInactivity(getApplicationContext(), true, "DEBUG");
+                break;
+            case Constants.ACTION_TEST5:
+                Log.d("yiyi", "FitbitMessageService:" + intentAction);
+                notifyUserWithInactivity(getApplicationContext(), false, "DEBUG");
+                break;
             default:
                 return i;
         }
@@ -351,7 +363,6 @@ public class FitbitMessageService extends Service {
     private void enqueueOneTimeDBWorker() {
         OneTimeWorkRequest localDbWorker =
                 new OneTimeWorkRequest.Builder(LocalDBWorker.class).addTag("LocalDBWorker").build();
-
         WorkManager.getInstance().enqueue(localDbWorker);
     }
 
@@ -386,50 +397,59 @@ public class FitbitMessageService extends Service {
         Log.d(Constants.TAG, "FitbitMessageService:saveResponseForNo" + no_output);
         String resp = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
         char[] resp_array = resp.toCharArray();
-        ContentValues response = new ContentValues();
-        response.put(Provider.Notification_Responses.DEVICE_ID,
-                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-        response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
-        response.put(Provider.Notification_Responses.NOTIF_ID, session_id);
-        response.put(Provider.Notification_Responses.NOTIF_TYPE, Constants.NOTIF_TYPE_INACTIVITY);
-        response.put(Provider.Notification_Responses.NOTIF_DEVICE, Constants.NOTIF_DEVICE_PHONE);
-        response.put(Provider.Notification_Responses.RESP_OK, 0);
-        response.put(Provider.Notification_Responses.RESP_NO, 1);
-        response.put(Provider.Notification_Responses.RESP_SNOOZE, 0);
-        response.put(Provider.Notification_Responses.RESP_BUSY,
-                Integer.parseInt("" + resp_array[0]));
-        response.put(Provider.Notification_Responses.RESP_PAIN,
-                Integer.parseInt("" + resp_array[1]));
-        response.put(Provider.Notification_Responses.RESP_NAUSEA,
-                Integer.parseInt("" + resp_array[2]));
-        response.put(Provider.Notification_Responses.RESP_TIRED,
-                Integer.parseInt("" + resp_array[3]));
-        response.put(Provider.Notification_Responses.RESP_OTHER,
-                Integer.parseInt("" + resp_array[4]));
-        response.put(Provider.Notification_Responses.RESP_OTHER_SYMP, resp.substring(5));
-        getContentResolver().insert(Provider.Notification_Responses.CONTENT_URI, response);
-
+        DBUtils.savePResponseWatch(getApplicationContext(), System.currentTimeMillis(), session_id,
+                Integer.parseInt("" + resp_array[0]), Integer.parseInt("" + resp_array[1]),
+                Integer.parseInt("" + resp_array[2]), Integer.parseInt("" + resp_array[3]),
+                Integer.parseInt("" + resp_array[4]), resp.substring(5), 0, 1, 0);
+//        ContentValues response = new ContentValues();
+//        response.put(Provider.Notification_W_Responses.DEVICE_ID,
+//                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+//        response.put(Provider.Notification_W_Responses.TIMESTAMP, System.currentTimeMillis());
+//        response.put(Provider.Notification_W_Responses.NOTIF_ID, session_id);
+//        response.put(Provider.Notification_W_Responses.NOTIF_TYPE, Constants
+//        .NOTIF_TYPE_INACTIVITY);
+//        response.put(Provider.Notification_W_Responses.NOTIF_DEVICE, Constants
+//        .NOTIF_DEVICE_PHONE);
+//        response.put(Provider.Notification_W_Responses.RESP_OK, 0);
+//        response.put(Provider.Notification_W_Responses.RESP_NO, 1);
+//        response.put(Provider.Notification_W_Responses.RESP_SNOOZE, 0);
+//        response.put(Provider.Notification_W_Responses.RESP_BUSY,
+//                Integer.parseInt("" + resp_array[0]));
+//        response.put(Provider.Notification_W_Responses.RESP_PAIN,
+//                Integer.parseInt("" + resp_array[1]));
+//        response.put(Provider.Notification_W_Responses.RESP_NAUSEA,
+//                Integer.parseInt("" + resp_array[2]));
+//        response.put(Provider.Notification_W_Responses.RESP_TIRED,
+//                Integer.parseInt("" + resp_array[3]));
+//        response.put(Provider.Notification_W_Responses.RESP_OTHER,
+//                Integer.parseInt("" + resp_array[4]));
+//        response.put(Provider.Notification_W_Responses.RESP_OTHER_SYMP, resp.substring(5));
+//        getContentResolver().insert(Provider.Notification_W_Responses.CONTENT_URI, response);
     }
 
     public void saveResponseForOther(boolean ok) {
         Log.d(Constants.TAG, "FitbitMessageService:saveResponseForOther");
-        ContentValues response = new ContentValues();
-        response.put(Provider.Notification_Responses.DEVICE_ID,
-                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-        response.put(Provider.Notification_Responses.TIMESTAMP, System.currentTimeMillis());
-        response.put(Provider.Notification_Responses.NOTIF_ID, session_id);
-        response.put(Provider.Notification_Responses.NOTIF_TYPE, Constants.NOTIF_TYPE_INACTIVITY);
-        response.put(Provider.Notification_Responses.NOTIF_DEVICE, Constants.NOTIF_DEVICE_PHONE);
-        response.put(Provider.Notification_Responses.RESP_OK, ok ? 1 : 0);
-        response.put(Provider.Notification_Responses.RESP_NO, 0);
-        response.put(Provider.Notification_Responses.RESP_SNOOZE, ok ? 0 : 1);
-        response.put(Provider.Notification_Responses.RESP_BUSY, 0);
-        response.put(Provider.Notification_Responses.RESP_PAIN, 0);
-        response.put(Provider.Notification_Responses.RESP_NAUSEA, 0);
-        response.put(Provider.Notification_Responses.RESP_TIRED, 0);
-        response.put(Provider.Notification_Responses.RESP_OTHER, 0);
-        getContentResolver().insert(Provider.Notification_Responses.CONTENT_URI, response);
-
+        DBUtils.savePResponseWatch(getApplicationContext(), System.currentTimeMillis(), session_id,
+                Constants.NOTIF_DEVICE_PHONE, 0, 0, 0, 0, "", ok ? 1 : 0, 0, ok ? 0 : 1);
+//
+//        ContentValues response = new ContentValues();
+//        response.put(Provider.Notification_W_Responses.DEVICE_ID,
+//                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+//        response.put(Provider.Notification_W_Responses.TIMESTAMP, System.currentTimeMillis());
+//        response.put(Provider.Notification_W_Responses.NOTIF_ID, session_id);
+//        response.put(Provider.Notification_W_Responses.NOTIF_TYPE, Constants
+//        .NOTIF_TYPE_INACTIVITY);
+//        response.put(Provider.Notification_W_Responses.NOTIF_DEVICE, Constants
+//        .NOTIF_DEVICE_PHONE);
+//        response.put(Provider.Notification_W_Responses.RESP_OK, ok ? 1 : 0);
+//        response.put(Provider.Notification_W_Responses.RESP_NO, 0);
+//        response.put(Provider.Notification_W_Responses.RESP_SNOOZE, ok ? 0 : 1);
+//        response.put(Provider.Notification_W_Responses.RESP_BUSY, 0);
+//        response.put(Provider.Notification_W_Responses.RESP_PAIN, 0);
+//        response.put(Provider.Notification_W_Responses.RESP_NAUSEA, 0);
+//        response.put(Provider.Notification_W_Responses.RESP_TIRED, 0);
+//        response.put(Provider.Notification_W_Responses.RESP_OTHER, 0);
+//        getContentResolver().insert(Provider.Notification_W_Responses.CONTENT_URI, response);
     }
 
     private void showSurveyNotif() {
@@ -655,8 +675,12 @@ public class FitbitMessageService extends Service {
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption, String session_id) {
         Log.d(TAG, "notifyUserWithInactivity");
-        saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE,
+        DBUtils.savePIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
+                Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE,
                 snoozeOption ? Constants.SNOOZE_SHOWN : Constants.SNOOZE_NOT_SHOWN);
+//        saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants
+//        .NOTIF_DEVICE_PHONE,
+//                snoozeOption ? Constants.SNOOZE_SHOWN : Constants.SNOOZE_NOT_SHOWN);
         wakeUpAndVibrate(context, Constants.DURATION_AWAKE, Constants.DURATION_VIBRATE);
         Intent dashIntent = new Intent(this, NotificationResponseActivity.class);
         if (snoozeOption)
@@ -691,31 +715,33 @@ public class FitbitMessageService extends Service {
                     .notify(Constants.INTERVENTION_NOTIF_ID, monitorNotifCompatBuilder.build());
         }
     }
-
-    public void saveIntervention(String notif_id, int notif_type, int notif_device,
-                                 int snooze_shown) {
-        ContentValues intervention = new ContentValues();
-        intervention.put(Provider.Notification_Interventions.DEVICE_ID,
-                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
-        intervention.put(Provider.Notification_Interventions.TIMESTAMP, System.currentTimeMillis());
-        intervention.put(Provider.Notification_Interventions.NOTIF_ID, notif_id);
-        intervention.put(Provider.Notification_Interventions.NOTIF_TYPE, notif_type);
-        intervention.put(Provider.Notification_Interventions.NOTIF_DEVICE, notif_device);
-        intervention.put(Provider.Notification_Interventions.SNOOZE_SHOWN, snooze_shown);
-        getContentResolver().insert(Provider.Notification_Interventions.CONTENT_URI, intervention);
-        Log.d(Constants.TAG, "saveIntervention:saving intervention");
-    }
+//    public void saveIntervention(String notif_id, int notif_type, int notif_device,
+//                                 int snooze_shown) {
+//        ContentValues intervention = new ContentValues();
+//        intervention.put(Provider.Notification_W_Interventions.DEVICE_ID,
+//                Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+//        intervention
+//                .put(Provider.Notification_W_Interventions.TIMESTAMP, System.currentTimeMillis());
+//        intervention.put(Provider.Notification_W_Interventions.NOTIF_ID, notif_id);
+//        intervention.put(Provider.Notification_W_Interventions.NOTIF_TYPE, notif_type);
+//        intervention.put(Provider.Notification_W_Interventions.NOTIF_DEVICE, notif_device);
+//        intervention.put(Provider.Notification_W_Interventions.SNOOZE_SHOWN, snooze_shown);
+//        getContentResolver()
+//                .insert(Provider.Notification_W_Interventions.CONTENT_URI, intervention);
+//        Log.d(Constants.TAG, "saveIntervention:saving intervention");
+//    }
 
     public void notifyUserWithAppraisal(String session_id) {
         Log.d(TAG, "FitbitMessageService:notifyUserWithAppraisal");
-        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
+        DBUtils.savePIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
+                Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
                 Constants.SNOOZE_NOT_SHOWN);
+//        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
+//                Constants.SNOOZE_NOT_SHOWN);
         wakeUpAndVibrate(getApplicationContext(), Constants.DURATION_AWAKE,
                 Constants.DURATION_VIBRATE);
         Intent dashIntent =
                 new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_APPRAISAL);
-        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
-                Constants.SNOOZE_NOT_SHOWN);
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

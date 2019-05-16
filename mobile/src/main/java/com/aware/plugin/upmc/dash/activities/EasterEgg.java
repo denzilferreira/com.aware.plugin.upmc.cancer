@@ -27,4 +27,19 @@ public class EasterEgg extends AppCompatActivity {
         Intent intent = new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_TEST2);
         startService(intent);
     }
+
+    public void test3(View view) {
+        Intent intent = new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_TEST3);
+        startService(intent);
+    }
+
+    public void test4(View view) {
+        Intent intent = new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_TEST4);
+        startService(intent);
+    }
+
+    public void test5(View view) {
+        Intent intent = new Intent(this, FitbitMessageService.class).setAction(Constants.ACTION_TEST5);
+        startService(intent);
+    }
 }

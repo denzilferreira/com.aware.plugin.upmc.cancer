@@ -710,8 +710,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(Constants.TAG, "MainActivity:showSettings: Joining Study");
                         progressBar.setVisibility(View.VISIBLE);
                         Aware.joinStudy(getApplicationContext(),
-                                "https://upmcdash.pittbotlab.org/aware-server/index" + ".php" +
-                                        "/webservice/index/8/NPJHTw5kC255");
+                                "https://upmcdash.pittbotlab.org/aware-server/index" +
+                                        ".php/webservice/index/8/NPJHTw5kC255");
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))
                             sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);

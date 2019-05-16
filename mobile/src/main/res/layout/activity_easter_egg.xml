@@ -14,19 +14,37 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="nuewqdn" />
+        android:text="qoiwdw" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="test1"
-        android:text="Test1"/>
+        android:text="Ingest Fake Data"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="test2"
-        android:text="Test2"/>
+        android:text="Sync Fake Data"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="test3"
+        android:text="Fake Appraisal Prompt"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="test4"
+        android:text="Fake Inactivity Prompt 1"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="test5"
+        android:text="Fake Inactivity Prompt 2"/>
 
 </LinearLayout>
 

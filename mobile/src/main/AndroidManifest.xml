@@ -39,13 +39,6 @@
         tools:replace="android:icon">
         <activity android:name=".activities.EasterEgg">
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-
         </activity>
 
         <meta-data
@@ -132,7 +125,7 @@
             android:label="@string/title_activity_notification_response"
             android:theme="@style/Theme.AppCompat.Dialog.Alert" />
         <activity
-            android:name=".activities.OnboardingActivity"
+            android:name="com.aware.plugin.upmc.dash.activities.OnboardingActivity"
             android:label="UPMC Dash"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

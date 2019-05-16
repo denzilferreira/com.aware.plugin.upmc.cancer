@@ -157,6 +157,9 @@ public final class Constants {
     public static final String DND_MODE_OFF = "DND_MODE_OFF";
     public static final String INCOMPLETE_SYMPS_TEXT = "Symptom ratings not complete";
     public static final String SURVEY_CONTENT_TEXT = "UPMC DASH SURVEY";
+    public static final String ACTION_TEST3 = "ACTION_TEST3";
+    public static final String ACTION_TEST4 = "ACTION_TEST4";
+    public static final String ACTION_TEST5 = "ACTION_TEST5";
     public static String ACTION_SHOW_MORNING = "ACTION_SHOW_MORNING";
     public static int INTERVENTION_TIMEOUT = 5 * 60 * 1000;
     public static int DURATION_AWAKE = 15000;

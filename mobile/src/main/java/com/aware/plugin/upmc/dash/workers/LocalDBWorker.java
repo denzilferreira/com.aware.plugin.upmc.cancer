@@ -90,7 +90,7 @@ public class LocalDBWorker extends Worker {
                     Log.d(Constants.TAG, "LocalDBWorker: Corrupt  table [interventions_watch]");
                     return Result.failure();
                 }
-                DBUtils.saveIntervention(getApplicationContext(), timeStamp, session_id, type,
+                DBUtils.saveWIntervention(getApplicationContext(), timeStamp, session_id, type,
                         Constants.NOTIF_DEVICE_WATCH, snooze_shown);
                 counter++;
             }
@@ -119,7 +119,7 @@ public class LocalDBWorker extends Worker {
                 int snooze = rs.getInt("snooze");
                 double timeStamp = rs.getDouble("timestamp");
                 String sessionId = rs.getString("session_id");
-                DBUtils.saveResponseWatch(getApplicationContext(), timeStamp, sessionId, busy, pain,
+                DBUtils.saveWResponseWatch(getApplicationContext(), timeStamp, sessionId, busy, pain,
                         nausea, tired, other, ok, no, snooze);
                 counter++;
             }
