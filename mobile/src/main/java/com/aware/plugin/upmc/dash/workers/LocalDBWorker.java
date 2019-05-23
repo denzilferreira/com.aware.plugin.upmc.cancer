@@ -9,7 +9,9 @@ import androidx.work.WorkerParameters;
 
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.utils.DBUtils;
+import com.aware.plugin.upmc.dash.utils.LogFile;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -35,11 +37,13 @@ public class LocalDBWorker extends Worker {
         Connection conn = null;
         Statement stmt = null;
         try {
+            LogFile.createFile();
             //Register JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
             // 1. Sync Step Count
             //Open a connection
             int counter = 0;
+            LogFile.writeToFile("LocalDBWorker: Connecting to database [SensorData]");
             Log.d(Constants.TAG, "LocalDBWorker: Connecting to database [SensorData]");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
@@ -55,18 +59,23 @@ public class LocalDBWorker extends Worker {
                 DBUtils.saveSensor(getApplicationContext(), timeStamp, type, data, sessionId);
                 counter++;
             }
+            LogFile.writeToFile("LocalDBWorker: Synced " + counter + " records [SensorData]");
             Log.d(Constants.TAG, "LocalDBWorker: Synced " + counter + " records [SensorData]");
+
             // 2. drop step count table
             //After syncing all the data records, clear the table
             String command = "DROP TABLE SensorData";
             stmt.executeUpdate(command);
             Log.d(Constants.TAG, "LocalDBWorker: Dropped table [SensorData]");
+            LogFile.writeToFile("LocalDBWorker: Dropped table [SensorData]");
             command =
                     "CREATE TABLE SensorData " + "(timestamp double not NULL, " + " session_id " + "varchar(255) NULL, " + " type int(11) not NULL, " + " data int(11) " + "not NULL)";
             stmt.executeUpdate(command);
             Log.d(Constants.TAG, "LocalDBWorker:Reset SensorData table");
+            LogFile.writeToFile("LocalDBWorker:Reset SensorData table");
             // 3. Sync Interventions Count
             Log.d(Constants.TAG, "LocalDBWorker: Connecting to database [interventions_watch]");
+            LogFile.writeToFile("LocalDBWorker: Connecting to database [interventions_watch]");
             sql = new StringBuilder();
             sql.append("SELECT * FROM ");
             sql.append(TABLE_INTERVENTIONS);
@@ -88,23 +97,28 @@ public class LocalDBWorker extends Worker {
                     type = Constants.NOTIF_TYPE_BATT_LOW;
                 } else {
                     Log.d(Constants.TAG, "LocalDBWorker: Corrupt  table [interventions_watch]");
+                    LogFile.writeToFile("LocalDBWorker: Corrupt  table [interventions_watch]");
                     return Result.failure();
                 }
-                DBUtils.saveWIntervention(getApplicationContext(), timeStamp, session_id, type,
+                DBUtils.saveWatchIntervention(getApplicationContext(), timeStamp, session_id, type,
                         Constants.NOTIF_DEVICE_WATCH, snooze_shown);
                 counter++;
             }
-            Log.d(Constants.TAG,
+            Log.d(Constants.TAG,"LocalDBWorker: Synced " + counter + " records [interventions_watch]");
+            LogFile.writeToFile(
                     "LocalDBWorker: Synced " + counter + " records [interventions_watch]");
             // 4. drop interventions table
             command = "DROP TABLE interventions_watch";
             Log.d(Constants.TAG, "LocalDBWorker: Dropping table [interventions_watch]");
+            LogFile.writeToFile("LocalDBWorker: Dropping table [interventions_watch]");
             stmt.executeUpdate(command);
             command =
                     "CREATE TABLE interventions_watch " + "(id int(11) not NULL AUTO_INCREMENT, " + " timestamp double not NULL, " + " session_id varchar(255) NULL, " + " notif_type int NOT NULL, " + " PRIMARY KEY ( id ))";
             stmt.executeUpdate(command);
+
             // 5. Sync responses
             Log.d(Constants.TAG, "LocalDBWorker: Connecting to database [responses_watch]");
+            LogFile.writeToFile("LocalDBWorker: Connecting to database [responses_watch]");
             command = "SELECT * FROM responses_watch";
             rs = stmt.executeQuery(command);
             counter = 0;
@@ -119,13 +133,15 @@ public class LocalDBWorker extends Worker {
                 int snooze = rs.getInt("snooze");
                 double timeStamp = rs.getDouble("timestamp");
                 String sessionId = rs.getString("session_id");
-                DBUtils.saveWResponseWatch(getApplicationContext(), timeStamp, sessionId, busy, pain,
+                DBUtils.saveWatchResponse(getApplicationContext(), timeStamp, sessionId, busy, pain,
                         nausea, tired, other, ok, no, snooze);
                 counter++;
             }
             Log.d(Constants.TAG, "LocalDBWorker: Synced " + counter + " records [responses_watch]");
+            LogFile.writeToFile("LocalDBWorker: Synced " + counter + " records [responses_watch]");
             // 6. Drop responses table
             Log.d(Constants.TAG, "LocalDBWorker:Dropping table [responses_watch]");
+            LogFile.writeToFile("LocalDBWorker:Dropping table [responses_watch]");
             command = "DROP TABLE responses_watch";
             stmt.executeUpdate(command);
             command =
@@ -139,22 +155,53 @@ public class LocalDBWorker extends Worker {
             conn.close();
         } catch (ClassNotFoundException e) {
             Log.d(Constants.TAG, "LocalDBWorker:class not found.. retrying..");
+            try {
+                LogFile.writeToFile("LocalDBWorker:class not found.. retrying..");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
             return Result.retry();
         } catch (SQLException e) {
+            Log.d(Constants.TAG, "LocalDBWorker:SQLException.. retrying..");
+            try {
+                LogFile.writeToFile("LocalDBWorker:SQLException.. retrying..");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
             return Result.retry();
+        } catch (IOException e) {
+            Log.d(Constants.TAG, "LocalDBWorker:IOException.. retrying..");
+            try {
+                LogFile.writeToFile("LocalDBWorker:IOException.. retrying..");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null)
                     stmt.close();
             } catch (SQLException se2) {
+                Log.d(Constants.TAG, "LocalDBWorker:SQLException.. retrying..");
+                try {
+                    LogFile.writeToFile("LocalDBWorker:SQLException.. retrying..");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 se2.printStackTrace();
             }
             try {
                 if (conn != null)
                     conn.close();
             } catch (SQLException se) {
+                Log.d(Constants.TAG, "LocalDBWorker:SQLException.. retrying..");
+                try {
+                    LogFile.writeToFile("LocalDBWorker:SQLException.. retrying..");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 se.printStackTrace();
             }
         }

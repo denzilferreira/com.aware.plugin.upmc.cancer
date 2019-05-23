@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider {
     public static String AUTHORITY = "com.aware.plugin.upmc.dash.provider.survey"; //change to package.provider.your_plugin_name
-    public static final int DATABASE_VERSION = 31; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 32; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static String DATABASE_NAME = "plugin_upmc_dash.db"; //the database filename, use plugin_xxx for plugins.
 
     //Add here your database table names, as many as you need
@@ -87,6 +87,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_stepcount");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.stepcount";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.stepcount";
+        public static final String DEVICE_TIMESTAMP = "device_timestamp";
         public static final String STEP_COUNT = "stepcount";
         public static final String ALARM_TYPE = "alarmtype";
         public static final String SESSION_ID = "session_id";
@@ -96,6 +97,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_w_interventions");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.w.interventions";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.w.interventions";
+        public static final String DEVICE_TIMESTAMP = "device_timestamp";
         public static final String NOTIF_ID = "session_id";
         public static final String NOTIF_TYPE = "notif_type";
         public static final String NOTIF_DEVICE = "notif_device";
@@ -109,6 +111,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_w_responses");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.w.responses";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.w.responses";
+        public static final String DEVICE_TIMESTAMP = "device_timestamp";
         public static final String NOTIF_ID = "session_id";
         public static final String NOTIF_TYPE = "notif_type";
         public static final String NOTIF_DEVICE = "notif_device";
@@ -139,6 +142,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_p_interventions");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.p.interventions";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.p.interventions";
+        public static final String DEVICE_TIMESTAMP = "device_timestamp";
         public static final String NOTIF_ID = "session_id";
         public static final String NOTIF_TYPE = "notif_type";
         public static final String NOTIF_DEVICE = "notif_device";
@@ -152,6 +156,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/upmc_dash_p_responses");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.upmc.dash.p.responses";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.upmc.dash.p.responses";
+        public static final String DEVICE_TIMESTAMP = "device_timestamp";
         public static final String NOTIF_ID = "session_id";
         public static final String NOTIF_TYPE = "notif_type";
         public static final String NOTIF_DEVICE = "notif_device";
@@ -194,6 +199,7 @@ public class Provider extends ContentProvider {
             Stepcount_Data._ID + " integer primary key autoincrement," +
                     Stepcount_Data.TIMESTAMP + " real default 0," +
                     Stepcount_Data.DEVICE_ID + " text default ''," +
+                    Stepcount_Data.DEVICE_TIMESTAMP + " text default ''," +
                     Stepcount_Data.STEP_COUNT + " integer default -1," +
                     Stepcount_Data.ALARM_TYPE + " integer default -1," +
                     Stepcount_Data.SESSION_ID + " text default ''",
@@ -201,6 +207,7 @@ public class Provider extends ContentProvider {
             Notification_W_Interventions._ID + " integer primary key autoincrement," +
                     Notification_W_Interventions.TIMESTAMP + " real default 0," +
                     Notification_W_Interventions.DEVICE_ID + " text default ''," +
+                    Notification_W_Interventions.DEVICE_TIMESTAMP + " text default ''," +
                     Notification_W_Interventions.NOTIF_ID + " text default ''," +
                     Notification_W_Interventions.NOTIF_TYPE + " integer default -1," +
                     Notification_W_Interventions.NOTIF_DEVICE + " integer default -1," +
@@ -212,6 +219,7 @@ public class Provider extends ContentProvider {
             Notification_W_Responses._ID + " integer primary key autoincrement," +
                     Notification_W_Responses.TIMESTAMP + " real default 0," +
                     Notification_W_Responses.DEVICE_ID + " text default ''," +
+                    Notification_W_Responses.DEVICE_TIMESTAMP + " text default ''," +
                     Notification_W_Responses.NOTIF_ID + " text default ''," +
                     Notification_W_Responses.NOTIF_TYPE + " integer default -1," +
                     Notification_W_Responses.NOTIF_DEVICE + " integer default -1," +
@@ -234,6 +242,7 @@ public class Provider extends ContentProvider {
             Notification_P_Interventions._ID + " integer primary key autoincrement," +
                     Notification_P_Interventions.TIMESTAMP + " real default 0," +
                     Notification_P_Interventions.DEVICE_ID + " text default ''," +
+                    Notification_P_Interventions.DEVICE_TIMESTAMP + " text default ''," +
                     Notification_P_Interventions.NOTIF_ID + " text default ''," +
                     Notification_P_Interventions.NOTIF_TYPE + " integer default -1," +
                     Notification_P_Interventions.NOTIF_DEVICE + " integer default -1," +
@@ -244,6 +253,7 @@ public class Provider extends ContentProvider {
             Notification_P_Responses._ID + " integer primary key autoincrement," +
                     Notification_P_Responses.TIMESTAMP + " real default 0," +
                     Notification_P_Responses.DEVICE_ID + " text default ''," +
+                    Notification_P_Responses.DEVICE_TIMESTAMP + " text default ''," +
                     Notification_P_Responses.NOTIF_ID + " text default ''," +
                     Notification_P_Responses.NOTIF_TYPE + " integer default -1," +
                     Notification_P_Responses.NOTIF_DEVICE + " integer default -1," +
@@ -323,6 +333,7 @@ public class Provider extends ContentProvider {
         stepcountMap.put(Stepcount_Data._ID, Stepcount_Data._ID);
         stepcountMap.put(Stepcount_Data.TIMESTAMP, Stepcount_Data.TIMESTAMP);
         stepcountMap.put(Stepcount_Data.DEVICE_ID, Stepcount_Data.DEVICE_ID);
+        stepcountMap.put(Stepcount_Data.DEVICE_TIMESTAMP, Stepcount_Data.DEVICE_TIMESTAMP);
         stepcountMap.put(Stepcount_Data.STEP_COUNT, Stepcount_Data.STEP_COUNT);
         stepcountMap.put(Stepcount_Data.ALARM_TYPE, Stepcount_Data.ALARM_TYPE);
         stepcountMap.put(Stepcount_Data.SESSION_ID, Stepcount_Data.SESSION_ID);
@@ -333,6 +344,7 @@ public class Provider extends ContentProvider {
         wInterventionsMap.put(Notification_W_Interventions._ID, Notification_W_Interventions._ID);
         wInterventionsMap.put(Notification_W_Interventions.TIMESTAMP, Notification_W_Interventions.TIMESTAMP);
         wInterventionsMap.put(Notification_W_Interventions.DEVICE_ID, Notification_W_Interventions.DEVICE_ID);
+        wInterventionsMap.put(Notification_W_Interventions.DEVICE_TIMESTAMP, Notification_W_Interventions.DEVICE_TIMESTAMP);
         wInterventionsMap.put(Notification_W_Interventions.NOTIF_ID, Notification_W_Interventions.NOTIF_ID);
         wInterventionsMap.put(Notification_W_Interventions.NOTIF_TYPE, Notification_W_Interventions.NOTIF_TYPE);
         wInterventionsMap.put(
@@ -347,6 +359,7 @@ public class Provider extends ContentProvider {
         wRespMap.put(Notification_W_Responses._ID, Notification_W_Responses._ID);
         wRespMap.put(Notification_W_Responses.TIMESTAMP, Notification_W_Responses.TIMESTAMP);
         wRespMap.put(Notification_W_Responses.DEVICE_ID, Notification_W_Responses.DEVICE_ID);
+        wRespMap.put(Notification_W_Responses.DEVICE_TIMESTAMP, Notification_W_Responses.DEVICE_TIMESTAMP);
         wRespMap.put(Notification_W_Responses.NOTIF_ID, Notification_W_Responses.NOTIF_ID);
         wRespMap.put(Notification_W_Responses.NOTIF_TYPE, Notification_W_Responses.NOTIF_TYPE);
         wRespMap.put(Notification_W_Responses.NOTIF_DEVICE, Notification_W_Responses.NOTIF_DEVICE);
@@ -373,6 +386,7 @@ public class Provider extends ContentProvider {
         pInterventionsMap.put(Notification_P_Interventions._ID, Notification_P_Interventions._ID);
         pInterventionsMap.put(Notification_P_Interventions.TIMESTAMP, Notification_P_Interventions.TIMESTAMP);
         pInterventionsMap.put(Notification_P_Interventions.DEVICE_ID, Notification_P_Interventions.DEVICE_ID);
+        pInterventionsMap.put(Notification_P_Interventions.DEVICE_TIMESTAMP, Notification_P_Interventions.DEVICE_TIMESTAMP);
         pInterventionsMap.put(Notification_P_Interventions.NOTIF_ID, Notification_P_Interventions.NOTIF_ID);
         pInterventionsMap.put(Notification_P_Interventions.NOTIF_TYPE, Notification_P_Interventions.NOTIF_TYPE);
         pInterventionsMap.put(
@@ -387,6 +401,7 @@ public class Provider extends ContentProvider {
         pRespMap.put(Notification_P_Responses._ID, Notification_P_Responses._ID);
         pRespMap.put(Notification_P_Responses.TIMESTAMP, Notification_P_Responses.TIMESTAMP);
         pRespMap.put(Notification_P_Responses.DEVICE_ID, Notification_P_Responses.DEVICE_ID);
+        pRespMap.put(Notification_P_Responses.DEVICE_TIMESTAMP, Notification_P_Responses.DEVICE_TIMESTAMP);
         pRespMap.put(Notification_P_Responses.NOTIF_ID, Notification_P_Responses.NOTIF_ID);
         pRespMap.put(Notification_P_Responses.NOTIF_TYPE, Notification_P_Responses.NOTIF_TYPE);
         pRespMap.put(Notification_P_Responses.NOTIF_DEVICE, Notification_P_Responses.NOTIF_DEVICE);

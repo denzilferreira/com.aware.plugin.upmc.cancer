@@ -711,7 +711,7 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.VISIBLE);
                         Aware.joinStudy(getApplicationContext(),
                                 "https://upmcdash.pittbotlab.org/aware-server/index" +
-                                        ".php/webservice/index/8/NPJHTw5kC255");
+                                        ".php/webservice/index/20/YMFp2QcGdj05");
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))
                             sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);

@@ -49,6 +49,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.aware.plugin.upmc.dash.utils.Constants.ACTION_CHECK_PROMPT;
 import static com.aware.plugin.upmc.dash.utils.Constants.BLUETOOTH_ON;
@@ -362,7 +363,9 @@ public class FitbitMessageService extends Service {
 
     private void enqueueOneTimeDBWorker() {
         OneTimeWorkRequest localDbWorker =
-                new OneTimeWorkRequest.Builder(LocalDBWorker.class).addTag("LocalDBWorker").build();
+                new OneTimeWorkRequest.Builder(LocalDBWorker.class).
+                        setInitialDelay(10, TimeUnit.MINUTES).
+                        addTag("LocalDBWorker").build();
         WorkManager.getInstance().enqueue(localDbWorker);
     }
 
@@ -397,7 +400,7 @@ public class FitbitMessageService extends Service {
         Log.d(Constants.TAG, "FitbitMessageService:saveResponseForNo" + no_output);
         String resp = intent.getStringExtra(Constants.NOTIF_RESPONSE_EXTRA_KEY);
         char[] resp_array = resp.toCharArray();
-        DBUtils.savePResponseWatch(getApplicationContext(), System.currentTimeMillis(), session_id,
+        DBUtils.savePhoneResponse(getApplicationContext(), System.currentTimeMillis(), session_id,
                 Integer.parseInt("" + resp_array[0]), Integer.parseInt("" + resp_array[1]),
                 Integer.parseInt("" + resp_array[2]), Integer.parseInt("" + resp_array[3]),
                 Integer.parseInt("" + resp_array[4]), resp.substring(5), 0, 1, 0);
@@ -429,7 +432,7 @@ public class FitbitMessageService extends Service {
 
     public void saveResponseForOther(boolean ok) {
         Log.d(Constants.TAG, "FitbitMessageService:saveResponseForOther");
-        DBUtils.savePResponseWatch(getApplicationContext(), System.currentTimeMillis(), session_id,
+        DBUtils.savePhoneResponse(getApplicationContext(), System.currentTimeMillis(), session_id,
                 Constants.NOTIF_DEVICE_PHONE, 0, 0, 0, 0, "", ok ? 1 : 0, 0, ok ? 0 : 1);
 //
 //        ContentValues response = new ContentValues();
@@ -675,7 +678,7 @@ public class FitbitMessageService extends Service {
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption, String session_id) {
         Log.d(TAG, "notifyUserWithInactivity");
-        DBUtils.savePIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
+        DBUtils.savePhoneIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
                 Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE,
                 snoozeOption ? Constants.SNOOZE_SHOWN : Constants.SNOOZE_NOT_SHOWN);
 //        saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants
@@ -733,7 +736,7 @@ public class FitbitMessageService extends Service {
 
     public void notifyUserWithAppraisal(String session_id) {
         Log.d(TAG, "FitbitMessageService:notifyUserWithAppraisal");
-        DBUtils.savePIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
+        DBUtils.savePhoneIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
                 Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
                 Constants.SNOOZE_NOT_SHOWN);
 //        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
@@ -833,6 +836,18 @@ public class FitbitMessageService extends Service {
         myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval,
                 alarmPendingIntent_min);
     }
+
+    public void cacnelFitbitCheckPromptAlarm() {
+        AlarmManager myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent_min = new Intent(getApplicationContext(), FitbitMessageService.class);
+        alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
+        PendingIntent alarmPendingIntent_min =
+                PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
+        assert myAlarmManager != null;
+        myAlarmManager.cancel(alarmPendingIntent_min);
+    }
+
+
 
     private void saveTimeSchedule() {
         // Yiyi's code here....
