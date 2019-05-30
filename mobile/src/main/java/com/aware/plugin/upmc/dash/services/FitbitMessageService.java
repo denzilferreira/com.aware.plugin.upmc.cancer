@@ -41,8 +41,10 @@ import com.aware.plugin.upmc.dash.activities.Provider;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
 import com.aware.plugin.upmc.dash.utils.DBUtils;
+import com.aware.plugin.upmc.dash.utils.LogFile;
 import com.aware.plugin.upmc.dash.workers.LocalDBWorker;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -289,18 +291,30 @@ public class FitbitMessageService extends Service {
                 setShowMorningSetting(false);
                 break;
             case Plugin.ACTION_CANCER_SURVEY:
+                try {
+                    LogFile.writeToFile("FitbitMessageService: ACTION_CANCER_SURVEY");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Log.d(TAG, "FitbitMessageService:onStartCommand: ACTION_CANCER_SURVEY");
                 // do not disturb mode forced to off.
                 forceDndOffIfNeeded();
                 notifySurvey(true);
                 setShowMorningSetting(true);
+                startFitbitCheckPromptAlarm();
                 break;
             case Constants.ACTION_SETTINGS_CHANGED:
                 Log.d(TAG, "FibitMessageService:onStartCommand : ACTION_SETTINGS_CHANGED");
                 saveTimeSchedule();
                 break;
             case Constants.ACTION_SYNC_DATA:
+                try {
+                    LogFile.writeToFile("FitbitMessageService: ACTION_SYNC_DATA");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Log.d(Constants.TAG, "FitbitMessageService:onCommand : ACTION_SYNC_DATA");
+                cancelFitbitCheckPromptAlarm();
                 enqueueOneTimeDBWorker();
                 break;
             case Constants.ACTION_APPRAISAL:
@@ -362,10 +376,9 @@ public class FitbitMessageService extends Service {
     }
 
     private void enqueueOneTimeDBWorker() {
-        OneTimeWorkRequest localDbWorker =
-                new OneTimeWorkRequest.Builder(LocalDBWorker.class).
-                        setInitialDelay(10, TimeUnit.MINUTES).
-                        addTag("LocalDBWorker").build();
+        OneTimeWorkRequest localDbWorker = new OneTimeWorkRequest.Builder(LocalDBWorker.class).
+                setInitialDelay(15, TimeUnit.MINUTES).
+                addTag("LocalDBWorker").build();
         WorkManager.getInstance().enqueue(localDbWorker);
     }
 
@@ -678,8 +691,8 @@ public class FitbitMessageService extends Service {
 
     public void notifyUserWithInactivity(Context context, boolean snoozeOption, String session_id) {
         Log.d(TAG, "notifyUserWithInactivity");
-        DBUtils.savePhoneIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
-                Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE,
+        DBUtils.savePhoneIntervention(getApplicationContext(), System.currentTimeMillis(),
+                session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants.NOTIF_DEVICE_PHONE,
                 snoozeOption ? Constants.SNOOZE_SHOWN : Constants.SNOOZE_NOT_SHOWN);
 //        saveIntervention(session_id, Constants.NOTIF_TYPE_INACTIVITY, Constants
 //        .NOTIF_DEVICE_PHONE,
@@ -736,8 +749,8 @@ public class FitbitMessageService extends Service {
 
     public void notifyUserWithAppraisal(String session_id) {
         Log.d(TAG, "FitbitMessageService:notifyUserWithAppraisal");
-        DBUtils.savePhoneIntervention(getApplicationContext(), System.currentTimeMillis(), session_id,
-                Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
+        DBUtils.savePhoneIntervention(getApplicationContext(), System.currentTimeMillis(),
+                session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
                 Constants.SNOOZE_NOT_SHOWN);
 //        saveIntervention(session_id, Constants.NOTIF_TYPE_APPRAISAL, Constants.NOTIF_DEVICE_PHONE,
 //                Constants.SNOOZE_NOT_SHOWN);
@@ -837,7 +850,7 @@ public class FitbitMessageService extends Service {
                 alarmPendingIntent_min);
     }
 
-    public void cacnelFitbitCheckPromptAlarm() {
+    public void cancelFitbitCheckPromptAlarm() {
         AlarmManager myAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent_min = new Intent(getApplicationContext(), FitbitMessageService.class);
         alarmIntent_min.setAction(ACTION_CHECK_PROMPT);
@@ -846,7 +859,6 @@ public class FitbitMessageService extends Service {
         assert myAlarmManager != null;
         myAlarmManager.cancel(alarmPendingIntent_min);
     }
-
 
 
     private void saveTimeSchedule() {

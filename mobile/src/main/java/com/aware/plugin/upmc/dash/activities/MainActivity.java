@@ -41,12 +41,10 @@ import com.aware.plugin.upmc.dash.R;
 import com.aware.plugin.upmc.dash.services.FitbitMessageService;
 import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.utils.Scheduler;
 import com.aware.ui.PermissionsHandler;
-import com.aware.utils.Scheduler;
 import com.crashlytics.android.Crashlytics;
 import com.ramotion.fluidslider.FluidSlider;
-
-import org.json.JSONException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -238,41 +236,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-
-    public void engageScheduler() {
-        Aware.setSetting(getApplicationContext(), Settings.STATUS_PLUGIN_UPMC_CANCER, true);
-        int morning_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(),
-                Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
-        int morning_minute = Integer.parseInt(
-                Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
-        String className = getPackageName() + "/" + FitbitMessageService.class.getName();
-        createSchedule(morning_hour, morning_minute, Constants.MORNING_SURVEY_SCHED_ID, className,
-                Scheduler.ACTION_TYPE_SERVICE, Plugin.ACTION_CANCER_SURVEY);
-        int evening_hour = Integer.parseInt(
-                Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
-        int evening_minute =
-                Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
-        createSchedule(evening_hour, evening_minute, Constants.EVENING_SYNC_ID, className,
-                Scheduler.ACTION_TYPE_SERVICE, Constants.ACTION_SYNC_DATA);
-    }
-
-    public void createSchedule(int hour, int minute, String id, String className, String classType,
-                               String action) {
-        Log.d(Constants.TAG, "MainActivity:createSchedule:creating a schedule..");
-        Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), id);
-        if (currentScheduler != null)
-            Scheduler.removeSchedule(getApplicationContext(), id);
-        Scheduler.Schedule schedule = new Scheduler.Schedule(id);
-        try {
-            schedule.addHour(hour).addMinute(minute).setActionClass(className)
-                    .setActionIntentAction(action).setActionType(classType);
-            Scheduler.saveSchedule(this, schedule);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Aware.startScheduler(getApplicationContext());
-    }
+//    public void engageScheduler() {
+//        Aware.setSetting(getApplicationContext(), Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+//        int morning_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(),
+//                Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+//        int morning_minute = Integer.parseInt(
+//                Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+//        String className = getPackageName() + "/" + FitbitMessageService.class.getName();
+//        createSchedule(morning_hour, morning_minute, Constants.MORNING_SURVEY_SCHED_ID, className,
+//                Scheduler.ACTION_TYPE_SERVICE, Plugin.ACTION_CANCER_SURVEY);
+//        int evening_hour = Integer.parseInt(
+//                Aware.getSetting(getApplicationContext(), Settings
+//                .PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+//        int evening_minute =
+//                Integer.parseInt(Aware.getSetting(this, Settings
+//                .PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+//        createSchedule(evening_hour, evening_minute, Constants.EVENING_SYNC_ID, className,
+//                Scheduler.ACTION_TYPE_SERVICE, Constants.ACTION_SYNC_DATA);
+//    }
+//
+//    public void createSchedule(int hour, int minute, String id, String className, String
+//    classType,
+//                               String action) {
+//        Log.d(Constants.TAG, "MainActivity:createSchedule:creating a schedule..");
+//        Scheduler.Schedule currentScheduler = Scheduler.getSchedule(getApplicationContext(), id);
+//        if (currentScheduler != null)
+//            Scheduler.removeSchedule(getApplicationContext(), id);
+//        Scheduler.Schedule schedule = new Scheduler.Schedule(id);
+//        try {
+//            schedule.addHour(hour).addMinute(minute).setActionClass(className)
+//                    .setActionIntentAction(action).setActionType(classType);
+//            Scheduler.saveSchedule(this, schedule);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        Aware.startScheduler(getApplicationContext());
+//    }
 
 
     public void showSymptomSurvey(boolean daily) {
@@ -710,8 +709,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(Constants.TAG, "MainActivity:showSettings: Joining Study");
                         progressBar.setVisibility(View.VISIBLE);
                         Aware.joinStudy(getApplicationContext(),
-                                "https://upmcdash.pittbotlab.org/aware-server/index" +
-                                        ".php/webservice/index/8/NPJHTw5kC255");
+                                "https://upmcdash.pittbotlab.org/aware-server/index" + ".php" +
+                                        "/webservice/index/8/NPJHTw5kC255");
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))
                             sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
@@ -734,7 +733,7 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
                 // modifying the schedules
-                engageScheduler();
+                resetSchedules();
             } else {
                 // settings did not change, do nothing!
                 Log.d(Constants.TAG, "MainActivity:showSettings: settings did not change");
@@ -770,6 +769,35 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    private void setSchedules() {
+        Aware.setSetting(getApplicationContext(), Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+        int morning_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(),
+                Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        int morning_minute = Integer.parseInt(
+                Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        Scheduler.setSurveySchedule(getApplicationContext(), morning_hour, morning_minute);
+        int evening_hour = Integer.parseInt(
+                Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        int evening_minute =
+                Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        Scheduler.setSyncSchedule(getApplicationContext(), evening_hour, evening_minute);
+
+    }
+
+    private void resetSchedules() {
+        Aware.setSetting(getApplicationContext(), Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+        int morning_hour = Integer.parseInt(Aware.getSetting(getApplicationContext(),
+                Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        int morning_minute = Integer.parseInt(
+                Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        Scheduler.resetSurveySchedule(getApplicationContext(), morning_hour, morning_minute);
+        int evening_hour = Integer.parseInt(
+                Aware.getSetting(getApplicationContext(), Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        int evening_minute =
+                Integer.parseInt(Aware.getSetting(this, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        Scheduler.resetSyncSchedule(getApplicationContext(), evening_hour, evening_minute);
     }
 
     private static class PostData extends AsyncTask<String, Void, Void> {
@@ -826,7 +854,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
 
     private class JoinedStudy extends BroadcastReceiver {
         @Override
@@ -890,7 +917,7 @@ public class MainActivity extends AppCompatActivity {
                                     .setSyncAdapter(aware_account, authority)
                                     .setExtras(new Bundle()).build();
                     ContentResolver.requestSync(request);
-                    engageScheduler();
+                    setSchedules();
                     finish();
                 }
             }

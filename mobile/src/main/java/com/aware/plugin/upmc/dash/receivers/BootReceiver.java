@@ -7,8 +7,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
+import com.aware.Aware;
 import com.aware.plugin.upmc.dash.services.FitbitMessageService;
+import com.aware.plugin.upmc.dash.settings.Settings;
 import com.aware.plugin.upmc.dash.utils.Constants;
+import com.aware.plugin.upmc.dash.utils.Scheduler;
 
 /**
  * Created by RaghuTeja on 8/6/17.
@@ -26,6 +29,7 @@ public class BootReceiver extends BroadcastReceiver {
             else {
                 context.startService(msgServiceIntent);
             }
+            setSchedules(context);
         }
 
     }
@@ -40,5 +44,21 @@ public class BootReceiver extends BroadcastReceiver {
             }
         }
         return false;
+    }
+
+
+    private void setSchedules(Context context) {
+        Aware.setSetting(context, Settings.STATUS_PLUGIN_UPMC_CANCER, true);
+        int morning_hour = Integer.parseInt(Aware.getSetting(context,
+                Settings.PLUGIN_UPMC_CANCER_MORNING_HOUR));
+        int morning_minute = Integer.parseInt(
+                Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_MORNING_MINUTE));
+        Scheduler.setSurveySchedule(context, morning_hour, morning_minute);
+        int evening_hour = Integer.parseInt(
+                Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_HOUR));
+        int evening_minute =
+                Integer.parseInt(Aware.getSetting(context, Settings.PLUGIN_UPMC_CANCER_NIGHT_MINUTE));
+        Scheduler.setSyncSchedule(context, evening_hour, evening_minute);
+
     }
 }
