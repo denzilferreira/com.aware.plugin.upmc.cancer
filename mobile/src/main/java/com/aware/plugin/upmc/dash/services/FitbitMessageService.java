@@ -278,6 +278,7 @@ public class FitbitMessageService extends Service {
             case Constants.ACTION_CHECK_PROMPT:
                 Log.d(TAG, "FitbitMessageService: onStartCommand check prompt repeatedly");
                 new CheckPrompt().execute();
+                startFitbitCheckPromptAlarm();
                 break;
             case Constants.ACTION_CHECK_CONN:
                 Log.d(TAG, "FitbitMessageService: onStartCommand check watch connection");
@@ -846,8 +847,14 @@ public class FitbitMessageService extends Service {
         PendingIntent alarmPendingIntent_min =
                 PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
         assert myAlarmManager != null;
-        myAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval,
-                alarmPendingIntent_min);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,
+                    alarmPendingIntent_min);
+        }
+        else {
+            myAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,
+                    alarmPendingIntent_min);
+        }
     }
 
     public void cancelFitbitCheckPromptAlarm() {
