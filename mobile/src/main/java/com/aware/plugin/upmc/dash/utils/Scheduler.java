@@ -42,6 +42,7 @@ public class Scheduler {
         } else {
             pendingIntent = PendingIntent.getService(context, 0, intent, 0);
         }
+        assert alarmManager != null;
         alarmManager.cancel(pendingIntent);
 
     }
@@ -82,6 +83,7 @@ public class Scheduler {
         } else {
             pendingIntent = PendingIntent.getService(context, 0, intent, 0);
         }
+        assert alarmManager != null;
         alarmManager.cancel(pendingIntent);
 
     }

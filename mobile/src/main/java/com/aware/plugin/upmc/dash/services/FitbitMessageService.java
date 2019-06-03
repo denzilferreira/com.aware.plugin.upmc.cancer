@@ -848,10 +848,9 @@ public class FitbitMessageService extends Service {
                 PendingIntent.getService(getApplicationContext(), 668, alarmIntent_min, 0);
         assert myAlarmManager != null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,
-                    alarmPendingIntent_min);
-        }
-        else {
+            myAlarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis() + interval, alarmPendingIntent_min);
+        } else {
             myAlarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval,
                     alarmPendingIntent_min);
         }
