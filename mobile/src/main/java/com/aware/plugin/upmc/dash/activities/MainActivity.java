@@ -51,7 +51,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Random;
 
 import io.fabric.sdk.android.Fabric;
 import kotlin.Unit;
@@ -568,12 +567,13 @@ public class MainActivity extends AppCompatActivity {
             mBuilder.create().show();
             return true;
         } else if (title.equalsIgnoreCase("Sync")) {
+            sendBroadcast(new Intent(Aware.ACTION_AWARE_SYNC_DATA));
             Log.d(Constants.TAG, "MainActivity:Sync happened");
-            Random ran = new Random();
-            for (int i = 0; i < 1000; i++)
-                syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101),
-                        "DEBUG");
-            return true;
+//            Random ran = new Random();
+//            for (int i = 0; i < 1000; i++)
+//                syncSCWithServer(System.currentTimeMillis(), ran.nextInt(3), ran.nextInt(101),
+//                        "DEBUG");
+//            return true;
         }
         // do not disturb on
         else if (title.equalsIgnoreCase("Dnd1")) {
@@ -587,13 +587,13 @@ public class MainActivity extends AppCompatActivity {
         } else if (title.equalsIgnoreCase("About")) {
             Log.d(Constants.TAG, "MainActivity:Easter egg selected");
             Toast.makeText(getApplicationContext(), "UPMC Dash app", Toast.LENGTH_SHORT).show();
-            easter++;
-            if (easter == 3) {
-                Log.d(Constants.TAG, "Congratulations! You are a developer now!");
-                Intent intent = new Intent(this, EasterEgg.class);
-                startActivity(intent);
-
-            }
+//            easter++;
+//            if (easter == 3) {
+//                Log.d(Constants.TAG, "Congratulations! You are a developer now!");
+//                Intent intent = new Intent(this, EasterEgg.class);
+//                startActivity(intent);
+//
+//            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -710,7 +710,7 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.VISIBLE);
                         Aware.joinStudy(getApplicationContext(),
                                 "https://upmcdash.pittbotlab.org/aware-server/index" + ".php" +
-                                        "/webservice/index/8/NPJHTw5kC255");
+                                        "/webservice/index/22/QZP21cOI4pFO");
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))
                             sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);

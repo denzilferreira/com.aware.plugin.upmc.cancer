@@ -18,8 +18,8 @@ android {
         applicationId "com.aware.plugin.upmc.dash"
         minSdkVersion minimum_sdk
         targetSdkVersion target_sdk
-        versionCode 21
-        versionName "2.0.3"
+        versionCode 23
+        versionName "1.0.0"
         multiDexEnabled true
 
         //AWARE core sensors provider authority overrides
@@ -130,8 +130,8 @@ dependencies {
     api group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
 
     api 'com.google.firebase:firebase-crash:16.2.1'
-    api "com.crashlytics.sdk.android:crashlytics:2.9.9"
-    api 'com.google.firebase:firebase-core:16.0.7'
+    api "com.crashlytics.sdk.android:crashlytics:2.10.1"
+    api 'com.google.firebase:firebase-core:16.0.9'
 
     def work_version = "2.0.1"
 
