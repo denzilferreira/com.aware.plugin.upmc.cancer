@@ -450,8 +450,15 @@ public class MainActivity extends AppCompatActivity {
                 .equalsIgnoreCase(Constants.DEVICE_TYPE_CONTROL)) {
             for (int i = 0; i < menu.size(); i++) {
                 MenuItem item = menu.getItem(i);
-                if (item.getTitle().toString().equalsIgnoreCase("sync"))
+                if (item.getTitle().toString().equalsIgnoreCase("sync")) {
                     item.setVisible(false);
+                    if (Aware.isStudy(getApplicationContext()) && Aware
+                            .getSetting(getApplicationContext(),
+                                    Settings.PLUGIN_UPMC_CANCER_DEVICE_TYPE)
+                            .equalsIgnoreCase(Constants.DEVICE_TYPE_CONTROL)) {
+                        item.setVisible(true);
+                    }
+                }
                 if (item.getTitle().toString().equalsIgnoreCase("settings")) {
                     item.setVisible(false);
                     if (Aware.isStudy(getApplicationContext()) && Aware
@@ -709,8 +716,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(Constants.TAG, "MainActivity:showSettings: Joining Study");
                         progressBar.setVisibility(View.VISIBLE);
                         Aware.joinStudy(getApplicationContext(),
-                                "https://upmcdash.pittbotlab.org/aware-server/index" + ".php" +
-                                        "/webservice/index/22/QZP21cOI4pFO");
+                                "https://upmcdash.pittbotlab.org/aware-server/index" +
+                                        ".php/webservice/index/22/QZP21cOI4pFO\n");
                     } else {
                         if (!isMyServiceRunning(FitbitMessageService.class))
                             sendFitbitMessageServiceAction(Constants.ACTION_FIRST_RUN);
