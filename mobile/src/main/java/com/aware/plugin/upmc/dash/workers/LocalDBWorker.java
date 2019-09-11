@@ -173,7 +173,7 @@ public class LocalDBWorker extends Worker {
                 e1.printStackTrace();
             }
             e.printStackTrace();
-            return Result.retry();
+            return Result.failure();
         } catch (SQLException e) {
             Log.d(Constants.TAG, "LocalDBWorker:SQLException.. retrying..");
             try {
@@ -186,7 +186,7 @@ public class LocalDBWorker extends Worker {
                 e1.printStackTrace();
             }
             e.printStackTrace();
-            return Result.retry();
+            return Result.failure();
         } catch (IOException e) {
             Log.d(Constants.TAG, "LocalDBWorker:IOException.. retrying..");
             try {
