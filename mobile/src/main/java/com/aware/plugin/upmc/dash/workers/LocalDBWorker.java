@@ -32,6 +32,9 @@ public class LocalDBWorker extends Worker {
         super(context, workerParams);
     }
 
+
+    // 10 minutes after the specified evening time, every 24 hours.
+
     @NonNull
     @Override
     public Result doWork() {
@@ -199,7 +202,21 @@ public class LocalDBWorker extends Worker {
                 e1.printStackTrace();
             }
             e.printStackTrace();
-        } finally {
+        } catch (Exception e ) {
+            Log.d(Constants.TAG, "LocalDBWorker:GeneralException");
+            try {
+                LogFile.writeToFile("LocalDBWorker:GeneralException.. retrying..");
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                LogFile.writeToFile(e.toString());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+
+        finally {
             try {
                 if (stmt != null)
                     stmt.close();

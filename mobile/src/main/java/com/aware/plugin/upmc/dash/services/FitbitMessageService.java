@@ -1266,8 +1266,7 @@ public class FitbitMessageService extends Service {
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 stmt = conn.createStatement();
                 String sql =
-                        "CREATE TABLE Connection " + "(id int(11) not NULL AUTO_INCREMENT, " + " "
-                                + "status int(11) not NULL, " + " PRIMARY KEY ( id ))";
+                        "CREATE TABLE Connection(id int(11) not NULL AUTO_INCREMENT, timestamp double not NULL, status int(11) not NULL, PRIMARY KEY ( id ))";
                 stmt.executeUpdate(sql);
                 sql =
                         "CREATE TABLE PromptFromWatch " + "(id int(11) not NULL AUTO_INCREMENT, " + " session_id varchar(255) NULL, " + " message varchar(255) not NULL, " + " PRIMARY KEY ( id ))";

@@ -54,7 +54,7 @@ public class FileManager {
         stringBuilder.append(sc_count);
         stringBuilder.append("\t");
         stringBuilder.append(alarm);
-        stringBuilder.append("\n");
+        stringBuilder.append("\r\n");
         writer.append(stringBuilder.toString());
         writer.flush();
         writer.close();
