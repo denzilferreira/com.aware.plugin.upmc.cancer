@@ -21,3 +21,4 @@ mobile/gradlew.bat
 .DS_Store
 mobile/mobile.iml
 mobile/debug/output.json
+mobile/.DS_Store

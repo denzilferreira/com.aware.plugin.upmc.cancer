@@ -10,13 +10,21 @@ $pain = substr($reasons,-4,1);
 $nausea = substr($reasons,-3,1);
 $tired = substr($reasons,-2,1);
 $other = substr($reasons,-1,1);
-echo "Reasons are: " . $reasons . "<br>";
-$conn = new PDO('mysql:dbname=UPMC;host=127.0.0.1','root','');
+$response = array();
 try{
-    $result = $conn->exec("INSERT INTO responses_watch(timestamp,session_id,busy,pain,nausea,tired,other) VALUES('$unixTime','$sessionId','$busy','$pain','$nausea','$tired','$other')");
-	echo "Result is: " .$result . "<br>";
-} catch (Exception $e) {
-    echo $sql . "<br>" . $e->getMessage();
+	$conn = new PDO('mysql:dbname=UPMC;host=127.0.0.1','root','');
+	$result = $conn->exec("INSERT INTO responses_watch(timestamp,session_id,busy,pain,nausea,tired,other) VALUES('$unixTime','$sessionId','$busy','$pain','$nausea','$tired','$other')");
+	if($result) {
+		$response["error"] = false;
+		$response["message"] = "Success";
+	}else{
+		$response["error"] = true;
+		$response["message"] = "Insertion query failed";
+	}
+} catch(Exception $e){
+	$response["error"] = true;
+	$response["message"] = $e->getMessage();
 }
+echo json_encode($response);
 $conn = null;
 ?>
