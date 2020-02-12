@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:orientation="vertical"
+    android:id="@+id/inability_form"
+    android:layout_height="fill_parent">
+
+    <CheckBox
+        android:id="@+id/busy_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/no_busy_response"/>
+    <CheckBox
+        android:id="@+id/pain_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/no_pain_response"/>
+    <CheckBox
+        android:id="@+id/nausea_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/no_nausea_response"/>
+
+    <CheckBox
+        android:id="@+id/tired_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/no_response_tired"/>
+
+    <CheckBox
+        android:id="@+id/other_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckBoxClicked"
+        android:text="@string/no_other_response"/>
+
+    <EditText
+        android:id="@+id/reason_field"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/no_other_hint"
+        />
+
+    <Button
+        android:id="@+id/inability_submit"
+        android:text="@string/submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

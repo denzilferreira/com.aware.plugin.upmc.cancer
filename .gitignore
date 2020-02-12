@@ -1,7 +1,24 @@
-.gradle
-.idea
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
+.idea/*
+build/*
+wear/wear.iml
+*.iml
+.gradle/*
+wear/*
+local.properties mobile/ wear/
+local.properties mobile/mobile.iml wear/wear.iml
+local.properties
+*.iml
+*.properties
+*.apk
+*.iml
+*.apk
+*.iml
+*.iml
+mobile/.idea/
+mobile/gradle
+mobile/gradlew
+mobile/gradlew.bat
 .DS_Store
-/build
+mobile/mobile.iml
+mobile/debug/output.json
+mobile/.DS_Store

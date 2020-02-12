@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "657046898938",
+    "firebase_url": "https://comawarepluginupmccancer.firebaseio.com",
+    "project_id": "comawarepluginupmccancer",
+    "storage_bucket": "comawarepluginupmccancer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657046898938:android:a92cbd9ad8271572",
+        "android_client_info": {
+          "package_name": "com.aware.plugin.upmc.dash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "657046898938-iqgl528bilkj8f51nvi8d638k85sdssu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aware.plugin.upmc.dash",
+            "certificate_hash": "0f398e8c3170cda0903b9bd0032dc05deeb15dbf"
+          }
+        },
+        {
+          "client_id": "657046898938-8sr1ca10qphpm87q1uhc029h5669etml.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByhQPjKkBFKzgUqxH7wRCLFzgfcIZl3LI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "657046898938-8sr1ca10qphpm87q1uhc029h5669etml.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

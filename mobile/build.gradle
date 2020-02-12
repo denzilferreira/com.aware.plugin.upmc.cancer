@@ -1,0 +1,149 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+android {
+    compileSdkVersion compile_sdk
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        applicationId "com.aware.plugin.upmc.dash"
+        minSdkVersion minimum_sdk
+        targetSdkVersion target_sdk
+        versionCode 24
+        versionName "1.0.1"
+        multiDexEnabled true
+
+        //AWARE core sensors provider authority overrides
+//        resValue "string", "provider_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer"
+//        resValue "string", "provider_applications", android.defaultConfig.applicationId + ".provider.applications"
+        resValue "string", "provider_aware", android.defaultConfig.applicationId + ".provider.aware"
+//        resValue "string", "provider_barometer", android.defaultConfig.applicationId + ".provider.barometer"
+//        resValue "string", "provider_battery", android.defaultConfig.applicationId + ".provider.battery"
+//        resValue "string", "provider_bluetooth", android.defaultConfig.applicationId + ".provider.bluetooth"
+//        resValue "string", "provider_communication", android.defaultConfig.applicationId + ".provider.communication"
+//        resValue "string", "provider_esm", android.defaultConfig.applicationId + ".provider.esm"
+//        resValue "string", "provider_gravity", android.defaultConfig.applicationId + ".provider.gravity"
+//        resValue "string", "provider_gyroscope", android.defaultConfig.applicationId + ".provider.gyroscope"
+//        resValue "string", "provider_installations", android.defaultConfig.applicationId + ".provider.installations"
+//        resValue "string", "provider_keyboard", android.defaultConfig.applicationId + ".provider.keyboard"
+//        resValue "string", "provider_light", android.defaultConfig.applicationId + ".provider.light"
+//        resValue "string", "provider_linear_accelerometer", android.defaultConfig.applicationId + ".provider.accelerometer.linear"
+//        resValue "string", "provider_locations", android.defaultConfig.applicationId + ".provider.locations"
+//        resValue "string", "provider_magnetometer", android.defaultConfig.applicationId + ".provider.magnetometer"
+//        resValue "string", "provider_network", android.defaultConfig.applicationId + ".provider.network"
+//        resValue "string", "provider_processor", android.defaultConfig.applicationId + ".provider.processor"
+//        resValue "string", "provider_proximity", android.defaultConfig.applicationId + ".provider.proximity"
+//        resValue "string", "provider_rotation", android.defaultConfig.applicationId + ".provider.rotation"
+//        resValue "string", "provider_screen", android.defaultConfig.applicationId + ".provider.screen"
+//        resValue "string", "provider_significant", android.defaultConfig.applicationId + ".provider.significant"
+//        resValue "string", "provider_telephony", android.defaultConfig.applicationId + ".provider.telephony"
+//        resValue "string", "provider_temperature", android.defaultConfig.applicationId + ".provider.temperature"
+//        resValue "string", "provider_timezones", android.defaultConfig.applicationId + ".provider.timezone"
+//        resValue "string", "provider_traffic", android.defaultConfig.applicationId + ".provider.traffic"
+//        resValue "string", "provider_wifi", android.defaultConfig.applicationId + ".provider.wifi"
+
+        //Bundled plugins provider authority overrides
+//        resValue "string", "provider_google_activity_recognition", android.defaultConfig.applicationId + ".provider.gar"
+        resValue "string", "provider_upmc", android.defaultConfig.applicationId + ".provider.survey"
+
+
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+    }
+
+    signingConfigs {
+        release
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
+}
+
+if (System.getenv("storeFile") != null && System.getenv("storePassword") != null && System.getenv("keyAlias") != null && System.getenv("keyPassword") != null) {
+    android.signingConfigs.release.storeFile = file(System.getenv("storeFile"))
+    android.signingConfigs.release.storePassword = System.getenv("storePassword")
+    android.signingConfigs.release.keyAlias = System.getenv("keyAlias")
+    android.signingConfigs.release.keyPassword = System.getenv("keyPassword")
+} else {
+    println("No keystore defined. Unsigned!")
+    android.buildTypes.release.signingConfig = null
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+
+dependencies {
+    //AWARE is now self-contained. No more leftover dependencies!
+    api 'com.ramotion.fluidslider:fluid-slider:0.3.0'
+    api "com.github.denzilferreira:aware-client:4.0.810"
+//    api "com.github.denzilferreira:com.aware.plugin.google.activity_recognition:$aware_libs"
+    api "com.google.android.gms:play-services-wearable:$google_libs"
+//    api "com.android.support:design:$support_libs"
+//    api "com.android.support:support-v4:$support_libs"
+//    api "com.android.support:gridlayout-v7:$support_libs"
+//    api 'com.android.support.constraint:constraint-layout:1.1.3'
+    api "com.google.android.gms:play-services-wearable:$google_libs"
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    api group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+
+    api 'com.google.firebase:firebase-crash:16.2.1'
+    api "com.crashlytics.sdk.android:crashlytics:2.10.1"
+    api 'com.google.firebase:firebase-core:17.2.0'
+
+    def work_version = "2.0.1"
+
+    // (Java only)
+    implementation "androidx.work:work-runtime:$work_version"
+
+
+    // optional - RxJava2 support
+    implementation "androidx.work:work-rxjava2:$work_version"
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+}
+
+apply plugin: 'com.google.gms.google-services'

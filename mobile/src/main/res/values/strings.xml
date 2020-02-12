@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">UPMC DASH</string>
+    <string name="plugin_upmc_dash">Plugin: UPMC Dash</string>
+    <string name="cancer_intro">Please rate how severe the following symptoms are <b><u>right now</u></b> from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be).</string>
+    <string name="dash_intro">Please choose Yes or Not to indicate whether you experienced the following symptoms <b><u>in the last 24 hours.</u></b> For any symptoms marked as Yes, rate how severe the symptom was in the last 24 hours from 0 (symptom not present) to 10 (symptom was as bad as you can imagine it could be)</string>
+    <string name="evening_intro">What was the most stressful or negative event you experienced today?</string>
+    <string name="aware_description">This service makes sure the application is running at all times. Please activate it during the study.</string>
+    <string name="aware_activate_accessibility">Activate UPMC DASH in the accessibility services.</string>
+    <string name="title_activity_main">UPMC DASH</string>
+    <string name="title_activity_inability_response_form">InabilityResponseForm</string>
+    <string name="title_activity_demo_esm">DemoESM</string>
+
+    <string name="title_activity_wear_status">WearStatusActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_notification_response">Your Response</string>
+    <string name="title_activity_demo_mode">DemoMode</string>
+    <string name="title_activity_inability_response">InabilityResponseActivity</string>
+
+
+    <string name="symptom1">Pain</string>
+    <string name="symptom2">Fatigue/Tiredness</string>
+    <string name="symptom3">Sleep Disturbance</string>
+    <string name="symptom4">Trouble Concentrating/Remembering Things</string>
+    <string name="symptom5">Feel Sad/Down</string>
+    <string name="symptom6">Feel Anxious/Worried</string>
+    <string name="symptom7">Shortness of Breath</string>v
+    <string name="symptom8">Numbness/Tingling</string>
+    <string name="symptom9">Nausea</string>
+    <string name="symptom10">Diarrhea/Constipation</string>
+    <string name="symptom11">Dizziness/lightheadedness</string>
+    <string name="symptom12">Other</string>
+
+    <string name="rb1_text">Yes</string>
+    <string name="rb2_text">No</string>
+    <string name="img_btn_text"></string>
+    <string name="save_btn_text">Save answers</string>
+    <string name="regular">Regular</string>
+    <string name="control">Control</string>
+    <string name="choose_participant_type">Choose participant type:</string>
+
+    <string name="other_hint"><font size="18">Please specify</font></string>
+    <string name="join_btn_text">Join Study</string>
+    <string name="join_btn_saving_txt">Saving Schedule....</string>
+    <string name="i_went_to_bed_last_night_at">I went to bed last night at:</string>
+    <string name="i_got_out_of_bed_this_morning_at">I got out of bed this morning at:</string>
+    <string name="last_night_my_sleep_was">Last night my sleep was:</string>
+    <string name="very_good">Very good</string>
+    <string name="fairly_good">Fairly good</string>
+    <string name="fairly_bad">Fairly bad</string>
+    <string name="very_bad">Very bad</string>
+    <string name="settings">Settings</string>
+    <string name="participant">Participant</string>
+    <string name="sync">Sync</string>
+    <string name="easter">About</string>
+    <string name="do_not_disturb">Dnd1</string>
+    <string name="ok_response">OK!</string>
+    <string name="no_response">NO</string>
+    <string name="snooze_response">SNOOZE</string>
+    <string name="no_busy_response">Busy</string>
+    <string name="no_pain_response">Pain</string>
+    <string name="no_nausea_response">Nausea</string>
+    <string name="no_other_response">Other</string>
+    <string name="no_other_hint">Please enter reason here</string>
+    <string name="submit">SUBMIT</string>
+    <string name="no_response_tired">Tired</string>
+
+
+</resources>

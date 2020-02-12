@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:animateLayoutChanges="true">
+
+    <TextView
+        android:id="@+id/mobility_question"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ready for a two minute walk?"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="normal|bold" />
+
+    <RadioGroup
+        android:id="@+id/walking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/walking_yes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ok!"
+            android:layout_marginBottom="16dp" />
+
+        <RadioButton
+            android:id="@+id/walking_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Not able to walk now"
+            android:layout_marginBottom="16dp" />
+
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/rationale"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <CheckBox
+            android:id="@+id/busy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Busy" />
+
+        <CheckBox
+            android:id="@+id/pain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pain" />
+
+        <CheckBox
+            android:id="@+id/nausea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nausea" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/symptom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other symptom:" />
+
+            <EditText
+                android:id="@+id/other_symptom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Symptom?"
+                android:inputType="textPersonName"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/reason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other reason:" />
+
+            <EditText
+                android:id="@+id/other_reason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Reason?"
+                android:inputType="textPersonName"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/already_walked"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Already walked/walking" />
+
+        <CheckBox
+            android:text="Snooze (prompt later)"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/snoozed" />
+
+    </LinearLayout>
+
+    <Button
+        android:text="Dismiss"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/motivation_dismiss"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        android:textStyle="normal|bold"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

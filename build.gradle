@@ -1,16 +1,54 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+project.ext {
+
+    apply from: 'https://raw.githubusercontent.com/denzilferreira/aware-client/master/aware-core/aware.gradle'
+//    mqtt_libs = (System.getenv("mqtt_libs") as String ?: "1.1.0")
+//    mobile_support_libs = (System.getenv("mobile_support_libs") as String ?: "27.1.0")
+//    wear_support_libs = (System.getenv("wear_support_libs") as String ?: "26.1.0")
+//    google_libs = (System.getenv("google_libs") ?: "12.0.0")
+//    version_code = (System.getenv("aware_revision") as Integer ?: 700)
+//    version_readable = "4.0." + version_code + "." + (System.getenv("aware_label") as String ?: "selfie")
+//    compile_sdk = (System.getenv("compile_sdk") as Integer ?: 26)
+//    mobile_target_sdk = (System.getenv("mobile_target_sdk") as Integer ?: 25)
+//    wear_target_sdk = (System.getenv("wear_target_sdk") as Integer ?: 26)
+//    mobile_min_sdk = (System.getenv("mobile_min_sdk") as Integer ?: 19) //Android 4.0+
+//    wear_min_sdk = (System.getenv("wear_min_sdk") as Integer ?: 24)
+//    build_tools = (System.getenv("build_tools") ?: "27.0.3")
+//    aware_libs = (System.getenv("aware_libs") as String ?: "development-SNAPSHOT")
+//    gradle_version = (System.getenv("gradle_version") as String ?: "3.1.0")
+}
 
 buildscript {
     repositories {
+        maven {
+            url 'https://maven.google.com'
+        }
+
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
+
+        maven { url "https://jitpack.io" }
+
+        mavenCentral()
         jcenter()
+        google()
+
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.google.gms:google-services:4.3.2'
+        classpath 'io.fabric.tools:gradle:1.31.0'
     }
 }
 
 allprojects {
     repositories {
+        maven {
+            url 'https://maven.google.com'
+        }
+        google()
         jcenter()
+        mavenCentral()
     }
 }

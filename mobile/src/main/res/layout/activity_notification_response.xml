@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:orientation="vertical">
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/radio_group"
+        android:orientation="vertical">
+        <RadioButton android:id="@+id/radio_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ok_response"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_response"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_snooze"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/snooze_response"
+            android:onClick="onRadioButtonClicked"/>
+    </RadioGroup>
+    <Button
+        android:id="@+id/submit_response"
+        android:text="SUBMIT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="submitResponse"/>
+</LinearLayout>
